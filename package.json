@@ -1,18 +1,20 @@
 {
   "private": true,
   "scripts": {
-    "prod": "gulp --production",
-    "dev": "gulp watch"
+    "postinstall": "rollup -c && node-sass resources/assets/sass/app.scss > public/css/app.css",
+    "sass": "node-sass resources/assets/sass/app.scss > public/css/app.css",
+    "build": "rollup -c",
+    "dev": "wrollup --live"
   },
-  "devDependencies": {
+  "dependencies": {
     "bootstrap-sass": "^3.3.7",
-    "gulp": "^3.9.1",
-    "jquery": "^3.1.0",
-    "laravel-elixir": "^6.0.0-14",
-    "laravel-elixir-vue-2": "^0.2.0",
-    "laravel-elixir-webpack-official": "^1.0.2",
-    "lodash": "^4.16.2",
-    "vue": "^2.0.1",
-    "vue-resource": "^1.0.3"
-  }
+    "node-sass": "^3.13.0",
+    "rollup": "^0.36.4",
+    "rollup-plugin-buble": "^0.14.0",
+    "rollup-plugin-livereload": "^0.3.1",
+    "rollup-plugin-vue2": "^0.6.0"
+  },
+  "name": "openinghours",
+  "description": "Manage and publish opening hours",
+  "repository": "https://github.com/weconnectdata/openinghours"
 }

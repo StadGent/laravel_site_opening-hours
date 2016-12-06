@@ -1,0 +1,172 @@
+[{
+	"@type": "Service",
+	"id": "dav",
+	"updated_at": "2016-02-09T21:08:48",
+	"updated_by": "Jozef",
+	"label": "Dienst administratieve vereenvoudiging",
+	"availableChannel": [{
+		"@type": "Channel",
+		"label": "Loket",
+		"hours": {
+			"@type": "oh:OpeningHours",
+			"calendar": [{
+				"@type": "oh:Calendar",
+				"oh:closinghours": true,
+				"label": "Super uitzonderingen",
+				"rdfcal": [{
+					"@type": "ical:Vevent",
+					"ical:dtstart": "2003-03-11T16:00:00",
+					"ical:rrule": {
+						"@id": "_:b1",
+						"ical:byday": "SU,WE,TH,FR,SA",
+						"ical:freq": "WEEKLY",
+						"ical:interval": "1"
+					},
+					"ical:summary": "Open Tue 4-11p"
+				}]
+			}, {
+				"@type": "oh:Calendar",
+				"oh:closinghours": true,
+				"label": "Nationale feestdagen",
+				"rdfcal": [{
+					"@type": "ical:Vevent",
+					"ical:dtstart": "2003-03-11T16:00:00",
+					"ical:rrule": {
+						"@id": "_:b1",
+						"ical:byday": "SU,WE,TH,FR,SA",
+						"ical:freq": "WEEKLY",
+						"ical:interval": "1"
+					},
+					"ical:summary": "Open Tue 4-11p"
+				}]
+			}, {
+				"@type": "oh:Calendar",
+				"oh:closinghours": true,
+				"label": "Normale uren",
+				"rdfcal": [{
+					"@type": "ical:Vevent",
+					"ical:dtstart": "2003-03-11T16:00:00",
+					"ical:rrule": {
+						"@id": "_:b1",
+						"ical:byday": "SU,WE,TH,FR,SA",
+						"ical:freq": "WEEKLY",
+						"ical:interval": "1"
+					},
+					"ical:summary": "Open Tue 4-11p"
+				}]
+			}]
+		}
+	}, {
+		"label": "Zwembad",
+		"hours": {
+			"@type": "oh:OpeningHours",
+			"calendar": [{
+				"@type": "oh:Calendar",
+				"oh:closinghours": true,
+				"label": "Normale uren",
+				"rdfcal": [{
+					"@type": "ical:Vevent",
+					"ical:dtstart": "2003-03-11T16:00:00",
+					"ical:rrule": {
+						"@id": "_:b1",
+						"ical:byday": "SU,WE,TH,FR,SA",
+						"ical:freq": "WEEKLY",
+						"ical:interval": "1"
+					}
+				}]
+			}]
+		}
+	}, {
+		"label": "Telefoon",
+		"hours": {
+			"@type": "oh:OpeningHours",
+			"calendar": []
+		}
+	}]
+}, {
+	"@type": "Service",
+	"id": "a",
+	"updated_at": "2016-12-06T14:29:57",
+	"updated_by": "Maria",
+	"label": "Bibliotheek Zuid",
+	"availableChannel": [{
+		"@type": "Channel",
+		"label": "Verhuur",
+		"hours": {
+			"@type": "oh:OpeningHours",
+			"calendar": []
+		}
+	}]
+},  {
+	"@type": "Service",
+	"id": "b",
+	"updated_at": "2016-12-06T14:29:57",
+	"updated_by": "Maria",
+	"label": "Dienst Rekrutering en Selectie",
+	"availableChannel": [{
+		"@type": "Channel",
+		"label": "Verhuur",
+		"hours": {
+			"@type": "oh:OpeningHours",
+			"calendar": [{
+				"@type": "oh:Calendar",
+				"oh:closinghours": true,
+				"label": "Normale uren",
+				"rdfcal": [{
+					"@type": "ical:Vevent",
+					"ical:dtstart": "2003-03-11T16:00:00",
+					"ical:rrule": {
+						"@id": "_:b1",
+						"ical:byday": "SU,WE,TH,FR,SA",
+						"ical:freq": "WEEKLY",
+						"ical:interval": "1"
+					},
+					"ical:summary": "Open Tue 4-11p"
+				}]
+			}]
+		}
+	}]
+},  {
+	"@type": "Service",
+	"id": "c",
+	"updated_at": "2016-12-06T14:29:57",
+	"updated_by": "Maria",
+	"label": "Pedagogische Begeleiding Dienst Kinderopvang",
+	"availableChannel": [{
+		"@type": "Channel",
+		"label": "Verhuur",
+		"hours": {
+			"@type": "oh:OpeningHours",
+			"calendar": [{
+				"@type": "oh:Calendar",
+				"oh:closinghours": true,
+				"label": "Normale uren",
+				"rdfcal": []
+			}]
+		}
+	}]
+}, {
+	"@type": "Service",
+	"id": "d",
+	"label": "Dienst Wegen"
+}, {
+	"@type": "Service",
+	"id": "e",
+	"label": "Dienst Mobiliteitsbedrijf"
+}, {
+	"@type": "Service",
+	"id": "f",
+	"label": "Dienst Werken en Ondernemen"
+}, {
+	"@type": "Service",
+	"id": "g",
+	"label": "Dienst Milieu en Natuur"
+}, {
+	"@type": "Service",
+	"id": "h",
+	"label": "OCMW Gent - Lokaal Dienstencentrum De Horizon"
+}, {
+	"@type": "Service",
+	"id": "i",
+	"label": "Dienst Beleidsparticipatie"
+}]

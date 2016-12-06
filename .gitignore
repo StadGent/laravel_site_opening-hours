@@ -6,3 +6,11 @@
 Homestead.json
 Homestead.yaml
 .env
+
+/notes
+/npm-debug.log
+
+/public/js/*
+!/public/js/chunks
+/public/css/*
+!/public/js/vendor
