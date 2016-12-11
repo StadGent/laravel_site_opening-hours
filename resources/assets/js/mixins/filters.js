@@ -14,7 +14,7 @@ function date(d) {
   d = new Date(+d + 6e4 * d.getTimezoneOffset())
   var diff = new Date() - d
   if (diff > 1000 * 60 * 60 * 24) {
-    return d.getHours() + ':' + d.getSeconds() + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()]
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getHours() + ':' + d.getSeconds()
   }
   if (diff > 1000 * 60 * 60) {
     console.log((diff / 36e5))

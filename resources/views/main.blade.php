@@ -22,6 +22,15 @@
   --}}
 
   <script src="{{ asset('js/chunks/vendor.min.js') }}"></script>
+  <script src="{{ asset('js/chunks/lib.js') }}"></script>
+
+  @if (env('APP_DEBUG'))
+  <script type="text/javascript">
+  Vue.config.debug = true
+  Vue.config.devtools = true
+  </script>
+  @endif
+
   <script src="{{ asset('js/bundle.js') }}"></script>
 </body>
 

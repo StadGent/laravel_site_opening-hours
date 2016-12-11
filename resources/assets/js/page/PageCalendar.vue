@@ -1,6 +1,10 @@
 <template>
   <div class="container">
     <h1>{{ cal.label || 'Kalender zonder naam' }}</h1>
+    <div style="padding-top:10em">
+      <h3>Debug info</h3>
+      <pre v-text="cal"></pre>
+    </div>
   </div>
 </template>
 
@@ -23,7 +27,7 @@ export default {
       if (!channel) {
         return {}
       }
-      return channel.hours.calendar[this.route.calendar] || {}
+      return channel.oh.calendar[this.route.calendar] || {}
     }
   }
 }

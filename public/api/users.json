@@ -1,0 +1,74 @@
+[{
+  "id": 1,
+  "email": "admin@mijngent.be",
+  "name": "Administrator",
+  "verified": true,
+  "roles": [],
+  "admin": true
+}, {
+  "id": 2,
+  "email": "annemie@mijngent.be",
+  "name": "Annemie",
+  "verified": true,
+  "roles": [{
+    "service": 1,
+    "role": "owner"
+  }, {
+    "service": 2,
+    "role": "owner"
+  }, {
+    "service": 3,
+    "role": "owner"
+  }]
+}, {
+  "id": 3,
+  "email": "bob@mijngent.be",
+  "name": "Bob",
+  "verified": true,
+  "roles": [{
+    "service": 1,
+    "role": "basic"
+  }, {
+    "service": 4,
+    "role": "basic"
+  }, {
+    "service": 5,
+    "role": "owner"
+  }]
+}, {
+  "id": 4,
+  "email": "carol@mijngent.be",
+  "name": "Carol",
+  "verified": true,
+  "roles": [{
+    "service": 1,
+    "role": "basic"
+  }, {
+    "service": 5,
+    "role": "basic"
+  }]
+}, {
+  "id": 5,
+  "email": "david@mijngent.be",
+  "name": "",
+  "verified": false,
+  "roles": [{
+    "service": 1,
+    "role": "owner"
+  }, {
+    "service": 3,
+    "role": "basic"
+  }]
+}, {
+  "id": 6,
+  "email": "erwin@mijngent.be",
+  "name": "",
+  "verified": false,
+  "roles": [{
+    "service": 1,
+    "role": "basic"
+  }, {
+    "service": 4,
+    "role": "owner"
+  }]
+}]

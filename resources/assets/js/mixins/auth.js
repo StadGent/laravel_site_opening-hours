@@ -1,8 +1,18 @@
-export const user = window.initialUser || {
+import { expandUser } from './users.js'
+
+const userDefault = {
   id: 1,
   name: 'Voornaam Naam',
-  groups: []
+  roles: [],
+  admin: false,
+  owner: false,
+  basic: true
 }
+lsDefault('user', userDefault)
+
+Object.assign(userDefault, window.initialUser || ls('user'))
+
+export const user = expandUser(userDefault)
 
 export default {
   data () {
@@ -10,7 +20,26 @@ export default {
       user
     }
   },
-  computed () {
+  computed: {
+    isOwner () {
+      return this.user.admin || (this.user.roles.find(r => r.service == this.route.service) || {}).role === 'owner'
+    }
+  }
+}
 
+export const rootAuthMixin = {
+  mounted () {
+    setTimeout(() => {
+      ls('user', this.user)
+    }, 1000)
+  },
+  watch: {
+    user: {
+      deep: true,
+      handler  (v) {
+        console.log('Update user', inert(this.user))
+        ls('user', v)
+      }
+    }
   }
 }

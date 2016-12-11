@@ -1,7 +1,17 @@
 export const route = window.initialRoute || {
   uri: '/',
   page: 'home',
-  id: 'home'
+  tab: null,
+  tab2: null,
+  id: 'home',
+  offset: 0,
+  service: -1,
+  channel: -1,
+  calendar: -1
+}
+
+function hasCalendarSelected(hash) {
+  return ['service', 'channel', 'calendar'].indexOf(hash.split(':')[0]) !== -1
 }
 
 export const addListener = {
@@ -17,24 +27,22 @@ export const addListener = {
       var hash = window.location.hash
       if (hash.startsWith('#!')) {
         hash = hash.slice(2).split('/')
-        if (hash[0] == 'service') {
-          this.route.page = hash[3] ? 'calendar' : hash[2] ? 'channel' : hash[1] ? 'service' : 'home'
-          this.$set(this.route, 'service', hash[1])
-          this.$set(this.route, 'channel', parseInt(hash[2] || 0))
-          this.$set(this.route, 'calendar', parseInt(hash[3] || 0))
-        } else {
-          this.route.page = hash[0]
-          this.route.id = hash[1]
+        if (hasCalendarSelected(hash[0])) {
+          route.service = parseInt(hash[1] || -1)
+          route.channel = parseInt(hash[2] || -1)
+          route.calendar = parseInt(hash[3] || -1)
         }
+        route.page = hash[0]
+        route.id = hash[1]
       } else {
-        this.route.page = window.location.hash.slice(1) || 'home'
+        route.page = window.location.hash.slice(1) || 'home'
       }
-      // var colon = window.location.hash.indexOf(':')
-      // if (colon > 4) {
-      //  this.route.page = window.location.hash.slice(2, colon)
-      //  this.$emit('id', window.location.hash.slice(1 + window.location.hash.indexOf(':')))
-      // } else {
-      // }
+
+      if (hasCalendarSelected(this.route.page)) {
+        window.location.replace('#!' + [route.page, route.service, route.channel, route.calendar].join('/'))
+      }
+
+      return false
     }
   }
 }
@@ -43,6 +51,24 @@ export default {
   data() {
     return {
       route
+    }
+  },
+  methods: {
+    href(v) {
+      window.location.href = v
+    },
+    toChannel(c) {
+      console.log(c)
+      route.page = 'channel'
+      route.channel = parseInt(c || 0)
+    },
+    toCalendar(c) {
+      route.page = 'calendar'
+      route.calendar = parseInt(c || 0)
+    },
+    refresh(c) {
+      route.page = 'calendar'
+      route.calendar = parseInt(c || 0)
     }
   }
 }
