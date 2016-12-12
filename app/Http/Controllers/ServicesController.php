@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ServicesController extends Controller
 {
@@ -34,7 +35,7 @@ class ServicesController extends Controller
             ],
             [
                 'label' => 'Bib Zuid',
-                'uri' => 'http://stad.gent/bib-zuid'
+                'uri' => 'http://stad.gent/bib-zuid',
                 'channels' => [
                     'id' => 2,
                     'label' => 'loket',

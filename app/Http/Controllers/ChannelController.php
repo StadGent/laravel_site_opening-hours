@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\OpeninghoursRepository;
+use App\Repositories\ChannelRepository;
 
-class OpeninghoursController extends Controller
+class ChannelController extends Controller
 {
-    public function __construct(OpeninghoursRepository $openinghours)
+    public function __construct(ChannelRepository $channels)
     {
-        $this->openinghours = $openinghours;
+        $this->channels = $channels;
     }
 
     /**
@@ -42,15 +42,13 @@ class OpeninghoursController extends Controller
     {
         $input = $request->input();
 
-        $id = $this->openinghours->store($input);
+        $channel = $this->channels->getById($id);
 
-        $openinghours = $this->openinghours->getById($id);
-
-        if (! empty($openinghours)) {
-            return response()->json($openinghours);
+        if (! empty($channel)) {
+            return response()->json($channel);
         }
 
-        return response()->json(['message' => 'Something went wrong while storing the new openingshours, check the logs.'], 400);
+        return response()->json(['message' => 'Something went wrong while storing the new channel, check the logs.'], 400);
     }
 
     /**
@@ -61,7 +59,7 @@ class OpeninghoursController extends Controller
      */
     public function show($id)
     {
-        //
+        throw new Exception('Not yet implemented');
     }
 
     /**
@@ -72,7 +70,7 @@ class OpeninghoursController extends Controller
      */
     public function edit($id)
     {
-        //
+        throw new Exception('Not yet implemented');
     }
 
     /**
@@ -86,13 +84,13 @@ class OpeninghoursController extends Controller
     {
         $input = $request->input();
 
-        $success = $this->openinghours->update($id, $input);
+        $success = $this->channels->update($id, $input);
 
         if ($success) {
-            return response()->json($this->openinghours->getById($id));
+            return response()->json($this->channels->getById($id));
         }
 
-        return response()->json(['message' => 'Something went wrong while updating the openinghours, check the logs.'], 400);
+        return response()->json(['message' => 'Something went wrong while updating the channel, check the logs.'], 400);
     }
 
     /**
@@ -103,6 +101,6 @@ class OpeninghoursController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $this->channels->delete($id);
     }
 }
