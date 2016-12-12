@@ -46,26 +46,33 @@
       <table v-else class="table">
         <thead>
           <tr>
-            <th>Kanaal</th>
-            <th>Geldig tot</th>
-            <th>Bewerk</th>
+            <th-sort by="label">Kanaal</th-sort>
+            <th-sort by="status">Status</th-sort>
+            <th-sort by="updated_at">Laatst aangepast</th-sort>
+            <th class="text-right">Verwijder</th>
+            <th class="text-right">Bewerk</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(channel, index) in filteredChannels">
+          <tr v-for="(channel, index) in filteredChannels" @click="href('#!channel/'+[srv.id,index].join('/'))">
             <td>
               <a :href="'#!channel/'+[srv.id,index].join('/')">{{ channel.label }}</a>
             </td>
-            <td>{{ channel.dtend }}</td>
-            <td>
-              <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-warning">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 528.899 528.899">
-                  <path d="M328.883,89.125l107.59,107.589l-272.34,272.34L56.604,361.465L328.883,89.125z M518.113,63.177l-47.981-47.981 c-18.543-18.543-48.653-18.543-67.259,0l-45.961,45.961l107.59,107.59l53.611-53.611 C532.495,100.753,532.495,77.559,518.113,63.177z M0.3,512.69c-1.958,8.812,5.998,16.708,14.811,14.565l119.891-29.069 L27.473,390.597L0.3,512.69z"/>
-                </svg>
+            <td>{{ channel | toChannelStatus }}</td>
+            <td class="text-muted">
+              <div>{{ channel.updated_at | date }}</div>
+              <div>{{ channel.updated_by }}</div>
+            </td>
+            <td class="text-right">
+              <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-default">
+                <i class="glyphicon glyphicon-trash"></i>
               </a>
             </td>
-            <td></td>
-            <td></td>
+            <td class="text-right">
+              <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-primary">
+                <i class="glyphicon glyphicon-pencil"></i>
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -82,7 +89,7 @@
 import ThSort from '../components/ThSort.vue'
 import RowUserOwner from '../components/RowUserOwner.vue'
 
-import { orderBy } from '../lib.js'
+import { toChannelStatus, orderBy } from '../lib.js'
 
 export default {
   name: 'dienst',
@@ -123,6 +130,9 @@ export default {
     sortedUsers () {
       return this.order ? this.filteredUsers.slice().sort(orderBy(this.order)) : this.filteredUsers
     }
+  },
+  filters: {
+    toChannelStatus
   },
   components: {
     RowUserOwner,

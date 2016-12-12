@@ -3,6 +3,7 @@
 
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "vendor/bootstrap-year";
 
 /* container maybe max-width to 100% */
 
@@ -150,6 +151,86 @@ h1+h3 {
 .slideup-enter,
 .slideup-leave-active {
   transform: translateY(100%);
+}
+
+/* Version > Preview */
+
+.version-split {
+  position: fixed;
+  top: 217px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #ccc;
+  background: #fff;
+  &>div {
+    height: 100%;
+    overflow: auto;
+  }
+}
+.version-cals {
+  width: 30em;
+}
+.version-preview {
+  border-left: 1px solid #ccc;
+  padding-top: 1em;
+  width: calc(100% - 30em);
+}
+.calendar {
+  overflow: hidden;
+}
+.calendar .month-container {
+  min-width: 180px;
+  text-align: center;
+  height: 200px;
+  padding: 0;
+}
+
+/* Version > Cals */
+
+.cal {
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  &:last-child {
+    border-bottom: 1px solid #ddd;
+  }
+  /* Colors */
+  &:nth-child(1) .cal-img {
+    background-color: red;
+    color: white;
+  }
+  &:nth-child(2) .cal-img {
+    background-color: blue;
+    color: white;
+  }
+  &:nth-child(3) .cal-img {
+    background-color: yellow;
+  }
+}
+.cal-header {
+  line-height: 32px;
+}
+.cal-options {
+  float: right;
+}
+.cal-img {
+  float: left;
+  margin-right: 1rem;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 4px;
+}
+.cal-higher,
+.cal-lower,
+.cal-view,
+.cal-drag {
+  margin-left: 1em
+}
+.cal-drag {
+  font-size: 12px;
 }
 
 /* Modal > Content */

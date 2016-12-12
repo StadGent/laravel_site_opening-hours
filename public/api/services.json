@@ -11,7 +11,7 @@
 			"@type": "oh:OpeningHours",
 			"active": true, 
 			"dtstart": "2012-01-01",
-			"dtend": "2016-12-31",
+			"dtend": "2015-06-31",
 			"calendar": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
@@ -64,7 +64,7 @@
 			"@type": "oh:OpeningHours",
 			"active": true,
 			"dtstart": "2012-01-01",
-			"dtend": "2016-12-31",
+			"dtend": "2017-12-31",
 			"calendar": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
@@ -87,7 +87,7 @@
 			"@type": "oh:OpeningHours",
 			"active": true, 
 			"dtstart": "2012-01-01",
-			"dtend": "2016-12-31",
+			"dtend": "2017-06-31",
 			"calendar": []
 		}]
 	}]

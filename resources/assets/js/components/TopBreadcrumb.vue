@@ -15,10 +15,13 @@
       <li v-if="!route.tab&&route.service>-1" :class="{active:route.page=='service'}">
         <a href="#service">{{ srv.label }}</a>
       </li>
-      <li v-if="!route.tab&&route.channel>-1" :class="{active:route.page=='channel'}">
+      <li v-if="!route.tab&&level>1&&route.channel>-1" :class="{active:route.page=='channel'}">
         <a href="#channel">Kanaal {{ route.channel + 1 }}</a>
       </li>
-      <li v-if="!route.tab&&route.calendar>-1" :class="{active:route.page=='calendar'}">
+      <li v-if="!route.tab&&level>2&&route.version>-1" :class="{active:route.page=='version'}">
+        <a href="#version">Versie {{ route.version + 1 }}</a>
+      </li>
+      <li v-if="!route.tab&&level>3&&route.calendar>-1" :class="{active:route.page=='calendar'}">
         <a href="#calendar">Kalender {{ route.calendar + 1 }}</a>
       </li>
 
@@ -48,6 +51,15 @@ export default {
     },
     channels () {
       return this.srv && this.srv.availableChannel || []
+    },
+    level () {
+      switch(this.route.page) {
+        case 'service': return 1
+        case 'channel': return 2
+        case 'version': return 3
+        case 'calendar': return 4
+      }
+      return 0
     }
   }
 }

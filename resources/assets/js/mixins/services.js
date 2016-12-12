@@ -8,6 +8,20 @@ export default {
       services
     }
   },
+  computed: {
+    routeService () {
+      return this.services.find(s => s.id === this.route.service) || {}
+    },
+    routeChannel () {
+      return this.routeService.availableChannel && this.routeService.availableChannel[this.route.channel] || {}
+    },
+    routeVersion () {
+      return this.routeChannel.oh && this.routeChannel.oh[this.route.version] || {}
+    },
+    routeCalendar () {
+      return this.routeVersion.calendar && this.routeVersion.calendar[this.route.calendar] || {}
+    }
+  },
   methods: {
     fetchServices () {
       return this.$http.get('/api/services.json')

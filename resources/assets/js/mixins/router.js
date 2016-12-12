@@ -7,11 +7,12 @@ export const route = window.initialRoute || {
   offset: 0,
   service: -1,
   channel: -1,
+  version: -1,
   calendar: -1
 }
 
 function hasCalendarSelected(hash) {
-  return ['service', 'channel', 'calendar'].indexOf(hash.split(':')[0]) !== -1
+  return ['service', 'channel', 'version', 'calendar'].indexOf(hash.split(':')[0]) !== -1
 }
 
 export const addListener = {
@@ -30,7 +31,8 @@ export const addListener = {
         if (hasCalendarSelected(hash[0])) {
           route.service = parseInt(hash[1] || -1)
           route.channel = parseInt(hash[2] || -1)
-          route.calendar = parseInt(hash[3] || -1)
+          route.version = parseInt(hash[3] || -1)
+          route.calendar = parseInt(hash[4] || -1)
         }
         route.page = hash[0]
         route.id = hash[1]
@@ -41,10 +43,11 @@ export const addListener = {
       if (this.route.page === 'user') {
         route.service = -1
         route.channel = -1
+        route.version = -1
         route.calendar = -1
       }
       if (hasCalendarSelected(this.route.page)) {
-        window.location.replace('#!' + [route.page, route.service, route.channel, route.calendar].join('/'))
+        window.location.replace('#!' + [route.page, route.service, route.channel, route.version, route.calendar].join('/'))
       }
 
       return false
@@ -67,13 +70,16 @@ export default {
       route.page = 'channel'
       route.channel = parseInt(c || 0)
     },
+    toVersion(c) {
+      route.page = 'version'
+      route.version = parseInt(c || 0)
+    },
     toCalendar(c) {
       route.page = 'calendar'
       route.calendar = parseInt(c || 0)
     },
     refresh(c) {
-      route.page = 'calendar'
-      route.calendar = parseInt(c || 0)
+      window.location.reload()
     }
   }
 }

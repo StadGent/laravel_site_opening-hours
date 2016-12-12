@@ -31,10 +31,20 @@ export default {
       console.log('req')
       this.modal.text = 'requestService'
     },
+
     newChannel(srv) {
       this.modal.text = 'newChannel'
       this.modal.srv = srv
     },
+    newVersion(srv) {
+      this.modal.text = 'newChannel'
+      this.modal.srv = srv
+    },
+    newCalendar(srv) {
+      this.modal.text = 'newChannel'
+      this.modal.srv = srv
+    },
+
     newUser(srv) {
       this.modal.text = 'newUser'
       this.modal.srv = srv
