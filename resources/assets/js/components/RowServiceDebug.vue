@@ -21,11 +21,11 @@
       </td>
       <td>
         <ol class="table-list">
-          <li v-for="(calendar, cal) in channel.oh.calendar" :class="{'text-danger':!calendar.rdfcal||!calendar.rdfcal.length}">
+          <li v-for="(calendar, cal) in channel.openinghours.calendar" :class="{'text-danger':!calendar.rdfcal||!calendar.rdfcal.length}">
             <a :href="'#!calendar/'+[s.id,ch,cal].join('/')">{{ calendar.label }}</a>
           </li>
         </ol>
-        <a href="#" class="text-danger" v-if="!channel.oh.calendar||!channel.oh.calendar.length">Toevoegen...</a>
+        <a href="#" class="text-danger" v-if="!channel.openinghours.calendar||!channel.openinghours.calendar.length">Toevoegen...</a>
       </td>
     </tr>
     <tr v-if="!s.availableChannel">

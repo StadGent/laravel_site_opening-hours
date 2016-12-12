@@ -27,7 +27,7 @@ export default {
       if (!channel) {
         return {}
       }
-      return channel.oh.calendar[this.route.calendar] || {}
+      return channel.openinghours.calendar[this.route.calendar] || {}
     }
   }
 }

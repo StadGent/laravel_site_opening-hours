@@ -16,7 +16,7 @@ export default {
       return this.routeService.availableChannel && this.routeService.availableChannel[this.route.channel] || {}
     },
     routeVersion () {
-      return this.routeChannel.oh && this.routeChannel.oh[this.route.version] || {}
+      return this.routeChannel.openinghours && this.routeChannel.openinghours[this.route.version] || {}
     },
     routeCalendar () {
       return this.routeVersion.calendar && this.routeVersion.calendar[this.route.calendar] || {}
@@ -24,7 +24,7 @@ export default {
   },
   methods: {
     fetchServices () {
-      return this.$http.get('/api/services.json')
+      return this.$http.get('/api/services')
         .then(({ data }) => {
           this.services = data || []
         })

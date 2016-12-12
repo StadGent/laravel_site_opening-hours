@@ -13,54 +13,54 @@ function countCals(s) {
 /** Channel functions **/
 
 export function hasOh(ch) {
-  return ch && ch.oh || []
+  return ch && ch.openinghours || []
 }
 
 export function hasCal(ch) {
-  return ch && ch.oh && ch.oh[0] && ch.oh[0].calendar || []
+  return ch && ch.openinghours && ch.openinghours[0] && ch.openinghours[0].calendar || []
 }
 
 // Get active OH of a channel
 export function hasActiveOh(ch) {
-  return ch && ch.oh && ch.oh.filter(x => x.active) || []
+  return ch && ch.openinghours && ch.openinghours.filter(x => x.active) || []
 }
 
 // Get active expiring OH of a channel
 // export function hasExpiringOh(ch) {
-//   return ch && ch.oh && (ch.oh.find(x => x.active) || {}).calendar || []
+//   return ch && ch.openinghours && (ch.openinghours.find(x => x.active) || {}).calendar || []
 // }
 
 export function toChannelStatus(ch) {
   const oh = hasActiveOh(ch)
-  let dtend = expiresOn(oh)
-  return dtend
+  let end_date = expiresOn(oh)
+  return end_date
 }
 
 /** OH functions **/
 
 function isInUseOn(oh, date) {
-  console.log(oh.dtstart, oh.dtend, date, (oh.dtstart ? oh.dtstart < date : true) && (oh.dtend ? oh.dtend > date : true))
-  return (oh.dtstart ? oh.dtstart < date : true) && (oh.dtend ? oh.dtend > date : true)
+  console.log(oh.start_date, oh.end_date, date, (oh.start_date ? oh.start_date < date : true) && (oh.end_date ? oh.end_date > date : true))
+  return (oh.start_date ? oh.start_date < date : true) && (oh.end_date ? oh.end_date > date : true)
 }
 
 // Get expiry date of array of oh
 function expiresOn(oh) {
-  let dtend = today
+  let end_date = today
   let count = oh.length
 
   //
   for (var i = 0; i < count; i++) {
-    let nextIndex = oh.findIndex(x => isInUseOn(x, dtend))
+    let nextIndex = oh.findIndex(x => isInUseOn(x, end_date))
     let nextOh = oh.splice(nextIndex, 1).pop()
     if (!nextOh) {
       break
-    } else if (!nextOh.dtend) {
+    } else if (!nextOh.end_date) {
       return 'infinite'
     } else {
-      dtend = nextDateString(nextOh.dtend || dtend)
+      end_date = nextDateString(nextOh.end_date || end_date)
     }
   }
-  return dtend === today ? 'Verlopen' : dtend
+  return end_date === today ? 'Verlopen' : end_date
 }
 
 /** Date functions **/

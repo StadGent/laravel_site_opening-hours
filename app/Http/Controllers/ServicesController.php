@@ -25,9 +25,37 @@ class ServicesController extends Controller
                         'openinghours' => [
                             [
                                 'active' => true,
-                                'start_date' => (Carbon::now())->subMonth()->toDateString(),
-                                'end_date' => (Carbon::now())->subMonth()->addYear()->toDateString(),
+                                'label' => 'vroeger'
+                                'start_date' => (Carbon::now())->subYear()->toDateString(),
+                                'end_date' => (Carbon::now())->subDay()->toDateString(),
                                 'id' => 5
+                            ],
+                            [
+                                'active' => true,
+                                'label' => 'toekomst'
+                                'start_date' => (Carbon::now())->toDateString(),
+                                'end_date' => (Carbon::now())->subDay()->addYear()->toDateString(),
+                                'id' => 6
+                            ]
+                        ]
+                    ],
+                    [
+                        'id' => 2,
+                        'label' => 'loket',
+                        'openinghours' => [
+                            [
+                                'active' => true,
+                                'label' => 'v2016'
+                                'start_date' => '2016-01-01',
+                                'end_date' => '2016-12-31',
+                                'id' => 5
+                            ],
+                            [
+                                'active' => true,
+                                'label' => 'v2017'
+                                'start_date' => '2017-01-01',
+                                'end_date' => '2017-12-31',
+                                'id' => 6
                             ]
                         ]
                     ]
@@ -37,9 +65,35 @@ class ServicesController extends Controller
                 'label' => 'Bib Zuid',
                 'uri' => 'http://stad.gent/bib-zuid',
                 'channels' => [
-                    'id' => 2,
-                    'label' => 'loket',
-                    'openinghours' => [
+                    [
+                        'id' => 5,
+                        'label' => 'loket',
+                        'openinghours' => [
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'label' => 'Bib Sint-Amandsberg',
+                'uri' => 'http://stad.gent/bib-sint-amandsberg',
+                'channels' => [
+                    [
+                        'id' => 9,
+                        'label' => 'loket',
+                        'openinghours' => [
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'label' => 'Bib Ledeberg',
+                'uri' => 'http://stad.gent/bib-ledeberg',
+                'channels' => [
+                    [
+                        'id' => 13,
+                        'label' => 'loket',
+                        'openinghours' => [
+                        ]
                     ]
                 ]
             ]

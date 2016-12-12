@@ -13,8 +13,8 @@
         <thead>
           <tr>
             <th-sort by="label">Actief</th-sort>
-            <th-sort by="dtstart">Geldig van</th-sort>
-            <th-sort by="dtend">Geldig tot</th-sort>
+            <th-sort by="start_date">Geldig van</th-sort>
+            <th-sort by="end_date">Geldig tot</th-sort>
             <th class="text-right">Verwijder</th>
             <th class="text-right">Bewerk</th>
           </tr>
@@ -24,8 +24,8 @@
             <td>
               <a :href="'#!version/'+[srv.id,route.channel,index].join('/')">{{ version.label || 'Zonder label' }}</a>
             </td>
-            <td>{{ version.dtstart }}</td>
-            <td>{{ version.dtend }}</td>
+            <td>{{ version.start_date }}</td>
+            <td>{{ version.end_date }}</td>
             <td class="text-right">
               <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-default">
                 <i class="glyphicon glyphicon-trash"></i>
@@ -61,7 +61,7 @@ export default {
       return this.$parent.routeChannel || {}
     },
     versions () {
-      return this.$parent.routeChannel.oh || []
+      return this.$parent.routeChannel.openinghours || []
     }
   },
   components: {
