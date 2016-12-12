@@ -15,11 +15,15 @@
 
   {{--
   <script>
-  initialUser = {!! json_encode($user) !!}
-  initialServices = {!! json_encode($services) !!}
-  initialRoute = {!! json_encode($route) !!}
+  var initialUsers = {!! json_encode($users) !!}
+  var initialServices = {!! json_encode($services) !!}
+  var initialRoute = {!! json_encode($route) !!}
   </script>
   --}}
+
+  <script>
+  var initialUser = {!! json_encode(Auth::user()) !!}
+  </script>
 
   <script src="{{ asset('js/chunks/vendor.min.js') }}"></script>
   <script src="{{ asset('js/chunks/lib.js') }}"></script>

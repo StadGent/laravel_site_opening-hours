@@ -2,8 +2,21 @@
   <div class="container">
     <h1>{{ usr.name || 'Naamloos' }} <small>diensten ({{ filteredServices.length }})</small></h1>
 
-    <div>
+    <div v-if="user.admin">
+      Je bent admin
+    </div>
+    <div v-else>
       <button type="button" class="btn btn-primary" @click="requestService">+ Voeg diensten toe</button>
+    </div>
+
+    <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
+      <p>
+        Dit is je eigen profiel. Je kan je naam wijzigen
+      </p>
+      <p>
+      <label>Naam</label>
+        <input type="text" class="form-control" v-model="user.name">
+      </p>
     </div>
 
     <!-- Services -->

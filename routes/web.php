@@ -13,8 +13,6 @@
 
 Route::get('/', function () {
     return view('main');
-});
+})->middleware('auth:web');
 
 Auth::routes();
-
-Route::get('/home', 'HomeController@index');

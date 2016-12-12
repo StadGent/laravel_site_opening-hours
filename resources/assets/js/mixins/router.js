@@ -38,6 +38,11 @@ export const addListener = {
         route.page = window.location.hash.slice(1) || 'home'
       }
 
+      if (this.route.page === 'user') {
+        route.service = -1
+        route.channel = -1
+        route.calendar = -1
+      }
       if (hasCalendarSelected(this.route.page)) {
         window.location.replace('#!' + [route.page, route.service, route.channel, route.calendar].join('/'))
       }

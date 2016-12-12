@@ -9,7 +9,7 @@
       </div>
       <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
     </span>
-    <button v-else type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
+    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
 
     <div v-if="isOwner&&route.tab2==='users'">
       <div v-if="!sortedUsers.length" style="padding:5em 0;">
@@ -23,13 +23,13 @@
           <tr>
             <th-sort by="name">Naam gebruiker</th-sort>
             <th-sort by="email">E-mailadres</th-sort>
-            <th-sort by="services">Diensten</th-sort>
+            <th>Rol</th>
             <th-sort by="verified">Actief</th-sort>
             <th class="text-right">Nodig uit</th>
-            <th class="text-right">Verwijder</th>
+            <th class="text-right">Ontzeg toegang</th>
           </tr>
         </thead>
-        <tbody is="row-user" v-for="u in sortedUsers" :u="u"></tbody>
+        <tbody is="row-user-owner" v-for="u in sortedUsers" :u="u"></tbody>
       </table>
     </div>
 
@@ -80,7 +80,7 @@
 
 <script>
 import ThSort from '../components/ThSort.vue'
-import RowUser from '../components/RowUser.vue'
+import RowUserOwner from '../components/RowUserOwner.vue'
 
 import { orderBy } from '../lib.js'
 
@@ -125,7 +125,7 @@ export default {
     }
   },
   components: {
-    RowUser,
+    RowUserOwner,
     ThSort
   }
 }

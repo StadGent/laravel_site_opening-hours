@@ -14,7 +14,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#notifications">Notifications</a></li>
           <li class="divider-vertical"></li>
-          <li><a href="#login">{{ user.id ? user.name : 'Login' }}</a></li>
+          <li><a :href="'#!user/'+user.id">{{ user.id ? user.name : 'Login' }}</a></li>
         </ul>
       </div>
     </div>

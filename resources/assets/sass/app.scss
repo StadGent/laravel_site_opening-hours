@@ -4,6 +4,15 @@
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
+/* container maybe max-width to 100% */
+
+.container {
+  width: auto;
+  max-width: 1400px;
+}
+
+/* Breadcrumb */
+
 .container-breadcrumb {
   margin-top: -20px;
   margin-bottom: 0;
@@ -23,6 +32,7 @@
 }
 
 /* Table */
+
 .table-hover > tbody > tr:hover {
   cursor: pointer;
 }
@@ -81,6 +91,7 @@
 }
 
 /* Panel */
+
 a.panel {
   cursor: pointer;
   display: block;
@@ -103,7 +114,7 @@ a.panel {
   padding: 6px;
   min-width: 30px;
   font-size: 12px;
-  line-height: 16px;
+  line-height: 12px;
   >svg {
     fill: #fff;
     width: 16px;
@@ -111,7 +122,6 @@ a.panel {
     vertical-align: top;
   }
 }
-
 h1+h3 {
   margin-top: 10px;
 }
@@ -133,10 +143,12 @@ h1+h3 {
   text-align: center;
   min-width: 38px;
 }
-.slideup-enter-active, .slideup-leave-active {
+.slideup-enter-active,
+.slideup-leave-active {
   transition: transform .3s
 }
-.slideup-enter, .slideup-leave-active {
+.slideup-enter,
+.slideup-leave-active {
   transform: translateY(100%);
 }
 
