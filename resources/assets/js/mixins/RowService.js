@@ -60,7 +60,6 @@ function expiresOn(oh) {
       dtend = nextDateString(nextOh.dtend || dtend)
     }
   }
-  }
   return dtend === today ? 'Verlopen' : dtend
 }
 
