@@ -19,7 +19,7 @@ return [
     | the role if it is in a different namespace.
     |
     */
-    'role' => 'App\Role',
+    'role' => 'App\Models\Role',
 
     /*
     |--------------------------------------------------------------------------
@@ -40,7 +40,7 @@ return [
     | Update the permission if it is in a different namespace.
     |
     */
-    'permission' => 'App\Permission',
+    'permission' => 'App\Models\Permission',
 
     /*
     |--------------------------------------------------------------------------
@@ -95,7 +95,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'permission_foreign_key' => 'permission_id',
-    
+
     /*
     |--------------------------------------------------------------------------
     | Method to be called in the middleware return case
