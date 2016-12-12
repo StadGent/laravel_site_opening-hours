@@ -59,7 +59,17 @@ class ChannelController extends Controller
      */
     public function show($id)
     {
-        throw new Exception('Not yet implemented');
+        return [
+            'label' => 'telefonisch',
+            'openinghours' => [
+                [
+                    'active' => true,
+                    'start_date' => (Carbon::now())->subMonth()->toDateString(),
+                    'end_date' => (Carbon::now())->subMonth()->addYear()->toDateString(),
+                    'id' => 5
+                ]
+            ]
+        ];
     }
 
     /**
