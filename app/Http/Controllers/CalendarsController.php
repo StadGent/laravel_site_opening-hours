@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Repositories\CalendarRepository;
 
@@ -62,11 +63,11 @@ class CalendarsController extends Controller
         return response()->json([
             'priority' => 0,
             'label' => 'Kerstdagen',
-            [
+            'events' => [
                 'id' => 1,
                 'rrule' => 'RRULE',
-                'start_date' => (new Carbon::now())->subMonth()->toIso8601String(),
-                'end_date' => (new Carbon::now())->addMonth()->toIso8601String(),
+                'start_date' => (Carbon::now())->subMonth()->toIso8601String(),
+                'end_date' => (Carbon::now())->addMonth()->toIso8601String(),
             ]
         ]);
     }
