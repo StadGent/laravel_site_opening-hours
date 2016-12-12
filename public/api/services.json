@@ -10,6 +10,8 @@
 		"oh": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
+			"dtstart": "2012-01-01",
+			"dtend": "2016-12-31",
 			"calendar": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
@@ -60,7 +62,9 @@
 		"label": "Zwembad",
 		"oh": [{
 			"@type": "oh:OpeningHours",
-			"active": true, 
+			"active": true,
+			"dtstart": "2012-01-01",
+			"dtend": "2016-12-31",
 			"calendar": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
@@ -81,6 +85,9 @@
 		"label": "Telefoon",
 		"oh": [{
 			"@type": "oh:OpeningHours",
+			"active": true, 
+			"dtstart": "2012-01-01",
+			"dtend": "2016-12-31",
 			"calendar": []
 		}]
 	}]
@@ -95,6 +102,9 @@
 		"label": "Verhuur",
 		"oh": [{
 			"@type": "oh:OpeningHours",
+			"active": true, 
+			"dtstart": "2012-01-01",
+			"dtend": "2016-12-31",
 			"calendar": []
 		}]
 	}]
@@ -110,6 +120,8 @@
 		"oh": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
+			"dtstart": "2012-01-01",
+			"dtend": "2016-12-31",
 			"calendar": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
@@ -139,6 +151,20 @@
 		"label": "Verhuur",
 		"oh": [{
 			"@type": "oh:OpeningHours",
+			"active": true, 
+			"dtstart": "2012-01-01",
+			"dtend": "2016-12-31",
+			"calendar": [{
+				"@type": "oh:Calendar",
+				"oh:closinghours": true,
+				"label": "Normale uren",
+				"rdfcal": []
+			}]
+		}, {
+			"@type": "oh:OpeningHours",
+			"active": true, 
+			"dtstart": "2016-12-31",
+			"dtend": "2021-12-31",
 			"calendar": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,

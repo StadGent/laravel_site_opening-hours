@@ -32,26 +32,42 @@ function hasExpiringOh(ch) {
 
 function toChannelStatus(ch) {
   const oh = hasActiveOh(ch)
-  let dtend = today
-
-
-  let nextOh = oh.find(x => isInUseOn(x, today))
-  if (!nextOh) {
-    return dtend
-  } else {
-    dtend = nextOh.dtend
-  }
-
-
-  console.log(validUntil)
-  return validUntil
+  let dtend = expiresOn(oh)
+  return dtend
 }
 
 /** OH functions **/
 
 function isInUseOn(oh, date) {
-  console.log(oh['@type'], date)
+  console.log(oh.dtstart, oh.dtend, date, (oh.dtstart ? oh.dtstart < date : true) && (oh.dtend ? oh.dtend > date : true))
   return (oh.dtstart ? oh.dtstart < date : true) && (oh.dtend ? oh.dtend > date : true)
+}
+
+// Get expiry date of array of oh
+function expiresOn(oh) {
+  let dtend = today
+  let count = oh.length
+
+  //
+  for (var i = 0; i < count; i++) {
+    let nextIndex = oh.findIndex(x => isInUseOn(x, dtend))
+    let nextOh = oh.splice(nextIndex, 1).pop()
+    if (!nextOh) {
+      break
+    } else if (!nextOh.dtend) {
+      return 'infinite'
+    } else {
+      dtend = nextDateString(nextOh.dtend || dtend)
+    }
+  }
+  }
+  return dtend === today ? 'Verlopen' : dtend
+}
+
+/** Date functions **/
+
+function nextDateString (dateString) {
+  return new Date(Date.parse(dateString) + 36e5 * 24).toJSON().slice(0, 10)
 }
 
 var exampleChannel = {
