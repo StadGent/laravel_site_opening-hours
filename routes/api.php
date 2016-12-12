@@ -18,3 +18,5 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:api');
 
 Route::resource('/services', 'ServicesController');
+Route::resource('/calendars', 'CalendarsController');
+Route::resource('/channels', 'ChannelController');
