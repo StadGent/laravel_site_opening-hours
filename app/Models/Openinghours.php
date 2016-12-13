@@ -12,7 +12,7 @@ class Openinghours extends Model
      * @var array
      */
     protected $fillable = [
-        'active', 'start_date', 'end_date', 'label'
+        'active', 'start_date', 'end_date', 'label', 'channel_id'
     ];
 
     public function calendars()

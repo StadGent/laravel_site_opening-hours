@@ -14,14 +14,14 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // Create an admin user (if not present)
-        $admin = User::where('email', 'admin')->first();
+        $admin = User::where('email', 'admin@foo.bar')->first();
 
         if (empty($admin)) {
             $password = str_random();
 
             $admin = User::create([
                 'name' => 'admin',
-                'email' => 'admin',
+                'email' => 'admin@foo.bar',
                 'password' => bcrypt($password)
             ]);
 
@@ -41,6 +41,40 @@ class DatabaseSeeder extends Seeder
                     'name' => $roleName,
                     'display_name' => $roleName,
                 ]);
+            }
+        }
+
+        // Seed dummy services
+        $this->seedDummyServices();
+    }
+
+    private function seedDummyServices()
+    {
+        $services = app()->make('ServicesRepository');
+
+        $servicesData = [
+            [
+                'uri' => 'http://dev.foo/service1',
+                'label' => 'Service1',
+                'description' => 'Description of the service'
+            ],
+            [
+                'uri' => 'http://dev.foo/service2',
+                'label' => 'Service2',
+                'description' => 'Description of the service'
+            ],
+            [
+                'uri' => 'http://dev.foo/service3',
+                'label' => 'Service3',
+                'description' => 'Description of the service'
+            ]
+        ];
+
+        foreach ($servicesData as $serviceConfig) {
+            $service = $services->where('uri', $serviceConfig['uri'])->first();
+
+            if (empty($service)) {
+                $services->store($serviceConfig);
             }
         }
     }

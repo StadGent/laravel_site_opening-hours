@@ -43,6 +43,8 @@ class ChannelController extends Controller
     {
         $input = $request->input();
 
+        $id = $this->channels->store($input);
+
         $channel = $this->channels->getById($id);
 
         if (! empty($channel)) {

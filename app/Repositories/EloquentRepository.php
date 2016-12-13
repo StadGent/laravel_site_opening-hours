@@ -25,6 +25,11 @@ class EloquentRepository
         return $model->id;
     }
 
+    public function where($key, $value)
+    {
+        return $this->model->where($key, $value);
+    }
+
     public function delete($modelId)
     {
         $model = $this->model->find($modelId);

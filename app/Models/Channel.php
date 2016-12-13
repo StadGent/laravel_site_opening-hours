@@ -12,7 +12,7 @@ class Channel extends Model
      * @var array
      */
     protected $fillable = [
-        'uri', 'label', 'description'
+        'label', 'service_id'
     ];
 
     public function openinghours()
