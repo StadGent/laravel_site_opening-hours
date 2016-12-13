@@ -61,7 +61,7 @@ class OpeninghoursController extends Controller
      */
     public function show($id)
     {
-        //
+        return response()->json($this->openinghours->getById($id));
     }
 
     /**
