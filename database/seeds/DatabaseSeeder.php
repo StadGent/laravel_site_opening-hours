@@ -13,6 +13,44 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        // Seed the roles and give the admin the admin role
+        $roles = [
+            [
+                'name' => 'Admin',
+                'display_name' => 'Admin',
+                'description' => 'The admin of the application, can basically do anything.'
+            ],
+            [
+                'name' => 'AppUser',
+                'display_name' => 'Applicatie gebruiker',
+                'description' => 'Een gebruiker van de applicatie'
+            ],
+            [
+                'name' => 'Owner',
+                'display_name' => 'Beheerder van een dienst',
+                'description' => 'Beheerder van een dienst'
+            ],
+            [
+                'name' => 'Member',
+                'display_name' => 'Lid van een dienst',
+                'description' => 'Lid van een dienst'
+            ],
+        ];
+
+        foreach ($roles as $roleConfig) {
+            $role = Role::where('name', $roleConfig)->first();
+
+            if (empty($role)) {
+                $role = Role::create([
+                    'name' => $roleConfig['name'],
+                    'display_name' => $roleConfig['display_name'],
+                    'description' => $roleConfig['description']
+                ]);
+
+                $role->save();
+            }
+        }
+
         // Create an admin user (if not present)
         $admin = User::where('email', 'admin@foo.bar')->first();
 
@@ -26,22 +64,9 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $admin->save();
+            $admin->attachRole(Role::where('name', 'Admin')->first());
 
             $this->command->info('The admin has been created, the random password is: ' . $password . ' Copy this into your password manager, this will not be shown again.');
-        }
-
-        // Seed the roles and give the admin the admin role
-        $roles = ['Admin', 'AppUser', 'PublicServiceAdmin', 'CalenderUser'];
-
-        foreach ($roles as $roleName => $displayName) {
-            $role = Role::where('name', $roleName)->first();
-
-            if ($role) {
-                $role = Role::create([
-                    'name' => $roleName,
-                    'display_name' => $roleName,
-                ]);
-            }
         }
 
         // Seed dummy services
