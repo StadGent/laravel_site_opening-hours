@@ -1,6 +1,49 @@
 // Variables
 @import "variables";
 
+// Ghent colors
+$lightblue: #007db3;
+$darkblue: #2b3f47;
+$green: #4da22e;
+$kaki: #626c35;
+$orange: #f39200;
+$red: #e30513;
+$purple: #951b81;
+$yellow: yellow;
+
+// Map to bootstrap colors
+$brand-primary: $lightblue; // #337ab7
+$brand-success: $green;
+$brand-info: $darkblue;
+$brand-warning: $orange;
+$brand-danger: $red;
+
+$navbar-height:                    50px !default;
+$navbar-collapse-max-height:       340px !default;
+
+$navbar-default-color: white;
+$navbar-default-bg: $darkblue;
+$navbar-default-border: white;
+
+// Navbar links
+$navbar-default-link-color:              white;
+$navbar-default-link-hover-color:          #333 !default;
+$navbar-default-link-hover-bg:             transparent !default;
+$navbar-default-link-active-color:         #555 !default;
+$navbar-default-link-active-bg:            darken($navbar-default-bg, 6.5%) !default;
+$navbar-default-link-disabled-color:       #ccc !default;
+$navbar-default-link-disabled-bg:          transparent !default;
+
+// Navbar brand label
+$navbar-default-brand-color:               $navbar-default-link-color !default;
+$navbar-default-brand-hover-color:         darken($navbar-default-brand-color, 10%) !default;
+$navbar-default-brand-hover-bg:            transparent !default;
+
+// Navbar toggle
+$navbar-default-toggle-hover-bg:           #ddd !default;
+$navbar-default-toggle-icon-bar-bg:        #888 !default;
+$navbar-default-toggle-border-color:       #ddd !default;
+
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "vendor/bootstrap-year";
@@ -182,8 +225,58 @@ h1+h3 {
 .calendar .month-container {
   min-width: 180px;
   text-align: center;
-  height: 200px;
+  height: 230px;
   padding: 0;
+}
+
+/* Version > Preview > Topdown layer render */
+@mixin layer($num: 0, $background: #000, $color: white, $content: 'A'){
+  .layer-#{$num} {
+    background: $background;
+    color: $color;
+    &::after {
+      content: $content;
+    }
+  }
+  .cal {
+    &:nth-child(#{$num + 1}) .cal-img {
+      background: $background;
+      color: $color;
+      &::after {
+        content: $content;
+      }
+    }
+  }
+}
+@include layer(0, $lightblue, white, 'A')
+@include layer(1, $yellow, black, 'B')
+@include layer(2, $red, white, 'C')
+@include layer(3, $orange, white, 'D')
+@include layer(4, $green, white, 'E')
+
+.calendar-topview {
+  .day {
+    position: relative;
+    border-bottom: 1px solid white;
+    vertical-align: top;
+    width: 28px;
+    height: 28px;
+  }
+  .day+.day {
+    border-left: 1px solid white;
+  }
+  .layer>.day-content {
+    font-size: 9px;
+    height: 27px;
+    padding: 2px 0 0 4px !important;
+    text-align: left;
+  }
+  .day::after {
+    position: absolute;
+    bottom: 0;
+    right: 4px;
+    pointer-events: none;
+  }
 }
 
 /* Version > Cals */
@@ -194,18 +287,6 @@ h1+h3 {
   padding-bottom: 1rem;
   &:last-child {
     border-bottom: 1px solid #ddd;
-  }
-  /* Colors */
-  &:nth-child(1) .cal-img {
-    background-color: red;
-    color: white;
-  }
-  &:nth-child(2) .cal-img {
-    background-color: blue;
-    color: white;
-  }
-  &:nth-child(3) .cal-img {
-    background-color: yellow;
   }
 }
 .cal-header {

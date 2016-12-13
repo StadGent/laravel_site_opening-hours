@@ -24,6 +24,20 @@ export default {
     isOwner () {
       return this.user.admin || (this.user.roles.find(r => r.service == this.route.service) || {}).role === 'owner'
     }
+  },
+  methods: {
+    logout() {
+      console.log('ha')
+      return this.$http.post('/logout')
+        .catch(() => true)
+        .then(() => {
+          Object.assign(this.users, {
+            id: 0,
+            name: 'Naamloos'
+          })
+          window.location.reload()
+        })
+    }
   }
 }
 

@@ -13,18 +13,18 @@ export default {
       return this.services.find(s => s.id === this.route.service) || {}
     },
     routeChannel () {
-      return this.routeService.availableChannel && this.routeService.availableChannel[this.route.channel] || {}
+      return this.routeService.channels && this.routeService.channels[this.route.channel] || {}
     },
     routeVersion () {
       return this.routeChannel.openinghours && this.routeChannel.openinghours[this.route.version] || {}
     },
     routeCalendar () {
-      return this.routeVersion.calendar && this.routeVersion.calendar[this.route.calendar] || {}
+      return this.routeVersion.calendars && this.routeVersion.calendars[this.route.calendar] || {}
     }
   },
   methods: {
     fetchServices () {
-      return this.$http.get('/api/services')
+      return this.$http.get('/api/services.json')
         .then(({ data }) => {
           this.services = data || []
         })
@@ -46,10 +46,10 @@ export default {
         if (!srv) {
           return console.error('createChannel: service is invalid')
         }
-        if(!srv.availableChannel) {
-          srv.availableChannel = []
+        if(!srv.channels) {
+          srv.channels = []
         }
-        srv.availableChannel.push({
+        srv.channels.push({
           id: Math.floor(Math.random() * 1000),
           label: modal.label,
           created_at: new Date().toJSON().slice(0, 19),

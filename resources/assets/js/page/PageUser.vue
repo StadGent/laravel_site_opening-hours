@@ -19,6 +19,13 @@
       </p>
     </div>
 
+    <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
+      <p>
+        <button @click="$parent.logout">Uitloggen</button>
+      </p>
+      <p>
+    </div>
+
     <!-- Services -->
     <div v-if="!userServices.length" style="padding:5em 0;">
       <h1>Empty state</h1>

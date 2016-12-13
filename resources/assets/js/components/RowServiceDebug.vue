@@ -15,20 +15,20 @@
         <div>{{ s.updated_by }}</div>
       </td>
     </tr>
-    <tr v-for="(channel, ch) in s.availableChannel" @click.stop="href('#!channel/'+[s.id,ch].join('/'))">
+    <tr v-for="(channel, ch) in s.channels" @click.stop="href('#!channel/'+[s.id,ch].join('/'))">
       <td>
         <a :href="'#!channel/'+[s.id,ch].join('/')">{{ channel.label }}</a>
       </td>
       <td>
         <ol class="table-list">
-          <li v-for="(calendar, cal) in channel.openinghours.calendar" :class="{'text-danger':!calendar.rdfcal||!calendar.rdfcal.length}">
+          <li v-for="(calendar, cal) in channel.openinghours.calendars" :class="{'text-danger':!calendar.rdfcal||!calendar.rdfcal.length}">
             <a :href="'#!calendar/'+[s.id,ch,cal].join('/')">{{ calendar.label }}</a>
           </li>
         </ol>
-        <a href="#" class="text-danger" v-if="!channel.openinghours.calendar||!channel.openinghours.calendar.length">Toevoegen...</a>
+        <a href="#" class="text-danger" v-if="!channel.openinghours.calendars||!channel.openinghours.calendars.length">Toevoegen...</a>
       </td>
     </tr>
-    <tr v-if="!s.availableChannel">
+    <tr v-if="!s.channels">
       <td>
         <a href="#" class="text-danger">Toevoegen...</a></td>
       <td></td>

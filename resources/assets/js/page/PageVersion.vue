@@ -14,9 +14,9 @@
           De uren in de periode de hoogste prioriteit bepalen de openingsuren voor de kalender.
         </p>
         <div class="row">
-          <div class="col-sm-12 cal" v-for="(cal, index) in calendars">
+          <div class="col-sm-12 cal" v-for="(cal, index) in reversedCalendars">
             <header class="cal-header">
-              <div class="cal-img">{{ index }}</div>
+              <div class="cal-img"></div>
               <span class="cal-name">{{ cal.label }}</span>
               <div class="cal-options">
                 <span class="cal-lower">Lager</span>
@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="version-preview col-sm-6 col-md-7 col-lg-8">
-        <year-calendar></year-calendar>
+        <year-calendar :oh="version"></year-calendar>
       </div>
     </div>
   </div>
@@ -37,6 +37,8 @@
 
 <script>
 import YearCalendar from '../components/YearCalendar.vue'
+
+import { orderBy } from '../lib.js'
 
 export default {
   name: 'version',
@@ -58,7 +60,12 @@ export default {
       return this.$parent.routeVersion || {}
     },
     calendars () {
-      return this.version.calendar || []
+      const calendars = (this.version.calendars || [])
+      calendars.sort(orderBy('priority'))
+      return calendars
+    },
+    reversedCalendars () {
+      return inert(this.calendars).reverse()
     }
   },
   components: {

@@ -23,11 +23,11 @@ export default {
       if (!service) {
         return {}
       }
-      var channel = service.availableChannel[this.route.channel]
+      var channel = service.channels[this.route.channel]
       if (!channel) {
         return {}
       }
-      return channel.openinghours.calendar[this.route.calendar] || {}
+      return channel.openinghours.calendars[this.route.calendar] || {}
     }
   }
 }

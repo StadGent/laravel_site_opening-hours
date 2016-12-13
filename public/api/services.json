@@ -4,74 +4,63 @@
 	"updated_at": "2016-02-09T21:08:48",
 	"updated_by": "Jozef",
 	"label": "Dienst administratieve vereenvoudiging",
-	"availableChannel": [{
+	"channels": [{
 		"@type": "Channel",
 		"label": "Loket",
-		"oh": [{
+		"openinghours": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
-			"dtstart": "2012-01-01",
-			"dtend": "2015-06-31",
-			"calendar": [{
+			"start_date": "2012-01-01",
+			"end_date": "2015-06-31",
+			"calendars": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
-				"label": "Super uitzonderingen",
-				"rdfcal": [{
+				"label": "Normale uren",
+				"priority": 0,
+				"events": [{
 					"@type": "Vevent",
-					"dtstart": "2003-03-11T16:00:00",
-					"rrule": {
-						"@id": "_:b1",
-						"byday": "SU,WE,TH,FR,SA",
-						"freq": "WEEKLY",
-						"interval": "1"
-					},
-					"summary": "Open Tue 4-11p"
+					"start_date": "2016-07-11T09:00:00",
+					"end_date": "2016-09-11T17:00:00",
+					"rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;DTSTART=20160101T023000Z;UNTIL=20161231T235959Z"
 				}]
 			}, {
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
 				"label": "Nationale feestdagen",
-				"rdfcal": [{
+				"priority": 2,
+				"events": [{
 					"@type": "Vevent",
-					"dtstart": "2003-03-11T16:00:00",
-					"rrule": {
-						"@id": "_:b1",
-						"byday": "SU,WE,TH,FR,SA",
-						"freq": "WEEKLY",
-						"interval": "1"
-					},
+					"start_date": "2016-03-11T09:00:00",
+					"end_date": "2016-03-11T17:00:00",
+					"rrule": "FREQ=MONTHLY;BYDAY=SU;DTSTART=20160101T023000Z;UNTIL=20161231T235959Z",
 					"summary": "Open Tue 4-11p"
 				}]
 			}, {
 				"@type": "oh:Calendar",
-				"label": "Normale uren",
-				"rdfcal": [{
+				"label": "Super uitzonderingen",
+				"priority": 4,
+				"events": [{
 					"@type": "Vevent",
-					"dtstart": "2003-03-11T16:00:00",
-					"rrule": {
-						"@id": "_:b1",
-						"byday": "SU,WE,TH,FR,SA",
-						"freq": "WEEKLY",
-						"interval": "1"
-					},
+					"start_date": "2016-11-11T11:00:00",
+					"end_date": "2016-11-11T16:00:00",
 					"summary": "Open Tue 4-11p"
 				}]
 			}]
 		}]
 	}, {
 		"label": "Zwembad",
-		"oh": [{
+		"openinghours": [{
 			"@type": "oh:OpeningHours",
 			"active": true,
-			"dtstart": "2012-01-01",
-			"dtend": "2017-12-31",
-			"calendar": [{
+			"start_date": "2012-01-01",
+			"end_date": "2017-12-31",
+			"calendars": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
 				"label": "Normale uren",
-				"rdfcal": [{
+				"events": [{
 					"@type": "Vevent",
-					"dtstart": "2003-03-11T16:00:00",
+					"start_date": "2003-03-11T16:00:00",
 					"rrule": {
 						"@id": "_:b1",
 						"byday": "SU,WE,TH,FR,SA",
@@ -83,12 +72,12 @@
 		}]
 	}, {
 		"label": "Telefoon",
-		"oh": [{
+		"openinghours": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
-			"dtstart": "2012-01-01",
-			"dtend": "2017-06-31",
-			"calendar": []
+			"start_date": "2012-01-01",
+			"end_date": "2017-06-31",
+			"calendars": []
 		}]
 	}]
 }, {
@@ -97,15 +86,15 @@
 	"updated_at": "2016-12-06T14:29:57",
 	"updated_by": "Maria",
 	"label": "Bibliotheek Zuid",
-	"availableChannel": [{
+	"channels": [{
 		"@type": "Channel",
 		"label": "Verhuur",
-		"oh": [{
+		"openinghours": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
-			"dtstart": "2012-01-01",
-			"dtend": "2016-12-31",
-			"calendar": []
+			"start_date": "2012-01-01",
+			"end_date": "2016-12-31",
+			"calendars": []
 		}]
 	}]
 },  {
@@ -114,21 +103,21 @@
 	"updated_at": "2016-12-06T14:29:57",
 	"updated_by": "Maria",
 	"label": "Dienst Rekrutering en Selectie",
-	"availableChannel": [{
+	"channels": [{
 		"@type": "Channel",
 		"label": "Verhuur",
-		"oh": [{
+		"openinghours": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
-			"dtstart": "2012-01-01",
-			"dtend": "2016-12-31",
-			"calendar": [{
+			"start_date": "2012-01-01",
+			"end_date": "2016-12-31",
+			"calendars": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
 				"label": "Normale uren",
-				"rdfcal": [{
+				"events": [{
 					"@type": "Vevent",
-					"dtstart": "2003-03-11T16:00:00",
+					"start_date": "2003-03-11T16:00:00",
 					"rrule": {
 						"@id": "_:b1",
 						"byday": "SU,WE,TH,FR,SA",
@@ -146,30 +135,30 @@
 	"updated_at": "2016-12-06T14:29:57",
 	"updated_by": "Maria",
 	"label": "Pedagogische Begeleiding Dienst Kinderopvang",
-	"availableChannel": [{
+	"channels": [{
 		"@type": "Channel",
 		"label": "Verhuur",
-		"oh": [{
+		"openinghours": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
-			"dtstart": "2012-01-01",
-			"dtend": "2016-12-31",
-			"calendar": [{
+			"start_date": "2012-01-01",
+			"end_date": "2016-12-31",
+			"calendars": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
 				"label": "Normale uren",
-				"rdfcal": []
+				"events": []
 			}]
 		}, {
 			"@type": "oh:OpeningHours",
 			"active": true, 
-			"dtstart": "2016-12-31",
-			"dtend": "2021-12-31",
-			"calendar": [{
+			"start_date": "2016-12-31",
+			"end_date": "2021-12-31",
+			"calendars": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
 				"label": "Normale uren",
-				"rdfcal": []
+				"events": []
 			}]
 		}]
 	}]

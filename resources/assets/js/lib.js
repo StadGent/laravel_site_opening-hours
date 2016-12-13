@@ -3,7 +3,7 @@ const today = new Date().toJSON().slice(0, 10)
 /** Service functions **/
 
 export function hasChannels(s) {
-  return s && s.availableChannel || []
+  return s && s.channels || []
 }
 // Calendars in the first OH of the channels of a service
 function countCals(s) {
@@ -17,7 +17,7 @@ export function hasOh(ch) {
 }
 
 export function hasCal(ch) {
-  return ch && ch.openinghours && ch.openinghours[0] && ch.openinghours[0].calendar || []
+  return ch && ch.openinghours && ch.openinghours[0] && ch.openinghours[0].calendars || []
 }
 
 // Get active OH of a channel
@@ -27,7 +27,7 @@ export function hasActiveOh(ch) {
 
 // Get active expiring OH of a channel
 // export function hasExpiringOh(ch) {
-//   return ch && ch.openinghours && (ch.openinghours.find(x => x.active) || {}).calendar || []
+//   return ch && ch.openinghours && (ch.openinghours.find(x => x.active) || {}).calendars || []
 // }
 
 export function toChannelStatus(ch) {

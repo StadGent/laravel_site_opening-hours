@@ -22,7 +22,8 @@
   --}}
 
   <script>
-  var initialUser = {!! json_encode(Auth::user()) !!}
+  var initialUser = {!! json_encode(Auth::user()) !!};
+  Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
   </script>
 
   <script src="{{ asset('js/chunks/vendor.min.js') }}"></script>

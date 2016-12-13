@@ -9,8 +9,7 @@ Vue.mixin(authMixin)
 Vue.mixin(modalMixin)
 Vue.mixin(routerMixin)
 
-// Vue.http.interceptors.push((request, next) => {
-//     request.headers.set('X-CSRF-TOKEN', Laravel.csrfToken);
-
-//     next();
-// });
+Vue.http.interceptors.push((request, next) => {
+  request.headers.set('X-CSRF-TOKEN', Laravel.csrfToken);
+  next();
+});

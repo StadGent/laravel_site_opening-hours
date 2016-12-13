@@ -107,7 +107,7 @@ export default {
       return this.service || this.$parent.services.find(s => s.id === this.route.service) || this.$parent.services[0] || {}
     },
     channels () {
-      return this.srv.availableChannel || []
+      return this.srv.channels || []
     },
     filteredChannels () {
       console.log(this.channels)

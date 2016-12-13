@@ -50,7 +50,7 @@ export default {
       return this.service || this.$parent.services.find(s => s.id === this.route.service) || this.$parent.services[0] || {}
     },
     channels () {
-      return this.srv && this.srv.availableChannel || []
+      return this.srv && this.srv.channels || []
     },
     level () {
       switch(this.route.page) {
