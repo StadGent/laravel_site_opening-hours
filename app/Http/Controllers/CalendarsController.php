@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Repositories\CalendarRepository;
 
@@ -43,6 +42,13 @@ class CalendarsController extends Controller
     {
         $input = $request->input();
 
+        $id = $this->calendars->store($input);
+
+        // If events are passed, bulk upsert them
+        if (! empty($input['events']) && ! empty($id)) {
+            $this->bulkUpsertEvents($id, $input['events']);
+        }
+
         $calendar = $this->calendars->getById($id);
 
         if (! empty($calendar)) {
@@ -60,16 +66,7 @@ class CalendarsController extends Controller
      */
     public function show($id)
     {
-        return response()->json([
-            'priority' => 0,
-            'label' => 'Kerstdagen',
-            'events' => [
-                'id' => 1,
-                'rrule' => 'RRULE',
-                'start_date' => (Carbon::now())->subMonth()->toIso8601String(),
-                'end_date' => (Carbon::now())->addMonth()->toIso8601String(),
-            ]
-        ]);
+        return response()->json($this->calendars->getById($id));
     }
 
     /**
@@ -96,11 +93,36 @@ class CalendarsController extends Controller
 
         $success = $this->calendars->update($id, $input);
 
+        // If events are passed, bulk upsert them
+        if (! empty($input['events'])) {
+            $this->bulkUpsertEvents($id, $input['events']);
+        }
+
         if ($success) {
             return response()->json($this->calendars->getById($id));
         }
 
         return response()->json(['message' => 'Something went wrong while updating the calendar, check the logs.'], 400);
+    }
+
+    /**
+     * Bulk upsert events
+     *
+     * @param  integer $id     The id of the calendar
+     * @param  array   $events The events that need to be upserted
+     * @return void
+     */
+    private function bulkUpsertEvents($id, $events)
+    {
+        // Make sure the calendar_id is passed with the event
+        // so it gets linked properly
+        array_walk($events, function (&$event) use ($id) {
+            $event['calendar_id'] = $id;
+        });
+
+        $eventsRepo = app()->make('EventRepository');
+
+        return $eventsRepo->bulkUpsert($events);
     }
 
     /**

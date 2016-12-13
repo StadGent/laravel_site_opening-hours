@@ -49,8 +49,8 @@ class OpeninghourModelInitialSetup extends Migration
         Schema::create('events', function ($table) {
             $table->increments('id');
             $table->text('rrule');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->timestamp('start_date');
+            $table->timestamp('end_date');
             $table->integer('calendar_id')->unsigned();
             $table->timestamps();
         });

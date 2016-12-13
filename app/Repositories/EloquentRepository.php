@@ -25,6 +25,31 @@ class EloquentRepository
         return $model->id;
     }
 
+    /**
+     * Insert a model if no id field is passed, or update
+     * if the opposite is the case
+     *
+     * @param  array $models
+     * @return void
+     */
+    public function bulkUpsert(array $models)
+    {
+        foreach ($models as $model) {
+            if (array_key_exists('id', $model)) {
+                $this->update($id, $model);
+            } else {
+                $this->store($model);
+            }
+        }
+    }
+
+    /**
+     * Where proxy function for the underlying Eloquent model
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return Builder
+     */
     public function where($key, $value)
     {
         return $this->model->where($key, $value);
@@ -43,6 +68,8 @@ class EloquentRepository
 
     public function update($modelId, $properties)
     {
+        $properties = array_only($properties, $this->model->getFillable());
+
         $model = $this->model->find($modelId);
 
         if (! empty($model)) {

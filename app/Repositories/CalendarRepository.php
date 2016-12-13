@@ -10,4 +10,15 @@ class CalendarRepository extends EloquentRepository
     {
         parent::__construct($calendar);
     }
+
+    public function getById($id)
+    {
+        $calendar = $this->model->find($id);
+
+        if (! empty($calendar)) {
+            return $calendar->with('events')->get();
+        }
+
+        return [];
+    }
 }
