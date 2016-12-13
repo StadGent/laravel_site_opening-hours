@@ -16,3 +16,8 @@ Route::get('/', function () {
 })->middleware('auth:web');
 
 Auth::routes();
+
+Route::get('/register/confirm/{token}', 'Auth\RegisterController@showSetPassword');
+Route::post('/register/confirm/{token}', 'Auth\RegisterController@completeRegistration');
+
+Route::get('/home', 'HomeController@index');
