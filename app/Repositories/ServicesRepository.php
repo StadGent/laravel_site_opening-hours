@@ -40,6 +40,6 @@ class ServicesRepository extends EloquentRepository
             $results[] = $result;
         }
 
-        dd($results);
+        return $results;
     }
 }
