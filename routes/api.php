@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +12,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
-
+Route::resource('/users', 'UsersController');
 Route::resource('/services', 'ServicesController');
 Route::resource('/openinghours', 'OpeninghoursController');
 Route::resource('/calendars', 'CalendarsController');

@@ -26,7 +26,7 @@ class UserServiceRole extends Migration
             $table->foreign('service_id')->references('id')->on('services')
                 ->onUpdate('cascade')->onDelete('cascade');
 
-            $table->primary(['user_id', 'role_id']);
+            $table->primary(['user_id', 'role_id', 'service_id']);
         });
     }
 

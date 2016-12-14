@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Repositories\UserRepository;
+use App\Http\Requests\StoreRoleRequest;
 
 /**
  * RolesController takes care of CRUD'ing of roles
@@ -10,6 +12,11 @@ use Illuminate\Http\Request;
  */
 class RolesController extends Controller
 {
+    public function __construct(UserRepository $users)
+    {
+        $this->users = $users;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -36,9 +43,9 @@ class RolesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $input = $request->input();
+        //
     }
 
     /**
@@ -72,7 +79,15 @@ class RolesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input = $request->input();
+
+        $success = $this->users->linkToService($input['user_id'], $input['service_id'], $input['role']);
+
+        if ($success) {
+            return response()->json(['message' => 'De rol werd toegevoegd.']);
+        }
+
+        return response()->json(['message' => 'Er is iets misgegaan tijdens het toevoegen van de rol.'], 400);
     }
 
     /**
