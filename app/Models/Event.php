@@ -12,7 +12,7 @@ class Event extends Model
      * @var array
      */
     protected $fillable = [
-        'rrule', 'start_date', 'end_date', 'calendar_id'
+        'rrule', 'start_date', 'end_date', 'calendar_id', 'label'
     ];
 
     public function calendar()
