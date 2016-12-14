@@ -10,40 +10,42 @@
 		"openinghours": [{
 			"@type": "oh:OpeningHours",
 			"active": true, 
-			"start_date": "2012-01-01",
-			"end_date": "2015-06-31",
+			"start_date": "2016-01-01",
+			"end_date": "2017-06-06",
 			"calendars": [{
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
 				"label": "Normale uren",
-				"priority": 0,
+				"priority": 2,
 				"events": [{
 					"@type": "Vevent",
 					"start_date": "2016-07-11T09:00:00",
 					"end_date": "2016-09-11T17:00:00",
-					"rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;DTSTART=20160101T023000Z;UNTIL=20161231T235959Z"
+					"rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"
 				}]
 			}, {
 				"@type": "oh:Calendar",
 				"oh:closinghours": true,
 				"label": "Nationale feestdagen",
-				"priority": 2,
+				"priority": 1,
 				"events": [{
-					"@type": "Vevent",
+					"start_date": "2016-02-11T09:00:00",
+					"end_date": "2016-02-11T17:00:00",
+					"rrule": "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=2"
+				}, {
 					"start_date": "2016-03-11T09:00:00",
 					"end_date": "2016-03-11T17:00:00",
-					"rrule": "FREQ=MONTHLY;BYDAY=SU;DTSTART=20160101T023000Z;UNTIL=20161231T235959Z",
-					"summary": "Open Tue 4-11p"
+					"rrule": "FREQ=YEARLY;BYMONTH=12;BYMONTHDAY=25"
 				}]
 			}, {
 				"@type": "oh:Calendar",
-				"label": "Super uitzonderingen",
-				"priority": 4,
+				"label": "Paasvakantie",
+				"priority": 0,
 				"events": [{
 					"@type": "Vevent",
 					"start_date": "2016-11-11T11:00:00",
 					"end_date": "2016-11-11T16:00:00",
-					"summary": "Open Tue 4-11p"
+					"rrule": "FREQ=DAILY;DTSTART=20160327T000000Z;UNTIL=20160411T000000Z"
 				}]
 			}]
 		}]

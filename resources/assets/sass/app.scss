@@ -238,15 +238,6 @@ h1+h3 {
       content: $content;
     }
   }
-  .cal {
-    &:nth-child(#{$num + 1}) .cal-img {
-      background: $background;
-      color: $color;
-      &::after {
-        content: $content;
-      }
-    }
-  }
 }
 @include layer(0, $lightblue, white, 'A')
 @include layer(1, $yellow, black, 'B')
@@ -285,8 +276,12 @@ h1+h3 {
   border-top: 1px solid #ddd;
   padding-top: 1rem;
   padding-bottom: 1rem;
+  cursor: pointer;
   &:last-child {
     border-bottom: 1px solid #ddd;
+  }
+  &:hover {
+    background: #eee
   }
 }
 .cal-header {
