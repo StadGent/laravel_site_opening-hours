@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Repositories\UserRepository;
+use Illuminate\Http\Request;
 
 class DeleteRoleRequest extends FormRequest
 {
@@ -11,9 +13,11 @@ class DeleteRoleRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(UserRepository $users, Request $request)
     {
-        return true;
+        // A user may delete a role for a user in a service if:
+        // the user is a super admin or is an owner of the service
+        return $this->user->hasRole('Admin') || $users->hasRoleInService($this->user->id, $request->service_id, 'Owner');
     }
 
     /**

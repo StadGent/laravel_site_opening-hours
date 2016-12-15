@@ -93,11 +93,37 @@ class UserRepository extends EloquentRepository
      *
      * @param  integer $userId
      * @param  integer $serviceId
+     * @param  string  $role      The name of the role
      * @return boolean
      */
-    public function hasRoleInService($userId, $serviceId)
+    public function hasRoleInService($userId, $serviceId, $role)
     {
-        return ! empty($this->getRoleInService($userId, $serviceId));
+        return $this->getRoleInService($userId, $serviceId) == $role;
+    }
+
+    /**
+     * Get all services where the user is part of
+     *
+     * @param  integer $userId
+     * @return array
+     */
+    public function getServices($userId)
+    {
+        $services = DB::select(
+            'SELECT label, uri, description
+            FROM user_service_role
+            JOIN services ON user_service_role.service_id = services.id
+            WHERE user_id = ?',
+            [$userId]
+        );
+
+        $results = [];
+
+        foreach ($services as $service) {
+            $results[] = (array) $service;
+        }
+
+        return $results;
     }
 
     /**
@@ -114,7 +140,12 @@ class UserRepository extends EloquentRepository
             [$userId, $serviceId]
         );
 
-        dd($result);
+        if (! empty($result)) {
+            $result = array_shift($result);
+            $role =  Role::find($result->role_id);
+
+            return $role['name'];
+        }
     }
 
     /**
