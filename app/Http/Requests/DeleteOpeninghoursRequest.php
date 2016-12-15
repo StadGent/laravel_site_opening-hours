@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCalendarRequest extends FormRequest
+class DeleteOpeninghoursRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,9 +28,7 @@ class StoreCalendarRequest extends FormRequest
     public function rules()
     {
         return [
-            'priority' => 'required|numeric',
-            'label' => 'required',
-            'openinghours_id' => 'required|numeric'
+            //
         ];
     }
 }

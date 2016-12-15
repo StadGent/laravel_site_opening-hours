@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Repositories\OpeninghoursRepository;
+use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Http\Requests\DeleteOpeninghoursRequest;
 
 class OpeninghoursController extends Controller
 {
@@ -38,7 +39,7 @@ class OpeninghoursController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreOpeninghoursRequest $request)
     {
         $input = $request->input();
 
@@ -82,7 +83,7 @@ class OpeninghoursController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreOpeninghoursRequest $request, $id)
     {
         $input = $request->input();
 
@@ -101,8 +102,14 @@ class OpeninghoursController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DeleteOpeninghoursRequest $id)
     {
-        //
+        $success = $this->openinghours->delete($id);
+
+        if ($success) {
+            return response()->json(['message' => 'De openingsuren werden verwijderd']);
+        }
+
+        return reponse()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
     }
 }

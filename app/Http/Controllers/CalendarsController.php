@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\CalendarRepository;
-use App\Http\Requests\StoreCalendarRequest;
+use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Http\Requests\DeleteOpeninghoursRequest;
 
 class CalendarsController extends Controller
 {
@@ -87,7 +88,7 @@ class CalendarsController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreCalendarRequest $request, $id)
+    public function update(StoreOpeninghoursRequest $request, $id)
     {
         $input = $request->input();
 
@@ -131,8 +132,14 @@ class CalendarsController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DeleteOpeninghoursRequest $id)
     {
-        $this->calendars->delete($id);
+        $success = $this->calendars->delete($id);
+
+        if ($success) {
+            return response()->json(['message' => 'De kalender werd verwijderd.']);
+        }
+
+        return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
     }
 }
