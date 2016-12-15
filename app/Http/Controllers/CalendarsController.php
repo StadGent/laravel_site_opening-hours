@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Repositories\CalendarRepository;
+use App\Http\Requests\StoreCalendarRequest;
 
 class CalendarsController extends Controller
 {
@@ -38,7 +38,7 @@ class CalendarsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreCalendarRequest $request)
     {
         $input = $request->input();
 
@@ -87,7 +87,7 @@ class CalendarsController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreCalendarRequest $request, $id)
     {
         $input = $request->input();
 

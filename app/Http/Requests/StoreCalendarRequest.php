@@ -4,10 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * Add a new role to a user, for a certain service
- */
-class StoreRoleRequest extends FormRequest
+class StoreCalendarRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,7 +15,9 @@ class StoreRoleRequest extends FormRequest
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
-        return $this->user->hasRole('Admin') || $users->hasRoleInService($this->user->id, $request->service_id, 'Owner');
+        return $this->user->hasRole('Admin')
+        || $users->hasRoleInService($this->user->id, $request->service_id, 'Owner')
+        || $users->hasRoleInService($this->user->id, $request->service_id, 'Member');
     }
 
     /**
@@ -29,9 +28,9 @@ class StoreRoleRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|numeric',
-            'service_id' => 'required|numeric',
-            'role' => 'required|in:Owner,Member'
+            'priority' => 'required|numeric',
+            'label' => 'required',
+            'openinghours_id' => 'required|numeric'
         ];
     }
 }
