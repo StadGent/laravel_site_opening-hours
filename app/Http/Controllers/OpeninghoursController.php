@@ -10,6 +10,8 @@ class OpeninghoursController extends Controller
 {
     public function __construct(OpeninghoursRepository $openinghours)
     {
+        $this->middleware('auth');
+
         $this->openinghours = $openinghours;
     }
 
@@ -20,7 +22,7 @@ class OpeninghoursController extends Controller
      */
     public function index()
     {
-        throw new Exception('Not yet implemented');
+        return $this->openinghours->getOpeninghoursGraph(1);
     }
 
     /**

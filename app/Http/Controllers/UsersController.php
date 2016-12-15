@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
+use App\Http\Requests\GetUsersRequest;
+use Auth;
 
 class UsersController extends Controller
 {
     public function __construct(UserRepository $users)
     {
+        $this->middleware('auth');
+
         $this->users = $users;
     }
 
@@ -17,9 +21,11 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(GetUsersRequest $request)
     {
-        //
+        $users = $this->users->getAll();
+
+        return response()->json($users);
     }
 
     /**

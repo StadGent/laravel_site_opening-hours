@@ -10,6 +10,8 @@ class ChannelController extends Controller
 {
     public function __construct(ChannelRepository $channels)
     {
+        $this->middleware('auth');
+
         $this->channels = $channels;
     }
 

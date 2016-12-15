@@ -10,6 +10,8 @@ class CalendarsController extends Controller
 {
     public function __construct(CalendarRepository $calendars)
     {
+        $this->middleware('auth');
+
         $this->calendars = $calendars;
     }
 

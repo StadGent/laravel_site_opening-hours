@@ -30,6 +30,29 @@ class UserRepository extends EloquentRepository
     }
 
     /**
+     * Return all users with their roles
+     *
+     * @param  integer $limit
+     * @param  integer $offset
+     * @return array
+     */
+    public function getAll($limit = 50, $offset = 0)
+    {
+        $users = $this->model->take($limit)->skip($offset)->get();
+
+        $results = [];
+
+        foreach ($users as $user) {
+            $result = $user->toArray();
+            $result['roles'] = $this->getAllRolesForUser($user->id);
+
+            $results[] = $result;
+        }
+
+        return $results;
+    }
+
+    /**
      * Give a user a specific role in a certain service
      *
      * @param  integer $userId
