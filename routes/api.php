@@ -17,4 +17,5 @@ Route::resource('/services', 'ServicesController');
 Route::resource('/openinghours', 'OpeninghoursController');
 Route::resource('/calendars', 'CalendarsController');
 Route::resource('/channels', 'ChannelController');
-Route::resource('/roles', 'RolesController');
+Route::post('/roles', 'RolesController@update');
+Route::delete('/roles', 'RolesController@destroy');

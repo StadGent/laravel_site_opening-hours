@@ -126,7 +126,7 @@ class UserRepository extends EloquentRepository
      */
     public function removeRoleInService($userId, $serviceId)
     {
-        DB::delete('DELETE FROM user_service_role WHERE user_id = ? AND service_id = ?', [$userId, $serviceId]);
+        return DB::delete('DELETE FROM user_service_role WHERE user_id = ? AND service_id = ?', [$userId, $serviceId]);
     }
 
     private function getRoleId($role)
