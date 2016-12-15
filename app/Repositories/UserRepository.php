@@ -172,6 +172,31 @@ class UserRepository extends EloquentRepository
     }
 
     /**
+     * Get all users in a service
+     *
+     * @param  integer $serviceId
+     * @return array
+     */
+    public function getAllInService($serviceId)
+    {
+        $results = DB::select(
+            'SELECT users.name, users.id, users.email
+            FROM user_service_role
+            JOIN users ON  users.id = user_service_role.user_id
+            WHERE user_service_role.service_id = ?',
+            [$serviceId]
+        );
+
+        $users = [];
+
+        foreach ($results as $result) {
+            $users[] = (array) $result;
+        }
+
+        return $users;
+    }
+
+    /**
      * Remove a role of a user in a certain service
      *
      * @param  integer $userId
