@@ -101,6 +101,12 @@ export default {
       return this.$parent.routeChannel || {}
     },
     version () {
+      if (!Array.isArray(this.$parent.routeVersion.calendars)) {
+        this.$set(this.$parent.routeVersion, 'calendars', [])
+        this.$nextTick(() => {
+        this.fetchVersion()
+        })
+      }
       return this.$parent.routeVersion || {}
     },
     layeredVersion () {
@@ -135,6 +141,15 @@ export default {
       const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
       this.layeredVersion.calendars.push(newCal)
       this.toCalendar(newCal.layer)
+    },
+    fetchVersion () {
+      if (!this.route.version) {
+        return
+      }
+      this.$http.get('/api/openinghours/' + this.route.version)
+        .then(({ data }) => {
+          this.$set(this.version, calendars, data.calendars)
+        })
     }
   },
   components: {

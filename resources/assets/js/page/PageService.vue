@@ -54,9 +54,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(channel, index) in filteredChannels" @click="href('#!channel/'+[srv.id,index].join('/'))">
+          <tr v-for="channel in filteredChannels" @click="href('#!channel/'+[srv.id,channel.id].join('/'))">
             <td>
-              <a :href="'#!channel/'+[srv.id,index].join('/')">{{ channel.label }}</a>
+              <a :href="'#!channel/'+[srv.id,channel.id].join('/')">{{ channel.label }}</a>
             </td>
             <td>{{ channel | toChannelStatus }}</td>
             <td class="text-muted">
@@ -64,12 +64,12 @@
               <div>{{ channel.updated_by }}</div>
             </td>
             <td class="text-right">
-              <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-default">
+              <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-default">
                 <i class="glyphicon glyphicon-trash"></i>
               </a>
             </td>
             <td class="text-right">
-              <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-primary">
+              <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-primary">
                 <i class="glyphicon glyphicon-pencil"></i>
               </a>
             </td>

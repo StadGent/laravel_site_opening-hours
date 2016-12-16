@@ -2,6 +2,7 @@
   <div class="container">
     <h1>{{ channel.label }} versies <small>{{ $parent.routeService.label || 'Dienst zonder naam' }}</small></h1>
 
+    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
 
       <div v-if="!versions||!versions.length" style="padding:5em 0;">
         <h1>Empty state</h1>
@@ -20,19 +21,19 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(version, index) in versions" @click="href('#!version/'+[srv.id,route.channel,index].join('/'))">
+          <tr v-for="version in versions" @click="href('#!version/'+[srv.id,route.channel,version.id].join('/'))">
             <td>
-              <a :href="'#!version/'+[srv.id,route.channel,index].join('/')">{{ version.label || 'Zonder label' }}</a>
+              <a :href="'#!version/'+[srv.id,route.channel,version.id].join('/')">{{ version.label || 'Zonder label' }}</a>
             </td>
             <td>{{ version.start_date }}</td>
             <td>{{ version.end_date }}</td>
             <td class="text-right">
-              <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-default">
+              <a :href="'#!channel/'+[srv.id,version.id].join('/')" class="btn btn-icon btn-default">
                 <i class="glyphicon glyphicon-trash"></i>
               </a>
             </td>
             <td class="text-right">
-              <a :href="'#!channel/'+[srv.id,index].join('/')" class="btn btn-icon btn-primary">
+              <a :href="'#!channel/'+[srv.id,version.id].join('/')" class="btn btn-icon btn-primary">
                 <i class="glyphicon glyphicon-pencil"></i>
               </a>
             </td>
@@ -67,7 +68,7 @@ export default {
   mounted () {
     // Dev mode, if there is only 1 version, just open it
     if (this.versions.length === 1) {
-      this.toVersion(0)
+      // this.toVersion(0)
     }
   },
   components: {

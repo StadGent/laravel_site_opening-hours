@@ -6,10 +6,12 @@
         <input v-model="query" @input="route.offset=0" class="form-control" placeholder="Zoek dienst" style="max-width:300px" type="search">
       </div>
     </form>
-    <div class="btn-group" v-if="user.admin">
-      <button type="button" class="btn btn-primary" :class="{active: !route.tab}" @click="route.tab=0">Toon diensten</button>
-      <button type="button" class="btn btn-primary" :class="{active: route.tab=='users'}" @click="route.tab='users'">Toon gebruikers</button>
-      <button type="button" class="btn btn-primary" :class="{active: route.tab=='admin'}" @click="route.tab='admin'">Toon administrators</button>
+    <div v-if="user.admin">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" :class="{active: !route.tab}" @click="route.tab=0">Toon diensten</button>
+        <button type="button" class="btn btn-primary" :class="{active: route.tab=='users'}" @click="route.tab='users'">Toon gebruikers</button>
+      </div>
+      <button type="button" class="btn btn-link btn-disabled" :class="{active: route.tab=='admin'}" @click="route.tab='admin'" disabled>Toon administrators</button>
     </div>
     <div v-else>
       <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
@@ -113,16 +115,11 @@ export default {
     pagedServices () {
       var services = this.sortedServices.slice(this.route.offset || 0, this.route.offset + pageSize)
       if (this.user.admin) {
-        if (!this.users[0]) {
-          return []
-        }
-
         // TODO: do this enriching onload, like is done with users
-        services.forEach(v => {
-          const users = this.users.filter(u => u.role[v.id])
-          Object.assign(v, {
-            activeUsers: users.filter(u => u.verified),
-            ghostUsers: users.filter(u => !u.verified)
+        services.forEach(s => {
+          Object.assign(s, {
+            activeUsers: s.users.filter(u => u.verified),
+            ghostUsers: s.users.filter(u => !u.verified)
           })
         })
       }
@@ -137,7 +134,7 @@ export default {
       return this.order ? this.filteredUsers.slice().sort(orderBy(this.order)) : this.filteredUsers
     },
     pagedUsers () {
-      return this.sortedUsers.slice(this.route.offset || 0, pageSize)
+      return this.sortedUsers.slice(this.route.offset || 0, this.route.offset + pageSize)
     }
   },
   components: {

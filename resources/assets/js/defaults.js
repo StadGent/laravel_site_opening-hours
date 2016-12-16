@@ -1,6 +1,6 @@
 const defaultStart = '2016-01-01T00:00:00'
 const defaultEnd = '2016-01-02T00:00:00'
-const defaultUntil = '2018-01-01'
+const defaultUntil = '2021-01-01'
 
 const firstEventStart = '2016-01-01T09:00:00'
 const firstEventEnd = '2016-01-01T17:00:00'
@@ -50,6 +50,7 @@ export function createVersion() {
     active: true,
     start_date: defaultStart,
     end_date: defaultUntil,
+    priority: 0,
     label: 'Nieuwe versie',
     calendars: []
   }

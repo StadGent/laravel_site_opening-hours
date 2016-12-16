@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     isOwner () {
-      return this.user.admin || (this.user.roles.find(r => r.service == this.route.service) || {}).role === 'owner'
+      return this.user.admin || this.routeService && this.routeService.users && this.routeService.users.find(u => u.user_id == this.user.id && u.role === 'Owner')
     }
   },
   methods: {
