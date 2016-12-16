@@ -21,7 +21,7 @@ export default {
       return this.routeChannel.openinghours && this.routeChannel.openinghours.find(o => o.id === this.route.version) || {}
     },
     routeCalendar () {
-      return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.layer === this.route.calendar) || {}
+      return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.id === this.route.calendar) || {}
     }
   },
   methods: {
@@ -29,6 +29,19 @@ export default {
       return this.$http.get('/api/services')
         .then(({ data }) => {
           this.services = data || []
+        })
+    },
+    fetchVersion () {
+      if (!this.routeVersion) {
+        return console.warn('no route version')
+      }
+      return this.$http.get('/api/openinghours/' + this.route.version)
+        .then(({ data }) => {
+          const index = this.routeChannel.openinghours.findIndex(o => o.id === data.id)
+          if (!index) {
+            return console.warn('did not find this version', data)
+          }
+          this.$set(this.routeChannel.openinghours, index, data)
         })
     }
   },
@@ -62,6 +75,25 @@ export default {
         this.modalClose()
         this.toVersion(data.id)
       })
+    })
+
+    Hub.$on('createCalendar', calendar => {
+      if (!calendar.openinghours_id) {
+        calendar.openinghours_id = this.route.version
+      }
+      console.log('Create calendar', inert(calendar))
+
+      if (calendar.id) {
+        this.$http.put('/api/calendars/' + calendar.id, calendar).then(({ data }) => {
+          this.routeVersion.calendars.push(data)
+          this.toCalendar(data.id)
+        })
+      } else {
+        this.$http.post('/api/calendars/' + calendar.id, calendar).then(({ data }) => {
+          this.routeVersion.calendars.push(data)
+          this.toCalendar(data.id)
+        })
+      }
     })
   }
 }

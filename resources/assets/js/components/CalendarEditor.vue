@@ -30,7 +30,7 @@
 <script>
 import EventEditor from '../components/EventEditor.vue'
 import { createEvent } from '../defaults.js'
-import { cleanEmpty } from '../lib.js'
+import { cleanEmpty, Hub } from '../lib.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 
@@ -65,7 +65,7 @@ export default {
       this.cal.events.splice(index, 1)
     },
     save () {
-      
+      Hub.$emit('createCalendar', this.cal)
     }
   },
   created () {

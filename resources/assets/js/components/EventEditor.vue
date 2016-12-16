@@ -415,6 +415,9 @@ export default {
         if (!this.options.byweekday || !this.options.byweekday.length) {
           delete this.options.byweekday
         }
+        if (this.options.freq > 1) {
+          delete this.options.bymonthday
+        }
         const freq = this.options.freq
         const byweekday = this.options.byweekday
         this.options = cleanEmpty(this.options)

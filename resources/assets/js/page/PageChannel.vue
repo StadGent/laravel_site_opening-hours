@@ -2,7 +2,7 @@
   <div class="container">
     <h1>{{ channel.label }} versies <small>{{ $parent.routeService.label || 'Dienst zonder naam' }}</small></h1>
 
-    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
+    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newVersion()">+ Nieuwe versie</button>
 
       <div v-if="!versions||!versions.length" style="padding:5em 0;">
         <h1>Empty state</h1>

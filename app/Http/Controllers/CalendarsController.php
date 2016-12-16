@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\CalendarRepository;
-use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\DeleteOpeninghoursRequest;
 
 class CalendarsController extends Controller
