@@ -32,26 +32,43 @@ export default {
   },
   mounted () {
     this.fetchServices()
-    Hub.$on('createChannel', modal => {
-      console.log('Create channel on', modal)
-      setTimeout(() => {
-        if (!modal.srv) {
-          return console.error('createChannel: service is missing')
+    Hub.$on('createChannel', channel => {
+      if (!channel.srv) {
+        return console.error('createChannel: service is missing')
+      }
+
+      channel.service_id = channel.srv && channel.srv.id
+      this.$http.post('/api/channels', channel).then(() => {
+        this.fetchServices()
+        this.modalClose()
+        Hub.$emit('createRolec')
+      }).catch(error => {
+        console.warn(error)
+      })
+    })
+
+    Hub.$on('createOpeninghours', openinghours => {
+      openinghours.service_id = openinghours.srv && openinghours.srv.id
+      console.log('Create openinghours on', inert(openinghours))
+
+      this.$http.post('/api/openinghours', openinghours).then(() => {
+        if (!openinghours.srv) {
+          return console.error('createopeninghours: service is missing')
         }
-        var index = this.services.findIndex(s => s.id === modal.srv.id)
+        var index = this.services.findIndex(s => s.id === openinghours.srv.id)
         if (index === -1) {
-          return console.error('createChannel: service is not found')
+          return console.error('createopeninghours: service is not found')
         }
         var srv = this.services[index]
         if (!srv) {
-          return console.error('createChannel: service is invalid')
+          return console.error('createopeninghours: service is invalid')
         }
-        if(!srv.channels) {
-          srv.channels = []
+        if(!srv.openinghours) {
+          srv.openinghours = []
         }
-        srv.channels.push({
+        srv.openinghours.push({
           id: Math.floor(Math.random() * 1000),
-          label: modal.label,
+          label: openinghours.label,
           created_at: new Date().toJSON().slice(0, 19),
           created_by: this.user.name,
           updated_at: new Date().toJSON().slice(0, 19),

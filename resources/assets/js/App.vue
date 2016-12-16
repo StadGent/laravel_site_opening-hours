@@ -17,13 +17,9 @@
       <label>
         <input type="checkbox" v-model="user.admin"> User is admin: {{ user.admin ? 'yes' : 'no' }}
       </label>
-      <label>
-        <input type="checkbox" disabled> User is owner: {{ isOwner ? 'yes' : 'no' }}
-      </label>
-      <label>
-        <input type="checkbox" v-model="user.basic"> User is basic: {{ user.basic ? 'yes' : 'no' }}
-      </label>
-      <pre v-text="route"></pre>
+      <br>
+      Service role is: {{ isOwner ? 'owner' : 'member' }}
+      <!-- <pre v-text="route"></pre> -->
     </div>
   </div>
 </template>

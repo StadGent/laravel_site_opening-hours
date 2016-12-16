@@ -8,7 +8,7 @@
         {{ u.email }}
       </td>
       <td @click.stop>
-        <div class="pull-left">{{ u.roles.find(r => r.service === route.service).role === 'owner' ? 'eigenaar' : '' }}</div>
+        <div class="pull-left">rol</div>
       </td>
       <td v-if="u.verified" class="text-success">&checkmark;</td>
       <td v-else class="text-warning">&cross;</td>
