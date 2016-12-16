@@ -30,8 +30,9 @@ class QueryController extends Controller
                 try {
                     $day = new Carbon($request->input('date'));
 
-                    $data = $this->isOpenOnDay($day->toDateString(), $request->input());
+                    $data = $this->isOpenOnDay($day, $request);
                 } catch (\Exception $ex) {
+                    \Log::error($ex->getMessage());
                     return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
                 }
                 break;
@@ -41,6 +42,95 @@ class QueryController extends Controller
         }
 
         return response()->json($data);
+    }
+
+    /**
+     * Get the openinghours for a specific day
+     *
+     * @param  Carbon  $day
+     * @param  Request $request
+     * @return boolean
+     */
+    private function isOpenOnDay($day, $request)
+    {
+        $services = app()->make('ServicesRepository');
+        $openinghoursRepo = app()->make('OpeninghoursRepository');
+
+        // Get the service URI for which we need to compute the week schedule
+        $serviceUri = $request->input('serviceUri');
+        $channel = $request->input('channel');
+
+        // Get the service
+        $service = $services->where('uri', $serviceUri)->first();
+
+        if (empty($service)) {
+            return response()->json(['message' => 'The service was not found.'], 404);
+        }
+
+        $channels = [];
+
+        // If no channel is passed, return all channels
+        if (! empty($channel)) {
+            $channels[] = $channel;
+        } else {
+            $channelObjects = $service->channels->toArray();
+
+            foreach ($channelObjects as $object) {
+                $channels[] = $object['label'];
+            }
+        }
+
+        if (empty($channels)) {
+            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
+        }
+
+        $result = [];
+
+        foreach ($channels as $channel) {
+            $status = 'Gesloten';
+
+            // Get the openinghours for the channel
+            $openinghours = $openinghoursRepo->getAllForServiceAndChannel($serviceUri, $channel);
+
+            // Get the openinghours that is active now
+            $relevantOpeninghours = '';
+
+            foreach ($openinghours as $openinghoursInstance) {
+                if ($day->between(
+                    (new Carbon($openinghoursInstance->start_date)),
+                    (new Carbon($openinghoursInstance->end_date))
+                )) {
+                    $relevantOpeninghours = $openinghoursInstance;
+                    break;
+                }
+            }
+
+            if (! empty($openinghours)) {
+                // Check if any calendar has an event that falls within the timeframe
+                $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
+                    return $calendar->priority;
+                });
+
+                $status = 'Gesloten';
+
+                // Iterate all calendars for the day of the week
+                foreach ($calendars as $calendar) {
+                    $ical = $this->createIcalFromCalendar($calendar);
+
+                    $dayInfo = $this->extractDayInfo($ical, $day->toDateString(), $day->toDateString());
+
+                    if (! empty($dayInfo) && $calendar->closinghours == 0) {
+                        $status = $dayInfo;
+
+                        break;
+                    }
+                }
+            }
+
+            $result[$channel] = $status;
+        }
+
+        return $result;
     }
 
     /**
@@ -96,7 +186,7 @@ class QueryController extends Controller
             $relevantOpeninghours = '';
 
             foreach ($openinghours as $openinghoursInstance) {
-                if (Carbon::now()->between(
+                if ($now->between(
                     (new Carbon($openinghoursInstance->start_date)),
                     (new Carbon($openinghoursInstance->end_date))
                 )) {
