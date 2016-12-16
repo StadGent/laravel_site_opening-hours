@@ -39,7 +39,7 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        $this->middleware('auth');
     }
 
     /**
@@ -139,7 +139,7 @@ class RegisterController extends Controller
         $user = User::create([
             'name' => @$data['name'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            'password' => '',
             'token' => str_random(32),
             'verified' => false
         ]);

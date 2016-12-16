@@ -36,17 +36,34 @@ class UsersController extends Controller
     public function create()
     {
         //
+        return response()->json([ 'id' => 1 ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Upsert a user
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+        $id = $request->input('id');
+
+        if (!$id) {
+            $input = $request->input();
+            $input['password'] = '';
+            $input['token'] = str_random(32);
+            $input['verified'] = false;
+            $id = $this->users->store($input);
+        }
+
+        $user = $this->users->getById($id);
+
+        if (! empty($user)) {
+            return response()->json($user);
+        }
+
+        return response()->json(['message' => 'Something went wrong while storing the user, check the logs.'], 400);
     }
 
     /**

@@ -78,10 +78,10 @@
       </table>
     </div>
 
-    <div style="padding-top:10em">
+ <!--    <div style="padding-top:10em">
       <h3>Debug info</h3>
       <pre v-text="srv"></pre>
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -19,34 +19,47 @@ export default {
   },
   mounted() {
     this.fetchUsers()
-    Hub.$on('createRole', modal => {
-      setTimeout(() => {
-        if (!modal.email) {
-          return console.error('createRole: email is missing')
-        }
-        if (!modal.srv || !modal.srv.id) {
-          return console.error('createRole: service is missing')
-        }
-        const service = modal.srv.id
-        const role = modal.owner ? 'owner' : 'basic'
-        const index = this.users.findIndex(s => s.email === modal.email)
+    Hub.$on('createRole', newRole => {
+      if (!newRole.service_id) {
+        newRole.service_id = this.routeService.id
+      }
+      newRole.role_id = newRole.role_id || 3
+      newRole.user_id = newRole.user_id || newRole.id
+      if (!newRole.user_id && !newRole.email) {
+        // Cannot continue without at least one of these
+        return console.error('createRole: email is missing')
+      } else if (!newRole.user_id) {
+        // Create the missing user based on user.email
+        // After the creation, the role will be added too
+        Hub.$emit('createUser', newRole)
+        return
+      }
 
-        // Create or update user
-        if (index === -1) {
-          this.users.push(expandUser({
-              id: Math.floor(Math.random() * 1000),
-              name: 'Temp',
-              email: modal.email,
-              roles: [{ service, role }]
-            }))
-            // Send invite
+      this.$http.post('/api/roles', newRole).then(() => {
+        this.fetchServices()
+        this.modalClose()
+      }).catch(error => {
+        console.warn(error)
+      })
+    })
+
+    Hub.$on('createUser', newUser => {
+      if (!newUser.email) {
+        return console.error('createRole: email is missing')
+      }
+      newUser.name = newUser.name || newUser.email
+
+      this.$http.post('/api/users', newUser).then(({ data }) => {
+        Object.assign(newUser, data)
+        if (newUser.role_id) {
+          Hub.$emit('createRole', newUser)
         } else {
-          const user = this.users[index]
-          user.roles.push({ service, role })
-          this.$set(this.users, index, expandUser(user))
+          this.fetchServices()
         }
         this.modalClose()
-      }, 100)
+      }).catch(error => {
+        console.warn(error)
+      })
     })
   }
 }

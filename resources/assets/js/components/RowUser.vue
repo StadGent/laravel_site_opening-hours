@@ -12,8 +12,8 @@
         <div style="margin-left:20px;">
           <div v-for="r in u.roles">
           {{ r.service }}
-          <input type="radio" value="basic" v-model="r.role">
-          <input type="radio" value="owner" v-model="r.role">
+          <input type="radio" value="Owner" v-model="r.role">
+          <input type="radio" value="Member" v-model="r.role">
           </div>
         </div>
       </td>

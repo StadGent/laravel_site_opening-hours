@@ -4,9 +4,7 @@ const userDefault = {
   id: 1,
   name: 'Voornaam Naam',
   roles: [],
-  admin: false,
-  owner: false,
-  basic: true
+  admin: false
 }
 lsDefault('user', userDefault)
 
