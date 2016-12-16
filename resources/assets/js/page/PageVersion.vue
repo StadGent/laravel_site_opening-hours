@@ -19,7 +19,7 @@
             <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length">Voeg uitzonderingen toe</button>
           </p>
           <div class="row">
-            <div class="col-sm-12 cal" v-for="(cal, index) in reversedCalendars" @click="toCalendar(cal.layer)">
+            <div class="col-sm-12 cal" v-for="cal in reversedCalendars" @click="toCalendar(cal.id)">
               <header class="cal-header">
                 <div class="cal-img" :class="'layer-'+cal.layer"></div>
                 <span class="cal-name">{{ cal.label }}</span>
@@ -82,7 +82,7 @@ import YearCalendar from '../components/YearCalendar.vue'
 import CalendarEditor from '../components/CalendarEditor.vue'
 
 import { createCalendar, createFirstCalendar } from '../defaults.js'
-import { orderBy } from '../lib.js'
+import { orderBy, Hub } from '../lib.js'
 
 export default {
   name: 'version',
@@ -101,10 +101,10 @@ export default {
       return this.$parent.routeChannel || {}
     },
     version () {
-      if (!Array.isArray(this.$parent.routeVersion.calendars)) {
+      if (this.$parent.routeVersion && !Array.isArray(this.$parent.routeVersion.calendars)) {
         this.$set(this.$parent.routeVersion, 'calendars', [])
         this.$nextTick(() => {
-        this.fetchVersion()
+          this.$parent.fetchVersion()
         })
       }
       return this.$parent.routeVersion || {}
@@ -139,17 +139,8 @@ export default {
     },
     addCalendar () {
       const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
-      this.layeredVersion.calendars.push(newCal)
-      this.toCalendar(newCal.layer)
-    },
-    fetchVersion () {
-      if (!this.route.version) {
-        return
-      }
-      this.$http.get('/api/openinghours/' + this.route.version)
-        .then(({ data }) => {
-          this.$set(this.version, calendars, data.calendars)
-        })
+      console.log(inert(newCal))
+      Hub.$emit('createCalendar', newCal)
     }
   },
   components: {

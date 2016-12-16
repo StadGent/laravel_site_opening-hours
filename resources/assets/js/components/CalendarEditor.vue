@@ -1,21 +1,24 @@
 <template>
-  <div class="">
+  <div class="wrapper-height100">
     <div class="wrapper-above-save">
-      <div class="close" style="padding:10px 15px;margin: -10px -15px;" @click="route.calendar=-1">&times;</div>
+      <div class="close" style="padding:10px 15px;margin:0 -15px;" @click="route.calendar=-1">&times;</div>
       <h3>{{ cal.label }}</h3>
       <label v-if="cal.layer">
         <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
       </label>
+      <br v-else>
 
       <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
       <p v-if="cal.layer">
-        <button @click="cal.events.push(createEvent())" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
+        <button @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
       </p>
     </div>
 
-    <div class="">
-      <button class="btn btn-primary">Bewaren</button>
+    <div class="row wrapper-save-btn">
+      <div class="col-xs-12 text-right">
+        <button class="btn btn-primary" @click="save">Bewaren</button>
+      </div>
     </div>
 
 <!-- 
@@ -27,7 +30,7 @@
 <script>
 import EventEditor from '../components/EventEditor.vue'
 import { createEvent } from '../defaults.js'
-import { cleanEmpty } from '../lib.js'
+import { cleanEmpty, Hub } from '../lib.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 
@@ -50,6 +53,9 @@ export default {
     toggleClosing () {
       this.$set(this.cal, 'closinghours', !this.cal.closinghours)
     },
+    pushEvent (index, event) {
+      this.cal.events.push(createEvent())
+    },
     addEvent (index, event) {
       console.log('add yes', index, event)
       event = Object.assign({}, event)
@@ -57,6 +63,9 @@ export default {
     },
     rmEvent (index) {
       this.cal.events.splice(index, 1)
+    },
+    save () {
+      Hub.$emit('createCalendar', this.cal)
     }
   },
   created () {

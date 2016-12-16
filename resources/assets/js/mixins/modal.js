@@ -8,7 +8,6 @@ export const modal = {
 
 export default {
   data() {
-    console.log(modal)
     return {
       modal
     }
