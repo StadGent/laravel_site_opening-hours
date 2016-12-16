@@ -85,7 +85,6 @@ class QueryController extends Controller
         $result = [];
 
         $now = Carbon::now();
-        $now = Carbon::create(2016, 12, 11, 10, 01, 00);
 
         foreach ($channels as $channel) {
             $status = 'Gesloten';
@@ -117,7 +116,9 @@ class QueryController extends Controller
                     $ical = $this->createIcalFromCalendar($calendar);
 
                     if ($this->hasEventForRange($ical, $now->toIso8601String(), $now->toIso8601String())) {
-                        $status = $calendar->closinghours == 0 ? 'Gesloten' : 'Open';
+                        $status = $calendar->closinghours == 0 ? 'Open' : 'Gesloten';
+
+                        continue;
                     }
                 }
             }
