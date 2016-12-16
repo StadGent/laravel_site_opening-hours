@@ -47,6 +47,7 @@ $navbar-default-toggle-border-color:       #ddd !default;
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "vendor/bootstrap-year";
+@import "vendor/bootstrap-multiselect";
 
 /* container maybe max-width to 100% */
 
@@ -134,6 +135,35 @@ $navbar-default-toggle-border-color:       #ddd !default;
   }
 }
 
+/* Form inline */
+
+.form-inline-always {
+  margin: 10px 0;
+  .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+  }
+  .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+  }
+  .multiselect-native-select {
+    display: inline-block;
+    width: 140px;
+  }
+  .control-time {
+    width: 70px;
+    margin: 0 10px;
+  }
+  .close {
+    margin: 0 -10px;
+    padding: 0 10px;
+    line-height: 32px;
+  }
+}
+
 /* Panel */
 
 a.panel {
@@ -200,7 +230,10 @@ h1+h3 {
 
 .version-split {
   position: fixed;
-  top: 217px;
+  z-index: 3;
+  top: 150px;
+  // Temp
+  // top: 217px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -307,6 +340,11 @@ h1+h3 {
 }
 .cal-drag {
   font-size: 12px;
+}
+.tooltip {
+  white-space: pre;
+  transition: none;
+  pointer-events: none;
 }
 
 /* Modal > Content */

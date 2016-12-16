@@ -46,9 +46,7 @@ export const addListener = {
         route.version = -1
         route.calendar = -1
       }
-      if (hasCalendarSelected(this.route.page)) {
-        window.location.replace('#!' + [route.page, route.service, route.channel, route.version, route.calendar].join('/'))
-      }
+      this.replaceHash()
 
       return false
     }
@@ -62,21 +60,36 @@ export default {
     }
   },
   methods: {
+    // Simulate clicking a link and let it trigger a hashchange event
     href(v) {
       window.location.href = v
     },
+    // Update the hash to match the current route without triggering a hashchange event
+    replaceHash() {
+      if (hasCalendarSelected(this.route.page)) {
+        window.location.replace('#!' + [route.page, route.service, route.channel, route.version, route.calendar].join('/'))
+      }
+    },
     toChannel(c) {
-      console.log(c)
       route.page = 'channel'
-      route.channel = parseInt(c || 0)
+      if (typeof c !== 'undefined') {
+        route.channel = parseInt(c || 0)
+      }
+      this.replaceHash()
     },
     toVersion(c) {
       route.page = 'version'
-      route.version = parseInt(c || 0)
+      if (typeof c !== 'undefined') {
+        route.version = parseInt(c || 0)
+      }
+      this.replaceHash()
     },
     toCalendar(c) {
       route.page = 'calendar'
-      route.calendar = parseInt(c || 0)
+      if (typeof c !== 'undefined') {
+        route.calendar = parseInt(c || 0)
+      }
+      this.replaceHash()
     },
     refresh(c) {
       window.location.reload()

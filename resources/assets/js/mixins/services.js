@@ -19,7 +19,7 @@ export default {
       return this.routeChannel.openinghours && this.routeChannel.openinghours[this.route.version] || {}
     },
     routeCalendar () {
-      return this.routeVersion.calendars && this.routeVersion.calendars[this.route.calendar] || {}
+      return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.layer === this.route.calendar) || {}
     }
   },
   methods: {

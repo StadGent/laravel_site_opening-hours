@@ -64,6 +64,12 @@ export default {
       return this.$parent.routeChannel.openinghours || []
     }
   },
+  mounted () {
+    // Dev mode, if there is only 1 version, just open it
+    if (this.versions.length === 1) {
+      this.toVersion(0)
+    }
+  },
   components: {
     ThSort
   }

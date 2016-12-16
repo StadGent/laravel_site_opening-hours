@@ -6,9 +6,8 @@
     <page-home v-if="route.page=='home'" :services="services" :users="users"></page-home>
     <page-service v-if="route.page=='service'" :users="users"></page-service>
     <page-channel v-if="route.page=='channel'"></page-channel>
-    <page-calendar v-if="route.page=='calendar'"></page-calendar>
     <page-user v-if="route.page=='user'"></page-user>
-    <page-version v-if="route.page=='version'"></page-version>
+    <page-version v-if="route.page=='version'||route.page=='calendar'"></page-version>
 
     <modal-text></modal-text>
     <div class="modal-backdrop fade in" v-show="modalActive"></div>
@@ -33,7 +32,6 @@
 import TopBreadcrumb from './components/TopBreadcrumb.vue'
 import TopNav from './components/TopNav.vue'
 
-import PageCalendar from './page/PageCalendar.vue'
 import PageChannel from './page/PageChannel.vue'
 import PageHome from './page/PageHome.vue'
 import PageService from './page/PageService.vue'
@@ -51,7 +49,6 @@ export default {
   mixins: [addListener, servicesMixin, usersMixin],
   components: {
     ModalText,
-    PageCalendar,
     PageChannel,
     PageHome,
     PageService,
