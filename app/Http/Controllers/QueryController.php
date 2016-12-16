@@ -68,7 +68,7 @@ class QueryController extends Controller
         }
 
         if (empty($channels)) {
-            abort(404, "Deze dienst heeft geen enkel kanaal met openingsuren.");
+            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
         }
 
         $openinghours = [];
@@ -99,7 +99,7 @@ class QueryController extends Controller
             abort(404, 'Het gevraagde kanaal heeft geen openingsuren binnen de gevraagde dienst.');
         }
 
-        $weekDays = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
+        $weekDays = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
 
         // Get the openinghours that is active now
         $relevantOpeninghours = '';
@@ -120,7 +120,7 @@ class QueryController extends Controller
 
         // Go to the start of the week starting from today and iterate over every day
         // then check if there are events for that given day in the calendar, by priority
-        $weekDay = (Carbon::now())->startOfWeek();
+        $weekDay = Carbon::now();
 
         $week = [];
 
@@ -149,21 +149,21 @@ class QueryController extends Controller
             $weekDay->addDay();
         }
 
-        ksort($week);
+        $schedule = [];
 
-        array_walk($weekDays, function (&$value, $index) use ($week) {
-            $value .= ': ' . $week[$index];
-        });
+        foreach ($week as $dayIndex => $daySchedule) {
+            $schedule[] = $weekDays[$dayIndex] . ': ' . $daySchedule;
+        }
 
-        return $weekDays;
+        return $schedule;
     }
 
     /**
      * Check if there are events in a given range (day)
      *
-     * @param  ICal $ical
+     * @param  ICal   $ical
      * @param  string $start date string YYYY-mm-dd
-     * @param  string $end  date string YYYY-mm-dd
+     * @param  string $end   date string YYYY-mm-dd
      * @return array
      */
     private function extractDayInfo($ical, $start, $end)
@@ -201,14 +201,14 @@ class QueryController extends Controller
             $dtEnd = $this->convertIsoToIcal($event->end_date);
 
             $icalString .= "BEGIN:VEVENT\n";
-            $icalString .= "DTSTART;TZID=Europe/Brussels:" . $dtStart . "\n";
-            $icalString .= "DTEND;TZID=Europe/Brussels:" . $dtEnd . "\n";
-            $icalString .= "RRULE:" . $event->rrule . "\n";
-            $icalString .= "UID:" . str_random(32) . "\n";
+            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $dtStart . "\n";
+            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $dtEnd . "\n";
+            $icalString .= 'RRULE:' . $event->rrule . "\n";
+            $icalString .= 'UID:' . str_random(32) . "\n";
             $icalString .= "END:VEVENT\n";
         }
 
-        $icalString .= "END:VCALENDAR";
+        $icalString .= 'END:VCALENDAR';
 
         return new \ICal\ICal(explode(PHP_EOL, $icalString), 'MO');
     }
@@ -216,7 +216,7 @@ class QueryController extends Controller
     /**
      * Format an ISO date to YYYYmmddThhmmss
      *
-     * @param  string $date
+     * @param string $date
      * @return
      */
     private function convertIsoToIcal($date)

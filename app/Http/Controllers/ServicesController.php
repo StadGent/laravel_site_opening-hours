@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 use App\Repositories\ServicesRepository;
 
 class ServicesController extends Controller
@@ -23,91 +22,6 @@ class ServicesController extends Controller
     public function index()
     {
         return response()->json($this->services->get());
-
-        return response()->json([
-            [
-                'label' => 'Dienst administratieve vereenvoudiging',
-                'uri' => 'http://stad.gent/vereenvoudiging',
-                'channels' => [
-                    [
-                        'id' => 1,
-                        'label' => 'telefonisch',
-                        'openinghours' => [
-                            [
-                                'active' => true,
-                                'label' => 'vroeger',
-                                'start_date' => (Carbon::now())->subYear()->toDateString(),
-                                'end_date' => (Carbon::now())->subDay()->toDateString(),
-                                'id' => 5
-                            ],
-                            [
-                                'active' => true,
-                                'label' => 'toekomst',
-                                'start_date' => (Carbon::now())->toDateString(),
-                                'end_date' => (Carbon::now())->subDay()->addYear()->toDateString(),
-                                'id' => 6
-                            ]
-                        ]
-                    ],
-                    [
-                        'id' => 2,
-                        'label' => 'loket',
-                        'openinghours' => [
-                            [
-                                'active' => true,
-                                'label' => 'v2016',
-                                'start_date' => '2016-01-01',
-                                'end_date' => '2016-12-31',
-                                'id' => 5
-                            ],
-                            [
-                                'active' => true,
-                                'label' => 'v2017',
-                                'start_date' => '2017-01-01',
-                                'end_date' => '2017-12-31',
-                                'id' => 6
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'label' => 'Bib Zuid',
-                'uri' => 'http://stad.gent/bib-zuid',
-                'channels' => [
-                    [
-                        'id' => 5,
-                        'label' => 'loket',
-                        'openinghours' => [
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'label' => 'Bib Sint-Amandsberg',
-                'uri' => 'http://stad.gent/bib-sint-amandsberg',
-                'channels' => [
-                    [
-                        'id' => 9,
-                        'label' => 'loket',
-                        'openinghours' => [
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'label' => 'Bib Ledeberg',
-                'uri' => 'http://stad.gent/bib-ledeberg',
-                'channels' => [
-                    [
-                        'id' => 13,
-                        'label' => 'loket',
-                        'openinghours' => [
-                        ]
-                    ]
-                ]
-            ]
-        ]);
     }
 
     /**
