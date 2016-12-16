@@ -32,4 +32,12 @@ class DeleteRoleRequest extends FormRequest
             'service_id' => 'required|numeric',
         ];
     }
+
+    public function messages()
+    {
+        return $messages = [
+            'required' => 'Het veld is verplicht in te vullen.',
+            'numeric' => 'Het veld moet een numerieke waarde krijgen.'
+        ];
+    }
 }

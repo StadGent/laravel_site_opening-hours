@@ -30,4 +30,11 @@ class StoreChannelRequest extends FormRequest
             'label' => 'required|min:1'
         ];
     }
+
+    public function messages()
+    {
+        return $messages = [
+            'required' => 'Het veld is verplicht in te vullen.'
+        ];
+    }
 }

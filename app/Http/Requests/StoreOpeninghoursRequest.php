@@ -33,4 +33,12 @@ class StoreOpeninghoursRequest extends FormRequest
             'openinghours_id' => 'required|numeric'
         ];
     }
+
+    public function messages()
+    {
+        return $messages = [
+            'required' => 'Het veld is verplicht in te vullen.',
+            'numeric' => 'Het veld moet een numerieke waarde krijgen.'
+        ];
+    }
 }
