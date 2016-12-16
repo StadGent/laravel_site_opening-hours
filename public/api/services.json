@@ -14,38 +14,96 @@
 			"end_date": "2017-06-06",
 			"calendars": [{
 				"@type": "oh:Calendar",
-				"oh:closinghours": true,
 				"label": "Normale uren",
 				"priority": 2,
 				"events": [{
 					"@type": "Vevent",
-					"start_date": "2016-07-11T09:00:00",
-					"end_date": "2016-09-11T17:00:00",
+					"label": "1",
+					"start_date": "2016-01-01T07:30:00",
+					"end_date": "2016-01-01T09:30:00",
+					"rrule": "FREQ=WEEKLY;BYDAY=MO"
+				}, {
+					"@type": "Vevent",
+					"label": "1",
+					"start_date": "2016-01-01T16:00:00",
+					"end_date": "2016-01-01T17:30:00",
+					"rrule": "FREQ=WEEKLY;BYDAY=MO,TU,TH,FR"
+				}, {
+					"@type": "Vevent",
+					"label": "1",
+					"start_date": "2016-01-01T12:30:00",
+					"end_date": "2016-01-01T13:30:00",
 					"rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"
+				}, {
+					"@type": "Vevent",
+					"label": "1",
+					"start_date": "2016-01-01T18:00:00",
+					"end_date": "2016-01-01T22:00:00",
+					"rrule": "FREQ=WEEKLY;BYDAY=WE"
+				}, {
+					"@type": "Vevent",
+					"label": "1",
+					"start_date": "2016-01-01T07:30:00",
+					"end_date": "2016-01-01T08:30:00",
+					"rrule": "FREQ=WEEKLY;BYDAY=WE,FR"
+				}, {
+					"@type": "Vevent",
+					"label": "1",
+					"start_date": "2016-01-01T13:00:00",
+					"end_date": "2016-01-01T16:30:00",
+					"rrule": "FREQ=WEEKLY;BYDAY=SU"
+				}, {
+					"@type": "Vevent",
+					"label": "1",
+					"start_date": "2016-01-01T09:00:00",
+					"end_date": "2016-01-01T12:00:00",
+					"rrule": "FREQ=WEEKLY;BYDAY=SA,SU"
 				}]
 			}, {
 				"@type": "oh:Calendar",
-				"oh:closinghours": true,
+				"closinghours": true,
 				"label": "Nationale feestdagen",
 				"priority": 1,
 				"events": [{
-					"start_date": "2016-02-11T09:00:00",
-					"end_date": "2016-02-11T17:00:00",
-					"rrule": "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=2"
+					"start_date": "2016-01-01T00:00:00",
+					"end_date": "2016-01-02T00:00:00",
+					"rrule": "FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1"
 				}, {
-					"start_date": "2016-03-11T09:00:00",
-					"end_date": "2016-03-11T17:00:00",
+					"start_date": "2016-05-01T00:00:00",
+					"end_date": "2016-05-02T00:00:00",
+					"rrule": "FREQ=YEARLY;BYMONTH=5;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1"
+				}, {
+					"start_date": "2016-07-21T00:00:00",
+					"end_date": "2016-07-22T00:00:00",
+					"rrule": "FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=21"
+				}, {
+					"start_date": "2016-08-15T00:00:00",
+					"end_date": "2016-08-16T00:00:00",
+					"rrule": "FREQ=YEARLY;BYMONTH=8;BYMONTHDAY=15"
+				}, {
+					"start_date": "2016-11-01T00:00:00",
+					"end_date": "2016-11-01T00:00:00",
+					"rrule": "FREQ=YEARLY;BYMONTH=11;BYMONTHDAY=1"
+				}, {
+					"start_date": "2016-11-11T00:00:00",
+					"end_date": "2016-11-12T00:00:00",
+					"rrule": "FREQ=YEARLY;BYMONTH=11;BYMONTHDAY=11"
+				}, {
+					"start_date": "2016-12-25T00:00:00",
+					"end_date": "2016-12-26T00:00:00",
 					"rrule": "FREQ=YEARLY;BYMONTH=12;BYMONTHDAY=25"
 				}]
 			}, {
 				"@type": "oh:Calendar",
 				"label": "Paasvakantie",
+				"closinghours": true,
 				"priority": 0,
 				"events": [{
 					"@type": "Vevent",
-					"start_date": "2016-11-11T11:00:00",
-					"end_date": "2016-11-11T16:00:00",
-					"rrule": "FREQ=DAILY;DTSTART=20160327T000000Z;UNTIL=20160411T000000Z"
+					"start_date": "2016-03-28T00:00:00",
+					"end_date": "2016-03-29T00:00:00",
+					"until": "2016-04-10T00:00:00",
+					"rrule": "FREQ=DAILY;UNTIL=20160410T000000Z"
 				}]
 			}]
 		}]
@@ -58,7 +116,6 @@
 			"end_date": "2017-12-31",
 			"calendars": [{
 				"@type": "oh:Calendar",
-				"oh:closinghours": true,
 				"label": "Normale uren",
 				"events": [{
 					"@type": "Vevent",
@@ -115,7 +172,6 @@
 			"end_date": "2016-12-31",
 			"calendars": [{
 				"@type": "oh:Calendar",
-				"oh:closinghours": true,
 				"label": "Normale uren",
 				"events": [{
 					"@type": "Vevent",
@@ -147,7 +203,6 @@
 			"end_date": "2016-12-31",
 			"calendars": [{
 				"@type": "oh:Calendar",
-				"oh:closinghours": true,
 				"label": "Normale uren",
 				"events": []
 			}]
@@ -158,7 +213,6 @@
 			"end_date": "2021-12-31",
 			"calendars": [{
 				"@type": "oh:Calendar",
-				"oh:closinghours": true,
 				"label": "Normale uren",
 				"events": []
 			}]

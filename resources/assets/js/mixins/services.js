@@ -19,12 +19,12 @@ export default {
       return this.routeChannel.openinghours && this.routeChannel.openinghours[this.route.version] || {}
     },
     routeCalendar () {
-      return this.routeVersion.calendars && this.routeVersion.calendars[this.route.calendar] || {}
+      return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.layer === this.route.calendar) || {}
     }
   },
   methods: {
     fetchServices () {
-      return this.$http.get('/api/services.json')
+      return this.$http.get('/api/services')
         .then(({ data }) => {
           this.services = data || []
         })

@@ -65,10 +65,38 @@ function expiresOn(oh) {
 
 /** Date functions **/
 
-function nextDateString (dateString) {
+export function nextDateString (dateString) {
   return new Date(Date.parse(dateString) + 36e5 * 24).toJSON().slice(0, 10)
 }
+export function toTime(d) {
+  if (!d) {
+    return '00:00'
+  }
+  if (d.getHours) {
+    return toTime(d.toJSON())
+  }
+  return d.slice(11, 16)
+}
 
+// Cast strings, ints and dates to datetime
+export function toDatetime (str) {
+  if (str && str.toJSON) {
+    return str
+  }
+  if (typeof str === 'number') {
+    return new Date(str)
+  }
+  if (typeof str !== 'string') {
+    console.warn('Unexpected type in toDatetime', typeof str)
+    return str
+  }
+  return new Date(Date.parse(str))
+}
+
+// Create a date object 1 day after the param
+export function dateAfter (date, ms) {
+  return new Date(date.valueOf() + (ms || (36e5 * 24)))
+}
 
 /** Sorting **/
 function compareArray(a, b, c) {
@@ -121,3 +149,108 @@ export function orderBy(order) {
 
 // Event hub
 export const Hub = new Vue()
+
+
+// Extended version of php empty()
+function empty(a) {
+  if (!a || typeof a !== 'object') {
+    return !a
+  }
+  for (var key in a) {
+    if (!key.startsWith('@') && !empty(a[key])) {
+      return false
+    }
+  }
+  if (Object.keys(a).length === 1 && a['@id']) {
+    return false
+  }
+  return true
+}
+
+// Removes empty properties from an object
+export function cleanEmpty(x) {
+  for (var key in x) {
+    if (empty(x[key])) {
+      delete x[key]
+    } else if (Array.isArray(x[key])) {
+      x[key] = x[key].map(cleanEmpty)
+    } else {
+      for (var j in x[key]) {
+        if (empty(x[key][j])) {
+          delete x[key][j]
+        }
+      }
+    }
+  }
+  return x
+}
+
+// Returns a function, that, when invoked, will only be triggered at most once
+// during a given window of time. Normally, the throttled function will run
+// as much as it can, without ever going more than once per `wait` duration;
+// but if you'd like to disable the execution on the leading edge, pass
+// `{leading: false}`. To disable execution on the trailing edge, ditto.
+export function _throttle(func, wait, options) {
+  var context, args, result;
+  var timeout = null;
+  var previous = 0;
+  if (!options) options = {};
+  var later = function() {
+    previous = options.leading === false ? 0 : Date.now();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+  return function() {
+    var now = Date.now();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+};
+
+/* Chunk loader */
+const fetched = {}
+const loaded = {}
+
+export function loadScript (lib, cb) {
+  if (window[lib]) {
+    return typeof cb === 'function' ? cb() : window[lib]
+  }
+
+  // Fetch the script
+  if (!fetched[lib]) {
+    fetched[lib] = true
+    var first, s
+    s = document.createElement('script')
+
+    // Callback after script was loaded
+    s.onreadystatechange = s.onload = function() {
+      if (!loaded[lib] && cb) {
+        cb()
+      }
+      loaded[lib] = true
+    }
+    s.src = '/js/chunks/' + lib + '.js'
+    s.type = 'text/javascript'
+    s.async = true
+    first = document.getElementsByTagName('script')[0]
+    first.parentNode.insertBefore(s, first)
+    console.log('Lazy loading', lib)
+  } else if (loaded[lib]) {
+    cb()
+  }
+}

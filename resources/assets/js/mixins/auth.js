@@ -31,7 +31,7 @@ export default {
       return this.$http.post('/logout')
         .catch(() => true)
         .then(() => {
-          Object.assign(this.users, {
+          Object.assign(this.user, {
             id: 0,
             name: 'Naamloos'
           })

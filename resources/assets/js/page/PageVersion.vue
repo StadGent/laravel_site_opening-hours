@@ -9,28 +9,69 @@
 
     <div class="version-split">
       <div class="version-cals col-sm-6 col-md-5 col-lg-4">
-        <h2>Prioriteitenlijst periodes</h2>
-        <p>
-          De uren in de periode de hoogste prioriteit bepalen de openingsuren voor de kalender.
-        </p>
-        <div class="row">
-          <div class="col-sm-12 cal" v-for="(cal, index) in reversedCalendars" @click="route.calendar=cal.layer">
-            <header class="cal-header">
-              <div class="cal-img" :class="'layer-'+cal.layer"></div>
-              <span class="cal-name">{{ cal.label }}</span>
-              <div class="cal-options">
-                <span class="cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)">Lager</span>
-                <span class="cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)">Hoger</span>
-                <span class="cal-view">Bekijk</span>
-                <span class="cal-drag"> <i class="glyphicon glyphicon-menu-hamburger"></i></span>
-              </div>
-            </header>
+        <calendar-editor v-if="$parent.routeCalendar.events" :cal="$parent.routeCalendar"></calendar-editor>
+        <div v-else>
+          <h2>Prioriteitenlijst periodes</h2>
+          <p>
+            De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
+          </p>
+          <p>
+            <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length">Voeg uitzonderingen toe</button>
+          </p>
+          <div class="row">
+            <div class="col-sm-12 cal" v-for="(cal, index) in reversedCalendars" @click="toCalendar(cal.layer)">
+              <header class="cal-header">
+                <div class="cal-img" :class="'layer-'+cal.layer"></div>
+                <span class="cal-name">{{ cal.label }}</span>
+                <div class="cal-options">
+                  <span class="cal-lower" @click.stop="swapLayers(cal.layer, cal.layer - 1)">Lager</span>
+                  <span class="cal-higher" @click.stop="swapLayers(cal.layer, cal.layer + 1)">Hoger</span>
+                  <span class="cal-view">Bekijk</span>
+                  <span class="cal-drag"> <i class="glyphicon glyphicon-menu-hamburger"></i></span>
+                </div>
+              </header>
+            </div>
+          </div>
+          <div v-if="reversedCalendars.length>1">
+            <hr>
+            <div class="text-center">
+              <p>
+                Om vakantieperiodes, nationale feestdagen of andere uitzondering in te stellen, druk op "<a href="#" @click.prevent="addCalendar">Voeg uitzonderingen toe</a>".
+              </p>
+              <p>
+                <button class="btn btn-link" @click="addCalendar">of voeg manueel dagen toe</button>
+              </p>
+            </div>
+          </div>
+          <div v-else-if="reversedCalendars.length">
+            <hr>
+            <div class="text-center">
+              <p>
+                Je normale openingsuren zijn ingesteld.  
+              </p>
+              <p>
+                Om vakantieperiodes, nationale feestdagen of andere uitzondering in te stellen, druk op <a href="#" @click.prevent="addCalendar">Voeg uitzonderingen toe</a>".
+              </p>
+              <p>
+                <button class="btn btn-link" @click="addCalendar">of voeg manueel dagen toe</button>
+              </p>
+            </div>
+          </div>
+          <div v-if="!reversedCalendars.length">
+            <hr>
+            <div class="text-center">
+              <p>
+                <button class="btn btn-primary" @click="addCalendar">Importeer bestaande openingsuren</button>
+              </p>
+              <p>
+                <button class="btn btn-link" @click="addCalendar">of voeg manueel dagen toe</button>
+              </p>
+            </div>
           </div>
         </div>
-        <calendar-editor v-if="$parent.routeCalendar.events" :cal="$parent.routeCalendar"></calendar-editor>
       </div>
       <div class="version-preview col-sm-6 col-md-7 col-lg-8">
-        <year-calendar :oh="version"></year-calendar>
+        <year-calendar :oh="layeredVersion"></year-calendar>
       </div>
     </div>
   </div>
@@ -40,6 +81,7 @@
 import YearCalendar from '../components/YearCalendar.vue'
 import CalendarEditor from '../components/CalendarEditor.vue'
 
+import { createCalendar, createFirstCalendar } from '../defaults.js'
 import { orderBy } from '../lib.js'
 
 export default {
@@ -60,6 +102,10 @@ export default {
     },
     version () {
       return this.$parent.routeVersion || {}
+    },
+    layeredVersion () {
+      this.$set(this.version, 'calendars', this.calendars)
+      return this.version
     },
     calendars () {
       const calendars = (this.version.calendars || [])
@@ -84,6 +130,11 @@ export default {
       } else {
         console.warn('one of the layers was not found', a, b)
       }
+    },
+    addCalendar () {
+      const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
+      this.layeredVersion.calendars.push(newCal)
+      this.toCalendar(newCal.layer)
     }
   },
   components: {

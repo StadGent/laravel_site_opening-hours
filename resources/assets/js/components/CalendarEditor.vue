@@ -1,182 +1,69 @@
 <template>
-  <div class="form-horizontal" @change="sync">
+  <div class="">
+    <div class="close" style="padding:10px 15px;margin: -10px -15px;" @click="route.calendar=-1">&times;</div>
+    <h3>{{ cal.label }}</h3>
+    <label v-if="cal.layer">
+      <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
+    </label>
 
-  geldig van tot
-  <hr>
-    <div class="form-group">
-      <label class="col-xs-3 control-label">Regelmaat</label>
-      <div class="col-xs-4">
-        <select v-model="options.freq" class="form-control">
-          <option :value="RRule.YEARLY">Jaarlijks</option>
-          <option :value="RRule.MONTHLY">Maandelijks</option>
-          <option :value="RRule.WEEKLY">Wekelijks</option>
-          <option :value="RRule.DAILY">Dagelijks</option>
-        </select>
-      </div>
-    </div>
+    <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
-    <!-- Yearly -->
-    <div v-if="options.freq==RRule.YEARLY">
-
-      <!-- BYMONTHDAY -->
-      <div>
-        <div class="form-group">
-          <label class="col-xs-3 control-label">op</label>
-          <div class="col-xs-4">
-            <select v-model="options.bymonthday" class="form-control">
-              <option :value="1" selected>1</option>
-              <option v-for="i in 30" :value="i + 1" v-text="i + 1"></option>
-            </select>
-           </div>
-          <div class="col-xs-5">
-            <select v-model="options.bymonth" class="form-control">
-              <option :value="1" selected>januari</option>
-              <option :value="2">februari</option>
-              <option :value="3">maart</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <!-- bysetpos -->
-      <div>
-        <div class="form-group">
-          <label class="col-xs-3 control-label">
-          <input type="checkbox" name="">
-          op de
-          </label>
-          <div class="col-xs-3">
-            <select v-model="options.bysetpos" class="form-control">
-              <option :value="1" selected>eerste</option>
-              <option :value="2">tweede</option>
-              <option :value="3">derde</option>
-              <option :value="-2">voorlaatste</option>
-              <option :value="-1">laatste</option>
-            </select>
-          </div>
-          <div class="col-xs-3">
-            <select v-model="options.byday" class="form-control">
-              <option value="1">maandag</option>
-              <option value="2">dinsdag</option>
-              <option value="3">woesndag</option>
-              <option value="4">donderdag</option>
-              <option value="5">vrijdag</option>
-              <option value="6">zaterdag</option>
-              <option value="0">zondag</option>
-              <option value="0,1,2,3,4,5,6" selected>dag</option>
-              <option value="1,2,3,4,5">weekdag</option>
-              <option value="0,6">weekend</option>
-            </select>
-          </div>
-          <div class="col-xs-3">
-            <select v-model="options.bymonth" class="form-control">
-              <option :value="1" selected>januari</option>
-              <option :value="2">februari</option>
-              <option :value="3">maart</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <!-- byday -->
-      <div>
-        <div class="form-group">
-          <label>&nbsp;</label>
-        </div>
-      </div>
-
-      <!-- BYMONTH -->
-      <div>
-        <div class="form-group">
-          <label>van</label>
-          <select v-model="options.bymonth" class="form-control">
-            <option :value="1" selected>januari</option>
-            <option :value="2">februari</option>
-            <option :value="3">maart</option>
-          </select>
-        </div>
-      </div>
-        
-    </div>
-    <div v-if="options.freq==RRule.MONTHLY">
-      
-    </div>
-    <div v-if="options.freq==RRule.WEEKLY">
-      
-    </div>
-    <div v-if="options.freq==RRule.DAILY">
-      
-    </div>
-    <pre class="cal-render">
-      {{ cal }}
-    </pre>
-    <div class="cal-render">
-      <!-- {{ rruleAll }} -->
-    </div>
+    <p v-if="cal.layer">
+      <button @click="cal.events.push(createEvent())" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
+    </p>
+<!-- 
+    <pre>{{ cal }}</pre>
+    <pre class="cal-render" style="margin-top:10em">{{ events }}</pre> -->
   </div>
 </template>
 
 <script>
+import EventEditor from '../components/EventEditor.vue'
+import { createEvent } from '../defaults.js'
+import { cleanEmpty } from '../lib.js'
+
+const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
+
 export default {
   name: 'calendar-editor',
-  props: ['cal'],
+  props: ['cal', 'layer'],
   data () {
     return {
       // options: {}
+      days: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'],
+      fullDays
     }
   },
   computed: {
-    // First event of calendar
-    event () {
-      if (!this.cal.events) {
-        this.$set(this.cal, 'events', [])
-      }
-      if (!this.cal.events[0]) {
-        this.$set(this.cal.events, 0, {
-          dtstart: new Date(2016, 1, 1),
-          dtend: new Date(2020, 1, 1),
-          rrule: 'FREQ=YEARLY'
-        })
-      }
-      console.log(inert(this.cal))
-      return this.cal.events[0]
-    },
-    // Recurring rule of first event
-    options: {
-      get () {
-        var opts = RRule.parseString(this.cal.events[0].rrule) || {}
-        if(opts.byweekday) {
-          opts.byweekday = opts.byweekday.map(d => d.weekday)
-        }
-        opts.wkst = null
-        return opts
-      },
-      set (v) {
-        console.log('set val', v)
-      }
-    },
-    // RRule object based on options
-    rrule () {
-      return new RRule(this.options)
-    },
-    rruleString () {
-      return this.rrule.toString()
-    },
-    rruleAll () {
-      return this.rrule.all()
+    events () {
+      return this.cal.events
     }
   },
   methods: {
-    sync () {
-      // console.log('sync', this.options.freq, new RRule(opts).toString())
-      this.$set(this.cal.events[0], 'rrule', new RRule(this.options).toString())
+    toggleClosing () {
+      this.$set(this.cal, 'closinghours', !this.cal.closinghours)
+    },
+    addEvent (index, event) {
+      console.log('add yes', index, event)
+      event = Object.assign({}, event)
+      this.cal.events.splice(index, 0, event)
+    },
+    rmEvent (index) {
+      this.cal.events.splice(index, 1)
     }
   },
   created () {
     this.RRule = RRule || {}
   },
   mounted () {
-    console.log('mount editor')
-
+    this.$set(this.cal, 'closinghours', !!this.cal.closinghours)
+    if (!this.cal.events) {
+      this.$set(this.cal, 'events', [])
+    }
   },
+  components: {
+    EventEditor
+  }
   // watch: {
   //   cal (v) {
   //     console.log('load cal', v)

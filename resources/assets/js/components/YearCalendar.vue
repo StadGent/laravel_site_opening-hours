@@ -5,8 +5,31 @@
 </template>
 
 <script>
+import { _throttle, toTime, dateAfter } from '../lib.js'
+
 const currentYear = new Date().getFullYear();
 
+// Human friendly duration
+function toDuration (n) {
+  n /= 1000 
+  if (n < 100) {
+    return n + ' seconds'
+  }
+  n /= 60 
+  if (n < 100) {
+    return n + ' minutes'
+  }
+  n /= 60 
+  if (n < 100) {
+    return n + ' hours'
+  }
+  n /= 24 
+  if (n < 100) {
+    return n + ' days'
+  }
+}
+
+// Cast strings, ints and dates to date only
 function toDate (str) {
   if (str && str.toJSON) {
     return toDate(str.toJSON())
@@ -21,65 +44,123 @@ function toDate (str) {
   return new Date(str.slice(0, 4), parseInt(str.slice(5, 7), 10) - 1, parseInt(str.slice(8, 10), 10))
 }
 
+// Cast strings, ints and dates to datetime
+function toDatetime (str) {
+  if (str && str.toJSON) {
+    return str
+  }
+  if (typeof str === 'number') {
+    return new Date(str)
+  }
+  if (typeof str !== 'string') {
+    console.warn('Unexpected type in toDatetime', typeof str)
+    return str
+  }
+  return new Date(Date.parse(str))
+}
+
+// Transform a date to ICS format
 function toIcsDate (str) {
   let obj = toDate(str)
   if (!obj) {
     obj = new Date()
   }
   str = obj.toJSON()
-  return str.slice(0, 4) + str.slice(5, 7) + str.slice(8, 10) + 'T10' + str.slice(14, 16) + str.slice(17, 19) + 'Z'
+  return str.slice(0, 4) + str.slice(5, 7) + str.slice(8, 10) + 'T020000Z'
 }
 
-function dateAfter (date) {
-  return new Date(date + 36e5 * 24)
+// Transform a datetime to ICS format
+function toIcsDatetime (str) {
+  let obj = toDate(str)
+  if (!obj) {
+    obj = new Date()
+  }
+  str = obj.toJSON()
+  return str.slice(0, 4) + str.slice(5, 7) + str.slice(8, 13) + str.slice(14, 16) + str.slice(17, 19) + 'Z'
 }
-function expandEvent (e, layer, dtstart, until) {
+
+// RRule can be expensive to calculate
+const rruleCache = {}
+function rruleToStarts(rule) {
+  if (rule.indexOf('undefined') > 0 || rule.indexOf('BYMINUTE') > 0 || rule.indexOf('BYSECOND') > 0) {
+    return console.error('Bad rules!', rule) || []
+  }
+  const cache = rruleCache[rule]
+  return cache || console.debug('miss', rule) || (rruleCache[rule] = rrulestr(rule).all())
+}
+
+// Transform a vevent to an event that bootstrap-year can use
+function expandEvent (e, layer, closinghours, dtstart, until) {
+  const startDate = toDatetime(e.start_date)
+  const endDate = toDatetime(e.end_date) 
+  // Subtract 1000 (1 second) to avoid drawing on the next day
+  const duration = ((endDate - startDate) || (36e5 * 24)) - 1000
+
+  const hours = closinghours ? 'gesloten' : e.start_date.slice(11, 16) + ' - ' + e.end_date.slice(11, 16)
+
+  // console.log(toDuration(endDate - startDate))
   if (typeof e.rrule !== 'string' || !e.rrule) {
     return {
-      layer: layer,
-      startDate: toDate(e.start_date),
-      endDate: toDate(e.end_date) || toDate(e.start_date)
+      layer,
+      startDate,
+      endDate
     }
   }
-  try {
-    keepRuleWithin(e, dtstart, until)
-    return rrulestr(e.rrule).all().map(start => {
-      return {
-        layer: layer,
-        startDate: toDate(start),
-        endDate: dateAfter(toDate(start))
-      }
-    })
-  } catch (e) {
-    console.error(e)
+  if (!e.rrule.includes('FREQ=')) {
+    console.log('weird event', inert(e))
+    return []
   }
+  e.until = e.until || until
+  // console.log(startDate, until)
+  const limitedRule = keepRuleWithin(e)
+  return rruleToStarts(limitedRule).map(start => {
+    const end = dateAfter(start, duration)
+    if (e.rrule.includes('WEEKLY')) {
+      // console.log(e, start)
+    }
+    if (e.rrule.includes('DAILY')) {
+      // console.log(duration, start.toISOString(), end.toISOString())
+    }
+    return {
+      layer: layer,
+      startDate: start,
+      endDate: end,
+      hours: hours
+    }
+  })
   return []
 }
 
-function keepRuleWithin (e, dtstart, until) {
-  if (e.rrule.indexOf(';DTSTART=') === -1) {
-    e.rrule += ';DTSTART=' + toIcsDate(dtstart)
+// Add dtstart and until
+function keepRuleWithin (e) {
+  let rule = e.rrule
+  if (rule.indexOf('DTSTART=') === -1) {
+    rule += ';DTSTART=' + toIcsDatetime(e.start_date)
   }
-  if (e.rrule.indexOf(';UNTIL=') === -1) {
-    e.rrule += ';UNTIL=' + toIcsDate(until)
+  if (rule.indexOf('UNTIL=') === -1) {
+    rule += ';UNTIL=' + toIcsDatetime(e.until)
   }
-}
-    
-function customDayRenderer(element, date) {
-
+  return rule
 }
 
+// Callback for every day that is currently visible
+function customDayRenderer(elem, date) {
+}
+
+// Callback for every day that contains events
 function customDataSourceRenderer (elem, date, events) {
   const parent = elem.parent()
-  parent.addClass('layer');
-  elem.parent().addClass('layer-' + events[events.length - 1].layer);
+  const layer = events[events.length - 1].layer
+  const tooltip = events.filter(e => e.layer == layer).map(e => e.hours).join('\n')
+  parent.addClass('layer').addClass('layer-' + layer)
+  elem.attr('title', tooltip)
 }
 
 export default {
   props: ['oh'],
   computed: {
     versionStart () {
-      return this.oh.date_start || currentYear + '-01-01'
+      return this.oh.date_start || (currentYear + '-01-01')
     },
     versionEnd () {
       return this.oh.date_end || '2018-01-01'
@@ -95,7 +176,7 @@ export default {
         (list, c) => list.concat(
           c.events.reduce(
             (evts, e) => evts.concat(
-              expandEvent(e, c.layer, this.versionStart, this.versionEnd)
+              expandEvent(e, c.layer, c.closinghours, this.versionStart, this.versionEnd)
             ),
          [])
        ),
@@ -103,12 +184,15 @@ export default {
     }
   },
   methods: {
-    render () {
+    render: _throttle(function () {
       if (!this.elem) {
         return console.warn('Not yet mounted')
       }
       this.elem.setDataSource(this.allEvents)
-    }
+      setTimeout(() => {
+        $('.layer>.day-content').tooltip()
+      }, 300)
+    }, 300, { leading: false })
   },
   mounted () {
     this.elem = $(this.$el).find('.calendar').calendar({
@@ -118,24 +202,9 @@ export default {
       // displayWeekNumber: true,
       minDate: toDate('2016-01-01'),
       maxDate: toDate('2018-01-01'),
-      style: 'custom',
-      dataSource: [{
-        id: 1,
-        startDate: new Date(currentYear, 4, 1),
-        endDate: new Date(currentYear, 4, 1),
-        name: 'blub'
-      }, {
-        id: 2,
-        startDate: new Date(currentYear, 2, 16),
-        endDate: new Date(currentYear, 2, 16),
-        name: 'blub'
-      }, {
-        id: 3,
-        startDate: new Date(currentYear, 4, 28),
-        endDate: new Date(currentYear, 4, 28),
-        name: 'blub'
-      }]
+      style: 'custom'
     })
+    // setTimeout(() => this.render(), 1000)
   },
   watch: {
     allEvents () {

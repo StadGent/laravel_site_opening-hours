@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Repositories\ChannelRepository;
+use App\Http\Requests\StoreChannelRequest;
 
 class ChannelController extends Controller
 {
@@ -41,7 +42,7 @@ class ChannelController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreChannelRequest $request)
     {
         $input = $request->input();
 
