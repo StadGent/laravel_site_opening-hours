@@ -13,10 +13,10 @@ class CalendarRepository extends EloquentRepository
 
     public function getById($id)
     {
-        $calendar = $this->model->find($id);
+        $calendar = $this->model->where('id', $id)->with('events')->first();
 
         if (! empty($calendar)) {
-            return $calendar->with('events')->get();
+            return $calendar->toArray();
         }
 
         return [];

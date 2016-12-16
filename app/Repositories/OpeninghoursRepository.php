@@ -18,6 +18,30 @@ class OpeninghoursRepository extends EloquentRepository
         parent::__construct($openinghours);
     }
 
+    public function getById($id)
+    {
+        $openinghours = $this->model->find($id);
+
+        if (empty($openinghours)) {
+            return [];
+        }
+
+        $result = $openinghours->toArray();
+        $result['calendars'] = [];
+
+        $calendars = app()->make('CalendarRepository');
+
+        $openinghours->with('calendars');
+
+        foreach ($openinghours->calendars as $calendar) {
+            $calendar = $calendars->getById($calendar->id);
+
+            $result['calendars'][] = $calendar;
+        }
+
+        return $result;
+    }
+
     /**
      * Create a graph from the openinghours object
      * containing calendar and event data
