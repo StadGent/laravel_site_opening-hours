@@ -24,6 +24,16 @@ class QueryController extends Controller
                 $data = $this->renderWeek($request);
                 break;
             case 'now':
+                $data = $this->isOpenNow($request);
+                break;
+            case 'day':
+                try {
+                    $day = new Carbon($request->input('date'));
+
+                    $data = $this->isOpenOnDay($day->toDateString(), $request->input());
+                } catch (\Exception $ex) {
+                    return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
+                }
                 break;
             default:
                 abort(400, 'The endpoint did not find a handler for your query.');
@@ -31,6 +41,104 @@ class QueryController extends Controller
         }
 
         return response()->json($data);
+    }
+
+    /**
+     * Calculate if a service is open now
+     *
+     * @param  Request $request
+     * @return boolean
+     */
+    private function isOpenNow($request)
+    {
+        $services = app()->make('ServicesRepository');
+        $openinghoursRepo = app()->make('OpeninghoursRepository');
+
+        // Get the service URI for which we need to compute the week schedule
+        $serviceUri = $request->input('serviceUri');
+        $channel = $request->input('channel');
+
+        // Get the service
+        $service = $services->where('uri', $serviceUri)->first();
+
+        if (empty($service)) {
+            return response()->json(['message' => 'The service was not found.'], 404);
+        }
+
+        $channels = [];
+
+        // If no channel is passed, return all channels
+        if (! empty($channel)) {
+            $channels[] = $channel;
+        } else {
+            $channelObjects = $service->channels->toArray();
+
+            foreach ($channelObjects as $object) {
+                $channels[] = $object['label'];
+            }
+        }
+
+        if (empty($channels)) {
+            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
+        }
+
+        $result = [];
+
+        $now = Carbon::now();
+        $now = Carbon::create(2016, 12, 11, 10, 01, 00);
+
+        foreach ($channels as $channel) {
+            $status = 'Gesloten';
+
+            // Get the openinghours for the channel
+            $openinghours = $openinghoursRepo->getAllForServiceAndChannel($serviceUri, $channel);
+
+            // Get the openinghours that is active now
+            $relevantOpeninghours = '';
+
+            foreach ($openinghours as $openinghoursInstance) {
+                if (Carbon::now()->between(
+                    (new Carbon($openinghoursInstance->start_date)),
+                    (new Carbon($openinghoursInstance->end_date))
+                )) {
+                    $relevantOpeninghours = $openinghoursInstance;
+                    break;
+                }
+            }
+
+            if (! empty($openinghours)) {
+                // Check if any calendar has an event that falls within the timeframe
+                $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
+                    return $calendar->priority;
+                });
+
+                // Iterate all calendars for the day of the week
+                foreach ($calendars as $calendar) {
+                    $ical = $this->createIcalFromCalendar($calendar);
+
+                    if ($this->hasEventForRange($ical, $now->toIso8601String(), $now->toIso8601String())) {
+                        $status = $calendar->closinghours == 0 ? 'Gesloten' : 'Open';
+                    }
+                }
+            }
+
+            $result[$channel] = $status;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Check if the ICal object has events in the given range
+     *
+     * @param  ICal    $ical
+     * @param  string  $start
+     * @param  string  $end
+     * @return boolean
+     */
+    private function hasEventForRange($ical, $start, $end)
+    {
+        return ! empty($ical->eventsFromRange($start, $end));
     }
 
     /**

@@ -52,9 +52,9 @@ class CalendarsController extends Controller
             $this->bulkUpsertEvents($id, $input['events']);
         }
 
-        $calendar = $this->calendars->getById($id);
+        if (! empty($id)) {
+            $calendar = $this->calendars->getById($id);
 
-        if (! empty($calendar)) {
             return response()->json($calendar);
         }
 
