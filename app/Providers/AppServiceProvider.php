@@ -52,5 +52,11 @@ class AppServiceProvider extends ServiceProvider
                 new \App\Models\Event()
             );
         });
+
+        $this->app->bind('UserRepository', function ($app) {
+            return new \App\Repositories\UserRepository(
+                new \App\Models\User()
+            );
+        });
     }
 }

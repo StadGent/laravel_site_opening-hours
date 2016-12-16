@@ -9,6 +9,7 @@ use EasyRdf_Literal as Literal;
 use EasyRdf_Literal_Boolean as BooleanLiteral;
 use EasyRdf_Literal_Integer as IntegerLiteral;
 use EasyRdf_Literal_DateTime as DateTimeLiteral;
+use DB;
 
 class OpeninghoursRepository extends EloquentRepository
 {
@@ -129,5 +130,32 @@ class OpeninghoursRepository extends EloquentRepository
         }
 
         throw new \Exception('Literal type ' . $type . ' is not supported');
+    }
+
+    /**
+     * Get all of the active openinghours for a channel and service
+     *
+     * @param  string $serviceUri The URI of the service
+     * @param  string $channel    The name of the channel
+     * @return array
+     */
+    public function getAllForServiceAndChannel($serviceUri, $channel)
+    {
+        $results = DB::select(
+            'SELECT openinghours.id
+            FROM openinghours
+            JOIN channels ON channels.id = openinghours.channel_id
+            JOIN services ON services.id = channels.service_id
+            WHERE services.uri = ? AND channels.label = ? AND openinghours.active = 1',
+            [$serviceUri, $channel]
+        );
+
+        $openinghoursIds = [];
+
+        foreach ($results as $result) {
+            $openinghoursIds[] = $result->id;
+        }
+
+        return $this->model->whereIn('id', $openinghoursIds)->get();
     }
 }

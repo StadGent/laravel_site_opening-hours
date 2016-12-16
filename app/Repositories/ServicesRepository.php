@@ -6,11 +6,9 @@ use App\Models\Service;
 
 class ServicesRepository extends EloquentRepository
 {
-    public function __construct(Service $service, UserRepository $users)
+    public function __construct(Service $service)
     {
         parent::__construct($service);
-
-        $this->users = $users;
     }
 
     /**
@@ -40,8 +38,10 @@ class ServicesRepository extends EloquentRepository
                 $result['channels'][] = $tmpChannel;
             }
 
+            $users = app()->make('UserRepository');
+
             // Get all of the users for the service
-            $result['users'] = $this->users->getAllInService($service->id);
+            $result['users'] = $users->getAllInService($service->id);
 
             $results[] = $result;
         }
