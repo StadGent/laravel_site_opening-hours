@@ -21,7 +21,7 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(GetUsersRequest $request)
+    public function index(Request $request)
     {
         $users = $this->users->getAll();
 

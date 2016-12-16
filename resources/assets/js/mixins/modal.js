@@ -8,6 +8,7 @@ export const modal = {
 
 export default {
   data() {
+    console.log(modal)
     return {
       modal
     }
@@ -34,14 +35,16 @@ export default {
 
     newChannel(srv) {
       this.modal.text = 'newChannel'
+      this.modal.label = 'Algemeen'
       this.modal.srv = srv
     },
     newVersion(srv) {
-      this.modal.text = 'newChannel'
+      this.modal.text = 'newVersion'
+      this.modal.label = 'Versie 1'
       this.modal.srv = srv
     },
     newCalendar(srv) {
-      this.modal.text = 'newChannel'
+      this.modal.text = 'newCalendar'
       this.modal.srv = srv
     },
 

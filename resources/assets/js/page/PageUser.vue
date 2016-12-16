@@ -2,11 +2,11 @@
   <div class="container">
     <h1>{{ usr.name || 'Naamloos' }} <small>diensten ({{ filteredServices.length }})</small></h1>
 
-    <div v-if="user.admin">
-      Je bent admin
+    <div v-if="usr.admin">
+      Admins hebben toegang tot alle diensten.
     </div>
     <div v-else>
-      <button type="button" class="btn btn-primary" @click="requestService">+ Voeg diensten toe</button>
+      <button type="button" class="btn btn-default btn-disabled" disabled @click="requestService">+ Voeg diensten toe</button>
     </div>
 
     <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
@@ -23,7 +23,6 @@
       <p>
         <button @click="$parent.logout">Uitloggen</button>
       </p>
-      <p>
     </div>
 
     <!-- Services -->
@@ -69,6 +68,8 @@ import RowService from '../components/RowService.vue'
 import RowServiceAdmin from '../components/RowServiceAdmin.vue'
 import ThSort from '../components/ThSort.vue'
 
+import { expandUser } from '../mixins/users.js'
+
 import { orderBy } from '../lib.js'
 
 export default {
@@ -76,6 +77,7 @@ export default {
   props: ['services', 'users'],
   data () {
     return {
+      fetchedUser: null,
       order: 'name',
       query: ''
     }
@@ -87,14 +89,7 @@ export default {
       return this.$parent.users || []
     },
     usr () {
-      return this.route.id &&
-        this.users.find(u => u.id == this.route.id) ||
-        this.users.find(u => u.id == this.user.id) ||
-        this.$parent.user ||
-        console.warn('user page without user') || {
-          name: 'Fout',
-          services: []
-        }
+      return this.fetchedUser || this.fetchUser(this.route.user) || {}
     },
 
     // Services
@@ -110,20 +105,24 @@ export default {
     sortedServices () {
       const services = this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices
       if (this.user.admin) {
-        if (!this.users[0]) {
-          return []
-        }
 
         // TODO: do this enriching onload, like is done with users
-        services.forEach(v => {
-          const users = this.users.filter(u => u.role[v.id])
-          Object.assign(v, {
-            activeUsers: users.filter(u => u.verified),
-            ghostUsers: users.filter(u => !u.verified)
+        services.forEach(s => {
+          Object.assign(s, {
+            activeUsers: s.users.filter(u => u.verified),
+            ghostUsers: s.users.filter(u => !u.verified)
           })
         })
       }
       return services
+    }
+  },
+  methods: {
+    fetchUser (id) {
+      this.$http.get('/api/users/' + id)
+        .then(({ data }) => {
+          this.fetchedUser = expandUser(data)
+        })
     }
   },
   components: {

@@ -30,7 +30,7 @@ class StoreOpeninghoursRequest extends FormRequest
         return [
             'priority' => 'required|numeric',
             'label' => 'required',
-            'openinghours_id' => 'required|numeric'
+            'channel_id' => 'required|numeric'
         ];
     }
 

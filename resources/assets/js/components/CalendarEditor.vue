@@ -1,16 +1,23 @@
 <template>
   <div class="">
-    <div class="close" style="padding:10px 15px;margin: -10px -15px;" @click="route.calendar=-1">&times;</div>
-    <h3>{{ cal.label }}</h3>
-    <label v-if="cal.layer">
-      <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
-    </label>
+    <div class="wrapper-above-save">
+      <div class="close" style="padding:10px 15px;margin: -10px -15px;" @click="route.calendar=-1">&times;</div>
+      <h3>{{ cal.label }}</h3>
+      <label v-if="cal.layer">
+        <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
+      </label>
 
-    <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
+      <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
-    <p v-if="cal.layer">
-      <button @click="cal.events.push(createEvent())" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
-    </p>
+      <p v-if="cal.layer">
+        <button @click="cal.events.push(createEvent())" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
+      </p>
+    </div>
+
+    <div class="">
+      <button class="btn btn-primary">Bewaren</button>
+    </div>
+
 <!-- 
     <pre>{{ cal }}</pre>
     <pre class="cal-render" style="margin-top:10em">{{ events }}</pre> -->

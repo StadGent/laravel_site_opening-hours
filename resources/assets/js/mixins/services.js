@@ -1,4 +1,6 @@
 import { Hub } from '../lib.js'
+
+import { createVersion } from '../defaults.js'
  
 export const services = window.initialServices || []
 
@@ -13,10 +15,10 @@ export default {
       return this.services.find(s => s.id === this.route.service) || {}
     },
     routeChannel () {
-      return this.routeService.channels && this.routeService.channels[this.route.channel] || {}
+      return this.routeService.channels && this.routeService.channels.find(c => c.id === this.route.channel) || {}
     },
     routeVersion () {
-      return this.routeChannel.openinghours && this.routeChannel.openinghours[this.route.version] || {}
+      return this.routeChannel.openinghours && this.routeChannel.openinghours.find(o => o.id === this.route.version) || {}
     },
     routeCalendar () {
       return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.layer === this.route.calendar) || {}
@@ -38,46 +40,28 @@ export default {
       }
 
       channel.service_id = channel.srv && channel.srv.id
-      this.$http.post('/api/channels', channel).then(() => {
+      this.$http.post('/api/channels', channel).then(({ data }) => {
         this.fetchServices()
         this.modalClose()
-        Hub.$emit('createRolec')
+        console.log(data, data.id)
+        this.toChannel(data.id)
       }).catch(error => {
         console.warn(error)
       })
     })
 
-    Hub.$on('createOpeninghours', openinghours => {
-      openinghours.service_id = openinghours.srv && openinghours.srv.id
-      console.log('Create openinghours on', inert(openinghours))
+    Hub.$on('createVersion', input => {
+      const version = Object.assign(createVersion(), input)
+      if (!version.channel_id) {
+        version.channel_id = this.route.channel
+      }
+      console.log('Create version', inert(version))
 
-      this.$http.post('/api/openinghours', openinghours).then(() => {
-        if (!openinghours.srv) {
-          return console.error('createopeninghours: service is missing')
-        }
-        var index = this.services.findIndex(s => s.id === openinghours.srv.id)
-        if (index === -1) {
-          return console.error('createopeninghours: service is not found')
-        }
-        var srv = this.services[index]
-        if (!srv) {
-          return console.error('createopeninghours: service is invalid')
-        }
-        if(!srv.openinghours) {
-          srv.openinghours = []
-        }
-        srv.openinghours.push({
-          id: Math.floor(Math.random() * 1000),
-          label: openinghours.label,
-          created_at: new Date().toJSON().slice(0, 19),
-          created_by: this.user.name,
-          updated_at: new Date().toJSON().slice(0, 19),
-          updated_by: this.user.name,
-          oh: []
-        })
-        this.$set(this.services, index, srv)
+      this.$http.post('/api/openinghours', version).then(({ data }) => {
+        this.fetchServices()
         this.modalClose()
-      }, 100)
+        this.toVersion(data.id)
+      })
     })
   }
 }

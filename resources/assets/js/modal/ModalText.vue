@@ -7,6 +7,7 @@
           <h4 class="modal-title">
             <span v-if="modal.text=='requestService'">Vraag toegang tot een dienst</span>
             <span v-else-if="modal.text=='newChannel'">Voeg een kanaal toe</span>
+            <span v-else-if="modal.text=='newVersion'">Voeg een kanaal toe</span>
             <span v-else-if="modal.text=='newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
             <span v-else>Probleem</span>
           </h4>
@@ -17,6 +18,10 @@
           </div>
           <div v-else-if="modal.text=='newChannel'" class="form-group">
             <label for="recipient-name" class="control-label">Naam van het kanaal</label>
+            <input type="text" class="form-control" v-model="modal.label">
+          </div>
+          <div v-else-if="modal.text=='newVersion'" class="form-group">
+            <label for="recipient-name" class="control-label">Naam van de versie</label>
             <input type="text" class="form-control" v-model="modal.label">
           </div>
           <div v-else-if="modal.text=='newRole'">
@@ -32,6 +37,10 @@
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
             <button type="button" class="btn btn-primary" @click="createChannel">Toevoegen</button>
+            <button type="button" class="btn btn-default" @click="modalClose">Annuleren</button>
+          </div>
+          <div v-else-if="modal.text=='newVersion'">
+            <button type="button" class="btn btn-primary" @click="createVersion">Toevoegen</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleren</button>
           </div>
           <div v-else-if="modal.text=='newRole'">
@@ -62,6 +71,9 @@ export default {
   methods: {
     createChannel () {
       Hub.$emit('createChannel', this.modal)
+    },
+    createVersion () {
+      Hub.$emit('createVersion', this.modal)
     },
     createRole () {
       this.modal.strict = true
