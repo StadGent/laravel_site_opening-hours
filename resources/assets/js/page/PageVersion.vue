@@ -16,7 +16,7 @@
             De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
           </p>
           <p>
-            <button class="btn btn-primary" @click="addCalendar">Voeg uitzonderingen toe</button>
+            <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length">Voeg uitzonderingen toe</button>
           </p>
           <div class="row">
             <div class="col-sm-12 cal" v-for="(cal, index) in reversedCalendars" @click="toCalendar(cal.layer)">
@@ -81,7 +81,7 @@
 import YearCalendar from '../components/YearCalendar.vue'
 import CalendarEditor from '../components/CalendarEditor.vue'
 
-import { createCalendar } from '../defaults.js'
+import { createCalendar, createFirstCalendar } from '../defaults.js'
 import { orderBy } from '../lib.js'
 
 export default {
@@ -104,7 +104,7 @@ export default {
       return this.$parent.routeVersion || {}
     },
     layeredVersion () {
-      this.version.calendars = this.calendars
+      this.$set(this.version, 'calendars', this.calendars)
       return this.version
     },
     calendars () {
@@ -132,9 +132,9 @@ export default {
       }
     },
     addCalendar () {
-      const layer = this.calendars.length
-      this.layeredVersion.calendars.push(createCalendar(layer))
-      this.toCalendar(layer)
+      const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
+      this.layeredVersion.calendars.push(newCal)
+      this.toCalendar(newCal.layer)
     }
   },
   components: {

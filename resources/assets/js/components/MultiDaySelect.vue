@@ -1,7 +1,9 @@
 <template>
-  <select class="multi-day-select" multiple="multiple" v-model="model">
-    <option v-for="(opt, index) in options" :value="index">{{ opt }}</option>
-  </select>
+  <span>
+    <select class="multi-day-select" multiple="multiple" v-model="model">
+      <option v-for="(opt, index) in options" :value="index">{{ opt }}</option>
+    </select>
+  </span>
 </template>
 
 <script>

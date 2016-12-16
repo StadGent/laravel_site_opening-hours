@@ -6,11 +6,11 @@ use App\Models\Service;
 
 class ServicesRepository extends EloquentRepository
 {
-    public function __construct(Service $service, UserRepository $users)
+    public function __construct(Service $service)
     {
         parent::__construct($service);
 
-        $this->users = $users;
+        $this->users = app()->make('UserRepository');
     }
 
     /**

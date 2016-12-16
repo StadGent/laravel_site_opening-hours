@@ -14,7 +14,18 @@
         <ul class="nav navbar-nav navbar-right">
           <!-- <li><a href="#notifications">Notifications</a></li> -->
           <!-- <li class="divider-vertical"></li> -->
-          <li><a :href="'#!user/'+user.id">{{ user.id ? user.name : 'Login' }}</a></li>
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ user.id ? user.name : 'Login' }} <span class="caret"></a>
+
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="/logout" @click.prevent="logout">
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </li>
         </ul>
       </div>
     </div>

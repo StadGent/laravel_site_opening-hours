@@ -65,7 +65,7 @@ function expiresOn(oh) {
 
 /** Date functions **/
 
-function nextDateString (dateString) {
+export function nextDateString (dateString) {
   return new Date(Date.parse(dateString) + 36e5 * 24).toJSON().slice(0, 10)
 }
 export function toTime(d) {

@@ -1,3 +1,20 @@
+const defaultStart = '2016-01-01T00:00:00'
+const defaultEnd = '2016-01-02T00:00:00'
+const defaultUntil = '2018-01-01'
+
+const firstEventStart = '2016-01-01T09:00:00'
+const firstEventEnd = '2016-01-01T17:00:00'
+
+export function createFirstEvent() {
+  return {
+    start_date: firstEventStart,
+    end_date: firstEventEnd,
+    until: defaultUntil,
+    rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR',
+    label: '1'
+  }
+}
+
 export function createEvent(label) {
   return {
     start_date: new Date().toJSON().slice(0, 11) + '00:00:00',
@@ -8,12 +25,39 @@ export function createEvent(label) {
   }
 }
 
+export function createFirstCalendar() {
+  return {
+    closinghours: false,
+    layer: 0,
+    label: 'Normale uren',
+    priority: 0,
+    events: [createFirstEvent()]
+  }
+}
+
 export function createCalendar(layer) {
   return {
     closinghours: true,
     layer: layer,
-    label: layer,
+    label: 'Nieuwe periode',
     priority: -layer,
-    events: [createEvent()]
+    events: [createEvent('1')]
+  }
+}
+
+export function createVersion() {
+  return {
+    active: true,
+    start_date: defaultStart,
+    end_date: defaultUntil,
+    label: 'Nieuwe versie',
+    calendars: []
+  }
+}
+
+export function createChannel() {
+  return {
+    label: 'Nieuw kanaal',
+    openinghours: [createVersion()]
   }
 }

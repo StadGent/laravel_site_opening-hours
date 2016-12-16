@@ -2,11 +2,11 @@
   <div class="">
     <div class="close" style="padding:10px 15px;margin: -10px -15px;" @click="route.calendar=-1">&times;</div>
     <h3>{{ cal.label }}</h3>
-    <label>
+    <label v-if="cal.layer">
       <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
     </label>
 
-    <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i"></event-editor>
+    <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
     <p v-if="cal.layer">
       <button @click="cal.events.push(createEvent())" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
@@ -42,6 +42,14 @@ export default {
   methods: {
     toggleClosing () {
       this.$set(this.cal, 'closinghours', !this.cal.closinghours)
+    },
+    addEvent (index, event) {
+      console.log('add yes', index, event)
+      event = Object.assign({}, event)
+      this.cal.events.splice(index, 0, event)
+    },
+    rmEvent (index) {
+      this.cal.events.splice(index, 1)
     }
   },
   created () {
@@ -51,9 +59,6 @@ export default {
     this.$set(this.cal, 'closinghours', !!this.cal.closinghours)
     if (!this.cal.events) {
       this.$set(this.cal, 'events', [])
-    }
-    if (!this.cal.events[0]) {
-      this.$set(this.cal.events, 0, createEvent())
     }
   },
   components: {

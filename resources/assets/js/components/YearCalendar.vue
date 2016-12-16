@@ -112,8 +112,8 @@ function expandEvent (e, layer, closinghours, dtstart, until) {
   }
   e.until = e.until || until
   // console.log(startDate, until)
-    keepRuleWithin(e)
-  return rruleToStarts(e.rrule).map(start => {
+  const limitedRule = keepRuleWithin(e)
+  return rruleToStarts(limitedRule).map(start => {
     const end = dateAfter(start, duration)
     if (e.rrule.includes('WEEKLY')) {
       // console.log(e, start)
@@ -133,12 +133,14 @@ function expandEvent (e, layer, closinghours, dtstart, until) {
 
 // Add dtstart and until
 function keepRuleWithin (e) {
-  if (e.rrule.indexOf(';DTSTART=') === -1) {
-    e.rrule += ';DTSTART=' + toIcsDatetime(e.start_date)
+  let rule = e.rrule
+  if (rule.indexOf('DTSTART=') === -1) {
+    rule += ';DTSTART=' + toIcsDatetime(e.start_date)
   }
-  if (e.rrule.indexOf(';UNTIL=') === -1) {
-    e.rrule += ';UNTIL=' + toIcsDatetime(e.until)
+  if (rule.indexOf('UNTIL=') === -1) {
+    rule += ';UNTIL=' + toIcsDatetime(e.until)
   }
+  return rule
 }
 
 // Callback for every day that is currently visible

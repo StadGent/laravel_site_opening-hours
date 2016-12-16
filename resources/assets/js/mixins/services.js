@@ -24,7 +24,7 @@ export default {
   },
   methods: {
     fetchServices () {
-      return this.$http.get('/api/services.json')
+      return this.$http.get('/api/services')
         .then(({ data }) => {
           this.services = data || []
         })
