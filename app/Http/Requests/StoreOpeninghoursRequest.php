@@ -15,9 +15,9 @@ class StoreOpeninghoursRequest extends FormRequest
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
-        return $this->user->hasRole('Admin')
-        || $users->hasRoleInService($this->user->id, $request->service_id, 'Owner')
-        || $users->hasRoleInService($this->user->id, $request->service_id, 'Member');
+        return $this->user()->hasRole('Admin')
+        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')
+        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Member');
     }
 
     /**

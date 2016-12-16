@@ -13,7 +13,7 @@ class GetUsersRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user->hasRole('Admin');
+        return $this->user()->hasRole('Admin');
     }
 
     /**
