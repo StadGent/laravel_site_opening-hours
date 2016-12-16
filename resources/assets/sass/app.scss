@@ -121,6 +121,20 @@
   }
 }
 
+/* Wrapper */
+
+.wrapper-height100 {
+  height: 100%;
+}
+.wrapper-above-save {
+  max-height: calc(100% - 4.7em);
+  overflow: auto;
+}
+.wrapper-save-btn {
+  border-top: 1px solid #ccc;
+  padding-top: 15px;
+}
+
 /* Panel */
 
 a.panel {

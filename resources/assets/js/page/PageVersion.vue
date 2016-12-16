@@ -148,7 +148,7 @@ export default {
       }
       this.$http.get('/api/openinghours/' + this.route.version)
         .then(({ data }) => {
-          this.$set(this.version, calendars, data.calendars)
+          this.$set(this.$parent.routeVersion, 'calendars', data.calendars)
         })
     }
   },

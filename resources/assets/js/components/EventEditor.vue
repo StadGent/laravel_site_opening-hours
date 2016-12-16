@@ -195,10 +195,10 @@
       </div>
     </div>
 
-    <pre>{{event}}</pre>
+    <!-- <pre>{{event}}</pre> -->
 
     <div class="row" v-if="!nextEventSameLabel">
-      <hr>
+      <br>
     </div>
 
     <!-- Single event: not recurring -->
