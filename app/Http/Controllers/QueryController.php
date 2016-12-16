@@ -41,20 +41,65 @@ class QueryController extends Controller
      */
     private function renderWeek($request)
     {
+        $services = app()->make('ServicesRepository');
+
         // Get the service URI for which we need to compute the week schedule
         $serviceUri = $request->input('serviceUri');
         $channel = $request->input('channel');
 
-        $weekDays = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
+        // Get the service
+        $service = $services->where('uri', $serviceUri)->first();
 
-        $openinghoursRepo = app()->make('OpeninghoursRepository');
+        if (empty($service)) {
+            return response()->json(['message' => 'The service was not found.'], 404);
+        }
 
+        $channels = [];
+
+        // If no channel is passed, return all channels
+        if (! empty($channel)) {
+            $channels[] = $channel;
+        } else {
+            $channelObjects = $service->channels->toArray();
+
+            foreach ($channelObjects as $object) {
+                $channels[] = $object['label'];
+            }
+        }
+
+        if (empty($channels)) {
+            abort(404, "Deze dienst heeft geen enkel kanaal met openingsuren.");
+        }
+
+        $openinghours = [];
+
+        foreach ($channels as $channel) {
+            $weekSchedule = $this->renderWeekForChannel($serviceUri, $channel);
+
+            $openinghours[$channel] = $weekSchedule;
+        }
+
+        return $openinghours;
+    }
+
+    /**
+     * Return the week schedule for a service and channel
+     *
+     * @param  string $serviceUri
+     * @param  string $channel
+     * @return array
+     */
+    private function renderWeekForChannel($serviceUri, $channel)
+    {
         // Check if the service and channel exist
+        $openinghoursRepo = app()->make('OpeninghoursRepository');
         $openinghours = $openinghoursRepo->getAllForServiceAndChannel($serviceUri, $channel);
 
         if (empty($openinghours)) {
-            abort(404, 'No openinghours found for the service and channel.');
+            abort(404, 'Het gevraagde kanaal heeft geen openingsuren binnen de gevraagde dienst.');
         }
+
+        $weekDays = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
 
         // Get the openinghours that is active now
         $relevantOpeninghours = '';
