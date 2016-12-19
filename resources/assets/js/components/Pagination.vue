@@ -27,7 +27,7 @@
 </template>
 
 <script>
-export const pageSize = 9
+export const pageSize = 20
 
 export default {
   name: 'pagination',

@@ -1,15 +1,27 @@
 <template>
   <div class="container">
-    <h1>{{ channel.label || 'Kanaal zonder naam' }} {{ version.label || 'gewoon' }} <small>{{ service.label || 'Dienst zonder naam' }}</small></h1>
+    <h1>{{ channel.label || 'Kanaal zonder naam' }} <small>{{ version.label || '' }}</small></h1>
 
-    <div class="btn-group">
-      <button type="button" class="btn btn-primary" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
-      <button type="button" class="btn btn-primary" :class="{active: tab=='users'}" @click="tab='users'">Toon open en gesloten</button>
+    <!-- Version actions -->
+    <div class="pull-right">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
+        <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'">Toon open en gesloten</button>
+      </div>
     </div>
+
+    <!-- Calender view options -->
+    <p>
+      <button type="button" class="btn btn-default" @click="editVersion">Versie naam bewerken</button>
+      <button type="button" class="btn btn-default" @click="editVersion">Versie geldigheidsperiode bewerken</button>
+    </p>
 
     <div class="version-split">
       <div class="version-cals col-sm-6 col-md-5 col-lg-4">
+        <!-- Editing a calendar -->
         <calendar-editor v-if="$parent.routeCalendar.events" :cal="$parent.routeCalendar"></calendar-editor>
+
+        <!-- Showing list of calendars -->
         <div v-else>
           <h2>Prioriteitenlijst periodes</h2>
           <p>
@@ -32,41 +44,22 @@
               </header>
             </div>
           </div>
-          <div v-if="reversedCalendars.length>1">
-            <hr>
-            <div class="text-center">
-              <p>
-                Om vakantieperiodes, nationale feestdagen of andere uitzondering in te stellen, druk op "<a href="#" @click.prevent="addCalendar">Voeg uitzonderingen toe</a>".
-              </p>
-              <p>
-                <button class="btn btn-link" @click="addCalendar">of voeg manueel dagen toe</button>
-              </p>
-            </div>
+
+          <!-- Encourage to add calendars after first one -->
+          <div class="text-center" v-if="reversedCalendars.length===1">
+            <p style="padding-top:3em">
+              Je normale openingsuren zijn ingesteld.  
+            </p>
+            <p>
+              Om vakantieperiodes, nationale feestdagen of andere uitzondering in te stellen, druk op "<a href="#" @click.prevent="addCalendar">Voeg uitzonderingen toe</a>".
+            </p>
           </div>
-          <div v-else-if="reversedCalendars.length">
-            <hr>
-            <div class="text-center">
-              <p>
-                Je normale openingsuren zijn ingesteld.  
-              </p>
-              <p>
-                Om vakantieperiodes, nationale feestdagen of andere uitzondering in te stellen, druk op <a href="#" @click.prevent="addCalendar">Voeg uitzonderingen toe</a>".
-              </p>
-              <p>
-                <button class="btn btn-link" @click="addCalendar">of voeg manueel dagen toe</button>
-              </p>
-            </div>
-          </div>
+
+          <!-- This should never happen -->
           <div v-if="!reversedCalendars.length">
-            <hr>
-            <div class="text-center">
-              <p>
-                <button class="btn btn-primary" @click="addCalendar">Importeer bestaande openingsuren</button>
-              </p>
-              <p>
-                <button class="btn btn-link" @click="addCalendar">of voeg manueel dagen toe</button>
-              </p>
-            </div>
+            <p>
+              <button class="btn btn-link" @click="addCalendar">voeg openingsuren toe</button>
+            </p>
           </div>
         </div>
       </div>
@@ -85,7 +78,7 @@ import { createCalendar, createFirstCalendar } from '../defaults.js'
 import { orderBy, Hub } from '../lib.js'
 
 export default {
-  name: 'version',
+  name: 'page-version',
   data () {
     return {
       tab: null,
@@ -101,17 +94,10 @@ export default {
       return this.$parent.routeChannel || {}
     },
     version () {
-      if (this.$parent.routeVersion && !Array.isArray(this.$parent.routeVersion.calendars)) {
-        this.$set(this.$parent.routeVersion, 'calendars', [])
-        this.$nextTick(() => {
-          this.$parent.fetchVersion()
-        })
-      }
       return this.$parent.routeVersion || {}
     },
     layeredVersion () {
-      this.$set(this.version, 'calendars', this.calendars)
-      return this.version
+      return Object.assign({}, this.version, { calendar: this.calendars })
     },
     calendars () {
       const calendars = (this.version.calendars || [])
@@ -141,6 +127,10 @@ export default {
       const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
       console.log(inert(newCal))
       Hub.$emit('createCalendar', newCal)
+    },
+    editVersion () {
+      console.log('edit version')
+      Hub.$emit('editVersion', newCal)
     }
   },
   components: {

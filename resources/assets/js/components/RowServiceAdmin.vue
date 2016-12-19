@@ -12,8 +12,8 @@
       <td class="pre-wrap" v-text="activeUsers.join('\n')"></td>
       <td class="pre-wrap" v-text="ghostUsers.join('\n')"></td>
       <td class="td-btn text-right">
-        <button class="btn btn-default btn-icon">
-          <i class="glyphicon glyphicon-trash"></i>
+        <button class="btn btn-primary btn-icon">
+          <i class="glyphicon glyphicon-pencil"></i>
         </button>
       </td>
     </tr>
@@ -33,6 +33,10 @@ export default {
       return this.s.ghostUsers.map(u => u.email) || []
     }
   },
-  methods () {}
+  methods: {
+    rmService () {
+
+    }
+  }
 }
 </script>

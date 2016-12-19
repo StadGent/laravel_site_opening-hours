@@ -25,9 +25,8 @@
         </button>
       </td>
       <td class="td-btn text-right">
-        <button @click="invite" class="btn btn-default btn-icon">
+        <button @click="rmUser" class="btn btn-default btn-icon">
           <i class="glyphicon glyphicon-trash"></i>
-          <i class="glyphicon glyphicon-delete"></i>
         </button>
       </td>
     </tr>
@@ -58,6 +57,10 @@ export default {
     invite () {
       // invite user
       alert('to implement: invite ' + u.name)
+    },
+    rmUser () {
+      // invite user
+      alert('to implement: remove user ' + u.name)
     }
   }
 }

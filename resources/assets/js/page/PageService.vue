@@ -35,7 +35,7 @@
 
     <div v-else>
       <div v-if="!channels||!channels.length" style="padding:5em 0;">
-        <h1>Empty state</h1>
+        <h3 class="text-muted">Er werden nog geen kanalen voor deze dienst aangemaakt.</h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newChannel(srv)">Voeg een nieuw kanaal toe</button>
         </p>
@@ -43,7 +43,7 @@
       <div v-else-if="!filteredChannels" style="padding:5em 0;">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
       </div>
-      <table v-else class="table">
+      <table v-else class="table table-hover">
         <thead>
           <tr>
             <th-sort by="label">Kanaal</th-sort>
@@ -63,12 +63,12 @@
               <div>{{ channel.updated_at | date }}</div>
               <div>{{ channel.updated_by }}</div>
             </td>
-            <td class="text-right">
-              <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-default">
+            <td class="td-btn text-right">
+              <button @click="rmChannel(channel)" class="btn btn-icon btn-default">
                 <i class="glyphicon glyphicon-trash"></i>
-              </a>
+              </button>
             </td>
-            <td class="text-right">
+            <td class="td-btn text-right">
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-primary">
                 <i class="glyphicon glyphicon-pencil"></i>
               </a>

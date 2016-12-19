@@ -90,7 +90,7 @@ class CalendarsController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreOpeninghoursRequest $request, $id)
+    public function update(StoreCalendarRequest $request, $id)
     {
         $input = $request->input();
 

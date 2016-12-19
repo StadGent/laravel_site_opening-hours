@@ -1,7 +1,7 @@
 import { Hub } from '../lib.js'
 
-import { createVersion } from '../defaults.js'
- 
+import { createVersion, createFirstCalendar } from '../defaults.js'
+
 export const services = window.initialServices || []
 
 export default {
@@ -18,6 +18,9 @@ export default {
       return this.routeService.channels && this.routeService.channels.find(c => c.id === this.route.channel) || {}
     },
     routeVersion () {
+      this.$nextTick(() => {
+        this.fetchVersion()
+      })
       return this.routeChannel.openinghours && this.routeChannel.openinghours.find(o => o.id === this.route.version) || {}
     },
     routeCalendar () {
@@ -35,12 +38,17 @@ export default {
       if (!this.routeVersion) {
         return console.warn('no route version')
       }
+      if (this.routeVersion.fetched) {
+        return console.warn('version already fetched')
+      }
+      this.routeVersion.fetched = true
       return this.$http.get('/api/openinghours/' + this.route.version)
         .then(({ data }) => {
           const index = this.routeChannel.openinghours.findIndex(o => o.id === data.id)
-          if (!index) {
+          if (index === -1) {
             return console.warn('did not find this version', data)
           }
+          Object.assign(data, { fetched: true })
           this.$set(this.routeChannel.openinghours, index, data)
         })
     }
@@ -74,10 +82,13 @@ export default {
         this.fetchServices()
         this.modalClose()
         this.toVersion(data.id)
+        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(), {
+          openinghours_id: data.id
+        }))
       })
     })
 
-    Hub.$on('createCalendar', calendar => {
+    Hub.$on('createCalendar', (calendar, done) => {
       if (!calendar.openinghours_id) {
         calendar.openinghours_id = this.route.version
       }
@@ -85,15 +96,40 @@ export default {
 
       if (calendar.id) {
         this.$http.put('/api/calendars/' + calendar.id, calendar).then(({ data }) => {
-          this.routeVersion.calendars.push(data)
-          this.toCalendar(data.id)
+          const index = this.routeVersion.calendars.findIndex(c => c.id === data.id)
+          if (index === -1) {
+            console.log(inert(this.routeVersion.calendars))
+            return console.warn('did not find this calendar', data)
+          }
+          this.$set(this.routeVersion.calendars, index, data)
+          done && this.toVersion(data.openinghours_id)
         })
       } else {
-        this.$http.post('/api/calendars/' + calendar.id, calendar).then(({ data }) => {
+        this.$http.post('/api/calendars/', calendar).then(({ data }) => {
+          if (!this.routeVersion.calendars) {
+            this.$set(this.routeVersion, 'calendars', [])
+          }
           this.routeVersion.calendars.push(data)
           this.toCalendar(data.id)
         })
       }
+    })
+
+    Hub.$on('editVersion', input => {
+      const version = Object.assign(createVersion(), input)
+      if (!version.channel_id) {
+        version.channel_id = this.route.channel
+      }
+      console.log('Create version', inert(version))
+
+      this.$http.post('/api/openinghours', version).then(({ data }) => {
+        this.fetchServices()
+        this.modalClose()
+        this.toVersion(data.id)
+        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(), {
+          openinghours_id: data.id
+        }))
+      })
     })
   }
 }

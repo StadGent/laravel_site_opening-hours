@@ -1,30 +1,55 @@
 <template>
-  <div class="wrapper-height100">
+  <form class="wrapper-height100" @submit.prevent>
     <div class="wrapper-above-save">
-      <div class="close" style="padding:10px 15px;margin:0 -15px;" @click="route.calendar=-1">&times;</div>
-      <h3>{{ cal.label }}</h3>
-      <label v-if="cal.layer">
-        <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
-      </label>
-      <br v-else>
+      <div class="cal-img top-right" :class="'layer-'+cal.layer"></div>
 
-      <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
+      <!-- First calendar is always weekly -->
+      <div v-if="!cal.layer">
+        <h3>Stel de openingsuren in voor {{ $parent.$parent.routeService.label }}. Op welke dagen is deze dienst normaal open?</h3>
+        <p class="text-muted">Uitzonderingen kan je later instellen.</p>
 
-      <p v-if="cal.layer">
-        <button @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
-      </p>
+        <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
+      </div>
+
+      <!-- Other calendars must be renamed -->
+      <div v-else-if="cal.label=='Uitzondering'">
+        <h3>Stel de uitzondering in.</h3>
+        <div class="form-group">
+          <label>Naam uitzondering</label>
+          <input type="text" class="form-control" v-model="calLabel" placeholder="Brugdagen, collectieve sluitingsdagen, ...">
+          <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
+        </div>
+      </div>
+
+      <!-- Other calendars have more options -->
+      <div v-else>
+        <h3>{{ cal.label }}</h3>
+        <label>
+          <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
+        </label>
+        <br v-else>
+
+        <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
+
+        <p>
+          <button @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
+        </p>
+      </div>
     </div>
 
-    <div class="row wrapper-save-btn">
+    <div class="wrapper-save-btn">
       <div class="col-xs-12 text-right">
-        <button class="btn btn-primary" @click="save">Bewaren</button>
+        <button type="button" class="btn btn-default pull-left" @click="toVersion()">Verwijder</button>
+        <button type="button" class="btn btn-default" @click="toVersion()">Annuleer</button>
+        <button type="submit" class="btn btn-primary" @click="saveLabel" v-if="cal.label=='Uitzondering'">Volgende stap</button>
+        <button type="submit" class="btn btn-primary" @click="save" v-else>Sla op</button>
       </div>
     </div>
 
 <!-- 
     <pre>{{ cal }}</pre>
     <pre class="cal-render" style="margin-top:10em">{{ events }}</pre> -->
-  </div>
+  </form>
 </template>
 
 <script>
@@ -40,6 +65,7 @@ export default {
   data () {
     return {
       // options: {}
+      calLabel: '',
       days: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'],
       fullDays
     }
@@ -54,7 +80,7 @@ export default {
       this.$set(this.cal, 'closinghours', !this.cal.closinghours)
     },
     pushEvent (index, event) {
-      this.cal.events.push(createEvent())
+      this.cal.events.push(createEvent(this.cal.events.length + 1))
     },
     addEvent (index, event) {
       console.log('add yes', index, event)
@@ -65,6 +91,13 @@ export default {
       this.cal.events.splice(index, 1)
     },
     save () {
+      Hub.$emit('createCalendar', this.cal, true)
+    },
+    saveLabel () {
+      if (!this.calLabel || this.calLabel === 'Uitzondering') {
+        return console.warn('Expected calendar name')
+      }
+      this.cal.label = this.calLabel
       Hub.$emit('createCalendar', this.cal)
     }
   },

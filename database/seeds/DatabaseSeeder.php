@@ -77,23 +77,39 @@ class DatabaseSeeder extends Seeder
     {
         $services = app()->make('ServicesRepository');
 
-        $servicesData = [
-            [
-                'uri' => 'http://dev.foo/service1',
-                'label' => 'Service1',
-                'description' => 'Description of the service'
-            ],
-            [
-                'uri' => 'http://dev.foo/service2',
-                'label' => 'Service2',
-                'description' => 'Description of the service'
-            ],
-            [
-                'uri' => 'http://dev.foo/service3',
-                'label' => 'Service3',
-                'description' => 'Description of the service'
-            ]
+        $sampleServiceNames = [
+            'Cultuurdienst',
+            'De Centrale',
+            'Departement Cultuur, Sport en Vrije Tijd',
+            'Dienst Administratieve Vereenvoudiging',
+            'Dienst Beleidsparticipatie',
+            'Dienst Burgerzaken',
+            'Dienst Evenementen, Feesten, Markten en Foren',
+            'Dienst Invorderingen',
+            'Dienst Milieu en Klimaat',
+            'Dienst Monumentenzorg en Architectuur',
+            'Dienst Preventie voor Veiligheid',
+            'Dienst Samenleven, Welzijn en Gezondheid',
+            'Dienst Stedelijke Vernieuwing',
+            'Dienst Wegen',
+            'Dienst Werken en Ondernemen',
+            'IVA Historische Huizen Gent',
+            'Jeugddienst - Huis van de Student',
+            'Mobiel Dienstencentrum',
+            'OOG - Ondersteuningspunt Ondernemers',
+            'Sportdienst - Huis van de Sport',
+            'Stadsarchief Gent',
         ];
+
+        $servicesData = array_map(function ($name) {
+            return [
+                'uri' => 'http://dev.foo/' . str_slug($name),
+                'label' => $name,
+                'description' => '',
+            ];
+        }, $sampleServiceNames);
+
+
 
         foreach ($servicesData as $serviceConfig) {
             $service = $services->where('uri', $serviceConfig['uri'])->first();
