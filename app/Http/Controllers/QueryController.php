@@ -379,7 +379,7 @@ class QueryController extends Controller
             $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart));
             $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend));
 
-            $hours[] = $dtStart->format('h:i') . ' - ' . $dtEnd->format('h:i');
+            $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
         }
 
         return rtrim(implode($hours, ', '), ',');
@@ -421,7 +421,7 @@ class QueryController extends Controller
     private function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
-        $date = $date->format('Ymd his');
+        $date = $date->format('Ymd His');
 
         return str_replace(' ', 'T', $date);
     }
