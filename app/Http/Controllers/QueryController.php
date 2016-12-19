@@ -49,7 +49,7 @@ class QueryController extends Controller
      *
      * @param  Carbon  $day
      * @param  Request $request
-     * @return boolean
+     * @return array
      */
     private function isOpenOnDay($day, $request)
     {
@@ -137,7 +137,7 @@ class QueryController extends Controller
      * Calculate if a service is open now
      *
      * @param  Request $request
-     * @return boolean
+     * @return array
      */
     private function isOpenNow($request)
     {
@@ -152,7 +152,7 @@ class QueryController extends Controller
         $service = $services->where('uri', $serviceUri)->first();
 
         if (empty($service)) {
-            return response()->json(['message' => 'The service was not found.'], 404);
+            abort(404, 'The service was not found.');
         }
 
         $channels = [];
