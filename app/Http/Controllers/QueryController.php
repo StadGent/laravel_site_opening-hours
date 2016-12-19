@@ -195,7 +195,7 @@ class QueryController extends Controller
                 }
             }
 
-            if (! empty($openinghours)) {
+            if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
                     return $calendar->priority;
@@ -314,7 +314,8 @@ class QueryController extends Controller
         }
 
         if (empty($relevantOpeninghours)) {
-            abort(404, 'No relevant openinghours found for this week.');
+            // abort(404, 'No relevant openinghours found for this week.');
+            return [];
         }
 
         // Go to the start of the week starting from today and iterate over every day
