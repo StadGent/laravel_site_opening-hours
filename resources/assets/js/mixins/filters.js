@@ -6,18 +6,19 @@ function date(d) {
   if (!d) {
     return 'nooit'
   }
+  if (typeof d === 'string') {
+    d = d.replace(' ', 'T')
+  }
   d = new Date(d)
   if (!d) {
     console.error('Report invalid updated_at')
     return 'invalid'
   }
-  d = new Date(+d + 6e4 * d.getTimezoneOffset())
   var diff = new Date() - d
   if (diff > 1000 * 60 * 60 * 24) {
     return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + pad(d.getHours()) + ':' + pad(d.getSeconds())
   }
   if (diff > 1000 * 60 * 60) {
-    console.log((diff / 36e5))
     return Math.round(diff / 36e5) + ' uur geleden'
   }
   if (diff > 1000 * 60) {
