@@ -107,7 +107,7 @@ export default {
 
     // Services
     filteredServices () {
-      return this.query ? this.services.filter(s => (s.label || '').indexOf(this.query) !== -1) : this.services
+      return this.query ? this.services.filter(s => (s.label || '').toLowerCase().indexOf(this.query.toLowerCase()) !== -1) : this.services
     },
     sortedServices () {
       return this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices

@@ -39,7 +39,7 @@ export function createCalendar(layer) {
   return {
     closinghours: true,
     layer: layer,
-    label: 'Nieuwe periode',
+    label: 'Uitzondering',
     priority: -layer,
     events: [createEvent('1')]
   }
@@ -51,7 +51,7 @@ export function createVersion() {
     start_date: defaultStart,
     end_date: defaultUntil,
     priority: 0,
-    label: 'Nieuwe versie',
+    label: '2016 t.e.m. 2020',
     calendars: []
   }
 }

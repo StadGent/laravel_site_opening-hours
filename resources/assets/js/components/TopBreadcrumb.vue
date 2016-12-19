@@ -16,13 +16,13 @@
         <a href="#service">{{ srv.label }}</a>
       </li>
       <li v-if="!route.tab&&level>1&&route.channel>-1" :class="{active:route.page=='channel'}">
-        <a href="#channel">Kanaal {{ route.channel + 1 }}</a>
+        <a href="#channel" @click.prevent="toChannel()">{{ $parent.routeChannel.label }}</a>
       </li>
       <li v-if="!route.tab&&level>2&&route.version>-1" :class="{active:route.page=='version'}">
-        <a href="#version">Versie {{ route.version + 1 }}</a>
+        <a href="#version" @click.prevent="toVersion()">{{ $parent.routeVersion.label }}</a>
       </li>
       <li v-if="!route.tab&&level>3&&route.calendar>-1" :class="{active:route.page=='calendar'}">
-        <a href="#calendar">Kalender {{ route.calendar + 1 }}</a>
+        <a href="#calendar" @click.prevent="toCalendar()">{{ $parent.routeCalendar.label }}</a>
       </li>
 
       <li v-if="route.page=='service'">

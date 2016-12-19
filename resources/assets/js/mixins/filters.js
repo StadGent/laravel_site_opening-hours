@@ -14,7 +14,7 @@ function date(d) {
   d = new Date(+d + 6e4 * d.getTimezoneOffset())
   var diff = new Date() - d
   if (diff > 1000 * 60 * 60 * 24) {
-    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getHours() + ':' + d.getSeconds()
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + pad(d.getHours()) + ':' + pad(d.getSeconds())
   }
   if (diff > 1000 * 60 * 60) {
     console.log((diff / 36e5))
@@ -24,4 +24,8 @@ function date(d) {
     return Math.round(diff / 6e4) + ' min. geleden'
   }
   return Math.round(diff / 1000) + ' s. geleden'
+}
+
+function pad (t) {
+  return t < 10 ? '0' + t : t
 }

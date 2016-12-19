@@ -33,6 +33,12 @@ export function hasActiveOh(ch) {
 export function toChannelStatus(ch) {
   const oh = hasActiveOh(ch)
   let end_date = expiresOn(oh)
+  if (!end_date) {
+    return 'Verlopen'
+  }
+  if (end_date === -1) {
+    return 'Oneindig'
+  }
   return end_date
 }
 
@@ -44,7 +50,7 @@ function isInUseOn(oh, date) {
 }
 
 // Get expiry date of array of oh
-function expiresOn(oh) {
+export function expiresOn(oh) {
   let end_date = today
   let count = oh.length
 
@@ -55,12 +61,12 @@ function expiresOn(oh) {
     if (!nextOh) {
       break
     } else if (!nextOh.end_date) {
-      return 'infinite'
+      return -1
     } else {
       end_date = nextDateString(nextOh.end_date || end_date)
     }
   }
-  return end_date === today ? 'Verlopen' : end_date
+  return end_date === today ? null : end_date
 }
 
 /** Date functions **/

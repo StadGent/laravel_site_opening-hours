@@ -1,13 +1,13 @@
 <template>
   <div class="modal fade" :class="{in: modal.text}" :style="{display: modal.text?'block':'none'}" @click="modalClose" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-      <div class="modal-content" @click.stop>
+      <form class="modal-content" @click.stop @submit.prevent>
         <div class="modal-header">
           <button type="button" class="close" @click="modalClose" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title">
             <span v-if="modal.text=='requestService'">Vraag toegang tot een dienst</span>
             <span v-else-if="modal.text=='newChannel'">Voeg een kanaal toe</span>
-            <span v-else-if="modal.text=='newVersion'">Voeg een kanaal toe</span>
+            <span v-else-if="modal.text=='newVersion'">Voeg een versie toe</span>
             <span v-else-if="modal.text=='newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
             <span v-else>Probleem</span>
           </h4>
@@ -18,11 +18,33 @@
           </div>
           <div v-else-if="modal.text=='newChannel'" class="form-group">
             <label for="recipient-name" class="control-label">Naam van het kanaal</label>
-            <input type="text" class="form-control" v-model="modal.label">
+            <input-channel :parent="modal" prop="label"></input-channel>
+            <div class="help-block">
+              Een contactkanaal is een manier waarop burgers jouw dienst kunnen contacteren.
+              <br><br> Dat kunnen algemene openingsuren zijn, maar ook bijvoorbeeld de telefonische beschikbaarheid, afspraak momenten, wanneer er een tolk aanwezig is, of wanneer een bepaalde doelgroep een bezoekje kan brengen zoals jongeren.
+            </div>
           </div>
-          <div v-else-if="modal.text=='newVersion'" class="form-group">
-            <label for="recipient-name" class="control-label">Naam van de versie</label>
-            <input type="text" class="form-control" v-model="modal.label">
+          <div v-else-if="modal.text=='newVersion'">
+            <div class="form-group">
+              <label for="recipient-name" class="control-label">Naam van de versie</label>
+              <input type="text" class="form-control" v-model="modal.label" :placeholder="nextVersionLabel">
+            </div>
+
+            <div class="row form-group">
+              <div class="col-sm-6">
+                <label for="recipient-name" class="control-label">Geldig van</label>
+                <select class="form-control" v-model="modal.start_date">
+                  <option v-for="i in 10" v-text="(i + 2015)+'-01-01'"></option>
+                </select>
+              </div>
+              <div class="col-sm-6">
+                
+                <label for="recipient-name" class="control-label">Verloopt op</label>
+                <select class="form-control" v-model="modal.end_date">
+                  <option v-for="i in 10" v-text="(i + parseInt(modal.start_date.slice(0,4), 10))+'-01-01'"></option>
+                </select>
+              </div>
+            </div>
           </div>
           <div v-else-if="modal.text=='newRole'">
             <div class="form-group" :class="{'has-error':!validEmail, 'has-success':allowedEmail}">
@@ -36,27 +58,29 @@
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
-            <button type="button" class="btn btn-primary" @click="createChannel">Toevoegen</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleren</button>
+            <button type="submit" class="btn btn-primary" @click="createChannel">Voeg toe</button>
+            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
-            <button type="button" class="btn btn-primary" @click="createVersion">Toevoegen</button>
+            <button type="submit" class="btn btn-primary" @click="createVersion">Toevoegen</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleren</button>
           </div>
           <div v-else-if="modal.text=='newRole'">
-            <button type="button" class="btn btn-primary" @click="createRole">Uitnodigen</button>
+            <button type="submit" class="btn btn-primary" @click="createRole">Uitnodigen</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleren</button>
           </div>
           <div v-else>
-            <button type="button" class="btn btn-primary" @click="modalClose">OK</button>
+            <button type="submit" class="btn btn-primary" @click="modalClose">OK</button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
+import InputChannel from '../components/InputChannel.vue'
+
 import { Hub } from '../lib.js'
 
 export default {
@@ -66,13 +90,25 @@ export default {
     },
     allowedEmail () {
       return (this.modal.email || '').endsWith('@mijngent.be')
+    },
+    nextVersionLabel () {
+      if (!this.modal.start_date || !this.modal.end_date) {
+        return 'Nieuwe versie'
+      }
+      return this.modal.start_date.slice(0, 4) + ' t.e.m. ' + (parseInt(this.modal.end_date.slice(0, 4), 10) - 1)
     }
   },
   methods: {
     createChannel () {
+      if (!this.modal.label) {
+        this.modal.label = 'Algemeen'
+      }
       Hub.$emit('createChannel', this.modal)
     },
     createVersion () {
+      if (!this.modal.label) {
+        this.modal.label = this.nextVersionLabel
+      }
       Hub.$emit('createVersion', this.modal)
     },
     createRole () {
@@ -82,6 +118,13 @@ export default {
       }
       Hub.$emit('createRole', this.modal)
     }
+  },
+  updated () {
+    const inp = this.$el.querySelector('input')
+    inp && inp.focus()
+  },
+  components: {
+    InputChannel
   }
 }
 </script>

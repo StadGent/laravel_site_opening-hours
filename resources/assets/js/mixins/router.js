@@ -82,6 +82,7 @@ export default {
       if (typeof c !== 'undefined') {
         route.version = parseInt(c || 0)
       }
+      route.calendar = -1
       this.replaceHash()
     },
     toCalendar(c) {

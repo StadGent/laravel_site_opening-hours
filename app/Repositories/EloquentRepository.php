@@ -36,7 +36,7 @@ class EloquentRepository
     {
         foreach ($models as $model) {
             if (array_key_exists('id', $model)) {
-                $this->update($id, $model);
+                $this->update($model['id'], $model);
             } else {
                 $this->store($model);
             }
