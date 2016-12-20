@@ -91,7 +91,7 @@ class SendGridMailer
         $this->data = [];
         $this->data['email'] = $email;
         $this->data['token'] = $token;
-        $this->subject = 'Voltooi je registratie';
+        $this->subject = 'Voltooi uw registratie';
         return $this->deliver();
     }
 

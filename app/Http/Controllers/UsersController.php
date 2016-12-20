@@ -46,17 +46,26 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        $id = $request->input('id');
+        // Check if the user already exists
+        $user = $this->users->where('email', $request->input('email'))->first();
 
-        if (! $id) {
+        if (empty($user)) {
             $input = $request->input();
             $input['password'] = '';
             $input['token'] = str_random(32);
 
-            $id = $this->users->store($input);
+            $userId = $this->users->store($input);
+
+            $user = $this->users->getById($userId);
+
+            // Send a confirmation email
+            $mailer = app()->make('App\Mailers\SendGridMailer');
+            $mailer->sendEmailConfirmationTo($user['email'], $user['token']);
+        } else {
+            $this->users->update($request->input());
         }
 
-        $user = $this->users->getById($id);
+        $user = $this->users->where('email', $request->input('email'))->first();
 
         if (! empty($user)) {
             return response()->json($user);

@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'token', 'verified'
+        'name', 'email', 'password', 'token'
     ];
 
     protected $appends = ['verified'];
@@ -39,6 +39,7 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $mailer = app()->make('App\Mailers\SendGridMailer');
+
         return $mailer->sendResetLinkEmail($this->email, $token);
     }
 }

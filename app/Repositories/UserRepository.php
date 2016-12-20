@@ -13,6 +13,18 @@ class UserRepository extends EloquentRepository
         parent::__construct($user);
     }
 
+    public function store(array $input)
+    {
+        $existingUser = $this->model->where('email', $input['email'])->first();
+
+        if (empty($existingUser)) {
+            $input = array_only($input, $this->model->getFillable());
+            return parent::store($input);
+        }
+
+        return $existingUser->id;
+    }
+
     public function getById($userId)
     {
         $user = $this->model->find($userId);
