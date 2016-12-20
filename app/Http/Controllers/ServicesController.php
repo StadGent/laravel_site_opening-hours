@@ -19,9 +19,14 @@ class ServicesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->services->get());
+        // An admin has access to all of the roles
+        if ($request->user()->hasRole('Admin')) {
+            return response()->json($this->services->get());
+        }
+
+        return response()->json($this->services->getForUser($request->user()->id));
     }
 
     /**

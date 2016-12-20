@@ -137,31 +137,6 @@ class UserRepository extends EloquentRepository
     }
 
     /**
-     * Get all services where the user is part of
-     *
-     * @param  integer $userId
-     * @return array
-     */
-    public function getServices($userId)
-    {
-        $services = DB::select(
-            'SELECT label, uri, description
-            FROM user_service_role
-            JOIN services ON user_service_role.service_id = services.id
-            WHERE user_id = ?',
-            [$userId]
-        );
-
-        $results = [];
-
-        foreach ($services as $service) {
-            $results[] = (array) $service;
-        }
-
-        return $results;
-    }
-
-    /**
      * Get the role in a service for a user
      *
      * @param  integer $userId
