@@ -1,9 +1,6 @@
 <template>
   <div class="container container-breadcrumb">
     <ol class="breadcrumb">
-      <li :class="{active:route.page=='home'}">
-        <a href="#home">Overzicht</a>
-      </li>
       <li v-if="route.page=='home'">
         {{ route.tab === 'admin' ? 'Administrators' : route.tab ? 'Gebruikers' : 'Diensten' }}
       </li>
