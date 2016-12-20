@@ -192,7 +192,7 @@ class UserRepository extends EloquentRepository
     public function getAllInService($serviceId)
     {
         $results = DB::select(
-            'SELECT users.name, users.id, users.email, roles.name as role
+            'SELECT users.name, users.id, users.email, roles.name as role, if(length(users.password)<10, 0, 1) as verified
             FROM user_service_role
             JOIN users ON users.id = user_service_role.user_id
             JOIN roles ON roles.id = user_service_role.role_id
