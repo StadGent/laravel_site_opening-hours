@@ -7,7 +7,9 @@
 @import "vendor/bootstrap-multiselect";
 
 body {
+  padding-top: 50px;
   font-family: 'Source Sans Pro', sans-serif;
+  color: #27373f;
 }
 
 /* container maybe max-width to 100% */
@@ -20,8 +22,8 @@ body {
 /* Breadcrumb */
 
 .container-breadcrumb {
-  margin-top: -20px;
   margin-bottom: 0;
+  border-bottom: 1px solid #ccc;
 }
 .breadcrumb > .active > a {
   color: #777;
@@ -53,7 +55,25 @@ body {
   color: inherit;
 }
 .td-btn {
-  padding: 4px 8px!important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+/* Table > extra padding */
+.table {
+    border-top: 1px solid #999;
+  >thead>tr>th {
+    border-bottom: 1px solid #999;
+  }
+  >thead>tr>th,
+  >tbody>tr>td {
+    &:first-child {
+      padding-left: 15px
+    }
+    &:last-child {
+      padding-right: 15px
+    }
+  }
 }
 
 /* Table */
@@ -185,7 +205,7 @@ h1+h3 {
   right: 0;
   bottom: 0;
   background: white;
-  border-top: 1px solid $navbar-default-border;
+  border-top: 1px solid #ccc;
 }
 .pagination {
   margin: 10px 0;

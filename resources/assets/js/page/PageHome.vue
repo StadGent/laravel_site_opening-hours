@@ -18,7 +18,7 @@
     </div>
 
     <!-- Users -->
-    <div v-if="user.admin&&route.tab==='users'">
+    <div v-if="user.admin&&route.tab==='users'" class="row">
       <div v-if="!users.length" style="padding:5em 0;">
         <h3 class="text-muted">
           Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
@@ -49,7 +49,7 @@
     </div>
 
     <!-- Services -->
-    <div v-else>
+    <div v-else class="row">
       <div v-if="!services.length" style="padding:5em 0;">
         <h3 class="text-muted">U hebt nog geen toegang tot diensten</h3>
       </div>
