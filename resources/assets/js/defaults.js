@@ -51,7 +51,7 @@ export function createVersion() {
     start_date: defaultStart,
     end_date: defaultUntil,
     priority: 0,
-    label: '2016 t.e.m. 2020',
+    label: 'openingsuren 2016 tot en met 2020',
     calendars: []
   }
 }
