@@ -248,6 +248,7 @@ h1+h3 {
   border-left: 1px solid #ccc;
   padding-top: 1em;
   width: calc(100% - 30em);
+  background: #eee;
 }
 .calendar {
   overflow: hidden;
@@ -257,6 +258,10 @@ h1+h3 {
   text-align: center;
   height: 230px;
   padding: 0;
+  >table {
+    border: 1px solid #ccc;
+    background: white;
+  }
 }
 
 /* Version > Preview > Topdown layer render */
@@ -264,8 +269,14 @@ h1+h3 {
   .layer-#{$num} {
     background: $background;
     color: $color;
+    border-color: mix($background, #000, 70%)!important;
     &::after {
       content: $content;
+    }
+    &+.layer-#{$num} {
+      &:after {
+        display: none;
+      }
     }
   }
 }
@@ -276,26 +287,33 @@ h1+h3 {
 @include layer(4, $green, white, 'E')
 
 .calendar-topview {
+  table.month th.month-title {
+    font-size: 14px;
+    padding: 0;
+  }
+  .day-header {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    font-weight: normal;
+  }
   .day {
     position: relative;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
     vertical-align: top;
-    width: 28px;
-    height: 28px;
-  }
-  .day+.day {
-    border-left: 1px solid white;
+    width: 26px;
+    height: 26px;
   }
   .layer>.day-content {
     font-size: 9px;
-    height: 27px;
+    height: 100%;
     padding: 2px 0 0 4px !important;
     text-align: left;
   }
   .day::after {
     position: absolute;
     bottom: 0;
-    right: 4px;
+    left: 4px;
     pointer-events: none;
   }
 }
