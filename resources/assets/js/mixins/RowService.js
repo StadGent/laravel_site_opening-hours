@@ -47,9 +47,10 @@ export default {
     },
     statusMessage() {
       if (this.user.admin) {
-        if (!this.activeUsers.length && !this.ghostUsers.length) {
-          return 'Geen gebruikers'
-        } else if (!this.ghostUsers) {
+        // if (!this.activeUsers.length && !this.ghostUsers.length) {
+        //   return 'Geen gebruikers'
+        // }
+        if (!this.ghostUsers) {
           return 'Geen actieve gebruikers'
         }
       }

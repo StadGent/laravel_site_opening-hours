@@ -20,7 +20,7 @@
             <label for="recipient-name" class="control-label">Naam van het kanaal</label>
             <input-channel :parent="modal" prop="label"></input-channel>
             <div class="help-block">
-              Een contactkanaal is een manier waarop burgers jouw dienst kunnen contacteren.
+              Een kanaal is een manier waarop burgers jouw dienst kunnen contacteren.
               <br><br> Dat kunnen algemene openingsuren zijn, maar ook bijvoorbeeld de telefonische beschikbaarheid, afspraak momenten, wanneer er een tolk aanwezig is, of wanneer een bepaalde doelgroep een bezoekje kan brengen zoals jongeren.
             </div>
           </div>

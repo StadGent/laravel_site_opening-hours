@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Contactkanalen <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
+    <h1>Kanalen <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
 
     <span v-if="isOwner">
       <div class="btn-group">
@@ -12,7 +12,7 @@
     <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
 
     <div v-if="isOwner&&route.tab2==='users'">
-      <div v-if="!sortedUsers.length" style="padding:5em 0;">
+      <div v-if="!filteredUsers.length" style="padding:5em 0;">
         <h3 class="text-muted">Er werden nog geen gebruikers aan deze dienst toegevoegd.</h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newRole(srv)">Nodig een gebruiker uit</button>
@@ -26,7 +26,7 @@
             <th>Rol</th>
             <th-sort by="verified">Actief</th-sort>
             <th class="text-right">Nodig uit</th>
-            <th class="text-right">Ontzeg toegang</th>
+            <th class="text-right">Ontzeg toegang tot dienst</th>
           </tr>
         </thead>
         <tbody is="row-user-owner" v-for="u in sortedUsers" :u="u"></tbody>
@@ -63,12 +63,12 @@
               <div>{{ channel.updated_at | date }}</div>
               <div>{{ channel.updated_by }}</div>
             </td>
-            <td class="td-btn text-right">
+            <td class="td-btn text-right" @click.stop>
               <button @click="rmChannel(channel)" class="btn btn-icon btn-default">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </td>
-            <td class="td-btn text-right">
+            <td class="td-btn text-right" @click.stop>
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-primary">
                 <i class="glyphicon glyphicon-pencil"></i>
               </a>
@@ -89,7 +89,7 @@
 import ThSort from '../components/ThSort.vue'
 import RowUserOwner from '../components/RowUserOwner.vue'
 
-import { toChannelStatus, orderBy } from '../lib.js'
+import { toChannelStatus, orderBy, Hub } from '../lib.js'
 
 export default {
   name: 'dienst',
@@ -104,13 +104,12 @@ export default {
   },
   computed: {
     srv () {
-      return this.service || this.$parent.services.find(s => s.id === this.route.service) || this.$parent.services[0] || {}
+      return this.$parent.routeService
     },
     channels () {
       return this.srv.channels || []
     },
     filteredChannels () {
-      console.log(this.channels)
       return this.query ? this.channels.filter(s => s.label.indexOf(this.query) !== -1) : this.channels
     },
     sortedChannels () {
@@ -119,16 +118,18 @@ export default {
 
     // Users
     filteredUsers () {
-      return this.users.filter((u, i) => {
-        for (var j = u.roles.length - 1; j >= 0; j--) {
-          if (u.roles[j].service == this.srv.id) {
-            return true
-          }
-        }
-      })
+      return this.srv.users
     },
     sortedUsers () {
       return this.order ? this.filteredUsers.slice().sort(orderBy(this.order)) : this.filteredUsers
+    }
+  },
+  methods: {
+    banUser (user) {
+      Hub.$emit('deleteRole', {
+        user_id: user.id,
+        service_id: this.srv.id
+      })
     }
   },
   filters: {

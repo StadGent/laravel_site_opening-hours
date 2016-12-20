@@ -19,13 +19,13 @@
       </td>
       <td v-if="u.verified" class="text-success">&checkmark;</td>
       <td v-else class="text-warning">&cross;</td>
-      <td class="td-btn text-right">
+      <td class="td-btn text-right" @click.stop>
         <button @click="invite" class="btn btn-default btn-icon" v-if="!u.verified">
           <i class="glyphicon glyphicon-envelope"></i>
         </button>
       </td>
-      <td class="td-btn text-right">
-        <button @click="rmUser" class="btn btn-default btn-icon">
+      <td class="td-btn text-right" @click.stop>
+        <button @click="rm" class="btn btn-default btn-icon">
           <i class="glyphicon glyphicon-trash"></i>
         </button>
       </td>
@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { Hub } from '../lib.js'
+
 export default {
   props: ['u'],
   computed: {
@@ -55,12 +57,10 @@ export default {
   },
   methods: {
     invite () {
-      // invite user
-      alert('to implement: invite ' + u.name)
+      Hub.$emit('inviteUser', this.u)
     },
-    rmUser () {
-      // invite user
-      alert('to implement: remove user ' + u.name)
+    rm () {
+      Hub.$emit('deleteUser', this.u)
     }
   }
 }

@@ -2,6 +2,10 @@ import { Hub } from '../lib.js'
 
 export const users = (window.initialUsers || []).map(expandUser)
 
+function errorHandler (err) {
+  console.warn(err)
+}
+
 export default {
   data() {
     return {
@@ -43,9 +47,20 @@ export default {
       this.$http.post('/api/roles', newRole).then(() => {
         this.fetchServices()
         this.modalClose()
-      }).catch(error => {
-        console.warn(error)
-      })
+      }).catch(errorHandler)
+    })
+    Hub.$on('deleteRole', role => {
+      if (!role.user_id || !role.service_id) {
+        return alert('Toegang kon niet ontzegd worden.')
+      }
+      if (!confirm('Toegang ontzeggen?')) {
+        return console.log('Delete role canceled')
+      }
+
+      this.$http.delete('/api/roles?service_id=' + role.service_id + '&user_id=' + role.user_id).then(() => {
+        this.fetchServices()
+        this.modalClose()
+      }).catch(errorHandler)
     })
 
     Hub.$on('fetchUser', newRole => {
@@ -67,9 +82,7 @@ export default {
       this.$http.post('/api/roles', newRole).then(() => {
         this.fetchServices()
         this.modalClose()
-      }).catch(error => {
-        console.warn(error)
-      })
+      }).catch(errorHandler)
     })
 
     Hub.$on('createUser', newUser => {
@@ -89,9 +102,22 @@ export default {
           this.fetchServices()
         }
         this.modalClose()
-      }).catch(error => {
-        console.warn(error)
-      })
+      }).catch(errorHandler)
+    })
+
+    Hub.$on('inviteUser', user => {
+      alert('Uitnodiging opnieuw verzenden? (werkt nog niet)')
+    })
+
+    Hub.$on('deleteUser', user => {
+      if (!user.id) {
+        return console.error('deleteRole: id is required')
+      }
+      this.$http.delete('/api/users/' + user.id).then(() => {
+        this.fetchUsers()
+        this.fetchServices()
+        this.modalClose()
+      }).catch(errorHandler)
     })
   }
 }

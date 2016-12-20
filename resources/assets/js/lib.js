@@ -45,7 +45,6 @@ export function toChannelStatus(ch) {
 /** OH functions **/
 
 function isInUseOn(oh, date) {
-  console.log(oh.start_date, oh.end_date, date, (oh.start_date ? oh.start_date < date : true) && (oh.end_date ? oh.end_date > date : true))
   return (oh.start_date ? oh.start_date < date : true) && (oh.end_date ? oh.end_date > date : true)
 }
 
