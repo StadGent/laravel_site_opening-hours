@@ -27,7 +27,7 @@
 
     <!-- Services -->
     <div v-if="!userServices.length" style="padding:5em 0;">
-      <h1>Empty state</h1>
+      <h3 class="text-muted">Deze gebruiker heeft nog geen diensten</h3>
       <p>
         <button class="btn btn-primary btn-lg" @click="newRole(srv)">Voeg een dienst toe</button>
       </p>

@@ -5,7 +5,7 @@
     <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newVersion()">+ Nieuwe versie</button>
 
       <div v-if="!versions||!versions.length" style="padding:5em 0;">
-        <h1>Empty state</h1>
+        <h3 class="text-muted">Er werden nog geen versies voor dit kanaal aangemaakt.</h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newVersion">Voeg een eerste versie toe</button>
         </p>

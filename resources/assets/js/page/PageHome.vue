@@ -20,7 +20,11 @@
     <!-- Users -->
     <div v-if="user.admin&&route.tab==='users'">
       <div v-if="!users.length" style="padding:5em 0;">
-        <h1>Empty state</h1>
+        <h3 class="text-muted">
+          Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
+          <br>U hebt niet genoeg rechten.
+          <br>Er liep iets fout.
+        </h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newRole(srv)">Nodig een gebruiker uit</button>
         </p>
@@ -47,10 +51,7 @@
     <!-- Services -->
     <div v-else>
       <div v-if="!services.length" style="padding:5em 0;">
-        <h1>Empty state</h1>
-        <p>
-          Is alles wel juist geïnstalleerd?
-        </p>
+        <h3 class="text-muted">U hebt nog geen toegang tot diensten</h3>
       </div>
       <div v-if="services.length&&!filteredServices.length" style="padding:5em 0;">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
