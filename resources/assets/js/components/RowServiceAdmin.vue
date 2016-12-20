@@ -9,8 +9,8 @@
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>
       </td>
-      <td class="pre-wrap" v-text="activeUsers.join('\n')"></td>
-      <td class="pre-wrap" v-text="ghostUsers.join('\n')"></td>
+      <td class="pre-wrap" @click="route.tab2='users'" v-text="activeUsers.join('\n')"></td>
+      <td class="pre-wrap" @click="route.tab2='users'" v-text="ghostUsers.join('\n')"></td>
       <td class="td-btn text-right">
         <button class="btn btn-primary btn-icon">
           <i class="glyphicon glyphicon-pencil"></i>

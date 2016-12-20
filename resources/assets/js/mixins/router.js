@@ -5,6 +5,7 @@ export const route = window.initialRoute || {
   tab2: null,
   id: 'home',
   offset: 0,
+  user: null,
   service: -1,
   channel: -1,
   version: -1,

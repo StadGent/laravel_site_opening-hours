@@ -17,8 +17,8 @@
           <i class="glyphicon glyphicon-envelope"></i>
         </button>
       </td>
-      <td class="td-btn text-right">
-        <button @click="invite" class="btn btn-default btn-icon">
+      <td class="td-btn text-right" @click.stop>
+        <button @click="$parent.banUser(u)" class="btn btn-default btn-icon">
           <i class="glyphicon glyphicon-ban-circle"></i>
         </button>
       </td>

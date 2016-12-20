@@ -29,7 +29,7 @@
     <div v-if="!userServices.length" style="padding:5em 0;">
       <h3 class="text-muted">Deze gebruiker heeft nog geen diensten</h3>
       <p>
-        <button class="btn btn-primary btn-lg" @click="newRole(srv)">Voeg een dienst toe</button>
+        <button class="btn btn-lg btn-default btn-disabled" disabled @click="newRole(srv)">Voeg een dienst toe</button>
       </p>
     </div>
     <div v-else-if="!filteredServices.length" style="padding:5em 0;">
@@ -74,7 +74,6 @@ import { orderBy } from '../lib.js'
 
 export default {
   name: 'page-user',
-  props: ['services', 'users'],
   data () {
     return {
       fetchedUser: null,
@@ -89,7 +88,7 @@ export default {
       return this.$parent.users || []
     },
     usr () {
-      return this.fetchedUser || this.fetchUser(this.route.user) || {}
+      return (this.$parent.users && this.$parent.users.find(u => u.id == this.route.id)) || this.fetchedUser || this.fetchUser(this.route.id) || {}
     },
 
     // Services
@@ -97,7 +96,7 @@ export default {
       return this.$parent.services || []
     },
     userServices () {
-      return this.usr.services ? this.services.filter(s => this.usr.services.indexOf(s.id) !== -1) : []
+      return this.services.filter(s => s.users.find(u => u.id == this.route.id))
     },
     filteredServices () {
       return this.query ? this.userServices.filter(s => (s.label || '').indexOf(this.query) !== -1) : this.userServices

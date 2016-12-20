@@ -47,6 +47,21 @@ export default {
         console.warn(error)
       })
     })
+    Hub.$on('deleteRole', role => {
+      if (!role.user_id || !role.service_id) {
+        return alert('Toegang kon niet ontzegd worden.')
+      }
+      if (!confirm('Toegang ontzeggen?')) {
+        return console.log('Delete role canceled')
+      }
+
+      this.$http.delete('/api/roles?service_id=' + role.service_id + '&user_id=' + role.user_id).then(() => {
+        this.fetchServices()
+        this.modalClose()
+      }).catch(error => {
+        console.warn(error)
+      })
+    })
 
     Hub.$on('fetchUser', newRole => {
       if (!newRole.service_id) {
