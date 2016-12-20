@@ -7,8 +7,11 @@
       <td>
         {{ u.email }}
       </td>
-      <td @click.stop>
-        <div class="pull-left">rol</div>
+      <td @click.prevent.stop>
+        <select @change="changeRole" v-model="u.role">
+          <option value="Owner">Ja</option>
+          <option value="Member">Nee</option>
+        </select>
       </td>
       <td v-if="u.verified" class="text-success">&checkmark;</td>
       <td v-else class="text-warning">&cross;</td>
@@ -27,6 +30,8 @@
 </template>
 
 <script>
+import { Hub } from '../lib.js'
+
 export default {
   props: ['u'],
   computed: {
@@ -47,9 +52,11 @@ export default {
     }
   },
   methods: {
+    changeRole () {
+      Hub.$emit('createRole', this.u)
+    },
     invite () {
-      // invite user
-      alert('to implement: invite ' + u.name)
+      Hub.$emit('inviteUser', this.u)
     }
   }
 }

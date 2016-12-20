@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Role;
 use App\Repositories\UserRepository;
 use Auth;
+use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
@@ -57,6 +58,11 @@ class UsersController extends Controller
             $userId = $this->users->store($input);
 
             $user = $this->users->getById($userId);
+
+            // Attach the role of application user to the new user
+            $appUserRole = Role::where('name', 'AppUser')->first();
+
+            $user->attachRole($appUserRole);
 
             // Send a confirmation email
             $mailer = app()->make('App\Mailers\SendGridMailer');
