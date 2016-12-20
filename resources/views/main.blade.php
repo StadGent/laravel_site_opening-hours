@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Opening hours</title>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
 </head>
 
