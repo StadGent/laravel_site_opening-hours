@@ -13,7 +13,7 @@
 
     <div v-if="isOwner&&route.tab2==='users'">
       <div v-if="!sortedUsers.length" style="padding:5em 0;">
-        <h1>Empty state</h1>
+        <h3 class="text-muted">Er werden nog geen gebruikers aan deze dienst toegevoegd.</h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newRole(srv)">Nodig een gebruiker uit</button>
         </p>

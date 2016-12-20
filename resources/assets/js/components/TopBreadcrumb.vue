@@ -26,7 +26,7 @@
       </li>
 
       <li v-if="route.page=='service'">
-        {{ route.tab2 ? 'Gebruikers' : 'Kanalen' }}
+        {{ route.tab2 && isOwner ? 'Gebruikers' : 'Kanalen' }}
       </li>
       <li v-if="route.page=='user'">
         {{ usr.name }}

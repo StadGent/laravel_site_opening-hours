@@ -10,7 +10,7 @@
         <div>{{ s.updated_by }}</div>
       </td>
       <td class="td-btn text-right">
-        <button class="btn btn-default btn-icon">
+        <button class="btn btn-default btn-icon" v-if="isOwnerOf(s)">
           <i class="glyphicon glyphicon-user"></i>
         </button>
       </td>

@@ -23,6 +23,7 @@
 
   <script>
   var initialUser = {!! json_encode(Auth::user()) !!};
+  initialUser.admin = {!! json_encode(Auth::user()->hasRole('Admin')) !!};
   Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
   </script>
 
