@@ -132,8 +132,8 @@ class QueryController extends Controller
 
                     $dayInfo = $this->extractDayInfo($ical, $day->toDateString(), $day->toDateString());
 
-                    if (! empty($dayInfo) && $calendar->closinghours == 0) {
-                        $status = $dayInfo;
+                    if (! empty($dayInfo)) {
+                        $status = $calendar->closinghours ? 'Gesloten' : $dayInfo;
 
                         break;
                     }
@@ -351,7 +351,7 @@ class QueryController extends Controller
                 $extractedDayInfo = $this->extractDayInfo($ical, $weekDay->toDateString(), $weekDay->toDateString());
 
                 if (! empty($extractedDayInfo)) {
-                    $dayInfo = $extractedDayInfo;
+                    $dayInfo = $calendar->closinghours ? 'Gesloten' : $extractedDayInfo;
 
                     break;
                 }
@@ -416,7 +416,7 @@ class QueryController extends Controller
             $icalString .= "BEGIN:VEVENT\n";
             $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $dtStart . "\n";
             $icalString .= 'DTEND;TZID=Europe/Brussels:' . $dtEnd . "\n";
-            $icalString .= 'RRULE:' . $event->rrule . "\n";
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $this->convertIsoToIcal($event->until) . "\n";
             $icalString .= 'UID:' . str_random(32) . "\n";
             $icalString .= "END:VEVENT\n";
         }
