@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Service;
+use App\Models\User;
 use DB;
 
 class ServicesRepository extends EloquentRepository
@@ -19,35 +20,7 @@ class ServicesRepository extends EloquentRepository
      */
     public function get()
     {
-        $services = $this->model->get();
-
-        $results = [];
-
-        foreach ($services as $service) {
-            $result = $service->toArray();
-            $result['channels'] = [];
-
-            // Get all of the channels for the service
-            foreach ($service->channels as $channel) {
-                $tmpChannel = $channel->toArray();
-                $tmpChannel['openinghours'] = [];
-
-                foreach ($channel->openinghours as $openinghours) {
-                    $tmpChannel['openinghours'][] = $openinghours->toArray();
-                }
-
-                $result['channels'][] = $tmpChannel;
-            }
-
-            $users = app()->make('UserRepository');
-
-            // Get all of the users for the service
-            $result['users'] = $users->getAllInService($service->id);
-
-            $results[] = $result;
-        }
-
-        return $results;
+        return $this->model->get()->map(array($this, 'expandService'));
     }
 
     /**
@@ -58,20 +31,39 @@ class ServicesRepository extends EloquentRepository
      */
     public function getForUser($userId)
     {
-        $services = DB::select(
-            'SELECT label, uri, description
-            FROM user_service_role
-            JOIN services ON user_service_role.service_id = services.id
-            WHERE user_id = ?',
-            [$userId]
-        );
+        return $this->model->whereHas('users', function ($query) use ($userId) {
+            $query->where('id', '=', $userId);
+        })->get()->map(array($this, 'expandService'));
+    }
 
-        $results = [];
+    /**
+     * Get the complete service detail
+     *
+     * @param  integer $userId
+     * @return array
+     */
+    public function expandService($service)
+    {
+        $result = $service->toArray();
+        $result['channels'] = [];
 
-        foreach ($services as $service) {
-            $results[] = (array) $service;
+        // Get all of the channels for the service
+        foreach ($service->channels as $channel) {
+            $tmpChannel = $channel->toArray();
+            $tmpChannel['openinghours'] = [];
+
+            foreach ($channel->openinghours as $openinghours) {
+                $tmpChannel['openinghours'][] = $openinghours->toArray();
+            }
+
+            $result['channels'][] = $tmpChannel;
         }
 
-        return $results;
+        $users = app()->make('UserRepository');
+
+        // Get all of the users for the service
+        $result['users'] = $users->getAllInService($result['id']);
+
+        return $result;
     }
 }

@@ -19,4 +19,12 @@ class Service extends Model
     {
         return $this->hasMany('App\Models\Channel');
     }
+
+    /**
+     * The roles that belong to the user.
+     */
+    public function users()
+    {
+        return $this->belongsToMany('App\Models\User', 'user_service_role', 'service_id', 'user_id');
+    }
 }

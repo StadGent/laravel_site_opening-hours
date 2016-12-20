@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,7 @@ class StoreChannelRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize(Request $request)
+    public function authorize(UserRepository $users, Request $request)
     {
         return $this->user()->hasRole('Admin')
         || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')

@@ -70,11 +70,25 @@ export default {
         console.warn(error)
       })
     })
+    Hub.$on('deleteChannel', channel => {
+      if (!channel.id) {
+        return console.error('deleteChannel: id is missing')
+      }
+      this.$http.delete('/api/channels/' + channel.id).then(() => {
+        this.fetchServices()
+        this.modalClose()
+      }).catch(error => {
+        console.warn(error)
+      })
+    })
 
     Hub.$on('createVersion', input => {
       const version = Object.assign(createVersion(), input)
       if (!version.channel_id) {
         version.channel_id = this.route.channel
+      }
+      if (!version.service_id) {
+        version.service_id = this.route.service
       }
       console.log('Create version', inert(version))
 

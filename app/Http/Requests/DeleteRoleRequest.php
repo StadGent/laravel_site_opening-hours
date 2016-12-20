@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Repositories\UserRepository;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
 class DeleteRoleRequest extends FormRequest

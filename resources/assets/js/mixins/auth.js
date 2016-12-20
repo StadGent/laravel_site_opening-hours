@@ -20,7 +20,9 @@ export default {
   },
   computed: {
     isOwner () {
-      return this.user.admin || this.routeService && this.routeService.users && this.routeService.users.find(u => u.user_id == this.user.id && u.role === 'Owner')
+      const srv = this.srv || this.routeService || this.$parent.routeService
+      console.log(srv)
+      return this.user.admin || srv && srv.users && srv.users.find(u => u.id == this.user.id && u.role === 'Owner')
     }
   },
   methods: {
@@ -28,7 +30,7 @@ export default {
       if (typeof service !== 'object') {
         return false
       }
-      return this.user.admin || service && service.users && service.users.find(u => u.user_id == this.user.id && u.role === 'Owner')
+      return this.user.admin || service && service.users && service.users.find(u => u.id == this.user.id && u.role === 'Owner')
     },
     logout() {
       console.log('ha')

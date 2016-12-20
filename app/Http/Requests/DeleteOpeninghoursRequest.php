@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 
 class DeleteOpeninghoursRequest extends FormRequest
@@ -11,7 +12,7 @@ class DeleteOpeninghoursRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(UserRepository $users)
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service

@@ -23,7 +23,7 @@
           <tr>
             <th-sort by="name">Naam gebruiker</th-sort>
             <th-sort by="email">E-mailadres</th-sort>
-            <th>Rol</th>
+            <th>Gebruikers beheren</th>
             <th-sort by="verified">Actief</th-sort>
             <th class="text-right">Nodig uit</th>
             <th class="text-right">Ontzeg toegang tot dienst</th>
@@ -130,6 +130,9 @@ export default {
         user_id: user.id,
         service_id: this.srv.id
       })
+    },
+    rmChannel (c) {
+      Hub.$emit('deleteChannel', c)
     }
   },
   filters: {
