@@ -41,7 +41,20 @@ class QueryController extends Controller
                 break;
         }
 
-        return response()->json($data);
+        // Check if the format paramater is passed and supported
+        $format = $request->input('format');
+
+        // The default format is JSON
+        switch ($format) {
+            case 'html':
+                $data = $this->makeHtmlFromJson($data);
+
+                return response()->make($data);
+                break;
+            default:
+                return response()->json($data);
+                break;
+        }
     }
 
     /**
@@ -425,5 +438,34 @@ class QueryController extends Controller
         $date = $date->format('Ymd His');
 
         return str_replace(' ', 'T', $date);
+    }
+
+    /**
+     * Create a readable text form of the passed JSON (PHP array) data
+     *
+     * @param  array  $data
+     * @return string
+     */
+    private function makeHtmlFromJson($data)
+    {
+        $text = '';
+
+        foreach ($data as $channel => $info) {
+            $text .= $channel . ': ' . PHP_EOL;
+
+            if (is_array($info)) {
+                foreach ($info as $day) {
+                    $text .= $day . PHP_EOL;
+                }
+            } else {
+                $text .= $info . PHP_EOL;
+            }
+
+            $text .= PHP_EOL . PHP_EOL;
+        }
+
+        $text = rtrim($text, PHP_EOL);
+
+        return $text;
     }
 }

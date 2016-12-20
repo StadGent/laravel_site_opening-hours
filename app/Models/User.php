@@ -20,6 +20,13 @@ class User extends Authenticatable
         'name', 'email', 'password', 'token', 'verified'
     ];
 
+    protected $appends = ['verified'];
+
+    public function getVerifiedAttribute()
+    {
+        return ! empty($this->password);
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *

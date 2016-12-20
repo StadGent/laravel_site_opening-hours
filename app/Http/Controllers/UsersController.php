@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
-use App\Http\Requests\GetUsersRequest;
 use Auth;
 
 class UsersController extends Controller
@@ -49,11 +48,11 @@ class UsersController extends Controller
     {
         $id = $request->input('id');
 
-        if (!$id) {
+        if (! $id) {
             $input = $request->input();
             $input['password'] = '';
             $input['token'] = str_random(32);
-            $input['verified'] = false;
+
             $id = $this->users->store($input);
         }
 
