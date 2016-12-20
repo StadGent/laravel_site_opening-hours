@@ -12,8 +12,7 @@
 
     <!-- Calender view options -->
     <p>
-      <button type="button" class="btn btn-default" @click="editVersion">Versie naam bewerken</button>
-      <button type="button" class="btn btn-default" @click="editVersion">Versie geldigheidsperiode bewerken</button>
+      <button type="button" class="btn btn-default" @click="editVersion(version)">Bewerk naam en geldigheidsperiode</button>
     </p>
 
     <div class="version-split">
@@ -127,10 +126,6 @@ export default {
       const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
       console.log(inert(newCal))
       Hub.$emit('createCalendar', newCal)
-    },
-    editVersion () {
-      console.log('edit version')
-      Hub.$emit('editVersion', newCal)
     }
   },
   components: {

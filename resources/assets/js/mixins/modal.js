@@ -61,6 +61,11 @@ export default {
       this.modal.srv = srv
     },
 
+    editVersion(v) {
+      this.modal.text = 'newVersion'
+      Object.assign(this.modal, v)
+    },
+
     newUser(srv) {
       this.modal.text = 'newUser'
       this.modal.srv = srv

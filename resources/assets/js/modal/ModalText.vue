@@ -6,8 +6,8 @@
           <button type="button" class="close" @click="modalClose" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title">
             <span v-if="modal.text=='requestService'">Vraag toegang tot een dienst</span>
-            <span v-else-if="modal.text=='newChannel'">Voeg een kanaal toe</span>
-            <span v-else-if="modal.text=='newVersion'">Voeg een versie toe</span>
+            <span v-else-if="modal.text=='newChannel'">{{ modal.id ? 'Bewerk dit kanaal' : 'Voeg een kanaal toe' }}</span>
+            <span v-else-if="modal.text=='newVersion'">{{ modal.id ? 'Bewerk deze versie' : 'Voeg een versie toe' }}</span>
             <span v-else-if="modal.text=='newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
             <span v-else>Probleem</span>
           </h4>
@@ -62,12 +62,12 @@
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
-            <button type="submit" class="btn btn-primary" @click="createVersion">Toevoegen</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleren</button>
+            <button type="submit" class="btn btn-primary" @click="createVersion">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newRole'">
             <button type="submit" class="btn btn-primary" @click="createRole">Uitnodigen</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleren</button>
+            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else>
             <button type="submit" class="btn btn-primary" @click="modalClose">OK</button>

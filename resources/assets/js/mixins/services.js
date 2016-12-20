@@ -34,11 +34,11 @@ export default {
           this.services = data || []
         })
     },
-    fetchVersion () {
+    fetchVersion (invalidate) {
       if (!this.routeVersion) {
         return console.warn('no route version')
       }
-      if (this.routeVersion.fetched) {
+      if (this.routeVersion.fetched && !invalidate) {
         return console.warn('version already fetched')
       }
       this.routeVersion.fetched = true
@@ -127,6 +127,15 @@ export default {
           this.toCalendar(data.id)
         })
       }
+    })
+    Hub.$on('deleteCalendar', calendar => {
+      if (!calendar.id) {
+        return console.warn('deleteCalendar: id is missing')  
+      }
+      this.$http.delete('/api/calendars/' + calendar.id).then(() => {
+        this.fetchVersion(true)
+        this.toVersion()
+      })
     })
 
     Hub.$on('editVersion', input => {
