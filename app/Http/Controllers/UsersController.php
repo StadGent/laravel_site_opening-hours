@@ -61,11 +61,7 @@ class UsersController extends Controller
             // Send a confirmation email
             $mailer = app()->make('App\Mailers\SendGridMailer');
             $mailer->sendEmailConfirmationTo($user['email'], $user['token']);
-        } else {
-            $this->users->update($request->input());
         }
-
-        $user = $this->users->where('email', $request->input('email'))->first();
 
         if (! empty($user)) {
             return response()->json($user);

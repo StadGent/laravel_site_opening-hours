@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Contactkanalen <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
+    <h1>Kanalen <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
 
     <span v-if="isOwner">
       <div class="btn-group">
@@ -63,12 +63,12 @@
               <div>{{ channel.updated_at | date }}</div>
               <div>{{ channel.updated_by }}</div>
             </td>
-            <td class="td-btn text-right">
+            <td class="td-btn text-right" @click.stop>
               <button @click="rmChannel(channel)" class="btn btn-icon btn-default">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </td>
-            <td class="td-btn text-right">
+            <td class="td-btn text-right" @click.stop>
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-primary">
                 <i class="glyphicon glyphicon-pencil"></i>
               </a>

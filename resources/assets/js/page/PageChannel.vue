@@ -27,8 +27,8 @@
             </td>
             <td>{{ version.start_date }}</td>
             <td>{{ version.end_date }}</td>
-            <td class="td-btn text-right">
-              <button class="btn btn-icon btn-default">
+            <td class="td-btn text-right" @click.stop>
+              <button class="btn btn-icon btn-default" @click="rmVersion(version)">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </td>

@@ -7,18 +7,23 @@
 
             <input type="hidden" name="token" value="{{ $token }}">
 
-            <div style="display:none">
-                <input type="text" name="email" value="{{ $user->email }}">
-            </div>
-
             @if ($errors->has('error'))
                 <span class="help-block">
                     <strong>{{ $errors->first('error') }}</strong>
                 </span>
             @endif
-            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+
+            <div class="form-group">
                 <label class="col-md-4 control-label">&nbsp;</label>
                 <h4 class="col-md-8">Kies een paswoord om je registratie te voltooien</h4>
+                <label class="col-md-4 control-label">E-mailadres</label>
+
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="email" value="{{ $user->email }}" readonly>
+                </div>
+            </div>
+
+            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
 
                 <label class="col-md-4 control-label">Paswoord</label>
 
@@ -49,7 +54,7 @@
             <div class="form-group">
                 <div class="col-md-6 col-md-offset-4">
                     <button type="submit" class="btn btn-primary">
-                        <i class="glyphicon glyphicon-btn glyphicon-refresh"></i>Bevestig registratie
+                        <i class="glyphicon glyphicon-btn glyphicon-check"></i> Bevestig registratie
                     </button>
                 </div>
             </div>
