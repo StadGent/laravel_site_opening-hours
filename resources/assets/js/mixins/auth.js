@@ -24,6 +24,12 @@ export default {
     }
   },
   methods: {
+    isOwnerOf (service) {
+      if (typeof service !== 'object') {
+        return false
+      }
+      return this.user.admin || service && service.users && service.users.find(u => u.user_id == this.user.id && u.role === 'Owner')
+    },
     logout() {
       console.log('ha')
       return this.$http.post('/logout')
