@@ -9,6 +9,10 @@
         <p class="text-muted">Uitzonderingen kan je later instellen.</p>
 
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
+
+        <p v-if="!cal.events.length">
+          <button @click="pushFirstEvent" class="btn btn-link">+ Voeg weekschema toe</button>
+        </p>
       </div>
 
       <!-- Other calendars must be renamed -->
@@ -54,7 +58,7 @@
 
 <script>
 import EventEditor from '../components/EventEditor.vue'
-import { createEvent } from '../defaults.js'
+import { createEvent, createFirstEvent } from '../defaults.js'
 import { cleanEmpty, Hub } from '../lib.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
@@ -79,8 +83,11 @@ export default {
     toggleClosing () {
       this.$set(this.cal, 'closinghours', !this.cal.closinghours)
     },
-    pushEvent (index, event) {
+    pushEvent () {
       this.cal.events.push(createEvent(this.cal.events.length + 1))
+    },
+    pushFirstEvent () {
+      this.cal.events.push(createFirstEvent())
     },
     addEvent (index, event) {
       console.log('add yes', index, event)
