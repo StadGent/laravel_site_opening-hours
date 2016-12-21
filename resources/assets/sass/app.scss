@@ -60,8 +60,10 @@ body {
 }
 
 /* Table > extra padding */
+
 .table {
-    border-top: 1px solid #999;
+  margin-top: 15px;
+  border-top: 1px solid #999;
   >thead>tr>th {
     border-bottom: 1px solid #999;
   }
