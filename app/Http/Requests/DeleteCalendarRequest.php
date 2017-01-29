@@ -6,7 +6,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
-class DeleteOpeninghoursRequest extends FormRequest
+class DeleteCalendarRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,6 +17,7 @@ class DeleteOpeninghoursRequest extends FormRequest
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
+        \Log::info($request->service_id);
         return $this->user()->hasRole('Admin')
         || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')
         || $users->hasRoleInService($this->user()->id, $request->service_id, 'Member');
