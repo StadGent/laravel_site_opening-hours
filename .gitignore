@@ -13,6 +13,7 @@ Homestead.yaml
 /public/js/*
 !/public/js/chunks
 /public/css/*
+!/public/css/.gitkeep
 !/public/js/vendor
 
 .phpintel/*
