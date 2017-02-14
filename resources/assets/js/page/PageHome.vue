@@ -62,8 +62,6 @@
             <th-sort by="label">Dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
-            <th-sort by="active">Actieve<br>gebruikers</th-sort>
-            <th-sort by="ghosts">Non-actieve<br>gebruikers</th-sort>
             <th class="text-right">Beheer</th>
           </tr>
         </thead>
