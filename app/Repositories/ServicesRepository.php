@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Service;
 use App\Models\User;
-use DB;
 
 class ServicesRepository extends EloquentRepository
 {
@@ -16,7 +15,7 @@ class ServicesRepository extends EloquentRepository
     /**
      * Return all services with their channels and openinghours (without the attached calendars)
      *
-     * @return array
+     * @return Collection
      */
     public function get()
     {
@@ -24,10 +23,10 @@ class ServicesRepository extends EloquentRepository
     }
 
     /**
-     * Get all services where the user is part of
+     * Get all services where the user, based on the passed user ID, is part of
      *
-     * @param  integer $userId
-     * @return array
+     * @param  integer    $userId
+     * @return Collection
      */
     public function getForUser($userId)
     {
@@ -59,7 +58,7 @@ class ServicesRepository extends EloquentRepository
             $result['channels'][] = $tmpChannel;
         }
 
-        $users = app()->make('UserRepository');
+        $users = app('UserRepository');
 
         // Get all of the users for the service
         $result['users'] = $users->getAllInService($result['id']);

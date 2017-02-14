@@ -19,8 +19,23 @@ class EloquentRepository
     public function store(array $properties)
     {
         $model = $this->model->create($properties);
-
         $model->save();
+
+        return $model->id;
+    }
+
+    /**
+     * Upsert a model based on unique properties
+     *
+     * @link https://laravel.com/docs/5.4/eloquent#other-creation-methods
+     *
+     * @param  array   $uniqueProperties
+     * @param  array   $properties
+     * @return integer The id of the model
+     */
+    public function updateOrCreate(array $uniqueProperties, array $properties)
+    {
+        $model = $this->model->updateOrCreate($uniqueProperties, $properties);
 
         return $model->id;
     }
