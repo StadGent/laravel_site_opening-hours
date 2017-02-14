@@ -16,7 +16,6 @@ export default {
     }
   },
   mounted() {
-    const self = this
     Hub.$on('printme', newRole => {
       this.printme = true
 
