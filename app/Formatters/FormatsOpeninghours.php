@@ -2,6 +2,8 @@
 
 namespace App\Formatters;
 
+use Carbon\Carbon;
+
 /**
  * Returns a textual form of the openinghours of a service
  */

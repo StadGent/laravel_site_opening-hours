@@ -29,8 +29,6 @@ class OpeninghoursRepository extends EloquentRepository
         $result = $openinghours->toArray();
         $result['calendars'] = [];
 
-        $calendars = app('CalendarRepository');
-
         $openinghours->with('calendars');
 
         foreach ($openinghours->calendars as $calendar) {

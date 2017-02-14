@@ -3,7 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\OpeninghoursUpdated;
+use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
+use App\Services\VestaService;
 
 class HandleUpdatedOpeninghours
 {
@@ -12,9 +14,10 @@ class HandleUpdatedOpeninghours
      *
      * @return void
      */
-    public function __construct(OpeninghoursRepository $openinghours)
+    public function __construct(OpeninghoursRepository $openinghours, ChannelRepository $channels)
     {
         $this->openinghours = $openinghours;
+        $this->channels = $channels;
     }
 
     /**
@@ -29,7 +32,12 @@ class HandleUpdatedOpeninghours
         // update the VESTA openinghours of the service entirely
         // otherwise, don't do anything
         if ($this->openinghours->isActive($event->getOpeninghoursId())) {
-            \Log::info('UPDATED!');
+            $openinghours = $this->openinghours->getById($event->getOpeninghoursId());
+
+            $channel = $this->channels->getById($openinghours['channel_id']);
+
+            $vestaService = new VestaService();
+            $vestaService->updateOpeninghours($channel['service_id']);
         }
     }
 }

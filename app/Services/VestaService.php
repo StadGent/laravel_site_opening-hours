@@ -18,6 +18,8 @@ class VestaService
      */
     public function updateOpeninghours($serviceId)
     {
-        $weekSchedule = $this->renderWeek($serviceId);
+        $weekSchedule = $this->formatWeek($serviceId);
+        dd($weekSchedule);
+        // Write the weekschedule to VESTA
     }
 }
