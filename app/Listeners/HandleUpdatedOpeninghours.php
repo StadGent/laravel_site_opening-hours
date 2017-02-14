@@ -2,7 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\UpdatedOpeninghours;
+use App\Events\OpeninghoursUpdated;
+use App\Repositories\OpeninghoursRepository;
 
 class HandleUpdatedOpeninghours
 {
@@ -22,9 +23,8 @@ class HandleUpdatedOpeninghours
      * @param  UpdatedOpeninghours $event
      * @return void
      */
-    public function handle(UpdatedOpeninghours $event)
+    public function handle(OpeninghoursUpdated $event)
     {
-        \Log::info('EVENT CAUGHT!');
         // If the openinghours object represented the active openinghours,
         // update the VESTA openinghours of the service entirely
         // otherwise, don't do anything

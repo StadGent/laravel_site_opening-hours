@@ -22,12 +22,17 @@ class OpeninghoursUpdated
      *
      * @return void
      */
-    public function __construct(integer $openinghoursId)
+    public function __construct(int $openinghoursId)
     {
         $this->openinghoursId = $openinghoursId;
     }
 
-    public function getOpeninghoursId($openinghoursId)
+    /**
+     * Return the ID of the updated openinghours object
+     *
+     * @return int
+     */
+    public function getOpeninghoursId()
     {
         return $this->openinghoursId;
     }

@@ -51,6 +51,8 @@ class OpeninghoursController extends Controller
         $openinghours = $this->openinghours->getById($id);
 
         if (! empty($openinghours)) {
+            event(new OpeninghoursUpdated($id));
+
             return response()->json($openinghours);
         }
 

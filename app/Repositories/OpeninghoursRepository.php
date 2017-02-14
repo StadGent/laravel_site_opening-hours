@@ -53,11 +53,11 @@ class OpeninghoursRepository extends EloquentRepository
     {
         $openinghours = $this->getById($openinghoursId);
 
-        if (empty($openingshours)) {
+        if (empty($openinghours)) {
             return false;
         }
 
-        return carbonize()->between(carbonize($openinghours['start']), carbonize($openinghours['end']));
+        return carbonize()->between(carbonize($openinghours['start_date']), carbonize($openinghours['end_date']));
     }
 
     /**
