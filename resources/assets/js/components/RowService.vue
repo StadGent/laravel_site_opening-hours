@@ -15,7 +15,7 @@
         </button>
       </td>
       <td class="td-btn text-right">
-        <button class="btn btn-primary btn-icon">
+        <button class="btn btn-default btn-icon btn-subtle">
           <i class="glyphicon glyphicon-pencil"></i>
         </button>
       </td>

@@ -195,6 +195,11 @@ a.panel {
     vertical-align: top;
   }
 }
+.btn-subtle {
+  background: none;
+  border-color: transparent;
+  pointer-events: none;
+}
 h1+h3 {
   margin-top: 10px;
 }
