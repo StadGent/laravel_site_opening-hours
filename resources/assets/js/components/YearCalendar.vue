@@ -1,11 +1,14 @@
 <template>
   <div>
     <div class="calendar" :class="{'calendar-topview':true}"></div>
+    <p style="text-align: right">
+      <button class="btn btn-default" @click="printme">Print</button>
+    </p>
   </div>
 </template>
 
 <script>
-import { _throttle, toTime, dateAfter } from '../lib.js'
+import { _throttle, Hub, toTime, dateAfter } from '../lib.js'
 
 const currentYear = new Date().getFullYear();
 
@@ -192,7 +195,10 @@ export default {
       setTimeout(() => {
         $('.layer>.day-content').tooltip()
       }, 300)
-    }, 300, { leading: false })
+    }, 300, { leading: false }),
+    printme () {
+      Hub.$emit('printme')
+    }
   },
   mounted () {
     this.elem = $(this.$el).find('.calendar').calendar({

@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{ printme: $root.printme }">
     <top-nav></top-nav>
     <top-breadcrumb></top-breadcrumb>
 
