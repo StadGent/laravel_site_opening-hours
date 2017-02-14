@@ -32,9 +32,16 @@ class SparqlService
         $this->password = $password;
     }
 
+    /**
+     * Return the response coming from the result of a SPARQL query
+     *
+     * @param  string $query
+     * @param  string $method
+     * @return string
+     */
     public function performSparqlQuery(string $query, $method = 'GET')
     {
-        dd($this->executeQuery($this->prepareQuery($query), $method));
+        return $this->executeQuery($this->prepareQuery($query), $method);
     }
 
     /**
@@ -95,8 +102,12 @@ class SparqlService
 
         // According to the SPARQL 1.1 spec, a SPARQL endpoint can only return 200,400,500 reponses
         if ($response_code == '400') {
+            $uri = urldecode($uri);
+
             abort(500, "The SPARQL endpoint returned a 400 error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The error was: $response. The URI was: $uri");
         } elseif ($response_code == '500') {
+            $uri = urldecode($uri);
+
             abort(500, "The SPARQL endpoint returned a 500 error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The URI was: $uri");
         }
 
@@ -114,6 +125,6 @@ class SparqlService
      */
     private function makeRequestUri(string $query)
     {
-        return $this->endpoint . '?q=' . $query;
+        return $this->endpoint . '?query=' . $query . '&format=turtle';
     }
 }

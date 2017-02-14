@@ -12,21 +12,24 @@ use EasyRdf_Parser_Turtle as Parser;
 class LodServicesRepository
 {
     /**
-     * Return the services fetch from the SPARQL endpoint
+     * Return the services fetched from the SPARQL endpoint
+     * in a structure that is compatible with our internal Service model
      *
      * @return array
      */
     public function fetchServices()
     {
-        // $data = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery());
-
-        // Get mock data for now
-        $data = $this->getMockServicesData();
+        $data = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery());
 
         // Return the services in a compatible model
         return $this->transform($data);
     }
 
+    /**
+     * Create and return a SparqlService object
+     *
+     * @return App\Services\SparqlService
+     */
     private function makeSparqlService()
     {
         return new SparqlService(
@@ -139,44 +142,5 @@ class LodServicesRepository
                         ?agent ?p ?o.
                     }
                 }';
-    }
-
-    private function getMockServicesData()
-    {
-        return '@prefix ns0:    <http://purl.org/oslo/ns/localgov#> .
-                @prefix ns1:    <https://qa.stad.gent/id/agents/> .
-                @prefix ns2:    <https://qa.stad.gent/id/agents/fdcd1f73-1f89-e111-8092-0050569805c9/> .
-                ns1:fdcd1f73-1f89-e111-8092-0050569805c9    ns0:mailingLocation ns2:location .
-                @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix foaf:   <http://xmlns.com/foaf/0.1/> .
-                ns1:fecd1f73-1f89-e111-8092-0050569805c9    rdf:type    foaf:Agent .
-                @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
-                ns1:fecd1f73-1f89-e111-8092-0050569805c9    foaf:name   "Bouw- soms Woontoezicht"^^xsd:string .
-                @prefix ns6:    <http://purl.org/dc/terms/> .
-                ns1:fecd1f73-1f89-e111-8092-0050569805c9    ns6:identifier  "fecd1f73-1f89-e111-8092-0050569805c9"^^xsd:string .
-                @prefix ns7:    <http://schema.org/> .
-                ns1:fecd1f73-1f89-e111-8092-0050569805c9    ns7:keywords    "Stedenbouw"^^xsd:string ;
-                    ns6:source  "VESTA"^^xsd:string ;
-                    ns6:type    "Stad Gent"^^xsd:string ,
-                        ""^^xsd:string ,
-                        "Dienst"^^xsd:string .
-                @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix ns9:    <https://qa.stad.gent/data/agents/> .
-                ns1:fecd1f73-1f89-e111-8092-0050569805c9    rdfs:definedBy  ns9:fecd1f73-1f89-e111-8092-0050569805c9 .
-                @prefix ns10:   <https://qa.stad.gent/id/agents/fecd1f73-1f89-e111-8092-0050569805c9/> .
-                ns1:fecd1f73-1f89-e111-8092-0050569805c9    ns0:contact ns10:contact ;
-                    ns0:mailingLocation ns10:location .
-                ns1:ffcd1f73-1f89-e111-8092-0050569805c9    rdf:type    foaf:Agent ;
-                    foaf:name   "Bouw- soms Woontoezicht"^^xsd:string ;
-                    ns6:identifier  "ffcd1f73-1f89-e111-8092-0050569805c9"^^xsd:string ;
-                    ns7:keywords    "Stedenbouw"^^xsd:string ;
-                    ns6:source  "VESTA"^^xsd:string ;
-                    ns6:type    "Stad Gent"^^xsd:string ,
-                        ""^^xsd:string ,
-                        "Dienst"^^xsd:string ;
-                    rdfs:definedBy  ns9:ffcd1f73-1f89-e111-8092-0050569805c9 .
-                @prefix ns11:   <https://qa.stad.gent/id/agents/ffcd1f73-1f89-e111-8092-0050569805c9/> .
-                ns1:ffcd1f73-1f89-e111-8092-0050569805c9    ns0:contact ns11:contact ;
-                    ns0:mailingLocation ns11:location .';
     }
 }
