@@ -4,10 +4,8 @@
       <td >
         <a :href="'#!service/'+s.id">{{ s.label }}</a>
       </td>
-      <td class="pre-wrap" :class="statusClass" :rowspan="rowspan" v-text="statusMessage"></td>
-      <td  class="text-muted">
-        <div>{{ s.updated_at | date }}</div>
-        <div>{{ s.updated_by }}</div>
+      <td>
+        <div>{{ role }}</div>
       </td>
     </tr>
   </tbody>
@@ -17,13 +15,14 @@
 import RowServiceMixin from '../mixins/RowService'
 
 export default {
+  props: ['roleOf'],
   mixins: [RowServiceMixin],
   computed: {
-    activeUsers () {
-      return this.s.activeUsers.map(u => u.email) || []
+    roleObj () {
+      return this.roleOf.roles && this.roleOf.roles.find(r => r.service_id === this.s.id) || {}
     },
-    ghostUsers () {
-      return this.s.ghostUsers.map(u => u.email) || []
+    role () {
+      return this.roleObj.role || 'Geen rol'
     }
   },
   methods: {

@@ -1,39 +1,34 @@
 import { expandUser } from './users.js'
 
-const userDefault = {
-  id: 1,
-  name: 'Voornaam Naam',
-  roles: [],
-  admin: false
-}
-lsDefault('user', userDefault)
-
-Object.assign(userDefault, window.initialUser || ls('user'))
-
-export const user = expandUser(userDefault)
-
 export default {
   data () {
+    const userDefault = {
+      id: 0,
+      name: 'Voornaam Naam',
+      roles: [],
+      admin: false
+    }
+    lsDefault('user', userDefault)
+
+    Object.assign(userDefault, window.initialUser || ls('user'))
+
     return {
-      user
+      user: expandUser(userDefault)
     }
   },
   computed: {
+    isAdmin () {
+      return this.$root.user.admin
+    },
     isOwner () {
-      const srv = this.srv || this.routeService || this.$parent.routeService
-      console.log(srv)
-      return this.user.admin || srv && srv.users && srv.users.find(u => u.id == this.user.id && u.role === 'Owner')
+      return this.isOwnerOf(this.srv || this.$root.routeService)
     }
   },
   methods: {
     isOwnerOf (service) {
-      if (typeof service !== 'object') {
-        return false
-      }
-      return this.user.admin || service && service.users && service.users.find(u => u.id == this.user.id && u.role === 'Owner')
+      return this.isAdmin || service && service.users && service.users.find(u => u.id == this.$root.user.id && u.role === 'Owner')
     },
     logout() {
-      console.log('ha')
       return this.$http.post('/logout')
         .catch(() => true)
         .then(() => {

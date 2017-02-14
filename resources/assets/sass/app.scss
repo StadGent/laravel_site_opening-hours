@@ -58,6 +58,9 @@ body {
   padding-top: 4px !important;
   padding-bottom: 4px !important;
 }
+.td-clickstop {
+  cursor: auto;
+}
 
 /* Table > extra padding */
 
@@ -194,6 +197,11 @@ a.panel {
     height: 16px;
     vertical-align: top;
   }
+}
+.btn-subtle {
+  background: none;
+  border-color: transparent;
+  pointer-events: none;
 }
 h1+h3 {
   margin-top: 10px;

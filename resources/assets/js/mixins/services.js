@@ -2,12 +2,10 @@ import { Hub } from '../lib.js'
 
 import { createVersion, createFirstCalendar } from '../defaults.js'
 
-export const services = window.initialServices || []
-
 export default {
   data () {
     return {
-      services
+      services: window.initialServices || []
     }
   },
   computed: {
@@ -51,6 +49,9 @@ export default {
           Object.assign(data, { fetched: true })
           this.$set(this.routeChannel.openinghours, index, data)
         })
+    },
+    serviceById (id) {
+      return this.services.find(s => s.id === id) || {}
     }
   },
   mounted () {
