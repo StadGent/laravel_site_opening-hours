@@ -61,7 +61,7 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Create a graph from the openinghours object
+     * Create a semantic data structure representing the openinghours
      * containing calendar and event data
      *
      * @param  integer        $openinghoursId

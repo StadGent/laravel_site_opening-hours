@@ -23,6 +23,23 @@ class ServicesRepository extends EloquentRepository
     }
 
     /**
+     * Return a specific service with linked channels
+     *
+     * @param  int   $serviceId
+     * @return array
+     */
+    public function getById($serviceId)
+    {
+        $service = $this->model->find($serviceId);
+
+        if (empty($service)) {
+            return [];
+        }
+
+        return $this->expandService($service);
+    }
+
+    /**
      * Get all services where the user, based on the passed user ID, is part of
      *
      * @param  integer    $userId
