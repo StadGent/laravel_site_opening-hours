@@ -49,6 +49,9 @@ export default {
           Object.assign(data, { fetched: true })
           this.$set(this.routeChannel.openinghours, index, data)
         })
+    },
+    serviceById (id) {
+      return this.services.find(s => s.id === id) || {}
     }
   },
   mounted () {

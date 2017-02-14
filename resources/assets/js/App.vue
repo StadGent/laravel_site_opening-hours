@@ -15,7 +15,7 @@
     <div class="container" style="padding-top:10em">
       <h3>Debug info</h3>
       <label>
-        <input type="checkbox" v-model="user.admin"> User is admin: {{ user.admin ? 'yes' : 'no' }}
+        <input type="checkbox" v-model="$root.user.admin"> User is admin: {{ isAdmin ? 'yes' : 'no' }}
       </label>
       <br>
       Service role is: {{ isOwner ? 'owner' : 'member' }}

@@ -35,19 +35,17 @@
     <div v-else-if="!filteredServices.length" style="padding:5em 0;">
       <h1>Deze zoekopdracht leverde geen resultaten op</h1>
     </div>
-    <div v-else-if="user.admin" class="row">
+    <div v-else-if="isAdmin" class="row">
       <table class="table table-hover table-service-admin">
         <thead>
           <tr>
             <th-sort by="label">Dienst</th-sort>
-            <th>Status</th>
-            <th-sort by="updated_at">Aangepast</th-sort>
-            <th-sort by="active">Actieve<br>gebruikers</th-sort>
-            <th-sort by="ghosts">Non-actieve<br>gebruikers</th-sort>
-            <th class="text-right">Beheer</th>
+            <th>Rol</th>
+            <th class="text-right">Beheer gebruikers</th>
+            <th class="text-right">Beheer dienst</th>
           </tr>
         </thead>
-        <tbody is="row-service-admin" v-for="s in sortedServices" :s="s"></tbody>
+        <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s" :role-of="usr"></tbody>
       </table>
     </div>
     <div v-else class="row">
@@ -55,21 +53,19 @@
         <thead>
           <tr>
             <th-sort by="label">Dienst</th-sort>
-            <th>Status</th>
-            <th-sort by="updated_at">Aangepast</th-sort>
-            <th class="text-right">Beheer gebruikers</th>
-            <th class="text-right">Bewerk</th>
+            <th>Rol</th>
+            <th class="text-right">Beheer kanalen</th>
           </tr>
         </thead>
-        <tbody is="row-service" v-for="s in sortedServices" :s="s"></tbody>
+        <tbody is="row-user-service" v-for="s in sortedServices" :s="s" :role-of="usr"></tbody>
       </table>
     </div>
   </div>
 </template>
 
 <script>
-import RowService from '../components/RowService.vue'
-import RowServiceAdmin from '../components/RowServiceAdmin.vue'
+import RowUserService from '../components/RowUserService.vue'
+import RowUserServiceAdmin from '../components/RowUserServiceAdmin.vue'
 import ThSort from '../components/ThSort.vue'
 
 import { expandUser } from '../mixins/users.js'
@@ -107,7 +103,7 @@ export default {
     },
     sortedServices () {
       const services = this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices
-      if (this.user.admin) {
+      if (this.isAdmin) {
 
         // TODO: do this enriching onload, like is done with users
         services.forEach(s => {
@@ -129,8 +125,8 @@ export default {
     }
   },
   components: {
-    RowService,
-    RowServiceAdmin,
+    RowUserService,
+    RowUserServiceAdmin,
     ThSort
   }
 }
