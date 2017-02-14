@@ -1,12 +1,12 @@
 <template>
   <div class="container">
-    <h1>{{ user.admin ? 'Admin' : 'Mijn diensten' }}</h1>
+    <h1>{{ isAdmin ? 'Admin' : 'Mijn diensten' }}</h1>
     <form class="pull-right">
       <div class="form-group">
         <input v-model="query" @input="route.offset=0" class="form-control" placeholder="Zoek dienst" style="max-width:300px" type="search">
       </div>
     </form>
-    <div v-if="user.admin">
+    <div v-if="isAdmin">
       <div class="btn-group">
         <button type="button" class="btn btn-primary" :class="{active: !route.tab}" @click="route.tab=0">Toon diensten</button>
         <button type="button" class="btn btn-primary" :class="{active: route.tab=='users'}" @click="route.tab='users'">Toon gebruikers</button>
@@ -18,7 +18,7 @@
     </div>
 
     <!-- Users -->
-    <div v-if="user.admin&&route.tab==='users'" class="row">
+    <div v-if="isAdmin&&route.tab==='users'" class="row">
       <div v-if="!users.length" style="padding:5em 0;">
         <h3 class="text-muted">
           Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
@@ -53,28 +53,26 @@
       <div v-if="!services.length" style="padding:5em 0;">
         <h3 class="text-muted">U hebt nog geen toegang tot diensten</h3>
       </div>
-      <div v-if="services.length&&!filteredServices.length" style="padding:5em 0;">
+      <div v-else-if="!filteredServices.length" style="padding:5em 0;">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
       </div>
-      <table v-if="filteredServices.length&&user.admin" class="table table-hover table-service-admin">
+      <table v-else-if="isAdmin" class="table table-hover table-service-admin">
         <thead>
           <tr>
             <th-sort by="label">Dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
-            <th class="text-right">Beheer</th>
           </tr>
         </thead>
         <tbody is="row-service-admin" v-for="s in pagedServices" :s="s"></tbody>
       </table>
-      <table v-if="filteredServices.length&&!user.admin" class="table table-hover table-service">
+      <table v-else class="table table-hover table-service">
         <thead>
           <tr>
             <th-sort by="label">Dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
             <th class="text-right">Beheer gebruikers</th>
-            <th class="text-right">Bewerk</th>
           </tr>
         </thead>
         <tbody is="row-service" v-for="s in pagedServices" :s="s"></tbody>
@@ -113,7 +111,7 @@ export default {
     },
     pagedServices () {
       var services = this.sortedServices.slice(this.route.offset || 0, this.route.offset + pageSize)
-      if (this.user.admin) {
+      if (this.isAdmin) {
         // TODO: do this enriching onload, like is done with users
         services.forEach(s => {
           Object.assign(s, {

@@ -46,7 +46,7 @@ export default {
       return this.statusMessage === '✓ In orde' ? 'text-success' : 'warning'
     },
     statusMessage() {
-      if (this.user.admin) {
+      if (this.isAdmin) {
         // if (!this.activeUsers.length && !this.ghostUsers.length) {
         //   return 'Geen gebruikers'
         // }

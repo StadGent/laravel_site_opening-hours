@@ -7,13 +7,13 @@
       <td>
         {{ u.email }}
       </td>
-      <td @click.stop>
-        <div class="pull-left">{{ u.roles.length }}: </div>
-        <div style="margin-left:20px;">
+      <td @click.stop class="td-clickstop">
+        <div>{{ u.roles.length }} dienst{{ u.roles.length === 1 ? '' : 'en' }}</div>
+        <div>
           <div v-for="r in u.roles">
-          {{ r.service }}
-          <input type="radio" value="Owner" v-model="r.role">
-          <input type="radio" value="Member" v-model="r.role">
+            {{ r.role === 'Owner' ? 'Eigenaar' : 'Lid' }}
+            &nbsp;
+            <a :href="'#!service/' + r.service_id">{{ $root.serviceById(r.service_id).label }}</a>
           </div>
         </div>
       </td>
