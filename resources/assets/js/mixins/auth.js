@@ -20,8 +20,7 @@ export default {
   },
   computed: {
     isOwner () {
-      const srv = this.srv || this.routeService || this.$parent.routeService
-      console.log(srv)
+      const srv = this.srv || this.routeService
       return this.user.admin || srv && srv.users && srv.users.find(u => u.id == this.user.id && u.role === 'Owner')
     }
   },

@@ -2,12 +2,10 @@ import { Hub } from '../lib.js'
 
 import { createVersion, createFirstCalendar } from '../defaults.js'
 
-export const services = window.initialServices || []
-
 export default {
   data () {
     return {
-      services
+      services: window.initialServices || []
     }
   },
   computed: {

@@ -18,7 +18,7 @@
     <div class="version-split">
       <div class="version-cals col-sm-6 col-md-5 col-lg-4">
         <!-- Editing a calendar -->
-        <calendar-editor v-if="$parent.routeCalendar.events" :cal="$parent.routeCalendar"></calendar-editor>
+        <calendar-editor v-if="$root.routeCalendar.events" :cal="$root.routeCalendar"></calendar-editor>
 
         <!-- Showing list of calendars -->
         <div v-else>
@@ -87,13 +87,13 @@ export default {
   },
   computed: {
     service () {
-      return this.$parent.routeService || {}
+      return this.$root.routeService || {}
     },
     channel () {
-      return this.$parent.routeChannel || {}
+      return this.$root.routeChannel || {}
     },
     version () {
-      return this.$parent.routeVersion || {}
+      return this.$root.routeVersion || {}
     },
     layeredVersion () {
       return Object.assign({}, this.version, { calendar: this.calendars })

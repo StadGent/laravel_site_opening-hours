@@ -58,13 +58,13 @@ export default {
   },
   computed: {
     srv () {
-      return this.$parent.services.find(s => s.id === this.route.service) || {}
+      return this.$root.services.find(s => s.id === this.route.service) || {}
     },
     channel () {
-      return this.$parent.routeChannel || {}
+      return this.$root.routeChannel || {}
     },
     versions () {
-      return this.$parent.routeChannel.openinghours || []
+      return this.$root.routeChannel.openinghours || []
     }
   },
   mounted () {

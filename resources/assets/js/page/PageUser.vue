@@ -21,7 +21,7 @@
 
     <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
       <p>
-        <button @click="$parent.logout">Uitloggen</button>
+        <button @click="$root.logout">Uitloggen</button>
       </p>
     </div>
 
@@ -89,15 +89,15 @@ export default {
 
     // User
     users () {
-      return this.$parent.users || []
+      return this.$root.users || []
     },
     usr () {
-      return (this.$parent.users && this.$parent.users.find(u => u.id == this.route.id)) || this.fetchedUser || this.fetchUser(this.route.id) || {}
+      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || this.fetchedUser || this.fetchUser(this.route.id) || {}
     },
 
     // Services
     services () {
-      return this.$parent.services || []
+      return this.$root.services || []
     },
     userServices () {
       return this.services.filter(s => s.users.find(u => u.id == this.route.id))

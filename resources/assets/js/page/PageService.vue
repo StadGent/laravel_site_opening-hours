@@ -104,7 +104,7 @@ export default {
   },
   computed: {
     srv () {
-      return this.$parent.routeService
+      return this.$root.routeService
     },
     channels () {
       return this.srv.channels || []

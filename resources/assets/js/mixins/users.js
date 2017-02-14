@@ -1,7 +1,5 @@
 import { Hub } from '../lib.js'
 
-export const users = (window.initialUsers || []).map(expandUser)
-
 function errorHandler (err) {
   console.warn(err)
 }
@@ -10,7 +8,7 @@ export default {
   data() {
     return {
       // WARNING: all user data must be passed through expandUser()
-      users
+      users: (window.initialUsers || []).map(expandUser)
     }
   },
   computed: {
