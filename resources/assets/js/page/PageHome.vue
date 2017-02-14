@@ -59,10 +59,9 @@
       <table v-else-if="isAdmin" class="table table-hover table-service-admin">
         <thead>
           <tr>
-            <th-sort by="label">Didenst</th-sort>
+            <th-sort by="label">Dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
-            <th class="text-right">Beheer</th>
           </tr>
         </thead>
         <tbody is="row-service-admin" v-for="s in pagedServices" :s="s"></tbody>
@@ -70,11 +69,10 @@
       <table v-else class="table table-hover table-service">
         <thead>
           <tr>
-            <th-sort by="label">Diefnst</th-sort>
+            <th-sort by="label">Dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
             <th class="text-right">Beheer gebruikers</th>
-            <th class="text-right">Bewerk</th>
           </tr>
         </thead>
         <tbody is="row-service" v-for="s in pagedServices" :s="s"></tbody>

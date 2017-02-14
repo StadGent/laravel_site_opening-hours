@@ -9,11 +9,6 @@
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>
       </td>
-      <td class="td-btn text-right">
-        <button class="btn btn-default btn-icon btn-subtle">
-          <i class="glyphicon glyphicon-pencil"></i>
-        </button>
-      </td>
     </tr>
   </tbody>
 </template>

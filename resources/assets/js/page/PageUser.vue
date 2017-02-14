@@ -42,7 +42,6 @@
             <th-sort by="label">Dienst</th-sort>
             <th>Rol</th>
             <th class="text-right">Beheer gebruikers</th>
-            <th class="text-right">Beheer dienst</th>
           </tr>
         </thead>
         <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s" :role-of="usr"></tbody>
@@ -54,7 +53,6 @@
           <tr>
             <th-sort by="label">Dienst</th-sort>
             <th>Rol</th>
-            <th class="text-right">Beheer kanalen</th>
           </tr>
         </thead>
         <tbody is="row-user-service" v-for="s in sortedServices" :s="s" :role-of="usr"></tbody>
