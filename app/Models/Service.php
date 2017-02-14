@@ -12,11 +12,12 @@ class Service extends Model
      * @var array
      */
     protected $fillable = [
-        'uri',
-        'label',
         'description',
+        'draft',
         'identifier',
-        'source'
+        'label',
+        'source',
+        'uri',
     ];
 
     public function channels()
