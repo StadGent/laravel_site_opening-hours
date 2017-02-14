@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\OpeninghoursRepository;
-use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Events\OpeninghoursUpdated;
 use App\Http\Requests\DeleteOpeninghoursRequest;
+use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Repositories\OpeninghoursRepository;
 
 class OpeninghoursController extends Controller
 {
@@ -92,6 +93,8 @@ class OpeninghoursController extends Controller
         $success = $this->openinghours->update($id, $input);
 
         if ($success) {
+            event(new OpeninghoursUpdated($id));
+
             return response()->json($this->openinghours->getById($id));
         }
 
@@ -112,6 +115,6 @@ class OpeninghoursController extends Controller
             return response()->json(['message' => 'De openingsuren werden verwijderd']);
         }
 
-        return reponse()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
+        return response()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
     }
 }

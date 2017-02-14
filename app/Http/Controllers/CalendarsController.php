@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\CalendarRepository;
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\DeleteCalendarRequest;
+use App\Events\CalendarUpdated;
 
 class CalendarsController extends Controller
 {
@@ -102,6 +103,8 @@ class CalendarsController extends Controller
         }
 
         if ($success) {
+            event(new CalendarUpdated($id));
+
             return response()->json($this->calendars->getById($id));
         }
 

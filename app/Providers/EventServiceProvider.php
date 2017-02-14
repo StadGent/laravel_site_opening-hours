@@ -19,6 +19,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\OpeninghoursUpdated' => [
             'App\Listeners\HandleUpdatedOpeninghours',
         ],
+        'App\Events\CalendarUpdated' => [
+            'App\Listeners\HandleUpdatedCalendar',
+        ]
     ];
 
     /**

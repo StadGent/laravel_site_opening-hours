@@ -7,29 +7,34 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 
-class OpeninghoursUpdated
+class CalendarUpdated
 {
     use InteractsWithSockets, SerializesModels;
 
     /**
-     * The ID of the updated openinghours object
+     * The ID of the updated calendar
      * @var integer
      */
-    private $openinghoursId;
+    private $calendarId;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(integer $openinghoursId)
+    public function __construct($calendarId)
     {
-        $this->openinghoursId = $openinghoursId;
+        $this->calendarId = $calendarId;
     }
 
-    public function getOpeninghoursId($openinghoursId)
+    /**
+     * Return the ID of the updated calendar
+     *
+     * @return integer
+     */
+    public function getCalendarId()
     {
-        return $this->openinghoursId;
+        return $this->calendarId;
     }
 
     /**

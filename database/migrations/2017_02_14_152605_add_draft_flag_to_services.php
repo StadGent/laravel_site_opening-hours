@@ -13,7 +13,7 @@ class AddDraftFlagToServices extends Migration
     public function up()
     {
         Schema::table('services', function ($table) {
-            $table->boolean('draft')->default(false);
+            $table->boolean('draft')->default(true);
         });
     }
 

@@ -29,7 +29,7 @@ class OpeninghoursRepository extends EloquentRepository
         $result = $openinghours->toArray();
         $result['calendars'] = [];
 
-        $calendars = app()->make('CalendarRepository');
+        $calendars = app('CalendarRepository');
 
         $openinghours->with('calendars');
 
@@ -40,6 +40,24 @@ class OpeninghoursRepository extends EloquentRepository
         }
 
         return $result;
+    }
+
+    /**
+     * Return a boolean indicating if an openinghours object is "active",
+     * meaning that its timespan is relevant "now".
+     *
+     * @param  integer $openinghoursId The id of the openinghours object
+     * @return boolean
+     */
+    public function isActive($openinghoursId)
+    {
+        $openinghours = $this->getById($openinghoursId);
+
+        if (empty($openingshours)) {
+            return false;
+        }
+
+        return carbonize()->between(carbonize($openinghours['start']), carbonize($openinghours['end']));
     }
 
     /**
