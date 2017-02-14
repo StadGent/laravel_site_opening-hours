@@ -14,7 +14,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th-sort by="label">Actief</th-sort>
+            <th-sort by="label">Versie</th-sort>
             <th-sort by="start_date">Geldig van</th-sort>
             <th-sort by="end_date">Verloopt op</th-sort>
             <th class="text-right">Verwijder</th>
