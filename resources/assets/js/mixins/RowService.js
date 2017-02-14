@@ -1,4 +1,9 @@
-import { hasChannels, hasCal, toChannelStatus } from '../lib.js'
+import {
+  hasCal,
+  hasChannels,
+  toChannelAlert,
+  toChannelStatus
+} from '../lib.js'
 
 var exampleChannel = {
   "@type": "Channel",
@@ -43,7 +48,11 @@ export default {
       return this.s.updated_at ? (Date.now() - new Date(this.s.updated_at)) / 1000 / 3600 / 24 : 0
     },
     statusClass() {
-      return this.statusMessage === '✓ In orde' ? 'text-success' : 'warning'
+      return {
+        'text-success': this.statusMessage === '✓ In orde',
+        'warning': this.statusMessage !== '✓ In orde',
+        'small': this.statusMessage.length > 20
+      }
     },
     statusMessage() {
       if (this.user.admin) {
@@ -54,15 +63,12 @@ export default {
           return 'Geen actieve gebruikers'
         }
       }
-      const status = this.hasChannels.map(toChannelStatus).join('\n')
-      if (status) {
-        return status
+      const channelAlerts = this.hasChannels.filter(toChannelAlert)
+      if (channelAlerts.length) {
+        return channelAlerts.map(c => toChannelStatus(c, true)).join('\n')
       }
       if (!this.countChannels) {
         return 'Geen kanalen'
-      }
-      if (!this.countCals) {
-        return 'Niet ingevoerd'
       }
       if (this.old > 200) {
         return 'Verouderd'

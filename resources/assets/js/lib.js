@@ -1,4 +1,5 @@
 const today = new Date().toJSON().slice(0, 10)
+const DAY_IN_MS = 24 * 60 * 60 * 1000
 
 /** Service functions **/
 
@@ -30,16 +31,27 @@ export function hasActiveOh(ch) {
 //   return ch && ch.openinghours && (ch.openinghours.find(x => x.active) || {}).calendars || []
 // }
 
-export function toChannelStatus(ch) {
+export function toChannelStatus(ch, includeLabel) {
   const oh = hasActiveOh(ch)
+  includeLabel = includeLabel ? ch.label : ''
+
   let end_date = expiresOn(oh)
-  if (!end_date) {
-    return 'Verlopen'
+  if (!end_date || Date.parse(end_date) < Date.now()) {
+    return 'Kanaal ' + includeLabel + ' is verlopen'
   }
   if (end_date === -1) {
-    return 'Oneindig'
+    return 'Kanaal ' + includeLabel + ' verloopt nooit'
   }
-  return end_date
+  return 'Kanaal ' + includeLabel + ' verloopt op ' + end_date
+}
+
+// Returns true if this channel expires within 90 days
+export function toChannelAlert(ch) {
+  const oh = hasActiveOh(ch)
+  let end_date = expiresOn(oh)
+  if (end_date) {
+    return Date.parse(end_date) < Date.now() + 90 * DAY_IN_MS
+  }
 }
 
 /** OH functions **/
@@ -71,7 +83,7 @@ export function expiresOn(oh) {
 /** Date functions **/
 
 export function nextDateString (dateString) {
-  return new Date(Date.parse(dateString) + 36e5 * 24).toJSON().slice(0, 10)
+  return new Date(Date.parse(dateString) + DAY_IN_MS).toJSON().slice(0, 10)
 }
 export function toTime(d) {
   if (!d) {
@@ -100,7 +112,7 @@ export function toDatetime (str) {
 
 // Create a date object 1 day after the param
 export function dateAfter (date, ms) {
-  return new Date(date.valueOf() + (ms || (36e5 * 24)))
+  return new Date(date.valueOf() + (ms || DAY_IN_MS))
 }
 
 /** Sorting **/
