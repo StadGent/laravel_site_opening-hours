@@ -1,9 +1,9 @@
 {
-    "name": "laravel/laravel",
-    "description": "The Laravel Framework.",
+    "name": "StadGent/laravel_site_opening-hours",
+    "description": "An open source web application to create calendars that represent openinghours of public services.",
     "keywords": ["framework", "laravel"],
-    "license": "MIT",
-    "type": "project",
+    "license": "AGPLv3",
+    "type": "Web application",
     "require": {
         "php": ">=5.6.4",
         "laravel/framework": "5.3.*",
