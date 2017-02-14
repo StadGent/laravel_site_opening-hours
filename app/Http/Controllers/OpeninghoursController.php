@@ -112,6 +112,6 @@ class OpeninghoursController extends Controller
             return response()->json(['message' => 'De openingsuren werden verwijderd']);
         }
 
-        return reponse()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
+        return response()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
     }
 }

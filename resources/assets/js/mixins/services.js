@@ -103,6 +103,29 @@ export default {
       })
     })
 
+    Hub.$on('updateVersion', version => {
+      if (!version || !version.id) {
+        return console.warn('id is missing', version)
+      }
+
+      this.$http.put('/api/openinghours/' + version.id, version).then(({ data }) => {
+        this.fetchServices()
+        this.modalClose()
+      })
+    })
+
+    Hub.$on('deleteVersion', version => {
+      if (!version || !version.id) {
+        return console.warn('id is missing', version)
+      }
+
+      this.$http.delete('/api/openinghours/' + version.id).then(() => {
+        this.modalClose()
+        this.toChannel(version.channel_id)
+        this.fetchServices()
+      })
+    })
+
     Hub.$on('createCalendar', (calendar, done) => {
       if (!calendar.openinghours_id) {
         calendar.openinghours_id = this.route.version
@@ -136,23 +159,6 @@ export default {
       this.$http.delete('/api/calendars/' + calendar.id).then(() => {
         this.fetchVersion(true)
         this.toVersion()
-      })
-    })
-
-    Hub.$on('editVersion', input => {
-      const version = Object.assign(createVersion(), input)
-      if (!version.channel_id) {
-        version.channel_id = this.route.channel
-      }
-      console.log('Create version', inert(version))
-
-      this.$http.post('/api/openinghours', version).then(({ data }) => {
-        this.fetchServices()
-        this.modalClose()
-        this.toVersion(data.id)
-        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(), {
-          openinghours_id: data.id
-        }))
       })
     })
   }
