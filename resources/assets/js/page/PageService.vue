@@ -50,7 +50,6 @@
             <th-sort by="status">Status</th-sort>
             <th-sort by="updated_at">Laatst aangepast</th-sort>
             <th class="text-right">Verwijder</th>
-            <th class="text-right">Bewerk</th>
           </tr>
         </thead>
         <tbody>
@@ -67,11 +66,6 @@
               <button @click="rmChannel(channel)" class="btn btn-icon btn-default">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
-            </td>
-            <td class="td-btn text-right" @click.stop>
-              <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-primary">
-                <i class="glyphicon glyphicon-pencil"></i>
-              </a>
             </td>
           </tr>
         </tbody>
@@ -104,7 +98,7 @@ export default {
   },
   computed: {
     srv () {
-      return this.$parent.routeService
+      return this.$root.routeService
     },
     channels () {
       return this.srv.channels || []

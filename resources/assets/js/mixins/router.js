@@ -16,7 +16,7 @@ function hasCalendarSelected(hash) {
   return ['service', 'channel', 'version', 'calendar'].indexOf(hash.split(':')[0]) !== -1
 }
 
-export const addListener = {
+export const rootRouterMixin = {
   mounted() {
     this.hashchange()
     window.addEventListener('hashchange', this.hashchange)

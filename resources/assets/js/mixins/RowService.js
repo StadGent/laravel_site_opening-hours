@@ -55,7 +55,7 @@ export default {
       }
     },
     statusMessage() {
-      if (this.user.admin) {
+      if (this.isAdmin) {
         // if (!this.activeUsers.length && !this.ghostUsers.length) {
         //   return 'Geen gebruikers'
         // }

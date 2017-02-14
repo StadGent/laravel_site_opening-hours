@@ -18,7 +18,6 @@
             <th-sort by="start_date">Geldig van</th-sort>
             <th-sort by="end_date">Verloopt op</th-sort>
             <th class="text-right">Verwijder</th>
-            <th class="text-right">Bewerk</th>
           </tr>
         </thead>
         <tbody>
@@ -31,11 +30,6 @@
             <td class="td-btn text-right" @click.stop>
               <button class="btn btn-icon btn-default" @click="rmVersion(version)">
                 <i class="glyphicon glyphicon-trash"></i>
-              </button>
-            </td>
-            <td class="td-btn text-right">
-              <button class="btn btn-icon btn-primary">
-                <i class="glyphicon glyphicon-pencil"></i>
               </button>
             </td>
           </tr>
@@ -58,13 +52,13 @@ export default {
   },
   computed: {
     srv () {
-      return this.$parent.services.find(s => s.id === this.route.service) || {}
+      return this.$root.services.find(s => s.id === this.route.service) || {}
     },
     channel () {
-      return this.$parent.routeChannel || {}
+      return this.$root.routeChannel || {}
     },
     versions () {
-      return this.$parent.routeChannel.openinghours || []
+      return this.$root.routeChannel.openinghours || []
     }
   },
   mounted () {

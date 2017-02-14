@@ -14,11 +14,6 @@
           <i class="glyphicon glyphicon-user"></i>
         </button>
       </td>
-      <td class="td-btn text-right">
-        <button class="btn btn-primary btn-icon">
-          <i class="glyphicon glyphicon-pencil"></i>
-        </button>
-      </td>
     </tr>
   </tbody>
 </template>
