@@ -106,10 +106,11 @@ class OpeninghoursController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  DeleteOpeninghoursRequest $request
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteOpeninghoursRequest $id)
+    public function destroy(DeleteOpeninghoursRequest $request, int $id)
     {
         $success = $this->openinghours->delete($id);
 
