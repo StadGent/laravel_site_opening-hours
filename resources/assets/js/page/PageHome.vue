@@ -12,6 +12,7 @@
         <button type="button" class="btn btn-primary" :class="{active: route.tab=='users'}" @click="route.tab='users'">Toon gebruikers</button>
       </div>
       <button type="button" class="btn btn-link btn-disabled" :class="{active: route.tab=='admin'}" @click="route.tab='admin'" disabled>Toon administrators</button>
+      <button type="button" class="btn btn-default" :class="{'btn-warning': draft}" @click="draft = !draft" v-if="!route.tab">Toon inactief</button>
     </div>
     <div v-else>
       <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
@@ -96,6 +97,7 @@ export default {
   props: ['services', 'users'],
   data () {
     return {
+      draft: false,
       order: 'name',
       query: ''
     }
@@ -104,7 +106,11 @@ export default {
 
     // Services
     filteredServices () {
-      return this.query ? this.services.filter(s => (s.label || '').toLowerCase().indexOf(this.query.toLowerCase()) !== -1) : this.services
+      // Filter by draft status
+      const services = this.services.filter(s => s.draft != this.draft)
+
+      // Filter by search query
+      return this.query ? services.filter(s => (s.label || '').toLowerCase().indexOf(this.query.toLowerCase()) !== -1) : services
     },
     sortedServices () {
       return this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices
