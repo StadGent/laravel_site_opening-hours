@@ -2,25 +2,23 @@
 
 namespace App\Services;
 
-use App\Formatters\FormatsOpeninghours;
 //http://stackoverflow.com/questions/14770898/soapenvelope-soap-envenvelope-php
 
+/**
+ * This class writes text to the VESTA application based on a certain VESTA UID
+ */
 class VestaService
 {
-    use FormatsOpeninghours;
-
     /**
-     * Update the opening hours text that resides for a
-     * certain service, within VESTA
+     * Update the opening hours output that was created for a
+     * certain service to the correct VESTA resource based on the VESTA UID
      *
-     * @param  int    $serviceId The ID of the service
-     * @param  string $vestaUid  The UID of the service in VESTA
+     * @param  string $vestaUid The UID of the service in VESTA
+     * @param  string $output   The openinghours output
      * @return void
      */
-    public function updateOpeninghours($serviceId, $vestaUid)
+    public function updateOpeninghours(string $vestaUid, string $output)
     {
-        $weekSchedule = $this->formatWeek($serviceId);
-        dd($weekSchedule);
-        // Write the weekschedule to VESTA
+        // Write the weekschedule to VESTA using a SOAP call
     }
 }

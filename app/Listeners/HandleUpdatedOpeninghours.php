@@ -6,7 +6,6 @@ use App\Events\OpeninghoursUpdated;
 use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ServicesRepository;
-use App\Services\VestaService;
 
 class HandleUpdatedOpeninghours
 {
@@ -39,9 +38,8 @@ class HandleUpdatedOpeninghours
 
             $service = $this->getServiceThroughChannel($openinghours['channel_id']);
 
-            if (! empty($service) && $services['source'] == 'vesta') {
-                $vestaService = new VestaService();
-                $vestaService->updateOpeninghours($service['id'], $service['identifier']);
+            if (! empty($service) && $service['source'] == 'vesta') {
+                dispatch((new UpdateVestaOpeninghours($service['identifier'], $service['id'])));
             }
         }
     }
