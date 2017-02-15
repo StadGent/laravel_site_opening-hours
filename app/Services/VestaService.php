@@ -13,10 +13,11 @@ class VestaService
      * Update the opening hours text that resides for a
      * certain service, within VESTA
      *
-     * @param  int  $serviceId
+     * @param  int    $serviceId The ID of the service
+     * @param  string $vestaUid  The UID of the service in VESTA
      * @return void
      */
-    public function updateOpeninghours($serviceId)
+    public function updateOpeninghours($serviceId, $vestaUid)
     {
         $weekSchedule = $this->formatWeek($serviceId);
         dd($weekSchedule);
