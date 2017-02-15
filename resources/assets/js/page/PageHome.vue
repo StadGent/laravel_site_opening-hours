@@ -23,7 +23,7 @@
       <div v-if="!users.length" class="table-message">
         <h3 class="text-muted">
           Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
-          <br>U hebt niet genoeg rechten.
+          <br>Je hebt niet genoeg rechten.
           <br>Er liep iets fout.
         </h3>
         <p>
@@ -51,12 +51,21 @@
 
     <!-- Services -->
     <div v-else class="row">
-      <div v-if="!services.length" class="table-message">
-        <h3 class="text-muted">U hebt nog geen toegang tot diensten</h3>
+      <div v-if="!allowedServices.length" class="table-message">
+        <h3 class="text-muted">Je hebt nog geen toegang tot diensten</h3>
       </div>
       <div v-else-if="!filteredServices.length" class="table-message">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
       </div>
+      <table v-else-if="draft" class="table table-service-admin">
+        <thead>
+          <tr>
+            <th width="50">Activeer</th>
+            <th-sort by="label">Dienst</th-sort>
+          </tr>
+        </thead>
+        <tbody is="row-service-draft" v-for="s in pagedServices" :s="s"></tbody>
+      </table>
       <table v-else-if="isAdmin" class="table table-hover table-service-admin">
         <thead>
           <tr>
@@ -87,6 +96,7 @@
 import { pageSize, default as Pagination } from '../components/Pagination.vue'
 import RowService from '../components/RowService.vue'
 import RowServiceAdmin from '../components/RowServiceAdmin.vue'
+import RowServiceDraft from '../components/RowServiceDraft.vue'
 import RowUser from '../components/RowUser.vue'
 import ThSort from '../components/ThSort.vue'
 
@@ -105,12 +115,11 @@ export default {
   computed: {
 
     // Services
+    allowedServices () {
+      return this.services.filter(s => s.draft == this.draft)
+    },
     filteredServices () {
-      // Filter by draft status
-      const services = this.services.filter(s => s.draft != this.draft)
-
-      // Filter by search query
-      return this.query ? services.filter(s => (s.label || '').toLowerCase().indexOf(this.query.toLowerCase()) !== -1) : services
+      return this.query ? this.allowedServices.filter(s => (s.label || '').toLowerCase().indexOf(this.query.toLowerCase()) !== -1) : this.allowedServices
     },
     sortedServices () {
       return this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices
@@ -144,6 +153,7 @@ export default {
     Pagination,
     RowService,
     RowServiceAdmin,
+    RowServiceDraft,
     RowUser,
     ThSort
   }

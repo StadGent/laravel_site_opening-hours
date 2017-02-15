@@ -1,4 +1,4 @@
-import { Hub } from '../lib.js'
+import { fetchError, Hub } from '../lib.js'
 
 import { createVersion, createFirstCalendar } from '../defaults.js'
 
@@ -30,7 +30,7 @@ export default {
       return this.$http.get('/api/services')
         .then(({ data }) => {
           this.services = data || []
-        })
+        }).catch(fetchError)
     },
     fetchVersion (invalidate) {
       if (!this.routeVersion) {
@@ -48,7 +48,7 @@ export default {
           }
           Object.assign(data, { fetched: true })
           this.$set(this.routeChannel.openinghours, index, data)
-        })
+        }).catch(fetchError)
     },
     serviceById (id) {
       return this.services.find(s => s.id === id) || {}
@@ -56,6 +56,16 @@ export default {
   },
   mounted () {
     this.fetchServices()
+    Hub.$on('activateService', service => {
+      if (!service.id) {
+        return console.error('activateService: id is missing')
+      }
+      service.draft = false
+
+      this.$http.put('/api/services/' + service.id, { draft: false }).then(({ data }) => {
+        service.draft = data.draft
+      }).catch(fetchError)
+    })
     Hub.$on('createChannel', channel => {
       if (!channel.srv) {
         return console.error('createChannel: service is missing')
@@ -67,9 +77,7 @@ export default {
         this.modalClose()
         console.log(data, data.id)
         this.toChannel(data.id)
-      }).catch(error => {
-        console.warn(error)
-      })
+      }).catch(fetchError)
     })
     Hub.$on('deleteChannel', channel => {
       if (!channel.id) {
@@ -78,9 +86,7 @@ export default {
       this.$http.delete('/api/channels/' + channel.id).then(() => {
         this.fetchServices()
         this.modalClose()
-      }).catch(error => {
-        console.warn(error)
-      })
+      }).catch(fetchError)
     })
 
     Hub.$on('createVersion', input => {
@@ -100,7 +106,7 @@ export default {
         Hub.$emit('createCalendar', Object.assign(createFirstCalendar(), {
           openinghours_id: data.id
         }))
-      })
+      }).catch(fetchError)
     })
 
     Hub.$on('updateVersion', version => {
@@ -111,7 +117,7 @@ export default {
       this.$http.put('/api/openinghours/' + version.id, version).then(({ data }) => {
         this.fetchServices()
         this.modalClose()
-      })
+      }).catch(fetchError)
     })
 
     Hub.$on('deleteVersion', version => {
@@ -123,7 +129,7 @@ export default {
         this.modalClose()
         this.toChannel(version.channel_id)
         this.fetchServices()
-      })
+      }).catch(fetchError)
     })
 
     Hub.$on('createCalendar', (calendar, done) => {
@@ -141,7 +147,7 @@ export default {
           }
           this.$set(this.routeVersion.calendars, index, data)
           done && this.toVersion(data.openinghours_id)
-        })
+        }).catch(fetchError)
       } else {
         this.$http.post('/api/calendars/', calendar).then(({ data }) => {
           if (!this.routeVersion.calendars) {
@@ -149,7 +155,7 @@ export default {
           }
           this.routeVersion.calendars.push(data)
           this.toCalendar(data.id)
-        })
+        }).catch(fetchError)
       }
     })
     Hub.$on('deleteCalendar', calendar => {
@@ -159,7 +165,7 @@ export default {
       this.$http.delete('/api/calendars/' + calendar.id).then(() => {
         this.fetchVersion(true)
         this.toVersion()
-      })
+      }).catch(fetchError)
     })
   }
 }
