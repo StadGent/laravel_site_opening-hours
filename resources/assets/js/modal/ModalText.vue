@@ -109,7 +109,7 @@ export default {
       if (!this.modal.label) {
         this.modal.label = this.nextVersionLabel
       }
-      Hub.$emit('createVersion', this.modal)
+      Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },
     createRole () {
       this.modal.strict = true

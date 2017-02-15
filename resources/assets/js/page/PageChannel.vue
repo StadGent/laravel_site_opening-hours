@@ -28,7 +28,7 @@
             <td>{{ version.start_date }}</td>
             <td>{{ version.end_date }}</td>
             <td class="td-btn text-right" @click.stop>
-              <button class="btn btn-icon btn-default" @click="rmVersion(version)">
+              <button class="btn btn-icon btn-default" @click="deleteVersion(version)">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </td>
@@ -41,6 +41,7 @@
 
 <script>
 import ThSort from '../components/ThSort.vue'
+import { Hub } from '../lib.js'
 
 export default {
   name: 'channel',
@@ -59,6 +60,11 @@ export default {
     },
     versions () {
       return this.$root.routeChannel.openinghours || []
+    }
+  },
+  methods: {
+    deleteVersion (v) {
+      Hub.$emit('deleteVersion', v)
     }
   },
   mounted () {

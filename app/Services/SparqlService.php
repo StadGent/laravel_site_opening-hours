@@ -100,7 +100,7 @@ class SparqlService
 
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        // According to the SPARQL 1.1 spec, a SPARQL endpoint can only return 200,400,500 reponses
+        // According to the SPARQL 1.1 spec, a SPARQL endpoint can only return 200,400,500 responses
         if ($response_code == '400') {
             $uri = urldecode($uri);
 

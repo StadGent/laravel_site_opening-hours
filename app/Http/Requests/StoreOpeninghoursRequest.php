@@ -30,7 +30,6 @@ class StoreOpeninghoursRequest extends FormRequest
     public function rules()
     {
         return [
-            'priority' => 'required|numeric',
             'label' => 'required',
             'channel_id' => 'required|numeric'
         ];
