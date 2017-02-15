@@ -1,6 +1,6 @@
 <?php
 
-function carbonize(string $datetime)
+function carbonize($datetime = null)
 {
     if (empty($dateTime)) {
         return \Carbon\Carbon::now();

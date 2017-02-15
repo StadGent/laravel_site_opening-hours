@@ -22,8 +22,6 @@ class HandleUpdatedCalendar
     public function __construct(CalendarRepository $calendars)
     {
         $this->calendars = $calendars;
-
-        $this->openinghours = $openinghours;
     }
 
     /**
@@ -36,7 +34,6 @@ class HandleUpdatedCalendar
     {
         $calendar = $this->calendars->getById($event->getCalendarId());
 
-        \Log::info($calendar);
         event(new OpeninghoursUpdated($calendar['openinghours_id']));
     }
 }

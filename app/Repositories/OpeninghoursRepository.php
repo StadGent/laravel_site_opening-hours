@@ -26,10 +26,10 @@ class OpeninghoursRepository extends EloquentRepository
             return [];
         }
 
+        $calendars = app('CalendarRepository');
+
         $result = $openinghours->toArray();
         $result['calendars'] = [];
-
-        $calendars = app('CalendarRepository');
 
         $openinghours->with('calendars');
 
@@ -43,6 +43,19 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
+     * Store new openinghours
+     *
+     * @param  array $properties
+     * @return int   The ID of the new openinghours object
+     */
+    public function store(array $properties)
+    {
+        $properties['active'] = $this->isOpeninghoursRelevantNow($properties);
+
+        return parent::store($properties);
+    }
+
+    /**
      * Return a boolean indicating if an openinghours object is "active",
      * meaning that its timespan is relevant "now".
      *
@@ -53,15 +66,32 @@ class OpeninghoursRepository extends EloquentRepository
     {
         $openinghours = $this->getById($openinghoursId);
 
-        if (empty($openingshours)) {
+        if (empty($openinghours)) {
             return false;
         }
 
-        return carbonize()->between(carbonize($openinghours['start']), carbonize($openinghours['end']));
+        return $this->isOpeninghoursRelevantNow($openinghours);
     }
 
     /**
-     * Create a graph from the openinghours object
+     * Check if the openinghours timestamp covers "today",
+     * meaning the timespan is relevant now.
+     *
+     * @param  array $openinghours
+     * @return bool
+     */
+    private function isOpeninghoursRelevantNow($openinghours)
+    {
+        if (empty($openinghours['start_date'])) {
+            // If no start date is passed we can assume it starts from today or earlier
+            $openinghours['start_date'] = carbonize()->subMonth()->toDateString();
+        }
+
+        return carbonize()->between(carbonize($openinghours['start_date']), carbonize($openinghours['end_date']));
+    }
+
+    /**
+     * Create a semantic data structure representing the openinghours
      * containing calendar and event data
      *
      * @param  integer        $openinghoursId

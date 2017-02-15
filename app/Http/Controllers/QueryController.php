@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Formatters\FormatsOpeninghours;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 date_default_timezone_set('Europe/Brussels');
 
 class QueryController extends Controller
 {
+    use FormatsOpeninghours;
+
     /**
      * Handle an openinghours query
      *
@@ -66,8 +69,8 @@ class QueryController extends Controller
      */
     private function isOpenOnDay($day, $request)
     {
-        $services = app()->make('ServicesRepository');
-        $openinghoursRepo = app()->make('OpeninghoursRepository');
+        $services = app('ServicesRepository');
+        $openinghoursRepo = app('OpeninghoursRepository');
 
         // Get the service URI for which we need to compute the week schedule
         $serviceUri = $request->input('serviceUri');
@@ -154,8 +157,8 @@ class QueryController extends Controller
      */
     private function isOpenNow($request)
     {
-        $services = app()->make('ServicesRepository');
-        $openinghoursRepo = app()->make('OpeninghoursRepository');
+        $services = app('ServicesRepository');
+        $openinghoursRepo = app('OpeninghoursRepository');
 
         // Get the service URI for which we need to compute the week schedule
         $serviceUri = $request->input('serviceUri');
@@ -253,7 +256,7 @@ class QueryController extends Controller
      */
     private function renderWeek($request)
     {
-        $services = app()->make('ServicesRepository');
+        $services = app('ServicesRepository');
 
         // Get the service URI for which we need to compute the week schedule
         $serviceUri = $request->input('serviceUri');
@@ -266,32 +269,7 @@ class QueryController extends Controller
             return response()->json(['message' => 'The service was not found.'], 404);
         }
 
-        $channels = [];
-
-        // If no channel is passed, return all channels
-        if (! empty($channel)) {
-            $channels[] = $channel;
-        } else {
-            $channelObjects = $service->channels->toArray();
-
-            foreach ($channelObjects as $object) {
-                $channels[] = $object['label'];
-            }
-        }
-
-        if (empty($channels)) {
-            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
-        }
-
-        $openinghours = [];
-
-        foreach ($channels as $channel) {
-            $weekSchedule = $this->renderWeekForChannel($serviceUri, $channel);
-
-            $openinghours[$channel] = $weekSchedule;
-        }
-
-        return $openinghours;
+        return $this->formatWeek($service['id']);
     }
 
     /**
@@ -438,34 +416,5 @@ class QueryController extends Controller
         $date = $date->format('Ymd His');
 
         return str_replace(' ', 'T', $date);
-    }
-
-    /**
-     * Create a readable text form of the passed JSON (PHP array) data
-     *
-     * @param  array  $data
-     * @return string
-     */
-    private function makeHtmlFromJson($data)
-    {
-        $text = '';
-
-        foreach ($data as $channel => $info) {
-            $text .= $channel . ': ' . PHP_EOL;
-
-            if (is_array($info)) {
-                foreach ($info as $day) {
-                    $text .= $day . PHP_EOL;
-                }
-            } else {
-                $text .= $info . PHP_EOL;
-            }
-
-            $text .= PHP_EOL . PHP_EOL;
-        }
-
-        $text = rtrim($text, PHP_EOL);
-
-        return $text;
     }
 }
