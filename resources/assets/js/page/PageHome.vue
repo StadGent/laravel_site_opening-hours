@@ -12,7 +12,8 @@
         <button type="button" class="btn btn-primary" :class="{active: route.tab=='users'}" @click="route.tab='users'">Toon gebruikers</button>
       </div>
       <button type="button" class="btn btn-link btn-disabled" :class="{active: route.tab=='admin'}" @click="route.tab='admin'" disabled>Toon administrators</button>
-      <button type="button" class="btn btn-default" :class="{'btn-warning': draft}" @click="draft = !draft" v-if="!route.tab">Toon inactief</button>
+      <button type="button" class="btn btn-default" :class="{'btn-warning': draft, 'btn-success': ! draft}" @click="draft = !draft" v-if="!route.tab">{{draft?'in':''}}actieve diensten</button>
+
     </div>
     <div v-else>
       <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
