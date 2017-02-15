@@ -24,7 +24,7 @@ class QueryController extends Controller
 
         switch ($type) {
             case 'week':
-                $data = $this->renderWeek($request);
+                $data = $this->renderWeekSchedule($request);
                 break;
             case 'now':
                 $data = $this->isOpenNow($request);
@@ -254,7 +254,7 @@ class QueryController extends Controller
      * @param  Request $request
      * @return array
      */
-    private function renderWeek($request)
+    private function renderWeekSchedule($request)
     {
         $services = app('ServicesRepository');
 
