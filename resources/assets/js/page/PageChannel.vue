@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="version in versions" @click="href('#!version/'+[srv.id,route.channel,version.id].join('/'))">
+          <tr v-for="version in sortedVersions" @click="href('#!version/'+[srv.id,route.channel,version.id].join('/'))">
             <td>
               <a :href="'#!version/'+[srv.id,route.channel,version.id].join('/')">{{ version.label || 'Zonder label' }}</a>
             </td>
@@ -41,12 +41,14 @@
 
 <script>
 import ThSort from '../components/ThSort.vue'
-import { Hub } from '../lib.js'
+import { Hub, orderBy } from '../lib.js'
 
 export default {
   name: 'channel',
   data () {
     return {
+      order: null,
+      // query: null,
       editing: 0,
       msg: 'Hello Vue!'
     }
@@ -58,8 +60,15 @@ export default {
     channel () {
       return this.$root.routeChannel || {}
     },
+
     versions () {
       return this.$root.routeChannel.openinghours || []
+    },
+    filteredVersions () {
+      return this.query ? this.versions.filter(s => s.label.indexOf(this.query) !== -1) : this.versions
+    },
+    sortedVersions () {
+      return this.order ? this.filteredVersions.slice().sort(orderBy(this.order)) : this.filteredVersions
     }
   },
   methods: {

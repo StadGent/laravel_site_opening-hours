@@ -47,13 +47,13 @@
         <thead>
           <tr>
             <th-sort by="label">Kanaal</th-sort>
-            <th-sort by="status">Status</th-sort>
+            <th>Status</th>
             <th-sort by="updated_at">Laatst aangepast</th-sort>
             <th class="text-right">Verwijder</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="channel in filteredChannels" @click="href('#!channel/'+[srv.id,channel.id].join('/'))">
+          <tr v-for="channel in sortedChannels" @click="href('#!channel/'+[srv.id,channel.id].join('/'))">
             <td>
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')">{{ channel.label }}</a>
             </td>
