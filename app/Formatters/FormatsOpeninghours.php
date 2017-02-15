@@ -170,4 +170,73 @@ trait FormatsOpeninghours
 
         return $schedule;
     }
+
+    /**
+     * Create ICal from a calendar object
+     *
+     * @param  Calendar $calendar
+     * @return ICal
+     */
+    private function createIcalFromCalendar($calendar)
+    {
+        $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+
+        foreach ($calendar->events as $event) {
+            $dtStart = $this->convertIsoToIcal($event->start_date);
+            $dtEnd = $this->convertIsoToIcal($event->end_date);
+
+            $icalString .= "BEGIN:VEVENT\n";
+            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $dtStart . "\n";
+            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $dtEnd . "\n";
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $this->convertIsoToIcal($event->until) . "\n";
+            $icalString .= 'UID:' . str_random(32) . "\n";
+            $icalString .= "END:VEVENT\n";
+        }
+
+        $icalString .= 'END:VCALENDAR';
+
+        return new \ICal\ICal(explode(PHP_EOL, $icalString), 'MO');
+    }
+
+    /**
+     * Format an ISO date to YYYYmmddThhmmss
+     *
+     * @param string $date
+     * @return
+     */
+    private function convertIsoToIcal($date)
+    {
+        $date = new Carbon($date);
+        $date = $date->format('Ymd His');
+
+        return str_replace(' ', 'T', $date);
+    }
+
+    /**
+     * Check if there are events in a given range (day)
+     *
+     * @param  ICal   $ical
+     * @param  string $start date string YYYY-mm-dd
+     * @param  string $end   date string YYYY-mm-dd
+     * @return array
+     */
+    private function extractDayInfo($ical, $start, $end)
+    {
+        $events = $ical->eventsFromRange($start, $end);
+
+        if (empty($events)) {
+            return '';
+        }
+
+        $hours = [];
+
+        foreach ($events as $event) {
+            $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart));
+            $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend));
+
+            $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+        }
+
+        return rtrim(implode($hours, ', '), ',');
+    }
 }

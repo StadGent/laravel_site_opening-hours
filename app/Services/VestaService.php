@@ -20,5 +20,6 @@ class VestaService
     public function updateOpeninghours(string $vestaUid, string $output)
     {
         // Write the weekschedule to VESTA using a SOAP call
+        \Log::info($output);
     }
 }
