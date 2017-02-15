@@ -26,13 +26,13 @@
     </div>
 
     <!-- Services -->
-    <div v-if="!userServices.length" style="padding:5em 0;">
+    <div v-if="!userServices.length" class="table-message">
       <h3 class="text-muted">Deze gebruiker heeft nog geen diensten</h3>
       <p>
         <button class="btn btn-lg btn-default btn-disabled" disabled @click="newRole(srv)">Voeg een dienst toe</button>
       </p>
     </div>
-    <div v-else-if="!filteredServices.length" style="padding:5em 0;">
+    <div v-else-if="!filteredServices.length" class="table-message">
       <h1>Deze zoekopdracht leverde geen resultaten op</h1>
     </div>
     <div v-else-if="isAdmin" class="row">

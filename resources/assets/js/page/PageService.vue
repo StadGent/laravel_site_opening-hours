@@ -12,7 +12,7 @@
     <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
 
     <div v-if="isOwner&&route.tab2==='users'" class="row">
-      <div v-if="!filteredUsers.length" style="padding:5em 0;">
+      <div v-if="!filteredUsers.length" class="table-message">
         <h3 class="text-muted">Er werden nog geen gebruikers aan deze dienst toegevoegd.</h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newRole(srv)">Nodig een gebruiker uit</button>
@@ -34,13 +34,13 @@
     </div>
 
     <div v-else class="row">
-      <div v-if="!channels||!channels.length" style="padding:5em 0;">
+      <div v-if="!channels||!channels.length" class="table-message">
         <h3 class="text-muted">Er werden nog geen kanalen voor deze dienst aangemaakt.</h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newChannel(srv)">Voeg een nieuw kanaal toe</button>
         </p>
       </div>
-      <div v-else-if="!filteredChannels" style="padding:5em 0;">
+      <div v-else-if="!filteredChannels" class="table-message">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
       </div>
       <table v-else class="table table-hover">
