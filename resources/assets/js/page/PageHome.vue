@@ -3,7 +3,7 @@
     <h1>{{ isAdmin ? 'Admin' : 'Mijn diensten' }}</h1>
     <form class="pull-right">
       <div class="form-group">
-        <input v-model="query" @input="route.offset=0" class="form-control" placeholder="Zoek dienst" style="max-width:300px" type="search">
+        <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : 'diensten')" style="max-width:300px" type="search">
       </div>
     </form>
     <div v-if="isAdmin">
@@ -20,7 +20,7 @@
 
     <!-- Users -->
     <div v-if="isAdmin&&route.tab==='users'" class="row">
-      <div v-if="!users.length" style="padding:5em 0;">
+      <div v-if="!users.length" class="table-message">
         <h3 class="text-muted">
           Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
           <br>U hebt niet genoeg rechten.
@@ -30,7 +30,7 @@
           <button class="btn btn-primary btn-lg" @click="newRole(srv)">Nodig een gebruiker uit</button>
         </p>
       </div>
-      <div v-if="users.length&&!filteredUsers.length" style="padding:5em 0;">
+      <div v-if="users.length&&!filteredUsers.length" class="table-message">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
       </div>
       <table v-if="filteredUsers.length" class="table table-hover table-user">
@@ -51,10 +51,10 @@
 
     <!-- Services -->
     <div v-else class="row">
-      <div v-if="!services.length" style="padding:5em 0;">
+      <div v-if="!services.length" class="table-message">
         <h3 class="text-muted">U hebt nog geen toegang tot diensten</h3>
       </div>
-      <div v-else-if="!filteredServices.length" style="padding:5em 0;">
+      <div v-else-if="!filteredServices.length" class="table-message">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
       </div>
       <table v-else-if="isAdmin" class="table table-hover table-service-admin">
