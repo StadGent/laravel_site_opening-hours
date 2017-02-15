@@ -16,7 +16,27 @@ trait FormatsOpeninghours
      * @param  string $channel   The specific channel to print
      * @return array
      */
-    private function formatWeek($serviceId, $channel = '')
+    private function formatWeek($serviceId, $format = 'array', $channel = '')
+    {
+        $data = $this->renderWeek($serviceId, $channel);
+
+        switch ($format) {
+            case 'html':
+                return $this->makeHtmlFromSchedule($data);
+                break;
+            default:
+                return $data;
+                break;
+        }
+    }
+
+    /**
+     * Render a week schedule for a service and a channel (optional)
+     * @param  int    $serviceId
+     * @param  string $channel
+     * @return array
+     */
+    private function renderWeek($serviceId, $channel = '')
     {
         $service = app('ServicesRepository')->getById($serviceId);
 
@@ -44,6 +64,35 @@ trait FormatsOpeninghours
         }
 
         return $openinghours;
+    }
+
+    /**
+     * Create a readable text form of a week schedule
+     *
+     * @param  array  $data
+     * @return string
+     */
+    private function makeHtmlFromSchedule($data)
+    {
+        $text = '';
+
+        foreach ($data as $channel => $info) {
+            $text .= $channel . ': ' . PHP_EOL;
+
+            if (is_array($info)) {
+                foreach ($info as $day) {
+                    $text .= $day . PHP_EOL;
+                }
+            } else {
+                $text .= $info . PHP_EOL;
+            }
+
+            $text .= PHP_EOL . PHP_EOL;
+        }
+
+        $text = rtrim($text, PHP_EOL);
+
+        return $text;
     }
 
     /**

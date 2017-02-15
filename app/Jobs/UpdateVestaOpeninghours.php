@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Formatters\FormatsOpeninghours;
+use App\Services\VestaService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -44,6 +45,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
     public function handle()
     {
         // Call the VestaService to write the output away
-        (new VestaService())->updateOpeninghours($this->vestaUid, $this->formatWeek($this->serviceId));
+        (new VestaService())->updateOpeninghours($this->vestaUid, $this->formatWeek($this->serviceId, 'html'));
     }
 }

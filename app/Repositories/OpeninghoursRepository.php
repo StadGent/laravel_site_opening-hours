@@ -26,6 +26,8 @@ class OpeninghoursRepository extends EloquentRepository
             return [];
         }
 
+        $calendars = app('CalendarRepository');
+
         $result = $openinghours->toArray();
         $result['calendars'] = [];
 
@@ -41,6 +43,19 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
+     * Store new openinghours
+     *
+     * @param  array $properties
+     * @return int   The ID of the new openinghours object
+     */
+    public function store(array $properties)
+    {
+        $properties['active'] = $this->isOpeninghoursRelevantNow($properties);
+
+        return parent::store($properties);
+    }
+
+    /**
      * Return a boolean indicating if an openinghours object is "active",
      * meaning that its timespan is relevant "now".
      *
@@ -53,6 +68,23 @@ class OpeninghoursRepository extends EloquentRepository
 
         if (empty($openinghours)) {
             return false;
+        }
+
+        return $this->isOpeninghoursRelevantNow($openinghours);
+    }
+
+    /**
+     * Check if the openinghours timestamp covers "today",
+     * meaning the timespan is relevant now.
+     *
+     * @param  array $openinghours
+     * @return bool
+     */
+    private function isOpeninghoursRelevantNow($openinghours)
+    {
+        if (empty($openinghours['start_date'])) {
+            // If no start date is passed we can assume it starts from today or earlier
+            $openinghours['start_date'] = carbonize()->subMonth()->toDateString();
         }
 
         return carbonize()->between(carbonize($openinghours['start_date']), carbonize($openinghours['end_date']));

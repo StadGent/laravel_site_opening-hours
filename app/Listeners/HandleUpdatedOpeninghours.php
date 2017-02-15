@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\OpeninghoursUpdated;
+use App\Jobs\UpdateVestaOpeninghours;
 use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ServicesRepository;
@@ -52,7 +53,7 @@ class HandleUpdatedOpeninghours
      */
     private function getServiceThroughChannel($channelId)
     {
-        $channel = $this->channels->getById($openinghours['channel_id']);
+        $channel = $this->channels->getById($channelId);
 
         return $this->services->getById($channel['service_id']);
     }
