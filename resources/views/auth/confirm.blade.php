@@ -15,7 +15,7 @@
 
             <div class="form-group">
                 <label class="col-md-4 control-label">&nbsp;</label>
-                <h4 class="col-md-8">Kies een paswoord om je registratie te voltooien</h4>
+                <h4 class="col-md-8">Kies een wachtwoord om je registratie te voltooien</h4>
                 <label class="col-md-4 control-label">E-mailadres</label>
 
                 <div class="col-md-6">
@@ -25,7 +25,7 @@
 
             <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
 
-                <label class="col-md-4 control-label">Paswoord</label>
+                <label class="col-md-4 control-label">Wachtwoord</label>
 
                 <div class="col-md-6">
                     <input type="password" class="form-control" name="password" autofocus>
@@ -39,7 +39,7 @@
             </div>
 
             <div class="form-group{{ $errors->has('password_confirmation') ? ' has-error' : '' }}" id="confirm">
-                <label class="col-md-4 control-label">Bevestig je paswoord</label>
+                <label class="col-md-4 control-label">Bevestig je wachtwoord</label>
                 <div class="col-md-6">
                     <input type="password" class="form-control" name="password_confirmation">
 

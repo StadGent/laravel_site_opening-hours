@@ -8,6 +8,7 @@ export default {
   entry: 'resources/assets/js/app.js',
   dest: 'public/js/bundle.js',
   sourceMap: true,
+  format: 'es',
   plugins: [
     vue2(),
     buble(),

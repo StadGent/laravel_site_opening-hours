@@ -29,20 +29,19 @@
           <p>
             <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length">Voeg uitzonderingen toe</button>
           </p>
-          <div class="row">
-            <div class="col-sm-12 cal" v-for="cal in reversedCalendars" @click="toCalendar(cal.id)">
+          <transition-group name="list" tag="div">
+            <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
               <header class="cal-header">
-                <div class="cal-img" :class="'layer-'+cal.layer"></div>
-                <span class="cal-name">{{ cal.label }}</span>
-                <div class="cal-options">
-                  <span class="cal-lower" @click.stop="swapLayers(cal.layer, cal.layer - 1)">Lager</span>
-                  <span class="cal-higher" @click.stop="swapLayers(cal.layer, cal.layer + 1)">Hoger</span>
-                  <span class="cal-view">Bekijk</span>
-                  <span class="cal-drag"> <i class="glyphicon glyphicon-menu-hamburger"></i></span>
+                <div class="cal-action cal-info">
+                  <div class="cal-img" :class="'layer-'+cal.layer" @click="toCalendar(cal.id)"></div>
+                  <div class="cal-name" @click="toCalendar(cal.id)">{{ cal.label }}</div>
+                  <div class="cal-view" @click="toCalendar(cal.id)">Bekijk</div>
                 </div>
+                <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)">Lager</div>
+                <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)">Hoger</div>
               </header>
             </div>
-          </div>
+          </transition-group>
 
           <!-- Encourage to add calendars after first one -->
           <div class="text-center" v-if="reversedCalendars.length===1">

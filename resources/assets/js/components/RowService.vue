@@ -9,10 +9,15 @@
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>
       </td>
-      <td class="td-btn text-right" @click="route.tab2='users'">
-        <button class="btn btn-default btn-icon" v-if="isOwnerOf(s)">
+      <td class="td-btn text-right" @click.stop>
+        <button class="btn btn-default btn-icon" v-if="isOwnerOf(s)" @click="newRoleFromOverview">
+          <i class="glyphicon glyphicon-plus"></i>
           <i class="glyphicon glyphicon-user"></i>
         </button>
+        <button class="btn btn-default btn-icon" v-if="isOwnerOf(s)" @click="route.tab2 = 'users'">
+          Lijst
+        </button>
+        <span v-else>-</span>
       </td>
     </tr>
   </tbody>

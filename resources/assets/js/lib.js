@@ -56,7 +56,7 @@ export function toChannelAlert(ch) {
 
 /** OH functions **/
 
-function isInUseOn(oh, date) {
+export function isInUseOn(oh, date) {
   return (oh.start_date ? oh.start_date < date : true) && (oh.end_date ? oh.end_date > date : true)
 }
 

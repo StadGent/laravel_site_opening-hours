@@ -32,17 +32,12 @@
 
             <div class="row form-group">
               <div class="col-sm-6">
-                <label for="recipient-name" class="control-label">Geldig van</label>
-                <select class="form-control" v-model="modal.start_date">
-                  <option v-for="i in 10" v-text="(i + 2015)+'-01-01'"></option>
-                </select>
+                <label for="start_date" class="control-label">Geldig van</label>
+                <pikaday id="start_date" class="form-control" v-model="modal.start_date" :options="startDateOptions" />
               </div>
               <div class="col-sm-6">
-                
-                <label for="recipient-name" class="control-label">Verloopt op</label>
-                <select class="form-control" v-model="modal.end_date">
-                  <option v-for="i in 10" v-text="(i + parseInt(modal.start_date.slice(0,4), 10))+'-01-01'"></option>
-                </select>
+                <label for="end_date" class="control-label">Verloopt op</label>
+                <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="endDateOptions" />
               </div>
             </div>
           </div>
@@ -80,11 +75,29 @@
 
 <script>
 import InputChannel from '../components/InputChannel.vue'
+import Pikaday from '../components/Pikaday.vue'
 
 import { Hub } from '../lib.js'
 
 export default {
   computed: {
+    pikadayOptions () {
+      return {
+        i18n: {
+          previousMonth : 'Vorige maand',
+          nextMonth     : 'Volgende maand',
+          months        : ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
+          weekdays      : ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'],
+          weekdaysShort : ['Zo','Ma','Di','Wo','Do','Vr','Za'],
+        }
+      }
+    },
+    startDateOptions () {
+      return Object.assign({}, this.pikadayOptions)
+    },
+    endDateOptions () {
+      return Object.assign({}, this.pikadayOptions)
+    },
     validEmail () {
       return !this.modal.strict || /.+@.+\...+/.test(this.modal.email || '')
     },
@@ -124,7 +137,8 @@ export default {
     inp && inp.focus()
   },
   components: {
-    InputChannel
+    InputChannel,
+    Pikaday
   }
 }
 </script>

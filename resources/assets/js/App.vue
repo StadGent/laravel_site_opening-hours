@@ -12,7 +12,7 @@
     <modal-text></modal-text>
     <div class="modal-backdrop fade in" v-show="modalActive"></div>
 
-    <div class="container" style="padding:10em 0">
+    <div class="container" style="padding:10em 1em" v-if="isDev">
       <h3>Debug info</h3>
       <label>
         <input type="checkbox" v-model="$root.user.admin"> User is admin: {{ isAdmin ? 'yes' : 'no' }}
