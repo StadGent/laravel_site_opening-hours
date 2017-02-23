@@ -21,7 +21,7 @@
         ]); ?>
     </script>
 </head>
-<body>
+<body style="padding-top:0;">
     <div id="app">
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">

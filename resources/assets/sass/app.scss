@@ -335,24 +335,17 @@ h1+h3 {
 
 .cal {
   border-top: 1px solid #ddd;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  cursor: pointer;
+  margin: 0 -1em;
+  background: white;
   &:last-child {
     border-bottom: 1px solid #ddd;
-  }
-  &:hover {
-    background: #eee
   }
 }
 .cal-header {
   line-height: 32px;
-}
-.cal-options {
-  float: right;
+  display: flex;
 }
 .cal-img {
-  float: left;
   margin-right: 1rem;
   width: 32px;
   height: 32px;
@@ -361,11 +354,21 @@ h1+h3 {
   text-align: center;
   border-radius: 4px;
 }
-.cal-higher,
-.cal-lower,
-.cal-view,
-.cal-drag {
-  margin-left: 1em
+.cal-action {
+  display: inline-block;
+  padding: .6em 1em;
+  cursor: pointer;
+  &:hover {
+    background: #eee;
+    border-color: #ccc;
+  }
+}
+.cal-info {
+  display: flex;
+  flex-grow: 1;
+}
+.cal-name {
+  flex-grow: 1;
 }
 .cal-drag {
   font-size: 12px;
@@ -380,6 +383,19 @@ h1+h3 {
   margin-top: 15px;
   margin-right: 0;
 }
+.cal {
+  transition: all .3s;
+}
+.list-enter,
+.list-leave-to,
+.list-leave-active {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-leave-active {
+  position: relative;
+}
+
 
 /* Modal > Content */
 
