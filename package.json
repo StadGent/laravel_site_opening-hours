@@ -3,6 +3,7 @@
   "scripts": {
     "postinstall": "rollup -c && node-sass resources/assets/sass/app.scss > public/css/app.css",
     "sass": "node-sass resources/assets/sass/app.scss > public/css/app.css",
+    "devsass": "node-sass -w resources/assets/sass/app.scss -o public/css",
     "build": "rollup -c",
     "dev": "wrollup --live"
   },
