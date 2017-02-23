@@ -26,6 +26,9 @@ export default {
       if (!newRole.service_id) {
         newRole.service_id = this.routeService.id
       }
+      if (!newRole.service_id && newRole.srv) {
+        newRole.service_id = newRole.srv.id
+      }
       newRole.role = newRole.role || 'Member'
       newRole.user_id = newRole.user_id || newRole.id
       if (!newRole.user_id && !newRole.email) {
