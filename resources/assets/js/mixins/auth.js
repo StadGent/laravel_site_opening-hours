@@ -17,6 +17,9 @@ export default {
     }
   },
   computed: {
+    isDev () {
+      return this.$root.user.email === 'dev@dev.dev'
+    },
     isAdmin () {
       return this.$root.user.admin
     },

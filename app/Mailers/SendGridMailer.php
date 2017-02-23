@@ -72,7 +72,7 @@ class SendGridMailer
         $this->data = [];
         $this->data['email'] = $user->email;
         $this->data['token'] = $token;
-        $this->subject = 'Reset paswoord';
+        $this->subject = 'Reset wachtwoord';
 
         return $this->deliver();
     }
