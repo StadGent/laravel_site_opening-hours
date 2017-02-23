@@ -73,6 +73,7 @@
             <th-sort by="label">Dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
+            <th class="text-right">Beheer gebruikers</th>
           </tr>
         </thead>
         <tbody is="row-service-admin" v-for="s in pagedServices" :s="s"></tbody>

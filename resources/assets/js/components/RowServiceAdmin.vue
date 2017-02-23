@@ -9,6 +9,15 @@
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>
       </td>
+      <td class="td-btn text-right" @click.stop>
+        <button class="btn btn-default btn-icon" @click="newRoleFromOverview">
+          <i class="glyphicon glyphicon-plus"></i>
+          <i class="glyphicon glyphicon-user"></i>
+        </button>
+        <button class="btn btn-default btn-icon" @click="route.tab2 = 'users'">
+          Lijst
+        </button>
+      </td>
     </tr>
   </tbody>
 </template>
@@ -24,11 +33,6 @@ export default {
     },
     ghostUsers () {
       return this.s.ghostUsers.map(u => u.email) || []
-    }
-  },
-  methods: {
-    rmService () {
-
     }
   }
 }

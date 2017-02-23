@@ -75,5 +75,12 @@ export default {
       }
       return '✓ In orde'
     }
+  },
+  methods: {
+    newRoleFromOverview () {
+      this.newRole(this.s)
+      this.href('#!service/' + this.s.id)
+      this.route.tab2 = 'users'
+    }
   }
 }
