@@ -21,7 +21,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="version in sortedVersions" @click="href('#!version/'+[srv.id,route.channel,version.id].join('/'))">
+          <tr
+            v-for="version in sortedVersions"
+            @click="href('#!version/'+[srv.id,route.channel,version.id].join('/'))"
+            :class="{ 'success text-success': isActive(version) }"
+          >
             <td>
               <a :href="'#!version/'+[srv.id,route.channel,version.id].join('/')">{{ version.label || 'Zonder label' }}</a>
             </td>
@@ -41,7 +45,9 @@
 
 <script>
 import ThSort from '../components/ThSort.vue'
-import { Hub, orderBy } from '../lib.js'
+import { Hub, orderBy, isInUseOn } from '../lib.js'
+
+const today = new Date().toJSON().slice(0, 10)
 
 export default {
   name: 'channel',
@@ -72,6 +78,9 @@ export default {
     }
   },
   methods: {
+    isActive (v) {
+      return isInUseOn(v, today)
+    },
     deleteVersion (v) {
       Hub.$emit('deleteVersion', v)
     }
