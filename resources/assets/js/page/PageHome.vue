@@ -41,7 +41,6 @@
             <th-sort by="email">E-mailadres</th-sort>
             <th-sort by="services">Diensten</th-sort>
             <th-sort by="verified">Actief</th-sort>
-            <th class="text-right">Nodig uit</th>
             <th class="text-right">Verwijder</th>
           </tr>
         </thead>

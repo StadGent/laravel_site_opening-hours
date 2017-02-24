@@ -126,20 +126,19 @@ class CalendarsController extends Controller
             $event['calendar_id'] = $id;
         });
 
-        $eventsRepo = app()->make('EventRepository');
-
-        return $eventsRepo->bulkUpsert($events);
+        return app('EventRepository')->bulkUpsert($events);
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     * @param  DeleteCalendarRequest     $request
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteCalendarRequest $id)
+    public function destroy(DeleteCalendarRequest $request, int $calendarId)
     {
-        $success = $this->calendars->delete($id);
+        $success = $this->calendars->delete($calendarId);
 
         if ($success) {
             return response()->json(['message' => 'De kalender werd verwijderd.']);

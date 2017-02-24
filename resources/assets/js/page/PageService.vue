@@ -25,7 +25,6 @@
             <th-sort by="email">E-mailadres</th-sort>
             <th>Gebruikers beheren</th>
             <th-sort by="verified">Actief</th-sort>
-            <th class="text-right">Nodig uit</th>
             <th class="text-right">Ontzeg toegang tot dienst</th>
           </tr>
         </thead>

@@ -16,11 +16,6 @@
       <td v-if="u.verified" class="text-success">&checkmark;</td>
       <td v-else class="text-warning">&cross;</td>
       <td class="td-btn text-right" @click.stop>
-        <button @click="invite" class="btn btn-default btn-icon" v-if="!u.verified">
-          <i class="glyphicon glyphicon-envelope"></i>
-        </button>
-      </td>
-      <td class="td-btn text-right" @click.stop>
         <button @click="$parent.banUser(u)" class="btn btn-default btn-icon">
           <i class="glyphicon glyphicon-ban-circle"></i>
         </button>
