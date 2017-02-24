@@ -50,7 +50,7 @@ class CalendarsController extends Controller
 
         // If events are passed, bulk upsert them
         if (! empty($input['events']) && ! empty($id)) {
-            $this->bulkUpsertEvents($id, $input['events']);
+            $this->bulkInsert($id, $input['events']);
         }
 
         if (! empty($id)) {
@@ -99,7 +99,7 @@ class CalendarsController extends Controller
 
         // If events are passed, bulk upsert them
         if (! empty($input['events'])) {
-            $this->bulkUpsertEvents($id, $input['events']);
+            $this->bulkInsert($id, $input['events']);
         }
 
         if ($success) {
@@ -118,15 +118,18 @@ class CalendarsController extends Controller
      * @param  array   $events The events that need to be upserted
      * @return void
      */
-    private function bulkUpsertEvents($id, $events)
+    private function bulkInsert($calendarId, $events)
     {
         // Make sure the calendar_id is passed with the event
         // so it gets linked properly
-        array_walk($events, function (&$event) use ($id) {
-            $event['calendar_id'] = $id;
+        array_walk($events, function (&$event) use ($calendarId) {
+            $event['calendar_id'] = $calendarId;
         });
 
-        return app('EventRepository')->bulkUpsert($events);
+        // Detach the current events from the calendar, then bulk insert them
+        app('EventRepository')->deleteForCalendar($calendarId);
+
+        return app('EventRepository')->bulkInsert($events);
     }
 
     /**

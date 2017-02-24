@@ -47,15 +47,13 @@ class EloquentRepository
      * @param  array $models
      * @return void
      */
-    public function bulkUpsert(array $models)
+    public function bulkInsert(array $models)
     {
-        foreach ($models as $model) {
-            if (array_key_exists('id', $model)) {
-                $this->update($model['id'], $model);
-            } else {
-                $this->store($model);
-            }
-        }
+        collect($models)->each(function ($model) {
+            unset($model['id']);
+
+            $this->store($model);
+        });
     }
 
     /**
@@ -79,6 +77,11 @@ class EloquentRepository
         }
 
         return false;
+    }
+
+    public function deleteForCalendar($calendarId)
+    {
+        return $this->model->where('calendar_id', $calendarId)->delete();
     }
 
     public function update($modelId, $properties)
