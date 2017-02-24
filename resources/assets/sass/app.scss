@@ -391,10 +391,7 @@ h1+h3 {
 .list-leave-to,
 .list-leave-active {
   opacity: 0;
-  transform: translateY(30px);
-}
-.list-leave-active {
-  position: relative;
+  transform: translateY(-30px);
 }
 
 

@@ -172,9 +172,9 @@
           <multi-day-select :options="fullDays" :parent="options" prop="byweekday" @change="toggleWeekday"></multi-day-select>
           <span v-if="!closinghours">
             van
-            <input type="text" class="form-control control-time" v-model="eventStartTime" placeholder="_ _ : _ _">
+            <input type="text" class="form-control control-time" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
             tot
-            <input type="text" class="form-control control-time" v-model="eventEndTime" placeholder="_ _ : _ _">
+            <input type="text" class="form-control control-time" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
           </span>
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
@@ -187,9 +187,9 @@
       <div v-if="options.freq!=RRule.WEEKLY&&!closinghours">
         <div class="form-inline-always text-center">
           van
-          <input type="text" class="form-control control-time" v-model="eventStartTime" placeholder="_ _ : _ _">
+          <input type="text" class="form-control control-time" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
           tot
-          <input type="text" class="form-control control-time" v-model="eventEndTime" placeholder="_ _ : _ _">
+          <input type="text" class="form-control control-time" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
       </div>
@@ -212,6 +212,7 @@
 <script>
 import MultiDaySelect from '../components/MultiDaySelect.vue'
 import { cleanEmpty, toTime, toDatetime, dateAfter } from '../lib.js'
+import { stringToHM } from '../util/stringToHM'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 const fullMonths = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
@@ -300,8 +301,13 @@ export default {
         return toTime(this.event.start_date)
       },
       set (v) {
+        console.log(v, stringToHM(v))
+        v = stringToHM(v)
         if (!/\d\d:\d\d/.test(v)) {
           return
+        }
+        if (v === '00:00' && this.eventEndTime === '00:00') {
+          this.eventEndTime = '23:59'
         }
         this.event.start_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
@@ -311,8 +317,12 @@ export default {
         return toTime(this.event.end_date)
       },
       set (v) {
+        v = stringToHM(v)
         if (!/\d\d:\d\d/.test(v)) {
           return
+        }
+        if (v === '00:00' && this.eventStartTime === '00:00') {
+          v = '23:59'
         }
         this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
       }
