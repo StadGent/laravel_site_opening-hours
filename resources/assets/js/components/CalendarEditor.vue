@@ -20,7 +20,7 @@
         <h3>Stel de uitzondering in.</h3>
         <div class="form-group">
           <label>Naam uitzondering</label>
-          <input type="text" class="form-control" v-model="calLabel" placeholder="Brugdagen, collectieve sluitingsdagen, ...">
+          <input type="text" class="form-control" v-model="calLabel" placeholder="Brugdagen, collectieve sluitingsdagen, ..." autofocus>
           <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default {
     },
     addEvent (index, event) {
       console.log('add yes', index, event)
-      event = Object.assign({}, event)
+      event = Object.assign({}, event, { id: null })
       this.cal.events.splice(index, 0, event)
     },
     rmEvent (index) {
