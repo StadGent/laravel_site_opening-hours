@@ -6,7 +6,7 @@
     <div class="pull-right">
       <div class="btn-group">
         <button type="button" class="btn btn-default" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
-        <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'">Toon open en gesloten</button>
+        <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'" disabled>Toon open en gesloten</button>
       </div>
     </div>
 
