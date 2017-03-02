@@ -37,8 +37,10 @@ export const rootRouterMixin = {
         }
         route.page = hash[0]
         route.id = hash[1]
+        route.tab2 = null
       } else {
         route.page = window.location.hash.slice(1) || 'home'
+        route.tab = null
       }
 
       if (this.route.page === 'user') {

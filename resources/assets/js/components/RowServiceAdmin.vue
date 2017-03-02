@@ -14,9 +14,6 @@
           <i class="glyphicon glyphicon-plus"></i>
           <i class="glyphicon glyphicon-user"></i>
         </button>
-        <button class="btn btn-default btn-icon" @click="route.tab2 = 'users'">
-          Lijst
-        </button>
       </td>
     </tr>
   </tbody>

@@ -5,7 +5,7 @@
         {{ route.tab === 'admin' ? 'Administrators' : route.tab ? 'Gebruikers' : 'Diensten' }}
       </li>
       <li v-else>
-        <a href="#home" @click="route.tab='users'" v-if="route.page==='user'"> Gebruikers </a>
+        <a href="#!home" @click="route.tab='users'" v-if="route.page==='user'"> Gebruikers </a>
         <a href="#home" @click="route.tab=0" v-else> Diensten </a>
       </li>
 
