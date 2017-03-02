@@ -163,10 +163,10 @@ export default {
   props: ['oh'],
   computed: {
     versionStart () {
-      return this.oh.date_start || (currentYear + '-01-01')
+      return this.oh.start_date || (currentYear + '-01-01')
     },
     versionEnd () {
-      return this.oh.date_end || '2018-01-01'
+      return this.oh.end_date || '2018-01-01'
     },
     recurring () {
       return this.oh.calendars.m
@@ -192,6 +192,8 @@ export default {
         return console.warn('Not yet mounted')
       }
       this.elem.setDataSource(this.allEvents)
+      this.elem.setMinDate(toDate(this.versionStart))
+      this.elem.setMaxDate(toDate(this.versionEnd))
       setTimeout(() => {
         $('.layer>.day-content').tooltip()
       }, 300)
@@ -206,8 +208,8 @@ export default {
       customDataSourceRenderer,
       language: 'nl',
       // displayWeekNumber: true,
-      minDate: toDate('2016-01-01'),
-      maxDate: toDate('2018-01-01'),
+      minDate: toDate(this.versionStart),
+      maxDate: toDate(this.versionEnd),
       style: 'custom'
     })
     // setTimeout(() => this.render(), 1000)
