@@ -1,16 +1,19 @@
 <template>
   <div @change="sync">
     <div class="row" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
-      <div class="col-xs-6">
+      <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
-        <input type="date" class="form-control" v-model="eventStartDate" placeholder="van">
+        <pikaday class="form-control" v-model="eventStartDate" />
       </div>
-      <div class="col-xs-6" v-if="eventUntilSet||show.endDate">
+      <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-if="eventUntilSet||show.endDate">
         <label class="control-label">tot en met</label>
-        <input type="date" class="form-control" v-model="eventUntil" placeholder="van">
+        <pikaday class="form-control" v-model="eventUntil" />
       </div>
       <div class="col-xs-6" v-else>
         <label class="control-label"><a href="#" @click.prevent="show.endDate=1">tot en met...</a></label>
+      </div>
+      <div class="col-xs-2" v-if="closinghours">
+        <div class="close close--col" style="padding-top: 30px;" @click="$emit('rm')">&times;</div>
       </div>
     </div>
 
@@ -211,6 +214,8 @@
 
 <script>
 import MultiDaySelect from '../components/MultiDaySelect.vue'
+import Pikaday from '../components/Pikaday.vue'
+
 import { cleanEmpty, toTime, toDatetime, dateAfter } from '../lib.js'
 import { stringToHM } from '../util/stringToHM'
 
@@ -301,7 +306,6 @@ export default {
         return toTime(this.event.start_date)
       },
       set (v) {
-        console.log(v, stringToHM(v))
         v = stringToHM(v)
         if (!/\d\d:\d\d/.test(v)) {
           return
@@ -446,7 +450,8 @@ export default {
     this.RRule = RRule || {}
   },
   components: {
-    MultiDaySelect
+    MultiDaySelect,
+    Pikaday
   }
 }
 </script>

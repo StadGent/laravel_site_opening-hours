@@ -33,11 +33,11 @@
             <div class="row form-group">
               <div class="col-sm-6">
                 <label for="start_date" class="control-label">Geldig van</label>
-                <pikaday id="start_date" class="form-control" v-model="modal.start_date" :options="startDateOptions" />
+                <pikaday id="start_date" class="form-control" v-model="modal.start_date" />
               </div>
               <div class="col-sm-6">
                 <label for="end_date" class="control-label">Verloopt op</label>
-                <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="endDateOptions" />
+                <pikaday id="end_date" class="form-control" v-model="modal.end_date" />
               </div>
             </div>
           </div>
@@ -81,23 +81,6 @@ import { Hub } from '../lib.js'
 
 export default {
   computed: {
-    pikadayOptions () {
-      return {
-        i18n: {
-          previousMonth : 'Vorige maand',
-          nextMonth     : 'Volgende maand',
-          months        : ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
-          weekdays      : ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'],
-          weekdaysShort : ['Zo','Ma','Di','Wo','Do','Vr','Za'],
-        }
-      }
-    },
-    startDateOptions () {
-      return Object.assign({}, this.pikadayOptions)
-    },
-    endDateOptions () {
-      return Object.assign({}, this.pikadayOptions)
-    },
     validEmail () {
       return !this.modal.strict || /.+@.+\...+/.test(this.modal.email || '')
     },

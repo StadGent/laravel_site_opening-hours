@@ -6,21 +6,26 @@
 var dateFormatter = date => new Date(date).toDateString()
 if (Intl && Intl.DateTimeFormat) {
   dateFormatter = date => new Intl.DateTimeFormat('nl', {
-    weekday: 'long',
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric' 
   }).format(new Date(date))
+}
+
+const pikadayOptions = {
+  i18n: {
+    previousMonth : 'Vorige maand',
+    nextMonth     : 'Volgende maand',
+    months        : ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
+    weekdays      : ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'],
+    weekdaysShort : ['Zo','Ma','Di','Wo','Do','Vr','Za'],
+  }
 }
 
 export default {
   props: {
     value: null,
-    options: {
-      default () {
-        return {}
-      }
-    }
+    options: null
   },
   computed: {
     opts () {
@@ -31,7 +36,10 @@ export default {
           date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
           this.$emit('input', date.toJSON().slice(0, 10))
         }
-      }, this.options, {
+      },
+      pikadayOptions,
+      this.options || {},
+      {
         field: this.$el
       })
     }
