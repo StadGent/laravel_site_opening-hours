@@ -1,4 +1,6 @@
 import {
+  hasActiveOh,
+  hasOh,
   hasCal,
   hasChannels,
   toChannelAlert,
@@ -49,31 +51,28 @@ export default {
     },
     statusClass() {
       return {
-        'text-success': this.statusMessage === '✓ In orde',
-        'warning': this.statusMessage !== '✓ In orde',
+        'text-success': this.statusMessage === '✓ Volledig',
+        'warning': this.statusMessage !== '✓ Volledig',
         'small': this.statusMessage.length > 20
       }
     },
     statusMessage() {
-      if (this.isAdmin) {
-        // if (!this.activeUsers.length && !this.ghostUsers.length) {
-        //   return 'Geen gebruikers'
-        // }
-        if (!this.ghostUsers) {
-          return 'Geen actieve gebruikers'
-        }
-      }
-      const channelAlerts = this.hasChannels.filter(toChannelAlert)
-      if (channelAlerts.length) {
-        return channelAlerts.map(c => toChannelStatus(c, true)).join('\n')
-      }
+      // Service without channels
       if (!this.countChannels) {
         return 'Geen kanalen'
       }
-      if (this.old > 200) {
-        return 'Verouderd'
+
+      // Not every channel of the service has at least 1 version
+      if (!this.hasChannels.filter(ch => hasOh(ch).length).length) {
+        return 'Ontbrekende kalender(s)'
       }
-      return '✓ In orde'
+
+      // Not every channel of the service has at least 1 active version
+      if (!this.hasChannels.filter(ch => hasActiveOh(ch).length).length) {
+        return 'Ontbrekende actieve kalender(s)'
+      }
+
+      return '✓ Volledig'
     }
   },
   methods: {
