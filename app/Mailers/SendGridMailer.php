@@ -67,10 +67,10 @@ class SendGridMailer
      */
     public function sendResetLinkEmail($email, $token)
     {
-        $this->to = $user->email;
+        $this->to = $email;
         $this->view = 'auth.emails.reset';
         $this->data = [];
-        $this->data['email'] = $user->email;
+        $this->data['email'] = $email;
         $this->data['token'] = $token;
         $this->subject = 'Reset wachtwoord';
 
