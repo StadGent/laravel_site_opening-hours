@@ -188,30 +188,31 @@ export default {
   },
   methods: {
     render: _throttle(function () {
-      if (!this.elem) {
+      console.log('draw', Date.now())
+      if (!this.$el) {
         return console.warn('Not yet mounted')
       }
-      this.elem.setDataSource(this.allEvents)
-      this.elem.setMinDate(toDate(this.versionStart))
-      this.elem.setMaxDate(toDate(this.versionEnd))
+      this.elem = $(this.$el).find('.calendar').calendar({
+        customDataSourceRenderer,
+        customDayRenderer,
+        dataSource: this.allEvents,
+        language: 'nl',
+        maxDate: toDate(this.versionEnd),
+        minDate: toDate(this.versionStart),
+        style: 'custom'
+      })
+      window.fadeInTime = 0
       setTimeout(() => {
         $('.layer>.day-content').tooltip()
       }, 300)
-    }, 300, { leading: false }),
+    }, 500, { leading: true }),
     printme () {
       Hub.$emit('printme')
     }
   },
   mounted () {
-    this.elem = $(this.$el).find('.calendar').calendar({
-      customDayRenderer,
-      customDataSourceRenderer,
-      language: 'nl',
-      // displayWeekNumber: true,
-      minDate: toDate(this.versionStart),
-      maxDate: toDate(this.versionEnd),
-      style: 'custom'
-    })
+    window.fadeInTime = 1000
+    this.render()
     // setTimeout(() => this.render(), 1000)
   },
   watch: {
