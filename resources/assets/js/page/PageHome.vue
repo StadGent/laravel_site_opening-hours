@@ -52,7 +52,8 @@
     <!-- Services -->
     <div v-else class="row">
       <div v-if="!allowedServices.length" class="table-message">
-        <h3 class="text-muted">Je hebt nog geen toegang tot diensten</h3>
+        <h3 class="text-muted" v-if="isAdmin">Er zijn nog geen actieve diensten.</h3>
+        <h3 class="text-muted" v-else>Je hebt nog geen toegang tot diensten</h3>
       </div>
       <div v-else-if="!filteredServices.length" class="table-message">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
