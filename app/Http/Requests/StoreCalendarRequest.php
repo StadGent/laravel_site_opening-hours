@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class StoreCalendarRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class StoreCalendarRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize(UserRepository $users)
+    public function authorize(UserRepository $users, Request $request)
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
