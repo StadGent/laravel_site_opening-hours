@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\CalendarRepository;
 use App\Http\Requests\StoreCalendarRequest;
+use App\Http\Requests\UpdateCalendarRequest;
 use App\Http\Requests\DeleteCalendarRequest;
 use App\Events\CalendarUpdated;
 
@@ -91,7 +92,7 @@ class CalendarsController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreCalendarRequest $request, $id)
+    public function update(UpdateCalendarRequest $request, $id)
     {
         $input = $request->input();
 
