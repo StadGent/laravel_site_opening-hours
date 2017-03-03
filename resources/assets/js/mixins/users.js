@@ -42,6 +42,7 @@ export default {
       }
 
       this.$http.post('/api/roles', newRole).then(() => {
+        this.fetchUsers()
         this.fetchServices()
         this.modalClose()
       }).catch(fetchError)
@@ -77,6 +78,7 @@ export default {
       }
 
       this.$http.post('/api/roles', newRole).then(() => {
+        this.fetchUsers()
         this.fetchServices()
         this.modalClose()
       }).catch(fetchError)
@@ -98,6 +100,7 @@ export default {
         } else {
           this.fetchServices()
         }
+        this.fetchUsers()
         this.modalClose()
       }).catch(fetchError)
     })

@@ -9,6 +9,7 @@
             <span v-else-if="modal.text=='newChannel'">{{ modal.id ? 'Bewerk dit kanaal' : 'Voeg een kanaal toe' }}</span>
             <span v-else-if="modal.text=='newVersion'">{{ modal.id ? 'Bewerk deze versie' : 'Voeg een versie toe' }}</span>
             <span v-else-if="modal.text=='newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
+            <span v-else-if="modal.text=='newUser'">Nodig iemand uit</span>
             <span v-else>Probleem</span>
           </h4>
         </div>
@@ -41,13 +42,35 @@
               </div>
             </div>
           </div>
-          <div v-else-if="modal.text=='newRole'">
+          <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
             <div class="form-group" :class="{'has-error':!validEmail, 'has-success':allowedEmail}">
               <label for="recipient-name" class="control-label">E-mailadres</label>
               <input type="text" class="form-control" v-model="modal.email" placeholder="... @mijngent.be">
             </div>
             <div class="alert alert-warning" v-if="!allowedEmail">
               <b>Pas op!</b> Het is de bedoeling dat je alleen mensen uitnodigt van Mijn Gent.
+            </div>
+          </div>
+
+          <div v-if="modal.text=='newUser'">
+            <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
+              <label for="recipient-name" class="control-label">Rol</label>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> Lid
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> Eigenaar
+                </label>
+              </div>
+            </div>
+            <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
+              <label for="recipient-name" class="control-label">Dienst</label>
+              <select v-model="modal.service_id" class="form-control">
+                <option v-for="service in allowedServices" :value="service.id" v-text="service.label"></option>
+              </select>
             </div>
           </div>
         </div>
@@ -60,7 +83,7 @@
             <button type="submit" class="btn btn-primary" @click="createVersion">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
-          <div v-else-if="modal.text=='newRole'">
+          <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
             <button type="submit" class="btn btn-primary" @click="createRole">Uitnodigen</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
@@ -92,6 +115,10 @@ export default {
         return 'Nieuwe versie'
       }
       return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + (parseInt(this.modal.end_date.slice(0, 4), 10) - 1)
+    },
+
+    allowedServices () {
+      return this.$root.services.filter(s => !s.draft)
     }
   },
   methods: {
