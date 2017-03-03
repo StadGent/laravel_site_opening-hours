@@ -2,9 +2,9 @@
 
 namespace App\Console;
 
+use App\Console\Commands\FetchServices;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use App\Console\Commands\FetchServices;
 
 class Kernel extends ConsoleKernel
 {

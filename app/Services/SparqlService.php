@@ -41,7 +41,15 @@ class SparqlService
      */
     public function performSparqlQuery(string $query, $method = 'GET')
     {
-        return $this->executeQuery($this->prepareQuery($query), $method);
+        try {
+            $this->executeQuery($this->prepareQuery($query), $method);
+
+            return true;
+        } catch (\Exception $ex) {
+            \Log::error('Something went wrong while writing to the LOD repository: ' . $ex->getMessage());
+        }
+
+        return false;
     }
 
     /**
@@ -94,8 +102,9 @@ class SparqlService
 
             $uri = urldecode($uri);
 
-            abort(500, "Something went wrong while executing query. The request we put together was: $uri.");
+            $message = "Something went wrong while executing query. The request we put together was: $uri.";
 
+            throw new \Exception($message);
         }
 
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -104,11 +113,15 @@ class SparqlService
         if ($response_code == '400') {
             $uri = urldecode($uri);
 
-            abort(500, "The SPARQL endpoint returned a 400 error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The error was: $response. The URI was: $uri");
+            $message = "The SPARQL endpoint returned a 400 error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The error was: $response. The URI was: $uri";
+
+            throw new \Exception($message);
         } elseif ($response_code == '500') {
             $uri = urldecode($uri);
 
-            abort(500, "The SPARQL endpoint returned a 500 error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The URI was: $uri");
+            $message = "The SPARQL endpoint returned a 500 error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The URI was: $uri";
+
+            throw new \Exception($message);
         }
 
         curl_close($curl);

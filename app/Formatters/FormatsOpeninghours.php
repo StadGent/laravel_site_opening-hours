@@ -32,6 +32,7 @@ trait FormatsOpeninghours
 
     /**
      * Render a week schedule for a service and a channel (optional)
+     *
      * @param  int    $serviceId
      * @param  string $channel
      * @return array

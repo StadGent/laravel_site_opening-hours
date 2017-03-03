@@ -23,7 +23,7 @@ class OpeninghoursController extends Controller
      */
     public function index()
     {
-        return $this->openinghours->getOpeninghoursGraph(1);
+        //
     }
 
     /**

@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Openinghours;
 use EasyRdf_Graph as Graph;
-use EasyRdf_Serialiser_Turtle as TurtleSerialiser;
 use EasyRdf_Literal as Literal;
 use EasyRdf_Literal_Boolean as BooleanLiteral;
 use EasyRdf_Literal_Integer as IntegerLiteral;
@@ -100,8 +99,10 @@ class OpeninghoursRepository extends EloquentRepository
     public function getOpeninghoursGraph($openinghoursId)
     {
         $openinghours = $this->model->find($openinghoursId);
+
         $calendars = $openinghours->calendars();
         $calendars = $calendars->with('events')->get()->toArray();
+
         $channel = $openinghours->channel->toArray();
 
         $openinghoursGraph = new Graph();
@@ -114,8 +115,6 @@ class OpeninghoursRepository extends EloquentRepository
                 env('BASE_URI') . '/openinghours/' . $openinghoursId,
                 'oh:OpeningHours'
             );
-
-            $openinghoursResource->addResource('oh:type', env('BASE_URI') . '/channel/' . $channel['label']);
 
             // Add the calendars taken into account the priority of the calendar
             // Sort the calendars first
@@ -171,12 +170,11 @@ class OpeninghoursRepository extends EloquentRepository
                 // Move the current list to the new list (= rdf:rest)
                 $calendarList = $calendarListRest;
             }
+
+            return $openinghoursResource;
         }
 
-        $serialiser = new TurtleSerialiser();
-        dd($serialiser->serialise($openinghoursGraph, 'turtle'));
-
-        return $openinghoursGraph;
+        return null;
     }
 
     /**

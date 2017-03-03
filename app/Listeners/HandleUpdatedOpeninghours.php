@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\OpeninghoursUpdated;
+use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
 use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
@@ -39,9 +40,13 @@ class HandleUpdatedOpeninghours
 
             $service = $this->getServiceThroughChannel($openinghours['channel_id']);
 
+            // Update VESTA if the service is linked to a VESTA UID
             if (! empty($service) && $service['source'] == 'vesta') {
                 dispatch((new UpdateVestaOpeninghours($service['identifier'], $service['id'])));
             }
+
+            // Update the LOD repository with the new openinghours information
+            dispatch(new UpdateLodOpeninghours($service['id'], $event->getOpeninghoursId()));
         }
     }
 
