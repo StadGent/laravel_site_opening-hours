@@ -8,7 +8,7 @@
         {{ u.email }}
       </td>
       <td @click.stop class="td-clickstop">
-        <div>{{ u.roles.length }} dienst{{ u.roles.length === 1 ? '' : 'en' }}</div>
+        <div v-if="! u.roles.length">-</div>
         <div>
           <div v-for="r in u.roles">
             {{ r.role === 'Owner' ? 'Eigenaar' : 'Lid' }}

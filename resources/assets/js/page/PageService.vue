@@ -91,7 +91,7 @@ export default {
     return {
       order: '',
       query: '',
-      msg: 'Hello dienst!',
+      msg: '',
       service: null
     }
   },

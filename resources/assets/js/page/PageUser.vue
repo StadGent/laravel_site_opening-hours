@@ -5,9 +5,6 @@
     <div v-if="usr.admin">
       Admins hebben toegang tot alle diensten.
     </div>
-    <div v-else>
-      <button type="button" class="btn btn-default btn-disabled" disabled @click="requestService">+ Voeg diensten toe</button>
-    </div>
 
     <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
       <p>

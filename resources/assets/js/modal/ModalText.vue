@@ -62,7 +62,7 @@
               </div>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> Eigenaar
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> Beheerder
                 </label>
               </div>
             </div>
