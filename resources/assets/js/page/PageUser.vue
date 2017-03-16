@@ -14,14 +14,8 @@
         Dit is je eigen profiel. Je kan je naam wijzigen
       </p>
       <p>
-      <label>Naam</label>
-        <input type="text" class="form-control" v-model="user.name">
-      </p>
-    </div>
-
-    <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
-      <p>
-        <button @click="$root.logout">Uitloggen</button>
+        <label>Naam</label>
+        <input type="text" class="form-control" v-model="usr.name">
       </p>
     </div>
 

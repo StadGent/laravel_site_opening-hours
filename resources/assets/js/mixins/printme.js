@@ -16,7 +16,7 @@ export default {
     }
   },
   mounted() {
-    Hub.$on('printme', newRole => {
+    Hub.$on('printme', () => {
       this.printme = true
 
       this.$calendar = $('.calendar').clone()

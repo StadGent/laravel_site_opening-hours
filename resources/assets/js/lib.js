@@ -215,8 +215,11 @@ export function cleanEmpty(x) {
 
 // HTTP
 
-export function fetchError (error) {
-  console.warn(error)
+export function fetchError (response) {
+  if (response && response.body && response.body.message) {
+    alert(response.body.message)
+  }
+  console.warn(response)
 }
 
 // Returns a function, that, when invoked, will only be triggered at most once
