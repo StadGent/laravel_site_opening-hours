@@ -7,9 +7,9 @@
       </div>
       <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-if="eventUntilSet||show.endDate">
         <label class="control-label">tot en met</label>
-        <pikaday class="form-control" v-model="eventUntil" />
+        <pikaday class="form-control" v-model="eventUntil" :options="pikadayUntil" />
       </div>
-      <div class="col-xs-6" v-else>
+      <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-else>
         <label class="control-label"><a href="#" @click.prevent="show.endDate=1">tot en met...</a></label>
       </div>
       <div class="col-xs-2" v-if="closinghours">
@@ -343,6 +343,11 @@ export default {
       set (v) {
         console.log('set until ', v)
         this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 19)
+      }
+    },
+    pikadayUntil () {
+      return {
+        maxDate: toDatetime(this.$parent.$parent.version.end_date)
       }
     },
     hasDates () {
