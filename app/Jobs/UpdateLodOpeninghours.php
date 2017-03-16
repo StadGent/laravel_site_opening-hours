@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Repositories\OpeninghoursRepository;
-use App\Repositories\LodOpeninghoursRepository;
 use App\Repositories\ChannelRepository;
+use App\Repositories\LodOpeninghoursRepository;
+use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ServicesRepository;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use EasyRdf_Graph as Graph;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateLodOpeninghours implements ShouldQueue
 {
