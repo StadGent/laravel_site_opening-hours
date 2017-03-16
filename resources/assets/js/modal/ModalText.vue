@@ -8,6 +8,7 @@
             <span v-if="modal.text=='requestService'">Vraag toegang tot een dienst</span>
             <span v-else-if="modal.text=='newChannel'">{{ modal.id ? 'Bewerk dit kanaal' : 'Voeg een kanaal toe' }}</span>
             <span v-else-if="modal.text=='newVersion'">{{ modal.id ? 'Bewerk deze versie' : 'Voeg een versie toe' }}</span>
+            <span v-else-if="modal.text=='newRoleForUser'">Nodig {{ modal.usr.name }} uit voor een dienst</span>
             <span v-else-if="modal.text=='newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
             <span v-else-if="modal.text=='newUser'">Nodig iemand uit</span>
             <span v-else>Probleem</span>
@@ -52,7 +53,7 @@
             </div>
           </div>
 
-          <div v-if="modal.text=='newUser'">
+          <div v-if="modal.text == 'newUser' || modal.text == 'newRoleForUser'">
             <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
               <label for="recipient-name" class="control-label">Rol</label>
               <div class="radio">
@@ -83,7 +84,7 @@
             <button type="submit" class="btn btn-primary" @click="createVersion">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
-          <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
+          <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">
             <button type="submit" class="btn btn-primary" @click="createRole">Uitnodigen</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
@@ -136,8 +137,14 @@ export default {
     },
     createRole () {
       this.modal.strict = true
-      if (!window.Vue.config.debug && !this.validEmail) {
+      if (this.modal.usr) {
+        this.modal.user_id = this.modal.usr.id
+      }
+      if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
         return
+      }
+      if (!this.modal.service_id && !this.modal.srv) {
+        return alert('Kies een dienst')
       }
       Hub.$emit('createRole', this.modal)
     }
