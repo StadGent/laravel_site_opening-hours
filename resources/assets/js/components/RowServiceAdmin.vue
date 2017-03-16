@@ -9,11 +9,11 @@
         :rowspan="rowspan"
       >
         <span
-          data-toggle="tooltip"
+          :data-toggle="statusTooltip ? 'tooltip' : null"
           :title="statusTooltip"
         >
           <span class="pre-wrap">{{ statusMessage }}</span> &nbsp;
-          <i class="glyphicon glyphicon-info-sign"></i>
+          <i class="glyphicon glyphicon-info-sign" v-if="statusTooltip"></i>
         </span>
       </td>
       <td  class="text-muted">
