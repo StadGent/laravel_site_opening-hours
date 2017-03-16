@@ -53,7 +53,7 @@ export function toChannelStatus(ch, includeLabel) {
   if (end_date === -1) {
     return 'Kanaal ' + includeLabel + ' verloopt nooit'
   }
-  return 'Kanaal ' + includeLabel + ' verloopt op ' + end_date
+  return '✓ Actief'
 }
 
 // Returns true if this channel expires within 90 days
