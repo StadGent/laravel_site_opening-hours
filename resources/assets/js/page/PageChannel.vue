@@ -2,7 +2,7 @@
   <div class="container">
     <h1>Versies <small>{{ channel.label }}</small></h1>
 
-    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newVersion()">+ Nieuwe versie</button>
+    <button type="button" class="btn btn-primary" @click="newVersion()">+ Nieuwe versie</button>
 
     <div v-if="!versions||!versions.length" class="table-message">
       <h3 class="text-muted">Er werden nog geen versies voor dit kanaal aangemaakt.</h3>
