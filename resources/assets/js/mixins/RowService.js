@@ -63,12 +63,12 @@ export default {
       }
 
       // Not every channel of the service has at least 1 version
-      if (!this.hasChannels.filter(ch => hasOh(ch).length).length) {
+      if (this.hasChannels.filter(ch => !hasOh(ch).length).length) {
         return 'Ontbrekende kalender(s)'
       }
 
       // Not every channel of the service has at least 1 active version
-      if (!this.hasChannels.filter(ch => hasActiveOh(ch).length).length) {
+      if (this.hasChannels.filter(ch => !hasActiveOh(ch).length).length) {
         return 'Ontbrekende actieve kalender(s)'
       }
 
