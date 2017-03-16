@@ -5,6 +5,12 @@
     "license": "AGPLv3",
     "type": "Web application",
     "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/digipolisgent/yaml-expander"
+        }
+    ],
     "require": {
         "php": ">=5.6.4",
         "laravel/framework": "5.3.*",
@@ -16,7 +22,9 @@
         "easyrdf/easyrdf": "^0.9.1",
         "ml/json-ld": "^1.0",
         "pda/pheanstalk": "^3.1",
-        "digipolisgent/robo-digipolis-laravel": "^0.1"
+        "digipolisgent/robo-digipolis-laravel": "^0.1",
+        "grasmash/yaml-expander": "dev-feature/symfony3",
+        "digipolisgent/robo-digipolis-general": "0.1.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
