@@ -73,6 +73,11 @@ export default {
     newRole(srv) {
       this.modal.text = 'newRole'
       this.modal.srv = srv
+    },
+    newRoleForUser(usr) {
+      this.modal.text = 'newRoleForUser'
+      this.modal.usr = usr
+      this.modal.role = 'Member'
     }
   }
 }
