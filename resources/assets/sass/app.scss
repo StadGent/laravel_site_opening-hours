@@ -418,3 +418,9 @@ h1+h3 {
   padding-top: 0;
   border: 0;
 }
+
+/* Wrap lines in bootstrap tooltips */
+
+.tooltip-inner {
+  white-space: pre-wrap;
+}
