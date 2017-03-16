@@ -32,8 +32,10 @@ export default {
   },
   methods: {
     manageUsers () {
-      this.route.tab2 = 'users'
       this.href('#!service/' + this.s.id)
+      setTimeout(() => {
+        this.route.tab2 = 'users'
+      }, 100)
     }
   }
 }
