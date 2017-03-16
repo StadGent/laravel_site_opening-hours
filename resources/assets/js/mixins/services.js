@@ -83,6 +83,9 @@ export default {
       if (!channel.id) {
         return console.error('deleteChannel: id is missing')
       }
+      if (!confirm('Zeker dat je dit kanaal wil verwijderen?')) {
+        return
+      }
       this.$http.delete('/api/channels/' + channel.id).then(() => {
         this.fetchServices()
         this.modalClose()
@@ -124,6 +127,9 @@ export default {
       if (!version || !version.id) {
         return console.warn('id is missing', version)
       }
+      if (!confirm('Zeker dat je deze versie wil verwijderen?')) {
+        return
+      }
 
       this.$http.delete('/api/openinghours/' + version.id).then(() => {
         this.modalClose()
@@ -162,6 +168,10 @@ export default {
       if (!calendar.id) {
         return console.warn('deleteCalendar: id is missing')  
       }
+      if (!confirm('Zeker dat je deze kalender wil verwijderen?')) {
+        return
+      }
+
       this.$http.delete('/api/calendars/' + calendar.id).then(() => {
         this.fetchVersion(true)
         this.toVersion()
