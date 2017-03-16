@@ -1,9 +1,12 @@
-const defaultStart = '2016-01-01T00:00:00'
-const defaultEnd = '2016-01-02T00:00:00'
-const defaultUntil = '2021-01-01'
+const startYear = new Date().getFullYear()
+const untilYear = startYear + 5
 
-const firstEventStart = '2016-01-01T09:00:00'
-const firstEventEnd = '2016-01-01T17:00:00'
+const defaultStart = startYear + '-01-01T00:00:00'
+const defaultEnd = startYear + '-01-02T00:00:00'
+const defaultUntil = untilYear + '-01-01'
+
+const firstEventStart = startYear + '-01-01T09:00:00'
+const firstEventEnd = startYear + '-01-01T17:00:00'
 
 export function createFirstEvent() {
   return {
@@ -51,7 +54,7 @@ export function createVersion() {
     start_date: defaultStart,
     end_date: defaultUntil,
     priority: 0,
-    label: 'Openingsuren 2016 tot en met 2020',
+    label: 'Openingsuren ' + startYear + ' tot en met ' + (untilYear - 1),
     calendars: []
   }
 }
