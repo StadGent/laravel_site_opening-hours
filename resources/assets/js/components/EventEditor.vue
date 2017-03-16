@@ -3,7 +3,7 @@
     <div class="row" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
       <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
-        <pikaday class="form-control" v-model="eventStartDate" />
+        <pikaday class="form-control" v-model="eventStartDate" :options="pikadayStart" />
       </div>
       <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-if="eventUntilSet||show.endDate">
         <label class="control-label">tot en met</label>
@@ -277,7 +277,8 @@ export default {
         const endDate = toDatetime(this.event.end_date)
         let startDate = toDatetime(this.event.start_date)
         const duration = endDate - startDate
-        console.log(duration)
+        // console.debug('duration', duration)
+
         // Keep duration the same if it's shorter than 2 days
         if (!v) {
           return console.warn('did not select date')
@@ -285,7 +286,7 @@ export default {
         this.event.start_date = v + ((this.event.start_date || '').slice(10, 19) || 'T00:00:00')
         if (duration < 36e5 * 48) {
           this.event.end_date = dateAfter(toDatetime(this.event.start_date), duration).toJSON().slice(0, 19)
-          console.log('enddate', this.event.end_date)
+          // console.debug('enddate', this.event.end_date)
         }
 
         if (this.options.bymonthday) {
@@ -332,21 +333,28 @@ export default {
       }
     },
     eventUntilSet () {
-      console.log('check until')
+      // console.debug('check until')
       return this.eventUntil !== this.versionEndDate
     },
     eventUntil: {
       get () {
-        console.log(this.event.until, this.versionEndDate)
+        // console.debug('until', this.event.until, this.versionEndDate)
         return toDatetime(this.event.until || this.versionEndDate).toJSON().slice(0, 10)
       },
       set (v) {
-        console.log('set until ', v)
+        // console.debug('set until ', v)
         this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 19)
+      }
+    },
+    pikadayStart () {
+      return {
+        minDate: toDatetime(this.$parent.$parent.version.start_date),
+        maxDate: toDatetime(this.event.until || this.versionEndDate)
       }
     },
     pikadayUntil () {
       return {
+        minDate: toDatetime(this.$parent.$parent.version.start_date),
         maxDate: toDatetime(this.$parent.$parent.version.end_date)
       }
     },
@@ -366,7 +374,7 @@ export default {
       return opts
     },
     versionEndDate() {
-      console.log(toDateString(this.$parent.$parent.version.end_date))
+      // console.debug(toDateString(this.$parent.$parent.version.end_date))
       return toDateString(this.$parent.$parent.version.end_date)
     },
     // RRule object based on options
@@ -382,18 +390,18 @@ export default {
   },
   methods: {
     setFreq () {
-      console.log('set freq')
+      // console.debug('set freq')
       if (this.options.freq === RRule.MONTHLY) {
         this.byMonthDay()
       } 
     },
     byMonthDay () {
-      console.log('monthday')
+      // console.debug('monthday')
       delete this.options.byweekday
       this.options.bymonthday = toDatetime(this.event.start_date).getDate()
     },
     byWeekDay () {
-      console.log('weekday')
+      // console.debug('weekday')
       delete this.options.bymonthday
       this.options.byweekday = this.options.byweekday || 0
       this.options.bysetpos = this.options.bysetpos && this.options.bysetpos < 8 ? this.options.bysetpos : 1
@@ -405,7 +413,7 @@ export default {
     },
     toggleWeekday (day) {
       day = parseInt(day, 10)
-      console.log(day)
+      // console.debug(day)
       if (!this.options.byweekday) {
         this.options.byweekday = []
       }
@@ -419,7 +427,7 @@ export default {
       if (!this.options.byweekday.length) {
         this.options.byweekday = []
       }
-      console.log(this.options.byweekday)
+      // console.debug(this.options.byweekday)
       this.sync()
     },
     sync () {
@@ -447,7 +455,7 @@ export default {
           .replace(';DTSTART=20160101T000000Z', '')
           .replace(';UNTIL=20160101T000000Z', '')
         this.$set(this.event, 'rrule', rule)
-        console.log(rule)
+        // console.debug(rule)
       }, 100)
     }
   },
