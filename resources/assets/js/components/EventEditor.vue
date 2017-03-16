@@ -310,7 +310,7 @@ export default {
         if (!/\d\d:\d\d/.test(v)) {
           return
         }
-        if (v === '00:00' && this.eventEndTime === '00:00') {
+        if (this.eventEndTime === '00:00') {
           this.eventEndTime = '23:59'
         }
         this.event.start_date = this.event.start_date.slice(0, 11) + v + ':00'
@@ -325,7 +325,7 @@ export default {
         if (!/\d\d:\d\d/.test(v)) {
           return
         }
-        if (v === '00:00' && this.eventStartTime === '00:00') {
+        if (v === '00:00') {
           v = '23:59'
         }
         this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
