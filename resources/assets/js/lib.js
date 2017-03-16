@@ -32,8 +32,19 @@ export function hasActiveOh(ch) {
 // }
 
 export function toChannelStatus(ch, includeLabel) {
-  const oh = hasActiveOh(ch)
   includeLabel = includeLabel ? ch.label : ''
+
+  // No openinghours at all
+  if (!hasOh(ch).length) {
+    return 'Kanaal ' + includeLabel + ' heeft geen kalender'
+  }
+
+  const oh = hasActiveOh(ch)
+
+  // No active openinghours
+  if (!oh.length) {
+    return 'Kanaal ' + includeLabel + ' heeft geen actieve versie'
+  }
 
   let end_date = expiresOn(oh)
   if (!end_date || Date.parse(end_date) < Date.now()) {
