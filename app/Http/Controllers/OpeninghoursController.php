@@ -6,6 +6,7 @@ use App\Events\OpeninghoursUpdated;
 use App\Http\Requests\DeleteOpeninghoursRequest;
 use App\Http\Requests\StoreOpeninghoursRequest;
 use App\Repositories\OpeninghoursRepository;
+use App\Repositories\ChannelRepository;
 
 class OpeninghoursController extends Controller
 {
@@ -44,6 +45,17 @@ class OpeninghoursController extends Controller
      */
     public function store(StoreOpeninghoursRequest $request)
     {
+        // Make sure the hours don't overlap existing openinghours
+        $overlap = app(ChannelRepository::class)->hasOpeninghoursForInterval(
+            $request->channel_id,
+            $request->start_date,
+            $request->end_date
+        );
+
+        if ($overlap) {
+            return response()->json(['error' => 'Er is een overlapping met een andere versie.'], 400);
+        }
+
         $input = $request->input();
 
         $id = $this->openinghours->store($input);
@@ -90,6 +102,18 @@ class OpeninghoursController extends Controller
      */
     public function update(StoreOpeninghoursRequest $request, $id)
     {
+        // Make sure the hours don't overlap existing openinghours
+        $overlap = app(ChannelRepository::class)->hasOpeninghoursForInterval(
+            $request->channel_id,
+            $request->start_date,
+            $request->end_date,
+            $id
+        );
+
+        if ($overlap) {
+            return response()->json(['error' => 'Er is een overlapping met een andere versie.'], 400);
+        }
+
         $input = $request->input();
 
         $success = $this->openinghours->update($id, $input);
