@@ -4,7 +4,18 @@
       <td >
         <a :href="'#!service/'+s.id">{{ s.label }}</a>
       </td>
-      <td class="pre-wrap" :class="statusClass" :rowspan="rowspan" v-text="statusMessage"></td>
+      <td
+        :class="statusClass"
+        :rowspan="rowspan"
+      >
+        <span
+          :data-toggle="statusTooltip ? 'tooltip' : null"
+          :title="statusTooltip"
+        >
+          <span class="pre-wrap">{{ statusMessage }}</span> &nbsp;
+          <i class="glyphicon glyphicon-info-sign" v-if="statusTooltip"></i>
+        </span>
+      </td>
       <td  class="text-muted">
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>

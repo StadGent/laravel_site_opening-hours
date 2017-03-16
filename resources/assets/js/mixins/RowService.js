@@ -73,6 +73,15 @@ export default {
       }
 
       return '✓ Volledig'
+    },
+
+    // TODO: refactor into structured set of messages
+    statusTooltip() {
+      switch (this.statusMessage) {
+        case 'Geen kanalen': return 'Deze dienst heeft geen kanalen.'
+        case 'Ontbrekende kalender(s)': return 'Minstens 1 van de kanalen van deze dienst heeft geen versies.'
+        case 'Ontbrekende actieve kalender(s)': return 'Alle kanalen hebben een versie maar minstens 1 kanaal heeft geen versie die nu geldt. Een versie geldt niet als deze verlopen is of pas in de toekomst actief wordt.'
+      }
     }
   },
   methods: {
@@ -81,5 +90,8 @@ export default {
       this.href('#!service/' + this.s.id)
       this.route.tab2 = 'users'
     }
+  },
+  mounted () {
+    $('[data-toggle="tooltip"]').tooltip()
   }
 }
