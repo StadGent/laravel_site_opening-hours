@@ -272,13 +272,6 @@ export default {
         this.$set(event, 'until', this.versionEndDate)
       }
 
-      // Switch start & end
-      if (event.start_date > event.until) {
-        const until = event.until
-        this.$set(event, 'until', event.start_date)
-        this.$set(event, 'start_date', until)
-      }
-
       return event
     },
     eventStartDayMonth () {
@@ -330,7 +323,7 @@ export default {
           this.eventEndTime = '23:59'
         }
         if (this.eventEndTime < v) {
-          this.eventEndTime = v
+          window.alert("Het begintijdstip moet vroeger vallen dan het eindtijdstip");
         }
         this.event.start_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
@@ -347,8 +340,8 @@ export default {
         if (v === '00:00') {
           v = '23:59'
         }
-        if (v < this.eventStartTime) {
-          this.eventStartTime = v
+        if (this.eventEndTime < v) {
+          window.alert("Het begintijdstip moet vroeger vallen dan het eindtijdstip");
         }
         this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
       }
@@ -414,7 +407,7 @@ export default {
       // console.debug('set freq')
       if (this.options.freq === RRule.MONTHLY) {
         this.byMonthDay()
-      } 
+      }
     },
     byMonthDay () {
       // console.debug('monthday')
@@ -430,7 +423,7 @@ export default {
     toggleRecurring () {
       const rule = this.event.rrule
       this.event.rrule = this.event.rrule ? '' : this.event.oldrrule || 'FREQ=WEEKLY'
-      this.event.oldrrule = rule 
+      this.event.oldrrule = rule
     },
     toggleWeekday (day) {
       day = parseInt(day, 10)

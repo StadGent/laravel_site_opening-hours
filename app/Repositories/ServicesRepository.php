@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Service;
 use App\Models\User;
-use Carbon\Carbon;
 
 class ServicesRepository extends EloquentRepository
 {
@@ -71,20 +70,6 @@ class ServicesRepository extends EloquentRepository
 
             foreach ($channel->openinghours as $openinghours) {
                 $instance = $openinghours->toArray();
-                $instance['active'] = 0;
-
-                 $endDate = Carbon::now()->addDay();
-
-                if (! empty($instance['end_date'])) {
-                    $endDate = Carbon::createFromFormat('Y-m-d', $instance['start_date']);
-                }
-
-                if (Carbon::now()->between(
-                    Carbon::createFromFormat('Y-m-d', $openinghours['start_date']),
-                    $endDate
-                )) {
-                    $instance['active'] = 1;
-                }
 
                 $tmpChannel['openinghours'][] = $instance;
             }
