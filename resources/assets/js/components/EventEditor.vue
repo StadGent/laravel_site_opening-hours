@@ -171,13 +171,13 @@
 
       <!-- Weekly -->
       <div v-else-if="options.freq==RRule.WEEKLY">
-        <div class="form-inline-always">
+        <div class="form-inline-always" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
           <multi-day-select :options="fullDays" :parent="options" prop="byweekday" @change="toggleWeekday"></multi-day-select>
           <span v-if="!closinghours">
             van
-            <input type="text" class="form-control control-time" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
+            <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
             tot
-            <input type="text" class="form-control control-time" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
+            <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
           </span>
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
@@ -190,9 +190,9 @@
       <div v-if="options.freq!=RRule.WEEKLY&&!closinghours">
         <div class="form-inline-always text-center">
           van
-          <input type="text" class="form-control control-time" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
+          <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
           tot
-          <input type="text" class="form-control control-time" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
+          <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
       </div>
@@ -323,7 +323,7 @@ export default {
           this.eventEndTime = '23:59'
         }
         if (this.eventEndTime < v) {
-          window.alert("Het begintijdstip moet vroeger vallen dan het eindtijdstip");
+          this.warnTime('.inp-startTime')
         }
         this.event.start_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
@@ -340,8 +340,8 @@ export default {
         if (v === '00:00') {
           v = '23:59'
         }
-        if (this.eventEndTime < v) {
-          window.alert("Het begintijdstip moet vroeger vallen dan het eindtijdstip");
+        if (this.eventStartTime > v) {
+          this.warnTime('.inp-endTime')
         }
         this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
       }
@@ -403,6 +403,19 @@ export default {
     }
   },
   methods: {
+    warnTime (selector) {
+      const elem = $(this.$el).find(selector)
+      elem.tooltip({
+        title: 'Het begintijdstip moet vroeger vallen dan het eindtijdstip.',
+        toggle: 'manual'
+      })
+      setTimeout(() => {
+        elem.tooltip('show')
+      }, 300)
+      setTimeout(() => {
+        elem.tooltip('hide').tooltip('destroy')
+      }, 3000)
+    },
     setFreq () {
       // console.debug('set freq')
       if (this.options.freq === RRule.MONTHLY) {

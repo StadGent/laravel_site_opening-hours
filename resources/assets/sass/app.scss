@@ -155,6 +155,9 @@ body {
     padding: 0 10px;
     line-height: 32px;
   }
+  &.has-error input {
+    background: #f2dede;
+  }
 }
 
 /* Close button in EventEditor */
