@@ -47,6 +47,7 @@ export default {
   },
   methods: {
     render () {
+      this.pikaday && this.pikaday.destroy()
       this.pikaday = new Pikaday(this.opts)
       this.$nextTick(() => {
         this.$el.value = this.opts.format(this.value)
@@ -62,7 +63,7 @@ export default {
   watch: {
     value (date, old) {
       this.$nextTick(() => {
-      if (this.pikaday && this.pikaday.getDate().toJSON().slice(0, 10) !== date) {
+        if (this.pikaday && this.pikaday.getDate().toJSON().slice(0, 10) !== date) {
           this.pikaday.setDate(date)
           this.$el.value = this.opts.format(date)
         }

@@ -89,7 +89,7 @@ function rruleToStarts(rule) {
     return console.error('Bad rules!', rule) || []
   }
   const cache = rruleCache[rule]
-  return cache || console.debug('miss', rule) || (rruleCache[rule] = rrulestr(rule).all())
+  return cache /* || console.debug('miss', rule) */ || (rruleCache[rule] = rrulestr(rule).all())
 }
 
 // Transform a vevent to an event that bootstrap-year can use
@@ -188,7 +188,6 @@ export default {
   },
   methods: {
     render: _throttle(function () {
-      console.log('draw', Date.now())
       if (!this.$el) {
         return console.warn('Not yet mounted')
       }

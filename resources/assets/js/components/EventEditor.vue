@@ -260,11 +260,26 @@ export default {
     },
     // The current event being edited
     event () {
-      const event = this.parent[this.prop]
+      const event = this.parent[this.prop] || {}
+
       if (!event.until) {
         this.$set(event, 'until', this.versionEndDate)
       }
-      return event || {}
+      if (event.start_date < this.versionStartDate) {
+        this.$set(event, 'start_date', this.versionStartDate)
+      }
+      if (event.until > this.versionEndDate) {
+        this.$set(event, 'until', this.versionEndDate)
+      }
+
+      // Switch start & end
+      if (event.start_date > event.until) {
+        const until = event.until
+        this.$set(event, 'until', event.start_date)
+        this.$set(event, 'start_date', until)
+      }
+
+      return event
     },
     eventStartDayMonth () {
       return toDatetime(this.event.start_date).getDate() + ' ' + fullMonths[toDatetime(this.event.start_date).getMonth()]
@@ -354,14 +369,14 @@ export default {
     },
     pikadayStart () {
       return {
-        minDate: toDatetime(this.$parent.$parent.version.start_date),
-        maxDate: toDatetime(this.event.until || this.versionEndDate)
+        minDate: toDatetime(this.$root.routeVersion.start_date),
+        maxDate: toDatetime(this.$root.routeVersion.end_date)
       }
     },
     pikadayUntil () {
       return {
-        minDate: toDatetime(this.$parent.$parent.version.start_date),
-        maxDate: toDatetime(this.$parent.$parent.version.end_date)
+        minDate: toDatetime(this.$root.routeVersion.start_date),
+        maxDate: toDatetime(this.$root.routeVersion.end_date)
       }
     },
     hasDates () {
