@@ -216,7 +216,10 @@ export default {
   },
   watch: {
     allEvents () {
-      this.render()
+      // Execute in timeout to avoid blocking
+      setTimeout(() => {
+        this.render()
+      })
     }
   }
 }
