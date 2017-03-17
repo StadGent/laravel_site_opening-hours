@@ -1,10 +1,10 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{ printme: $root.printme }">
     <top-nav></top-nav>
     <top-breadcrumb></top-breadcrumb>
 
-    <page-home v-if="route.page=='home'" :services="services" :users="users"></page-home>
-    <page-service v-if="route.page=='service'" :users="users"></page-service>
+    <page-home v-if="route.page=='home'" :services="$root.services" :users="$root.users"></page-home>
+    <page-service v-if="route.page=='service'" :users="$root.users"></page-service>
     <page-channel v-if="route.page=='channel'"></page-channel>
     <page-user v-if="route.page=='user'"></page-user>
     <page-version v-if="route.page=='version'||route.page=='calendar'"></page-version>
@@ -12,10 +12,10 @@
     <modal-text></modal-text>
     <div class="modal-backdrop fade in" v-show="modalActive"></div>
 
-    <div class="container" style="padding-top:10em">
+    <div class="container" style="padding:10em 1em" v-if="isDev">
       <h3>Debug info</h3>
       <label>
-        <input type="checkbox" v-model="user.admin"> User is admin: {{ user.admin ? 'yes' : 'no' }}
+        <input type="checkbox" v-model="$root.user.admin"> User is admin: {{ isAdmin ? 'yes' : 'no' }}
       </label>
       <br>
       Service role is: {{ isOwner ? 'owner' : 'member' }}
@@ -36,13 +36,8 @@ import PageVersion from './page/PageVersion.vue'
 
 import ModalText from './modal/ModalText.vue'
 
-import { addListener } from './mixins/router.js'
-import servicesMixin from './mixins/services.js'
-import usersMixin from './mixins/users.js'
-
 export default {
   name: 'app',
-  mixins: [addListener, servicesMixin, usersMixin],
   components: {
     ModalText,
     PageChannel,

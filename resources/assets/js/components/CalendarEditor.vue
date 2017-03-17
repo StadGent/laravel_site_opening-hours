@@ -5,7 +5,7 @@
 
       <!-- First calendar is always weekly -->
       <div v-if="!cal.layer">
-        <h3>Stel de openingsuren in voor {{ $parent.$parent.routeService.label }}. Op welke dagen is deze dienst normaal open?</h3>
+        <h3>Stel de openingsuren in voor {{ $root.routeService.label }}. Op welke dagen is deze dienst normaal open?</h3>
         <p class="text-muted">Uitzonderingen kan je later instellen.</p>
 
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
@@ -20,7 +20,7 @@
         <h3>Stel de uitzondering in.</h3>
         <div class="form-group">
           <label>Naam uitzondering</label>
-          <input type="text" class="form-control" v-model="calLabel" placeholder="Brugdagen, collectieve sluitingsdagen, ...">
+          <input type="text" class="form-control" v-model="calLabel" placeholder="Brugdagen, collectieve sluitingsdagen, ..." autofocus>
           <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
         </div>
       </div>
@@ -31,7 +31,7 @@
         <label>
           <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
         </label>
-        <br v-else>
+        <br>
 
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
@@ -44,7 +44,7 @@
     <div class="wrapper-save-btn">
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
-        <button type="button" class="btn btn-default" @click="toVersion()">Annuleer</button>
+        <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
         <button type="submit" class="btn btn-primary" @click="saveLabel" v-if="cal.label=='Uitzondering'">Volgende stap</button>
         <button type="submit" class="btn btn-primary" @click="save" v-else>Sla op</button>
       </div>
@@ -91,11 +91,15 @@ export default {
     },
     addEvent (index, event) {
       console.log('add yes', index, event)
-      event = Object.assign({}, event)
+      event = Object.assign({}, event, { id: null })
       this.cal.events.splice(index, 0, event)
     },
     rmEvent (index) {
       this.cal.events.splice(index, 1)
+    },
+    cancel () {
+      this.toVersion()
+      this.$root.fetchVersion(true)
     },
     save () {
       Hub.$emit('createCalendar', this.cal, true)

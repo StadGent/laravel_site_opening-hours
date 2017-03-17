@@ -8,7 +8,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">Openingsuren</a>
+        <a class="navbar-brand" href="#">{{ appName }}</a>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
@@ -34,6 +34,9 @@
 
 <script>
 export default {
-  name: 'top-nav'
+  name: 'top-nav',
+  computed: {
+    appName: _ => appName
+  }
 }
 </script>

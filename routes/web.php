@@ -11,16 +11,12 @@
 |
 */
 
-Route::get('/', function () {
-    return view('main');
-})->middleware('auth:web');
+Route::get('/', 'HomeController@index')->middleware('auth:web');
 
 Auth::routes();
 
 Route::get('/register/confirm/{token}', 'Auth\RegisterController@showSetPassword');
 Route::post('/register/confirm/{token}', 'Auth\RegisterController@completeRegistration');
-
-Route::get('/home', 'HomeController@index');
 
 Route::resource('/api/users', 'UsersController');
 Route::resource('/api/services', 'ServicesController');

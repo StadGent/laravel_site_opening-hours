@@ -63,7 +63,11 @@ class RegisterController extends Controller
         $mailer = app()->make('App\Mailers\SendGridMailer');
         $mailer->sendEmailConfirmationTo($user->email, $user->token);
 
-        return response()->json(['message' => 'De gebruiker werd succesvol aangemaakt.']);
+        if($request->ajax()){
+            return response()->json(['message' => 'De gebruiker werd succesvol aangemaakt.']);
+        }
+
+        return redirect('/');
     }
 
     public function showSetPassword(Request $request, $token)
@@ -110,7 +114,6 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => 'max:255',
             'email' => 'required|email|max:255|unique:users',
-            'password' => 'min:6|confirmed',
         ]);
     }
 

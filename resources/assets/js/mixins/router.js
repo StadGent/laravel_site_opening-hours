@@ -16,7 +16,7 @@ function hasCalendarSelected(hash) {
   return ['service', 'channel', 'version', 'calendar'].indexOf(hash.split(':')[0]) !== -1
 }
 
-export const addListener = {
+export const rootRouterMixin = {
   mounted() {
     this.hashchange()
     window.addEventListener('hashchange', this.hashchange)
@@ -37,8 +37,10 @@ export const addListener = {
         }
         route.page = hash[0]
         route.id = hash[1]
+        route.tab2 = null
       } else {
         route.page = window.location.hash.slice(1) || 'home'
+        route.tab = null
       }
 
       if (this.route.page === 'user') {

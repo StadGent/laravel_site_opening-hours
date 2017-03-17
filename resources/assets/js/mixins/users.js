@@ -1,16 +1,10 @@
-import { Hub } from '../lib.js'
-
-export const users = (window.initialUsers || []).map(expandUser)
-
-function errorHandler (err) {
-  console.warn(err)
-}
+import { fetchError, Hub } from '../lib.js'
 
 export default {
   data() {
     return {
       // WARNING: all user data must be passed through expandUser()
-      users
+      users: (window.initialUsers || []).map(expandUser)
     }
   },
   computed: {
@@ -23,7 +17,7 @@ export default {
       return this.$http.get('/api/users')
         .then(({ data }) => {
           this.users = (data || []).map(expandUser)
-        })
+        }).catch(fetchError)
     }
   },
   mounted() {
@@ -31,6 +25,9 @@ export default {
     Hub.$on('createRole', newRole => {
       if (!newRole.service_id) {
         newRole.service_id = this.routeService.id
+      }
+      if (!newRole.service_id && newRole.srv) {
+        newRole.service_id = newRole.srv.id
       }
       newRole.role = newRole.role || 'Member'
       newRole.user_id = newRole.user_id || newRole.id
@@ -45,9 +42,10 @@ export default {
       }
 
       this.$http.post('/api/roles', newRole).then(() => {
+        this.fetchUsers()
         this.fetchServices()
         this.modalClose()
-      }).catch(errorHandler)
+      }).catch(fetchError)
     })
     Hub.$on('deleteRole', role => {
       if (!role.user_id || !role.service_id) {
@@ -60,7 +58,7 @@ export default {
       this.$http.delete('/api/roles?service_id=' + role.service_id + '&user_id=' + role.user_id).then(() => {
         this.fetchServices()
         this.modalClose()
-      }).catch(errorHandler)
+      }).catch(fetchError)
     })
 
     Hub.$on('fetchUser', newRole => {
@@ -80,9 +78,10 @@ export default {
       }
 
       this.$http.post('/api/roles', newRole).then(() => {
+        this.fetchUsers()
         this.fetchServices()
         this.modalClose()
-      }).catch(errorHandler)
+      }).catch(fetchError)
     })
 
     Hub.$on('createUser', newUser => {
@@ -101,8 +100,9 @@ export default {
         } else {
           this.fetchServices()
         }
+        this.fetchUsers()
         this.modalClose()
-      }).catch(errorHandler)
+      }).catch(fetchError)
     })
 
     Hub.$on('inviteUser', user => {
@@ -117,7 +117,7 @@ export default {
         this.fetchUsers()
         this.fetchServices()
         this.modalClose()
-      }).catch(errorHandler)
+      }).catch(fetchError)
     })
   }
 }

@@ -12,15 +12,26 @@ class OpeninghoursUpdated
     use InteractsWithSockets, SerializesModels;
 
     /**
+     * The ID of the updated openinghours object
+     * @var integer
+     */
+    private $openinghoursId;
+
+    /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($openinghoursId)
+    public function __construct(int $openinghoursId)
     {
         $this->openinghoursId = $openinghoursId;
     }
 
+    /**
+     * Return the ID of the updated openinghours object
+     *
+     * @return int
+     */
     public function getOpeninghoursId()
     {
         return $this->openinghoursId;

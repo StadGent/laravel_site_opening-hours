@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Openinghours;
 use EasyRdf_Graph as Graph;
-use EasyRdf_Serialiser_Turtle as TurtleSerialiser;
 use EasyRdf_Literal as Literal;
 use EasyRdf_Literal_Boolean as BooleanLiteral;
 use EasyRdf_Literal_Integer as IntegerLiteral;
@@ -26,10 +25,10 @@ class OpeninghoursRepository extends EloquentRepository
             return [];
         }
 
+        $calendars = app('CalendarRepository');
+
         $result = $openinghours->toArray();
         $result['calendars'] = [];
-
-        $calendars = app()->make('CalendarRepository');
 
         $openinghours->with('calendars');
 
@@ -43,7 +42,55 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Create a graph from the openinghours object
+     * Store new openinghours
+     *
+     * @param  array $properties
+     * @return int   The ID of the new openinghours object
+     */
+    public function store(array $properties)
+    {
+        $properties['active'] = $this->isOpeninghoursRelevantNow($properties);
+
+        return parent::store($properties);
+    }
+
+    /**
+     * Return a boolean indicating if an openinghours object is "active",
+     * meaning that its timespan is relevant "now".
+     *
+     * @param  integer $openinghoursId The id of the openinghours object
+     * @return boolean
+     */
+    public function isActive($openinghoursId)
+    {
+        $openinghours = $this->getById($openinghoursId);
+
+        if (empty($openinghours)) {
+            return false;
+        }
+
+        return $this->isOpeninghoursRelevantNow($openinghours);
+    }
+
+    /**
+     * Check if the openinghours timestamp covers "today",
+     * meaning the timespan is relevant now.
+     *
+     * @param  array $openinghours
+     * @return bool
+     */
+    private function isOpeninghoursRelevantNow($openinghours)
+    {
+        if (empty($openinghours['start_date'])) {
+            // If no start date is passed we can assume it starts from today or earlier
+            $openinghours['start_date'] = carbonize()->subMonth()->toDateString();
+        }
+
+        return carbonize()->between(carbonize($openinghours['start_date']), carbonize($openinghours['end_date']));
+    }
+
+    /**
+     * Create a semantic data structure representing the openinghours
      * containing calendar and event data
      *
      * @param  integer        $openinghoursId
@@ -52,8 +99,10 @@ class OpeninghoursRepository extends EloquentRepository
     public function getOpeninghoursGraph($openinghoursId)
     {
         $openinghours = $this->model->find($openinghoursId);
+
         $calendars = $openinghours->calendars();
         $calendars = $calendars->with('events')->get()->toArray();
+
         $channel = $openinghours->channel->toArray();
 
         $openinghoursGraph = new Graph();
@@ -66,8 +115,6 @@ class OpeninghoursRepository extends EloquentRepository
                 env('BASE_URI') . '/openinghours/' . $openinghoursId,
                 'oh:OpeningHours'
             );
-
-            $openinghoursResource->addResource('oh:type', env('BASE_URI') . '/channel/' . $channel['label']);
 
             // Add the calendars taken into account the priority of the calendar
             // Sort the calendars first
@@ -123,12 +170,11 @@ class OpeninghoursRepository extends EloquentRepository
                 // Move the current list to the new list (= rdf:rest)
                 $calendarList = $calendarListRest;
             }
+
+            return $openinghoursResource;
         }
 
-        $serialiser = new TurtleSerialiser();
-        dd($serialiser->serialise($openinghoursGraph, 'turtle'));
-
-        return $openinghoursGraph;
+        return null;
     }
 
     /**

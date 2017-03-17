@@ -3,9 +3,13 @@
   "scripts": {
     "postinstall": "rollup -c && node-sass resources/assets/sass/app.scss > public/css/app.css",
     "sass": "node-sass resources/assets/sass/app.scss > public/css/app.css",
+    "devsass": "node-sass -w resources/assets/sass/app.scss -o public/css",
     "build": "rollup -c",
     "dev": "wrollup --live"
   },
+  "name": "openinghours",
+  "description": "Manage and publish opening hours",
+  "repository": "https://github.com/weconnectdata/openinghours",
   "dependencies": {
     "bootstrap-sass": "^3.3.7",
     "node-sass": "^3.13.0",
@@ -16,7 +20,7 @@
     "rollup-plugin-livereload": "^0.3.1",
     "rollup-plugin-vue2": "^0.6.0"
   },
-  "name": "openinghours",
-  "description": "Manage and publish opening hours",
-  "repository": "https://github.com/weconnectdata/openinghours"
+  "optionalDependencies": {
+    "wrollup": "^0.1.21"
+  }
 }

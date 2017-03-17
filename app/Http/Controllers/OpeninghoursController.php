@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\OpeninghoursRepository;
-use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Events\OpeninghoursUpdated;
 use App\Http\Requests\DeleteOpeninghoursRequest;
+use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Repositories\OpeninghoursRepository;
+use App\Repositories\ChannelRepository;
 
 class OpeninghoursController extends Controller
 {
@@ -22,7 +24,7 @@ class OpeninghoursController extends Controller
      */
     public function index()
     {
-        return $this->openinghours->getOpeninghoursGraph(1);
+        //
     }
 
     /**
@@ -43,6 +45,17 @@ class OpeninghoursController extends Controller
      */
     public function store(StoreOpeninghoursRequest $request)
     {
+        // Make sure the hours don't overlap existing openinghours
+        $overlap = app(ChannelRepository::class)->hasOpeninghoursForInterval(
+            $request->channel_id,
+            $request->start_date,
+            $request->end_date
+        );
+
+        if ($overlap) {
+            return response()->json(['message' => 'Er is een overlapping met een andere versie.'], 400);
+        }
+
         $input = $request->input();
 
         $id = $this->openinghours->store($input);
@@ -50,6 +63,8 @@ class OpeninghoursController extends Controller
         $openinghours = $this->openinghours->getById($id);
 
         if (! empty($openinghours)) {
+            event(new OpeninghoursUpdated($id));
+
             return response()->json($openinghours);
         }
 
@@ -87,11 +102,25 @@ class OpeninghoursController extends Controller
      */
     public function update(StoreOpeninghoursRequest $request, $id)
     {
+        // Make sure the hours don't overlap existing openinghours
+        $overlap = app(ChannelRepository::class)->hasOpeninghoursForInterval(
+            $request->channel_id,
+            $request->start_date,
+            $request->end_date,
+            $id
+        );
+
+        if ($overlap) {
+            return response()->json(['message' => 'Er is een overlapping met een andere versie.'], 400);
+        }
+
         $input = $request->input();
 
         $success = $this->openinghours->update($id, $input);
 
         if ($success) {
+            event(new OpeninghoursUpdated($id));
+
             return response()->json($this->openinghours->getById($id));
         }
 
@@ -101,10 +130,11 @@ class OpeninghoursController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  DeleteOpeninghoursRequest $request
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteOpeninghoursRequest $id)
+    public function destroy(DeleteOpeninghoursRequest $request, int $id)
     {
         $success = $this->openinghours->delete($id);
 
@@ -112,6 +142,6 @@ class OpeninghoursController extends Controller
             return response()->json(['message' => 'De openingsuren werden verwijderd']);
         }
 
-        return reponse()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
+        return response()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
     }
 }
