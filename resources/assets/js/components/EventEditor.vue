@@ -314,6 +314,9 @@ export default {
         if (this.eventEndTime === '00:00') {
           this.eventEndTime = '23:59'
         }
+        if (this.eventEndTime < v) {
+          this.eventEndTime = v
+        }
         this.event.start_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
     },
@@ -328,6 +331,9 @@ export default {
         }
         if (v === '00:00') {
           v = '23:59'
+        }
+        if (v < this.eventStartTime) {
+          this.eventStartTime = v
         }
         this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
       }
