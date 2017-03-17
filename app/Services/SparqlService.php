@@ -27,6 +27,10 @@ class SparqlService
 
     public function __construct(string $endpoint, $username = '', $password = '')
     {
+        if (empty($endpoint)) {
+            \Log::warning('No SPARQL endpoint was passed to the SparqlService.');
+        }
+
         $this->endpoint = $endpoint;
         $this->username = $username;
         $this->password = $password;

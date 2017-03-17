@@ -10,19 +10,42 @@ use Carbon\Carbon;
 trait FormatsOpeninghours
 {
     /**
+     * Render a schedule into HTML based on an array structure
+     *
+     * @param  array  $schedule
+     * @return string
+     */
+    protected function makeHtmlForSchedule($data)
+    {
+        $formattedSchedule = '<div>';
+
+        foreach ($data as $channel => $schedule) {
+            $formattedSchedule .= "<span><h4>$channel</h4>";
+
+            foreach ($schedule as $entry) {
+                $formattedSchedule .= "<p>$entry</p>";
+            }
+        }
+
+        $formattedSchedule .= '</div>';
+
+        return $formattedSchedule;
+    }
+
+    /**
      * Compute a week schedule for a service
      *
      * @param  int    $serviceId
      * @param  string $channel   The specific channel to print
      * @return array
      */
-    private function formatWeek($serviceId, $format = 'array', $channel = '')
+    protected function formatWeek($serviceId, $format = 'array', $channel = '')
     {
         $data = $this->renderWeek($serviceId, $channel);
 
         switch ($format) {
             case 'html':
-                return $this->makeHtmlFromSchedule($data);
+                return $this->makeHtmlForSchedule($data);
                 break;
             default:
                 return $data;
@@ -37,7 +60,7 @@ trait FormatsOpeninghours
      * @param  string $channel
      * @return array
      */
-    private function renderWeek($serviceId, $channel = '')
+    protected function renderWeek($serviceId, $channel = '')
     {
         $service = app('ServicesRepository')->getById($serviceId);
 
@@ -70,10 +93,11 @@ trait FormatsOpeninghours
     /**
      * Create a readable text form of a week schedule
      *
+     * @deprecated
      * @param  array  $data
      * @return string
      */
-    private function makeHtmlFromSchedule($data)
+    protected function makeHtmlFromSchedule($data)
     {
         $text = '';
 
@@ -103,7 +127,7 @@ trait FormatsOpeninghours
      * @param  string $channel
      * @return array
      */
-    private function renderWeekForChannel($serviceUri, $channel)
+    protected function renderWeekForChannel($serviceUri, $channel)
     {
         // Check if the service and channel exist
         $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
@@ -178,7 +202,7 @@ trait FormatsOpeninghours
      * @param  Calendar $calendar
      * @return ICal
      */
-    private function createIcalFromCalendar($calendar)
+    protected function createIcalFromCalendar($calendar)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
@@ -205,7 +229,7 @@ trait FormatsOpeninghours
      * @param string $date
      * @return
      */
-    private function convertIsoToIcal($date)
+    protected function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
         $date = $date->format('Ymd His');
@@ -221,7 +245,7 @@ trait FormatsOpeninghours
      * @param  string $end   date string YYYY-mm-dd
      * @return array
      */
-    private function extractDayInfo($ical, $start, $end)
+    protected function extractDayInfo($ical, $start, $end)
     {
         $events = $ical->eventsFromRange($start, $end);
 

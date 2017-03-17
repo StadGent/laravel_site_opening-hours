@@ -50,7 +50,10 @@ body {
   padding-left: 20px;
 }
 .table-message {
-  padding: 5em 1em;
+  padding: 5em 0;
+  .row & {
+    padding: 5em 1em;
+  }
 }
 .table > tbody + tbody {
   border-top-width: 1px;
@@ -414,4 +417,10 @@ h1+h3 {
   text-align: left;
   padding-top: 0;
   border: 0;
+}
+
+/* Wrap lines in bootstrap tooltips */
+
+.tooltip-inner {
+  white-space: pre-wrap;
 }

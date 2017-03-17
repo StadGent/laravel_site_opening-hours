@@ -52,7 +52,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="channel in sortedChannels" @click="href('#!channel/'+[srv.id,channel.id].join('/'))">
+          <tr
+            v-for="channel in sortedChannels"
+            @click="href('#!channel/'+[srv.id,channel.id].join('/'))"
+            :class="{ 'success text-success': hasActiveOh(channel).length  }"
+          >
             <td>
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')">{{ channel.label }}</a>
             </td>
@@ -82,7 +86,7 @@
 import ThSort from '../components/ThSort.vue'
 import RowUserOwner from '../components/RowUserOwner.vue'
 
-import { toChannelStatus, orderBy, Hub } from '../lib.js'
+import { toChannelStatus, hasActiveOh, orderBy, Hub } from '../lib.js'
 
 export default {
   name: 'dienst',
@@ -118,6 +122,7 @@ export default {
     }
   },
   methods: {
+    hasActiveOh,
     banUser (user) {
       Hub.$emit('deleteRole', {
         user_id: user.id,

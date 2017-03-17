@@ -5,20 +5,17 @@
     <div v-if="usr.admin">
       Admins hebben toegang tot alle diensten.
     </div>
+    <div v-else>
+      <button class="btn btn-default" @click="newRoleForUser(usr)">Nodig uit voor een dienst</button>
+    </div>
 
     <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
       <p>
         Dit is je eigen profiel. Je kan je naam wijzigen
       </p>
       <p>
-      <label>Naam</label>
-        <input type="text" class="form-control" v-model="user.name">
-      </p>
-    </div>
-
-    <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
-      <p>
-        <button @click="$root.logout">Uitloggen</button>
+        <label>Naam</label>
+        <input type="text" class="form-control" v-model="usr.name">
       </p>
     </div>
 
@@ -26,7 +23,7 @@
     <div v-if="!userServices.length" class="table-message">
       <h3 class="text-muted">Deze gebruiker heeft nog geen diensten</h3>
       <p>
-        <button class="btn btn-lg btn-default btn-disabled" disabled @click="newRole(srv)">Voeg een dienst toe</button>
+        <button class="btn btn-lg btn-default" @click="newRoleForUser(usr)">Nodig uit voor een dienst</button>
       </p>
     </div>
     <div v-else-if="!filteredServices.length" class="table-message">

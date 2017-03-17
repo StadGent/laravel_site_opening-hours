@@ -50,7 +50,7 @@ class QueryController extends Controller
         // The default format is JSON
         switch ($format) {
             case 'html':
-                $data = $this->makeHtmlFromJson($data);
+                $data = $this->makeHtmlForSchedule($data);
 
                 return response()->make($data);
                 break;

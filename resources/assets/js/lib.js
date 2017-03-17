@@ -32,8 +32,19 @@ export function hasActiveOh(ch) {
 // }
 
 export function toChannelStatus(ch, includeLabel) {
-  const oh = hasActiveOh(ch)
   includeLabel = includeLabel ? ch.label : ''
+
+  // No openinghours at all
+  if (!hasOh(ch).length) {
+    return 'Kanaal ' + includeLabel + ' heeft geen kalender'
+  }
+
+  const oh = hasActiveOh(ch)
+
+  // No active openinghours
+  if (!oh.length) {
+    return 'Kanaal ' + includeLabel + ' heeft geen actieve versie'
+  }
 
   let end_date = expiresOn(oh)
   if (!end_date || Date.parse(end_date) < Date.now()) {
@@ -42,7 +53,7 @@ export function toChannelStatus(ch, includeLabel) {
   if (end_date === -1) {
     return 'Kanaal ' + includeLabel + ' verloopt nooit'
   }
-  return 'Kanaal ' + includeLabel + ' verloopt op ' + end_date
+  return '✓ Actief'
 }
 
 // Returns true if this channel expires within 90 days
@@ -204,8 +215,11 @@ export function cleanEmpty(x) {
 
 // HTTP
 
-export function fetchError (error) {
-  console.warn(error)
+export function fetchError (response) {
+  if (response && response.body && response.body.message) {
+    alert(response.body.message)
+  }
+  console.warn(response)
 }
 
 // Returns a function, that, when invoked, will only be triggered at most once

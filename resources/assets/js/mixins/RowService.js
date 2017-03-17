@@ -63,16 +63,26 @@ export default {
       }
 
       // Not every channel of the service has at least 1 version
-      if (!this.hasChannels.filter(ch => hasOh(ch).length).length) {
+      if (this.hasChannels.filter(ch => !hasOh(ch).length).length) {
         return 'Ontbrekende kalender(s)'
       }
 
       // Not every channel of the service has at least 1 active version
-      if (!this.hasChannels.filter(ch => hasActiveOh(ch).length).length) {
+      if (this.hasChannels.filter(ch => !hasActiveOh(ch).length).length) {
         return 'Ontbrekende actieve kalender(s)'
       }
 
       return '✓ Volledig'
+    },
+
+    // TODO: refactor into structured set of messages
+    statusTooltip() {
+      switch (this.statusMessage) {
+        case 'Geen kanalen': return 'Deze dienst heeft geen kanalen.'
+        case 'Ontbrekende kalender(s)': return 'Minstens 1 van de kanalen van deze dienst heeft geen versie.'
+        case 'Ontbrekende actieve kalender(s)': return 'Alle kanalen hebben een versie maar minstens 1 kanaal heeft geen versie die nu geldt. Een versie geldt niet als deze verlopen is of pas in de toekomst actief wordt.'
+        case '✓ Volledig': return 'Alle kanalen hebben minstens een kalenderversie die nu geldig is.'
+      }
     }
   },
   methods: {
@@ -81,5 +91,8 @@ export default {
       this.href('#!service/' + this.s.id)
       this.route.tab2 = 'users'
     }
+  },
+  mounted () {
+    $('[data-toggle="tooltip"]').tooltip()
   }
 }
