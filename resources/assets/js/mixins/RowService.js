@@ -52,8 +52,7 @@ export default {
     statusClass() {
       return {
         'text-success': this.statusMessage === '✓ Volledig',
-        'warning': this.statusMessage !== '✓ Volledig',
-        'small': this.statusMessage.length > 20
+        'warning': this.statusMessage !== '✓ Volledig'
       }
     },
     statusMessage() {
