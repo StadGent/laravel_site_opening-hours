@@ -212,7 +212,7 @@
                 }
             ],
             "description": "Initialize Symfony Console commands from annotated command class methods.",
-            "time": "2017-02-28 22:50:54"
+            "time": "2017-02-28T22:50:54+00:00"
         },
         {
             "name": "consolidation/log",
@@ -260,7 +260,7 @@
                 }
             ],
             "description": "Improved Psr-3 / Psr\\Log logger based on Symfony Console components.",
-            "time": "2016-07-06 18:40:16"
+            "time": "2016-07-06T18:40:16+00:00"
         },
         {
             "name": "consolidation/output-formatters",
@@ -309,7 +309,7 @@
                 }
             ],
             "description": "Format text by applying transformations provided by plug-in formatters.",
-            "time": "2017-03-15 19:28:32"
+            "time": "2017-03-15T19:28:32+00:00"
         },
         {
             "name": "consolidation/robo",
@@ -386,7 +386,7 @@
                 }
             ],
             "description": "Modern task runner",
-            "time": "2017-03-11 19:48:06"
+            "time": "2017-03-11T19:48:06+00:00"
         },
         {
             "name": "container-interop/container-interop",
@@ -640,12 +640,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digipolisgent/robo-digipolis-laravel.git",
-                "reference": "ec1de204f6bb31fd63acae865b86e4df1e744134"
+                "reference": "9ca93423a2bd2e18aa268454686587f579dc5717"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/ec1de204f6bb31fd63acae865b86e4df1e744134",
-                "reference": "ec1de204f6bb31fd63acae865b86e4df1e744134",
+                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/9ca93423a2bd2e18aa268454686587f579dc5717",
+                "reference": "9ca93423a2bd2e18aa268454686587f579dc5717",
                 "shasum": ""
             },
             "require": {
@@ -681,7 +681,7 @@
                 }
             ],
             "description": "Basic deploy flow for a Laravel site.",
-            "time": "2017-03-16 15:15:16"
+            "time": "2017-03-17T08:34:50+00:00"
         },
         {
             "name": "digipolisgent/robo-digipolis-package",
@@ -1930,7 +1930,7 @@
                 "provider",
                 "service"
             ],
-            "time": "2017-03-06 15:24:06"
+            "time": "2017-03-06T15:24:06+00:00"
         },
         {
             "name": "league/flysystem",
@@ -2493,7 +2493,7 @@
                 "archive",
                 "tar"
             ],
-            "time": "2016-02-25 10:30:39"
+            "time": "2016-02-25T10:30:39+00:00"
         },
         {
             "name": "pear/console_getopt",
@@ -2639,7 +2639,7 @@
             "keywords": [
                 "exception"
             ],
-            "time": "2015-02-10 20:07:52"
+            "time": "2015-02-10T20:07:52+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -2877,7 +2877,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2017-03-08 03:55:37"
+            "time": "2017-03-08T03:55:37+00:00"
         },
         {
             "name": "psr/container",
@@ -2926,7 +2926,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/log",
@@ -3643,7 +3643,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-07 16:28:52"
+            "time": "2017-03-07T16:28:52+00:00"
         },
         {
             "name": "symfony/finder",
