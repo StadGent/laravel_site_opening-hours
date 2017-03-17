@@ -22,7 +22,7 @@
         "easyrdf/easyrdf": "^0.9.1",
         "ml/json-ld": "^1.0",
         "pda/pheanstalk": "^3.1",
-        "digipolisgent/robo-digipolis-laravel": "dev-develop",
+        "digipolisgent/robo-digipolis-laravel": "^0.1",
         "grasmash/yaml-expander": "dev-feature/symfony3",
         "digipolisgent/robo-digipolis-general": "0.1.1"
     },

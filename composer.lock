@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2bfbaf469fb5c8e5165fa3ea00d77e7c",
+    "content-hash": "d6ad368f9bc92458835a986f7da0cba0",
     "packages": [
         {
             "name": "adoy/fastcgi-client",
@@ -636,16 +636,16 @@
         },
         {
             "name": "digipolisgent/robo-digipolis-laravel",
-            "version": "dev-develop",
+            "version": "0.1.0-beta1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digipolisgent/robo-digipolis-laravel.git",
-                "reference": "6396c1f757207c8d5bd9bf9308c23b5f34cbebcf"
+                "reference": "a09e59dbe934a2a7b3edc5e58ab3ca63aab2328a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/6396c1f757207c8d5bd9bf9308c23b5f34cbebcf",
-                "reference": "6396c1f757207c8d5bd9bf9308c23b5f34cbebcf",
+                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/a09e59dbe934a2a7b3edc5e58ab3ca63aab2328a",
+                "reference": "a09e59dbe934a2a7b3edc5e58ab3ca63aab2328a",
                 "shasum": ""
             },
             "require": {
@@ -681,7 +681,7 @@
                 }
             ],
             "description": "Basic deploy flow for a Laravel site.",
-            "time": "2017-03-17T09:42:44+00:00"
+            "time": "2017-03-17T10:09:37+00:00"
         },
         {
             "name": "digipolisgent/robo-digipolis-package",
@@ -5733,7 +5733,6 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "johngrogg/ics-parser": 20,
-        "digipolisgent/robo-digipolis-laravel": 20,
         "grasmash/yaml-expander": 20
     },
     "prefer-stable": false,
