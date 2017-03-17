@@ -5,8 +5,8 @@
     <!-- Version actions -->
     <div class="pull-right">
       <div class="btn-group">
-        <button type="button" class="btn btn-default" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
-        <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'">Toon open en gesloten</button>
+<!--         <button type="button" class="btn btn-default" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
+        <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'" disabled>Toon open en gesloten</button> -->
       </div>
     </div>
 
@@ -18,7 +18,7 @@
     <div class="version-split">
       <div class="version-cals col-sm-6 col-md-5 col-lg-4">
         <!-- Editing a calendar -->
-        <calendar-editor v-if="$parent.routeCalendar.events" :cal="$parent.routeCalendar"></calendar-editor>
+        <calendar-editor v-if="$root.routeCalendar.events" :cal="$root.routeCalendar"></calendar-editor>
 
         <!-- Showing list of calendars -->
         <div v-else>
@@ -29,20 +29,19 @@
           <p>
             <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length">Voeg uitzonderingen toe</button>
           </p>
-          <div class="row">
-            <div class="col-sm-12 cal" v-for="cal in reversedCalendars" @click="toCalendar(cal.id)">
+          <transition-group name="list" tag="div">
+            <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
               <header class="cal-header">
-                <div class="cal-img" :class="'layer-'+cal.layer"></div>
-                <span class="cal-name">{{ cal.label }}</span>
-                <div class="cal-options">
-                  <span class="cal-lower" @click.stop="swapLayers(cal.layer, cal.layer - 1)">Lager</span>
-                  <span class="cal-higher" @click.stop="swapLayers(cal.layer, cal.layer + 1)">Hoger</span>
-                  <span class="cal-view">Bekijk</span>
-                  <span class="cal-drag"> <i class="glyphicon glyphicon-menu-hamburger"></i></span>
+                <div class="cal-action cal-info" @click="toCalendar(cal.id)">
+                  <div class="cal-img" :class="'layer-'+cal.layer"></div>
+                  <div class="cal-name">{{ cal.label }}</div>
+                  <div class="cal-view">Bekijk</div>
                 </div>
+                <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)">Lager</div>
+                <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)">Hoger</div>
               </header>
             </div>
-          </div>
+          </transition-group>
 
           <!-- Encourage to add calendars after first one -->
           <div class="text-center" v-if="reversedCalendars.length===1">
@@ -87,13 +86,13 @@ export default {
   },
   computed: {
     service () {
-      return this.$parent.routeService || {}
+      return this.$root.routeService || {}
     },
     channel () {
-      return this.$parent.routeChannel || {}
+      return this.$root.routeChannel || {}
     },
     version () {
-      return this.$parent.routeVersion || {}
+      return this.$root.routeVersion || {}
     },
     layeredVersion () {
       return Object.assign({}, this.version, { calendar: this.calendars })

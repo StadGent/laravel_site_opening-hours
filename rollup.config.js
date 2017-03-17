@@ -8,10 +8,11 @@ export default {
   entry: 'resources/assets/js/app.js',
   dest: 'public/js/bundle.js',
   sourceMap: true,
+  format: 'es',
   plugins: [
     vue2(),
     buble(),
-    process.argv.indexOf('--live') > 1 && livereload(),
+    process.argv.indexOf('--live') > 1 && livereload('./public'),
     // nodeResolve(),
     // commonjs({
     //   include: 'node_modules/**'

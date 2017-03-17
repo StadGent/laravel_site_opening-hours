@@ -14,7 +14,7 @@ function date(d) {
     console.error('Report invalid updated_at')
     return 'invalid'
   }
-  var diff = new Date() - d
+  var diff = new Date().valueOf() - d
   if (diff > 1000 * 60 * 60 * 24) {
     return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + pad(d.getHours()) + ':' + pad(d.getSeconds())
   }

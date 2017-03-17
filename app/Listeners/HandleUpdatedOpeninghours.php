@@ -3,7 +3,11 @@
 namespace App\Listeners;
 
 use App\Events\OpeninghoursUpdated;
+use App\Jobs\UpdateLodOpeninghours;
+use App\Jobs\UpdateVestaOpeninghours;
+use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
+use App\Repositories\ServicesRepository;
 
 class HandleUpdatedOpeninghours
 {
@@ -12,19 +16,50 @@ class HandleUpdatedOpeninghours
      *
      * @return void
      */
-    public function __construct(OpeninghoursRepository $openinghours)
+    public function __construct(OpeninghoursRepository $openinghours, ChannelRepository $channels, ServicesRepository $services)
     {
         $this->openinghours = $openinghours;
+        $this->channels = $channels;
+        $this->services = $services;
     }
 
     /**
      * Handle the event.
      *
-     * @param  OpeninghoursUpdated $event
+     * @param  UpdatedOpeninghours $event
      * @return void
      */
     public function handle(OpeninghoursUpdated $event)
     {
-        $openinghours = $this->openinghours->getById($event->getOpeninghoursId());
+        // If the openinghours object represented the active openinghours,
+        // update the VESTA openinghours of the service entirely, if that service
+        // is linked to a VESTA UID
+        // otherwise, don't do anything
+        if ($this->openinghours->isActive($event->getOpeninghoursId())) {
+            $openinghours = $this->openinghours->getById($event->getOpeninghoursId());
+
+            $service = $this->getServiceThroughChannel($openinghours['channel_id']);
+
+            // Update VESTA if the service is linked to a VESTA UID
+            if (! empty($service) && $service['source'] == 'vesta') {
+                dispatch((new UpdateVestaOpeninghours($service['identifier'], $service['id'])));
+            }
+
+            // Update the LOD repository with the new openinghours information
+            dispatch(new UpdateLodOpeninghours($service['id'], $event->getOpeninghoursId()));
+        }
+    }
+
+    /**
+     * Return the service that is linked to the channelId
+     *
+     * @param  int   $channelId
+     * @return array
+     */
+    private function getServiceThroughChannel($channelId)
+    {
+        $channel = $this->channels->getById($channelId);
+
+        return $this->services->getById($channel['service_id']);
     }
 }

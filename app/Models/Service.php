@@ -12,7 +12,12 @@ class Service extends Model
      * @var array
      */
     protected $fillable = [
-        'uri', 'label', 'description'
+        'description',
+        'draft',
+        'identifier',
+        'label',
+        'source',
+        'uri',
     ];
 
     public function channels()
@@ -21,7 +26,9 @@ class Service extends Model
     }
 
     /**
-     * The roles that belong to the user.
+     * Return roles for each service that the user belongs to
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users()
     {

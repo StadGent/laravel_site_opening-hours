@@ -48,9 +48,9 @@ export default {
       this.modal.end_date = '2021-01-01'
       this.modal.srv = srv
 
-      const expires = expiresOn(hasActiveOh(this.$parent.routeChannel))
+      const expires = expiresOn(hasActiveOh(this.$root.routeChannel))
       console.log(expires)
-      console.log(inert(this.$parent.routeVersion))
+      console.log(inert(this.$root.routeVersion))
       if (expires) {
         this.modal.start_date = expires.slice(0, 4) + '-01-01'
         this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + 5) + '-01-01'
@@ -68,11 +68,16 @@ export default {
 
     newUser(srv) {
       this.modal.text = 'newUser'
-      this.modal.srv = srv
+      this.modal.role = 'Member'
     },
     newRole(srv) {
       this.modal.text = 'newRole'
       this.modal.srv = srv
+    },
+    newRoleForUser(usr) {
+      this.modal.text = 'newRoleForUser'
+      this.modal.usr = usr
+      this.modal.role = 'Member'
     }
   }
 }

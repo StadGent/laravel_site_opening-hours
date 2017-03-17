@@ -109,8 +109,6 @@ class DatabaseSeeder extends Seeder
             ];
         }, $sampleServiceNames);
 
-
-
         foreach ($servicesData as $serviceConfig) {
             $service = $services->where('uri', $serviceConfig['uri'])->first();
 

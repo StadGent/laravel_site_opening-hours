@@ -1,11 +1,14 @@
 <template>
   <div>
     <div class="calendar" :class="{'calendar-topview':true}"></div>
+    <p style="text-align: right">
+      <button class="btn btn-default" @click="printme">Print</button>
+    </p>
   </div>
 </template>
 
 <script>
-import { _throttle, toTime, dateAfter } from '../lib.js'
+import { _throttle, Hub, toTime, dateAfter } from '../lib.js'
 
 const currentYear = new Date().getFullYear();
 
@@ -86,7 +89,7 @@ function rruleToStarts(rule) {
     return console.error('Bad rules!', rule) || []
   }
   const cache = rruleCache[rule]
-  return cache || console.debug('miss', rule) || (rruleCache[rule] = rrulestr(rule).all())
+  return cache /* || console.debug('miss', rule) */ || (rruleCache[rule] = rrulestr(rule).all())
 }
 
 // Transform a vevent to an event that bootstrap-year can use
@@ -160,10 +163,10 @@ export default {
   props: ['oh'],
   computed: {
     versionStart () {
-      return this.oh.date_start || (currentYear + '-01-01')
+      return this.oh.start_date || (currentYear + '-01-01')
     },
     versionEnd () {
-      return this.oh.date_end || '2018-01-01'
+      return this.oh.end_date || '2018-01-01'
     },
     recurring () {
       return this.oh.calendars.m
@@ -185,30 +188,38 @@ export default {
   },
   methods: {
     render: _throttle(function () {
-      if (!this.elem) {
+      if (!this.$el) {
         return console.warn('Not yet mounted')
       }
-      this.elem.setDataSource(this.allEvents)
+      this.elem = $(this.$el).find('.calendar').calendar({
+        customDataSourceRenderer,
+        customDayRenderer,
+        dataSource: this.allEvents,
+        language: 'nl',
+        maxDate: toDate(this.versionEnd),
+        minDate: toDate(this.versionStart),
+        style: 'custom'
+      })
+      window.fadeInTime = 0
       setTimeout(() => {
         $('.layer>.day-content').tooltip()
       }, 300)
-    }, 300, { leading: false })
+    }, 500, { leading: true }),
+    printme () {
+      Hub.$emit('printme')
+    }
   },
   mounted () {
-    this.elem = $(this.$el).find('.calendar').calendar({
-      customDayRenderer,
-      customDataSourceRenderer,
-      language: 'nl',
-      // displayWeekNumber: true,
-      minDate: toDate('2016-01-01'),
-      maxDate: toDate('2018-01-01'),
-      style: 'custom'
-    })
+    window.fadeInTime = 1000
+    this.render()
     // setTimeout(() => this.render(), 1000)
   },
   watch: {
     allEvents () {
-      this.render()
+      // Execute in timeout to avoid blocking
+      setTimeout(() => {
+        this.render()
+      })
     }
   }
 }

@@ -1,4 +1,5 @@
 const today = new Date().toJSON().slice(0, 10)
+const DAY_IN_MS = 24 * 60 * 60 * 1000
 
 /** Service functions **/
 
@@ -30,33 +31,55 @@ export function hasActiveOh(ch) {
 //   return ch && ch.openinghours && (ch.openinghours.find(x => x.active) || {}).calendars || []
 // }
 
-export function toChannelStatus(ch) {
+export function toChannelStatus(ch, includeLabel) {
+  includeLabel = includeLabel ? ch.label : ''
+
+  // No openinghours at all
+  if (!hasOh(ch).length) {
+    return 'Kanaal ' + includeLabel + ' heeft geen kalender'
+  }
+
   const oh = hasActiveOh(ch)
+
+  // No active openinghours
+  if (!oh.length) {
+    return 'Kanaal ' + includeLabel + ' heeft geen actieve versie'
+  }
+
   let end_date = expiresOn(oh)
-  if (!end_date) {
-    return 'Verlopen'
+  if (!end_date || Date.parse(end_date) < Date.now()) {
+    return 'Kanaal ' + includeLabel + ' is verlopen'
   }
   if (end_date === -1) {
-    return 'Oneindig'
+    return 'Kanaal ' + includeLabel + ' verloopt nooit'
   }
-  return end_date
+  return '✓ Actief'
+}
+
+// Returns true if this channel expires within 90 days
+export function toChannelAlert(ch) {
+  const oh = hasActiveOh(ch)
+  let end_date = expiresOn(oh)
+  if (end_date) {
+    return Date.parse(end_date) < Date.now() + 90 * DAY_IN_MS
+  }
 }
 
 /** OH functions **/
 
-function isInUseOn(oh, date) {
-  return (oh.start_date ? oh.start_date < date : true) && (oh.end_date ? oh.end_date > date : true)
+export function isInUseOn(oh, date) {
+  return oh.active
 }
 
 // Get expiry date of array of oh
-export function expiresOn(oh) {
+export function expiresOn(ohs) {
   let end_date = today
-  let count = oh.length
+  let count = ohs.length
 
   //
   for (var i = 0; i < count; i++) {
-    let nextIndex = oh.findIndex(x => isInUseOn(x, end_date))
-    let nextOh = oh.splice(nextIndex, 1).pop()
+    let nextIndex = ohs.findIndex(oh => isInUseOn(oh, end_date))
+    let nextOh = ohs.splice(nextIndex, 1).pop()
     if (!nextOh) {
       break
     } else if (!nextOh.end_date) {
@@ -71,7 +94,7 @@ export function expiresOn(oh) {
 /** Date functions **/
 
 export function nextDateString (dateString) {
-  return new Date(Date.parse(dateString) + 36e5 * 24).toJSON().slice(0, 10)
+  return new Date(Date.parse(dateString) + DAY_IN_MS).toJSON().slice(0, 10)
 }
 export function toTime(d) {
   if (!d) {
@@ -100,7 +123,7 @@ export function toDatetime (str) {
 
 // Create a date object 1 day after the param
 export function dateAfter (date, ms) {
-  return new Date(date.valueOf() + (ms || (36e5 * 24)))
+  return new Date(date.valueOf() + (ms || DAY_IN_MS))
 }
 
 /** Sorting **/
@@ -188,6 +211,15 @@ export function cleanEmpty(x) {
     }
   }
   return x
+}
+
+// HTTP
+
+export function fetchError (response) {
+  if (response && response.body && response.body.message) {
+    alert(response.body.message)
+  }
+  console.warn(response)
 }
 
 // Returns a function, that, when invoked, will only be triggered at most once

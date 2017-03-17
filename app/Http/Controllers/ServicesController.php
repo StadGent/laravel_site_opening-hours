@@ -81,7 +81,14 @@ class ServicesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        throw new Exception('Not yet implemented');
+        // The only field we allow to be updated is the draft flag
+        $draft = $request->input('draft', null);
+
+        if (! is_null($draft)) {
+            $this->services->update($id, ['draft' => $draft]);
+        }
+
+        return response()->json($this->services->getById($id));
     }
 
     /**

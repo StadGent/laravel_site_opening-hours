@@ -8,7 +8,9 @@
             <span v-if="modal.text=='requestService'">Vraag toegang tot een dienst</span>
             <span v-else-if="modal.text=='newChannel'">{{ modal.id ? 'Bewerk dit kanaal' : 'Voeg een kanaal toe' }}</span>
             <span v-else-if="modal.text=='newVersion'">{{ modal.id ? 'Bewerk deze versie' : 'Voeg een versie toe' }}</span>
+            <span v-else-if="modal.text=='newRoleForUser'">Nodig {{ modal.usr.name }} uit voor een dienst</span>
             <span v-else-if="modal.text=='newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
+            <span v-else-if="modal.text=='newUser'">Nodig iemand uit</span>
             <span v-else>Probleem</span>
           </h4>
         </div>
@@ -32,27 +34,44 @@
 
             <div class="row form-group">
               <div class="col-sm-6">
-                <label for="recipient-name" class="control-label">Geldig van</label>
-                <select class="form-control" v-model="modal.start_date">
-                  <option v-for="i in 10" v-text="(i + 2015)+'-01-01'"></option>
-                </select>
+                <label for="start_date" class="control-label">Geldig van</label>
+                <pikaday id="start_date" class="form-control" v-model="modal.start_date" :options="pikadayStart" />
               </div>
               <div class="col-sm-6">
-                
-                <label for="recipient-name" class="control-label">Verloopt op</label>
-                <select class="form-control" v-model="modal.end_date">
-                  <option v-for="i in 10" v-text="(i + parseInt(modal.start_date.slice(0,4), 10))+'-01-01'"></option>
-                </select>
+                <label for="end_date" class="control-label">Verloopt op</label>
+                <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="pikadayEnd" />
               </div>
             </div>
           </div>
-          <div v-else-if="modal.text=='newRole'">
+          <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
             <div class="form-group" :class="{'has-error':!validEmail, 'has-success':allowedEmail}">
               <label for="recipient-name" class="control-label">E-mailadres</label>
               <input type="text" class="form-control" v-model="modal.email" placeholder="... @mijngent.be">
             </div>
             <div class="alert alert-warning" v-if="!allowedEmail">
               <b>Pas op!</b> Het is de bedoeling dat je alleen mensen uitnodigt van Mijn Gent.
+            </div>
+          </div>
+
+          <div v-if="modal.text == 'newUser' || modal.text == 'newRoleForUser'">
+            <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
+              <label for="recipient-name" class="control-label">Rol</label>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> Lid
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> Beheerder
+                </label>
+              </div>
+            </div>
+            <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
+              <label for="recipient-name" class="control-label">Dienst</label>
+              <select v-model="modal.service_id" class="form-control">
+                <option v-for="service in allowedServices" :value="service.id" v-text="service.label"></option>
+              </select>
             </div>
           </div>
         </div>
@@ -65,7 +84,7 @@
             <button type="submit" class="btn btn-primary" @click="createVersion">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
-          <div v-else-if="modal.text=='newRole'">
+          <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">
             <button type="submit" class="btn btn-primary" @click="createRole">Uitnodigen</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
@@ -80,8 +99,9 @@
 
 <script>
 import InputChannel from '../components/InputChannel.vue'
+import Pikaday from '../components/Pikaday.vue'
 
-import { Hub } from '../lib.js'
+import { Hub, toDatetime } from '../lib.js'
 
 export default {
   computed: {
@@ -95,7 +115,23 @@ export default {
       if (!this.modal.start_date || !this.modal.end_date) {
         return 'Nieuwe versie'
       }
-      return 'openingsuren' + this.modal.start_date.slice(0, 4) + ' tot en met ' + (parseInt(this.modal.end_date.slice(0, 4), 10) - 1)
+      return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + (parseInt(this.modal.end_date.slice(0, 4), 10) - 1)
+    },
+
+    allowedServices () {
+      return this.$root.services.filter(s => !s.draft)
+    },
+
+    // Pikaday options
+    pikadayStart () {
+      return {
+        maxDate: toDatetime(this.modal.end_date)
+      }
+    },
+    pikadayEnd () {
+      return {
+        minDate: toDatetime(this.modal.start_date)
+      }
     }
   },
   methods: {
@@ -109,12 +145,18 @@ export default {
       if (!this.modal.label) {
         this.modal.label = this.nextVersionLabel
       }
-      Hub.$emit('createVersion', this.modal)
+      Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },
     createRole () {
       this.modal.strict = true
-      if (!window.Vue.config.debug && !this.validEmail) {
+      if (this.modal.usr) {
+        this.modal.user_id = this.modal.usr.id
+      }
+      if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
         return
+      }
+      if (!this.modal.service_id && !this.modal.srv) {
+        return alert('Kies een dienst')
       }
       Hub.$emit('createRole', this.modal)
     }
@@ -124,7 +166,8 @@ export default {
     inp && inp.focus()
   },
   components: {
-    InputChannel
+    InputChannel,
+    Pikaday
   }
 }
 </script>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Repositories\UserRepository;
+use App\Http\Requests\DeleteUserRequest;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -113,11 +114,20 @@ class UsersController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  DeleteUserRequest         $request
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DeleteUserRequest $request, int $id)
     {
-        //
+        $success = app(UserRepository::class)->delete($id);
+
+        if ($success !== false) {
+            $users = $this->users->getAll();
+
+            return response()->json($users);
+        }
+
+        return response()->json('Something went wrong while deleting the user, check the logs for more info.', 400);
     }
 }
