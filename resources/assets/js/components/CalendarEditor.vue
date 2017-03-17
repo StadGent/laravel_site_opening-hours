@@ -31,7 +31,7 @@
         <label>
           <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
         </label>
-        <br v-else>
+        <br>
 
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 

@@ -99,14 +99,14 @@
               <option value="4">vrijdag</option>
               <option value="5">zaterdag</option>
               <option value="6">zondag</option>
-              <option value="0,1,2,3,4,5,6" selected>dag</option>
+              <option value="0,1,2,3,4,5,6">dag</option>
               <option value="0,1,2,3,4">weekdag</option>
               <option value="5,6">weekend</option>
             </select>
           </div>
           <div class="col-xs-3">
             <select v-model="options.bymonth" class="form-control">
-              <option value="1" selected>januari</option>
+              <option value="1">januari</option>
               <option value="2">februari</option>
               <option value="3">maart</option>
             </select>
@@ -154,14 +154,14 @@
               <option value="4">vrijdag</option>
               <option value="5">zaterdag</option>
               <option value="6">zondag</option>
-              <option value="0,1,2,3,4,5,6" selected>dag</option>
+              <option value="0,1,2,3,4,5,6">dag</option>
               <option value="0,1,2,3,4">weekdag</option>
               <option value="5,6">weekend</option>
             </select>
           </div>
           <div class="col-xs-3">
             <select v-model="options.bymonth" class="form-control">
-              <option value="1" selected>januari</option>
+              <option value="1">januari</option>
               <option value="2">februari</option>
               <option value="3">maart</option>
             </select>
