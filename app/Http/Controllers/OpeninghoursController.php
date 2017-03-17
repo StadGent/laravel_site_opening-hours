@@ -53,7 +53,7 @@ class OpeninghoursController extends Controller
         );
 
         if ($overlap) {
-            return response()->json(['error' => 'Er is een overlapping met een andere versie.'], 400);
+            return response()->json(['message' => 'Er is een overlapping met een andere versie.'], 400);
         }
 
         $input = $request->input();
@@ -111,7 +111,7 @@ class OpeninghoursController extends Controller
         );
 
         if ($overlap) {
-            return response()->json(['error' => 'Er is een overlapping met een andere versie.'], 400);
+            return response()->json(['message' => 'Er is een overlapping met een andere versie.'], 400);
         }
 
         $input = $request->input();

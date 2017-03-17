@@ -30,6 +30,7 @@ export default {
   computed: {
     opts () {
       return Object.assign({
+        firstDay: 1,
         format: dateFormatter,
         onSelect: (date) => {
           // Correct for timezone
@@ -44,11 +45,16 @@ export default {
       })
     }
   },
+  methods: {
+    render () {
+      this.pikaday = new Pikaday(this.opts)
+      this.$nextTick(() => {
+        this.$el.value = this.opts.format(this.value)
+      })
+    }
+  },
   mounted () {
-    this.pikaday = new Pikaday(this.opts)
-    this.$nextTick(() => {
-      this.$el.value = this.opts.format(this.value)
-    })
+    this.render()
   },
   beforeDestroy () {
     this.pikaday.destroy()
@@ -61,6 +67,9 @@ export default {
           this.$el.value = this.opts.format(date)
         }
       })
+    },
+    options () {
+      this.render()
     }
   }
 }
