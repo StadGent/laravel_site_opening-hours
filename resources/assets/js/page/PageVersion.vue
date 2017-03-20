@@ -32,10 +32,10 @@
           <transition-group name="list" tag="div">
             <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
               <header class="cal-header">
-                <div class="cal-action cal-info">
-                  <div class="cal-img" :class="'layer-'+cal.layer" @click="toCalendar(cal.id)"></div>
-                  <div class="cal-name" @click="toCalendar(cal.id)">{{ cal.label }}</div>
-                  <div class="cal-view" @click="toCalendar(cal.id)">Bekijk</div>
+                <div class="cal-action cal-info" @click="toCalendar(cal.id)">
+                  <div class="cal-img" :class="'layer-'+cal.layer"></div>
+                  <div class="cal-name">{{ cal.label }}</div>
+                  <div class="cal-view">Bekijk</div>
                 </div>
                 <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)">Lager</div>
                 <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)">Hoger</div>

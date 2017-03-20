@@ -99,14 +99,14 @@
               <option value="4">vrijdag</option>
               <option value="5">zaterdag</option>
               <option value="6">zondag</option>
-              <option value="0,1,2,3,4,5,6" selected>dag</option>
+              <option value="0,1,2,3,4,5,6">dag</option>
               <option value="0,1,2,3,4">weekdag</option>
               <option value="5,6">weekend</option>
             </select>
           </div>
           <div class="col-xs-3">
             <select v-model="options.bymonth" class="form-control">
-              <option value="1" selected>januari</option>
+              <option value="1">januari</option>
               <option value="2">februari</option>
               <option value="3">maart</option>
             </select>
@@ -154,14 +154,14 @@
               <option value="4">vrijdag</option>
               <option value="5">zaterdag</option>
               <option value="6">zondag</option>
-              <option value="0,1,2,3,4,5,6" selected>dag</option>
+              <option value="0,1,2,3,4,5,6">dag</option>
               <option value="0,1,2,3,4">weekdag</option>
               <option value="5,6">weekend</option>
             </select>
           </div>
           <div class="col-xs-3">
             <select v-model="options.bymonth" class="form-control">
-              <option value="1" selected>januari</option>
+              <option value="1">januari</option>
               <option value="2">februari</option>
               <option value="3">maart</option>
             </select>
@@ -171,13 +171,13 @@
 
       <!-- Weekly -->
       <div v-else-if="options.freq==RRule.WEEKLY">
-        <div class="form-inline-always">
+        <div class="form-inline-always" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
           <multi-day-select :options="fullDays" :parent="options" prop="byweekday" @change="toggleWeekday"></multi-day-select>
           <span v-if="!closinghours">
             van
-            <input type="text" class="form-control control-time" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
+            <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
             tot
-            <input type="text" class="form-control control-time" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
+            <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
           </span>
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
@@ -190,9 +190,9 @@
       <div v-if="options.freq!=RRule.WEEKLY&&!closinghours">
         <div class="form-inline-always text-center">
           van
-          <input type="text" class="form-control control-time" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
+          <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
           tot
-          <input type="text" class="form-control control-time" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
+          <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
       </div>
@@ -260,11 +260,19 @@ export default {
     },
     // The current event being edited
     event () {
-      const event = this.parent[this.prop]
+      const event = this.parent[this.prop] || {}
+
       if (!event.until) {
         this.$set(event, 'until', this.versionEndDate)
       }
-      return event || {}
+      if (event.start_date < this.versionStartDate) {
+        this.$set(event, 'start_date', this.versionStartDate)
+      }
+      if (event.until > this.versionEndDate) {
+        this.$set(event, 'until', this.versionEndDate)
+      }
+
+      return event
     },
     eventStartDayMonth () {
       return toDatetime(this.event.start_date).getDate() + ' ' + fullMonths[toDatetime(this.event.start_date).getMonth()]
@@ -314,6 +322,9 @@ export default {
         if (this.eventEndTime === '00:00') {
           this.eventEndTime = '23:59'
         }
+        if (this.eventEndTime < v) {
+          this.warnTime('.inp-startTime')
+        }
         this.event.start_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
     },
@@ -328,6 +339,9 @@ export default {
         }
         if (v === '00:00') {
           v = '23:59'
+        }
+        if (this.eventStartTime > v) {
+          this.warnTime('.inp-endTime')
         }
         this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
       }
@@ -348,14 +362,14 @@ export default {
     },
     pikadayStart () {
       return {
-        minDate: toDatetime(this.$parent.$parent.version.start_date),
-        maxDate: toDatetime(this.event.until || this.versionEndDate)
+        minDate: toDatetime(this.$root.routeVersion.start_date),
+        maxDate: toDatetime(this.$root.routeVersion.end_date)
       }
     },
     pikadayUntil () {
       return {
-        minDate: toDatetime(this.$parent.$parent.version.start_date),
-        maxDate: toDatetime(this.$parent.$parent.version.end_date)
+        minDate: toDatetime(this.$root.routeVersion.start_date),
+        maxDate: toDatetime(this.$root.routeVersion.end_date)
       }
     },
     hasDates () {
@@ -389,11 +403,24 @@ export default {
     }
   },
   methods: {
+    warnTime (selector) {
+      const elem = $(this.$el).find(selector)
+      elem.tooltip({
+        title: 'Het begintijdstip moet vroeger vallen dan het eindtijdstip.',
+        toggle: 'manual'
+      })
+      setTimeout(() => {
+        elem.tooltip('show')
+      }, 300)
+      setTimeout(() => {
+        elem.tooltip('hide').tooltip('destroy')
+      }, 3000)
+    },
     setFreq () {
       // console.debug('set freq')
       if (this.options.freq === RRule.MONTHLY) {
         this.byMonthDay()
-      } 
+      }
     },
     byMonthDay () {
       // console.debug('monthday')
@@ -409,7 +436,7 @@ export default {
     toggleRecurring () {
       const rule = this.event.rrule
       this.event.rrule = this.event.rrule ? '' : this.event.oldrrule || 'FREQ=WEEKLY'
-      this.event.oldrrule = rule 
+      this.event.oldrrule = rule
     },
     toggleWeekday (day) {
       day = parseInt(day, 10)

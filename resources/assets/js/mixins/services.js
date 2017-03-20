@@ -37,7 +37,7 @@ export default {
         return console.warn('no route version')
       }
       if (this.routeVersion.fetched && !invalidate) {
-        return console.warn('version already fetched')
+        return // console.warn('version already fetched')
       }
       this.routeVersion.fetched = true
       return this.$http.get('/api/openinghours/' + this.route.version)

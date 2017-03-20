@@ -69,7 +69,9 @@ class ServicesRepository extends EloquentRepository
             $tmpChannel['openinghours'] = [];
 
             foreach ($channel->openinghours as $openinghours) {
-                $tmpChannel['openinghours'][] = $openinghours->toArray();
+                $instance = $openinghours->toArray();
+
+                $tmpChannel['openinghours'][] = $instance;
             }
 
             $result['channels'][] = $tmpChannel;

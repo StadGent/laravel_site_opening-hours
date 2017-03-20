@@ -35,11 +35,11 @@
             <div class="row form-group">
               <div class="col-sm-6">
                 <label for="start_date" class="control-label">Geldig van</label>
-                <pikaday id="start_date" class="form-control" v-model="modal.start_date" />
+                <pikaday id="start_date" class="form-control" v-model="modal.start_date" :options="pikadayStart" />
               </div>
               <div class="col-sm-6">
                 <label for="end_date" class="control-label">Verloopt op</label>
-                <pikaday id="end_date" class="form-control" v-model="modal.end_date" />
+                <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="pikadayEnd" />
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@
 import InputChannel from '../components/InputChannel.vue'
 import Pikaday from '../components/Pikaday.vue'
 
-import { Hub } from '../lib.js'
+import { Hub, toDatetime } from '../lib.js'
 
 export default {
   computed: {
@@ -120,6 +120,18 @@ export default {
 
     allowedServices () {
       return this.$root.services.filter(s => !s.draft)
+    },
+
+    // Pikaday options
+    pikadayStart () {
+      return {
+        maxDate: toDatetime(this.modal.end_date)
+      }
+    },
+    pikadayEnd () {
+      return {
+        minDate: toDatetime(this.modal.start_date)
+      }
     }
   },
   methods: {

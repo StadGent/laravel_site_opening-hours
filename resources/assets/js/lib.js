@@ -68,18 +68,18 @@ export function toChannelAlert(ch) {
 /** OH functions **/
 
 export function isInUseOn(oh, date) {
-  return (oh.start_date ? oh.start_date < date : true) && (oh.end_date ? oh.end_date > date : true)
+  return oh.active
 }
 
 // Get expiry date of array of oh
-export function expiresOn(oh) {
+export function expiresOn(ohs) {
   let end_date = today
-  let count = oh.length
+  let count = ohs.length
 
   //
   for (var i = 0; i < count; i++) {
-    let nextIndex = oh.findIndex(x => isInUseOn(x, end_date))
-    let nextOh = oh.splice(nextIndex, 1).pop()
+    let nextIndex = ohs.findIndex(oh => isInUseOn(oh, end_date))
+    let nextOh = ohs.splice(nextIndex, 1).pop()
     if (!nextOh) {
       break
     } else if (!nextOh.end_date) {

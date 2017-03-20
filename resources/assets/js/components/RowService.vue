@@ -13,7 +13,7 @@
           :title="statusTooltip"
         >
           <span class="pre-wrap">{{ statusMessage }}</span> &nbsp;
-          <i class="glyphicon glyphicon-info-sign"></i>
+          <i class="glyphicon glyphicon-info-sign" v-if="statusTooltip"></i>
         </span>
       </td>
       <td :rowspan="rowspan" class="text-muted">
