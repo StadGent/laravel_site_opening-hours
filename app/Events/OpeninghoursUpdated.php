@@ -22,7 +22,7 @@ class OpeninghoursUpdated
      *
      * @return void
      */
-    public function __construct(int $openinghoursId)
+    public function __construct($openinghoursId)
     {
         $this->openinghoursId = $openinghoursId;
     }
