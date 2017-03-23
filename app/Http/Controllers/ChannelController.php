@@ -48,7 +48,7 @@ class ChannelController extends Controller
 
         $id = $this->channels->store($input);
 
-        $channel = $this->channelsannels->getById($id);
+        $channel = $this->channels->getById($id);
 
         if (! empty($channel)) {
             return response()->json($channel);
