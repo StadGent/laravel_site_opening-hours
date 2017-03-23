@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use App\Models\Openinghours;
 
 class StoreCalendarRequest extends FormRequest
 {
@@ -17,9 +18,15 @@ class StoreCalendarRequest extends FormRequest
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
+        $openinghours = Openinghours::with('channel.service')->find($request->openinghours_id);
+
+        if (empty($openinghours) || empty($openinghours->channel->service)) {
+            return false;
+        }
+
         return $this->user()->hasRole('Admin')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Member');
+        || $users->hasRoleInService($this->user()->id, $openinghours->channel->service->id, 'Owner')
+        || $users->hasRoleInService($this->user()->id, $openinghours->channel->service->id, 'Member');
     }
 
     /**

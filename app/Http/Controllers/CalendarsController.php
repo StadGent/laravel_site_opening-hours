@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\CalendarRepository;
-use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
 use App\Http\Requests\DeleteCalendarRequest;
+use App\Http\Requests\StoreCalendarRequest;
 use App\Events\CalendarUpdated;
 
 class CalendarsController extends Controller
