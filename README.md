@@ -5,7 +5,13 @@
     artisan migrate
     artisan db:seed
 
-    npm install
+    gulp build
+    
+## Fetch services
+
+In order to fetch services from the SPARQL endpoint (first configure the endpoint in the .env), you can run the following command:
+
+    > php artisan openinghours:fetch-services
 
 ## Queries
 
