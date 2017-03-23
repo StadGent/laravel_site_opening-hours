@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Channel;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
@@ -17,9 +18,18 @@ class StoreOpeninghoursRequest extends FormRequest
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
+        // Get the service of the calendar
+        $channel = Channel::with('service')->find($request->channel_id);
+
+        if (empty($channel) || empty($channel->service->id)) {
+            return false;
+        }
+
+        $serviceId = $channel->service->id;
+
         return $this->user()->hasRole('Admin')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Member');
+        || $users->hasRoleInService($this->user()->id, $serviceId, 'Owner')
+        || $users->hasRoleInService($this->user()->id, $serviceId, 'Member');
     }
 
     /**
