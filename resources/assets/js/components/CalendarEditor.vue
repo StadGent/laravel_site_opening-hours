@@ -44,6 +44,7 @@
     <div class="wrapper-save-btn">
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
+        <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
         <button type="submit" class="btn btn-primary" @click="saveLabel" v-if="cal.label=='Uitzondering'">Volgende stap</button>
         <button type="button" class="btn btn-danger" @click="save" v-else-if="disabled" disabled>Sla op</button>
         <button type="button" class="btn btn-primary" @click="save" v-else>Sla op</button>
