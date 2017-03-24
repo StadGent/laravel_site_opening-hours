@@ -140,7 +140,7 @@ class CalendarsController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteCalendarRequest $request, int $calendarId)
+    public function destroy(DeleteCalendarRequest $request, $calendarId)
     {
         $success = $this->calendars->delete($calendarId);
 

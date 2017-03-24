@@ -118,7 +118,7 @@ class UsersController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteUserRequest $request, int $id)
+    public function destroy(DeleteUserRequest $request, $id)
     {
         $success = app(UserRepository::class)->delete($id);
 

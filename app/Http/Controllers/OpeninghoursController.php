@@ -134,7 +134,7 @@ class OpeninghoursController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteOpeninghoursRequest $request, int $id)
+    public function destroy(DeleteOpeninghoursRequest $request, $id)
     {
         $success = $this->openinghours->delete($id);
 
