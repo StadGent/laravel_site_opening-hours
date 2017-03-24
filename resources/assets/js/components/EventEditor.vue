@@ -188,7 +188,7 @@
 
       <!-- Dailu -->
       <div v-if="options.freq!=RRule.WEEKLY&&!closinghours">
-        <div class="form-inline-always text-center">
+        <div class="form-inline-always text-center" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
           van
           <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
           tot
