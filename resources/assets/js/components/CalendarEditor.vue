@@ -11,7 +11,7 @@
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
         <p v-if="!cal.events.length">
-          <button @click="pushFirstEvent" class="btn btn-link">+ Voeg weekschema toe</button>
+          <button type="button" @click="pushFirstEvent" class="btn btn-link">+ Voeg weekschema toe</button>
         </p>
       </div>
 
@@ -36,7 +36,7 @@
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
         <p>
-          <button @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
+          <button type="button" @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
         </p>
       </div>
     </div>
@@ -45,8 +45,8 @@
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
         <button type="submit" class="btn btn-primary" @click="saveLabel" v-if="cal.label=='Uitzondering'">Volgende stap</button>
-        <button type="submit" class="btn btn-danger" @click="save" v-else-if="disabled" disabled>Sla op</button>
-        <button type="submit" class="btn btn-primary" @click="save" v-else>Sla op</button>
+        <button type="button" class="btn btn-danger" @click="save" v-else-if="disabled" disabled>Sla op</button>
+        <button type="button" class="btn btn-primary" @click="save" v-else>Sla op</button>
       </div>
     </div>
 
@@ -111,6 +111,9 @@ export default {
       this.$root.fetchVersion(true)
     },
     save () {
+      if (this.disabled) {
+        return console.warn('Expected valid calendar')
+      }
       Hub.$emit('createCalendar', this.cal, true)
     },
     saveLabel () {

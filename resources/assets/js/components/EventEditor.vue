@@ -182,7 +182,7 @@
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
         <div v-if="!nextEventSameLabel">
-          <button class="btn btn-link" @click="$emit('add-event', prop, event)"><b>+</b> Voeg meer dagen toe</button>
+          <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"><b>+</b> Voeg meer dagen toe</button>
         </div>
       </div>
 
