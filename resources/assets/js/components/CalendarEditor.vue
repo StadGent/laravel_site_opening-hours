@@ -58,7 +58,7 @@
 <script>
 import EventEditor from '../components/EventEditor.vue'
 import { createEvent, createFirstEvent } from '../defaults.js'
-import { cleanEmpty, Hub } from '../lib.js'
+import { cleanEmpty, Hub, toDatetime } from '../lib.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 
@@ -83,7 +83,11 @@ export default {
       this.$set(this.cal, 'closinghours', !this.cal.closinghours)
     },
     pushEvent () {
-      this.cal.events.push(createEvent(this.cal.events.length + 1))
+      const start_date = toDatetime(this.$parent.version.start_date)
+      this.cal.events.push(createEvent({
+        start_date,
+        label: this.cal.events.length + 1
+      }))
     },
     pushFirstEvent () {
       this.cal.events.push(createFirstEvent())

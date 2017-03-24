@@ -73,7 +73,7 @@ import YearCalendar from '../components/YearCalendar.vue'
 import CalendarEditor from '../components/CalendarEditor.vue'
 
 import { createCalendar, createFirstCalendar } from '../defaults.js'
-import { orderBy, Hub } from '../lib.js'
+import { orderBy, Hub, toDatetime } from '../lib.js'
 
 export default {
   name: 'page-version',
@@ -122,7 +122,9 @@ export default {
       }
     },
     addCalendar () {
-      const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
+      const newCal = this.calendars.length ? createCalendar(this.calendars.length, {
+        start_date: toDatetime(this.version.start_date)
+      }) : createFirstCalendar()
       console.log(inert(newCal))
       Hub.$emit('createCalendar', newCal)
     }

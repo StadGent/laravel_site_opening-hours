@@ -196,6 +196,7 @@ export default {
         customDayRenderer,
         dataSource: this.allEvents,
         language: 'nl',
+        startYear: this.versionStart.slice(0, 4),
         maxDate: toDate(this.versionEnd),
         minDate: toDate(this.versionStart),
         style: 'custom'
