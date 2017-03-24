@@ -45,6 +45,7 @@
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
         <button type="submit" class="btn btn-primary" @click="saveLabel" v-if="cal.label=='Uitzondering'">Volgende stap</button>
+        <button type="submit" class="btn btn-danger" @click="save" v-else-if="disabled" disabled>Sla op</button>
         <button type="submit" class="btn btn-primary" @click="save" v-else>Sla op</button>
       </div>
     </div>
@@ -76,6 +77,11 @@ export default {
   computed: {
     events () {
       return this.cal.events
+    },
+    disabled () {
+      if (this.events.filter(e => e.start_date > e.end_date).length) {
+        return true
+      }
     }
   },
   methods: {
