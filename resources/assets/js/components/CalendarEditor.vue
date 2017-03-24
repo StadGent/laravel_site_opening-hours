@@ -45,8 +45,8 @@
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
         <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
-        <button type="submit" class="btn btn-primary" @click="saveLabel" v-if="cal.label=='Uitzondering'">Volgende stap</button>
-        <button type="button" class="btn btn-danger" @click="save" v-else-if="disabled" disabled>Sla op</button>
+        <button type="button" class="btn btn-danger" v-if="disabled" disabled>Sla op</button>
+        <button type="submit" class="btn btn-primary" @click="saveLabel" v-else-if="cal.label=='Uitzondering'">Sla op</button>
         <button type="button" class="btn btn-primary" @click="save" v-else>Sla op</button>
       </div>
     </div>
@@ -83,6 +83,9 @@ export default {
       if (this.events.filter(e => e.start_date > e.end_date).length) {
         return true
       }
+      if (!this.calLabel || this.calLabel === 'Uitzondering') {
+        return true
+      }
     }
   },
   methods: {
@@ -108,6 +111,9 @@ export default {
       this.cal.events.splice(index, 1)
     },
     cancel () {
+      if (this.cal.label === 'Uitzondering') {
+        return this.rmCalendar()
+      }
       this.toVersion()
       this.$root.fetchVersion(true)
     },

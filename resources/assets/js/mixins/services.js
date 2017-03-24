@@ -168,7 +168,7 @@ export default {
       if (!calendar.id) {
         return console.warn('deleteCalendar: id is missing')
       }
-      if (!confirm('Zeker dat je deze kalender wil verwijderen?')) {
+      if (calendar.label !== 'Uitzondering' && !confirm('Zeker dat je deze kalender wil verwijderen?')) {
         return
       }
 
