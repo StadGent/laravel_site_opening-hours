@@ -1,0 +1,14 @@
+engines:
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - php
+      - javascript
+exclude_paths:
+- public/js/chunks/*
+
