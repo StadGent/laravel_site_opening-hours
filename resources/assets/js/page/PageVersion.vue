@@ -117,11 +117,18 @@ export default {
         const p = a.priority
         a.priority = b.priority
         b.priority = p
+
+        Hub.$emit('createCalendar', a)
+        Hub.$emit('createCalendar', b)
       } else {
         console.warn('one of the layers was not found', a, b)
       }
     },
     addCalendar () {
+      if (this.calendars.length > 11) {
+        return alert('Er kan geen uitzondering toegevoegd worden.\n(Max. 1 normale uren + 10 uitzonderingen)')
+      }
+
       const newCal = this.calendars.length ? createCalendar(this.calendars.length, {
         start_date: toDatetime(this.version.start_date)
       }) : createFirstCalendar()

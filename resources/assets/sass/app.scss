@@ -312,7 +312,13 @@ h1+h3 {
 @include layer(2, $red, white, 'C')
 @include layer(3, $orange, white, 'D')
 @include layer(4, $green, white, 'E')
-
+@include layer(5, #2b3f47, white, 'F')
+@include layer(6, #951b81, white, 'G')
+@include layer(7, #ccb4a5, black, 'H')
+@include layer(8, #a09b96, white, 'I')
+@include layer(9, #e0cae3, black, 'J')
+@include layer(10, #e5e3c7, black, 'K')
+ 
 .calendar-topview {
   table.month th.month-title {
     font-size: 14px;
