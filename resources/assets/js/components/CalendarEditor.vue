@@ -51,7 +51,7 @@
       </div>
     </div>
 
-<!-- 
+<!--
     <pre>{{ cal }}</pre>
     <pre class="cal-render" style="margin-top:10em">{{ events }}</pre> -->
   </form>
