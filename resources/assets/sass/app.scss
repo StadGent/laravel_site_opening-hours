@@ -426,4 +426,7 @@ h1+h3 {
 
 .tooltip-inner {
   white-space: pre-wrap;
+  .calendar {
+    white-space: pre;
+  }
 }

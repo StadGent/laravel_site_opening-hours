@@ -203,7 +203,9 @@ export default {
       })
       window.fadeInTime = 0
       setTimeout(() => {
-        $('.layer>.day-content').tooltip()
+        $('.layer>.day-content').tooltip({
+          container: '.version-preview'
+        })
       }, 300)
     }, 500, { leading: true }),
     printme () {

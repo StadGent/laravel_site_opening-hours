@@ -283,7 +283,7 @@ export default {
       },
       set (v) {
         const endDate = toDatetime(this.event.end_date)
-        let startDate = toDatetime(this.event.start_date)
+        const startDate = toDatetime(this.event.start_date)
         const duration = endDate - startDate
         // console.debug('duration', duration)
 
@@ -293,7 +293,8 @@ export default {
         }
         this.event.start_date = v + ((this.event.start_date || '').slice(10, 19) || 'T00:00:00')
         if (duration < 36e5 * 48) {
-          this.event.end_date = dateAfter(toDatetime(this.event.start_date), duration).toJSON().slice(0, 19)
+          // Force end_date to be on same date as start_date
+          this.event.end_date = this.event.start_date.slice(0, 11) + this.event.end_date.slice(11, 19)
           // console.debug('enddate', this.event.end_date)
         }
 
@@ -307,7 +308,8 @@ export default {
         return (this.event.end_date || '').slice(0, 10)
       },
       set () {
-        this.event.end_date = v + ((this.event.end_date || '').slice(10, 19) || 'T00:00:00')
+        // Force end_date to be on same date as start_date
+        this.event.end_date = v + ((this.event.start_date || '').slice(10, 19) || 'T00:00:00')
       }
     },
     eventStartTime: {
@@ -343,7 +345,8 @@ export default {
         if (this.eventStartTime > v) {
           this.warnTime('.inp-endTime')
         }
-        this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
+        // Force end_date to be on same date as start_date
+        this.event.end_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
     },
     eventUntilSet () {

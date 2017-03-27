@@ -21,7 +21,7 @@ export function createFirstEvent() {
 export function createEvent({ label, start_date, end_date }) {
   return {
     start_date: (start_date || new Date()).toJSON().slice(0, 11) + '00:00:00',
-    end_date: new Date(start_date.valueOf() + 36e5 * 24).toJSON().slice(0, 11) + '00:00:00',
+    end_date: (start_date || new Date()).toJSON().slice(0, 11) + '00:00:00',
     until: new Date(start_date.valueOf() + 36e5 * 24).toJSON().slice(0, 11) + '00:00:00',
     rrule: 'FREQ=DAILY',
     label: (label || '1').toString()
