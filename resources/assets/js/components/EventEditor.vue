@@ -1,13 +1,13 @@
 <template>
   <div @change="sync">
-    <div class="row" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
+    <div class="row" :class="{ 'has-error text-danger': isUntilValid }" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
       <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
         <pikaday class="form-control" v-model="eventStartDate" :options="pikadayStart" />
       </div>
       <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-if="eventUntilSet||show.endDate">
         <label class="control-label">tot en met</label>
-        <pikaday class="form-control" v-model="eventUntil" :options="pikadayUntil" />
+        <pikaday class="form-control inp-until" v-model="eventUntil" :options="pikadayUntil" />
       </div>
       <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-else>
         <label class="control-label"><a href="#" @click.prevent="show.endDate=1">tot en met...</a></label>
@@ -301,6 +301,9 @@ export default {
         if (this.options.bymonthday) {
           this.options.bymonthday = toDatetime(this.event.start_date).getDate()
         }
+        if (!this.isUntilValid) {
+          this.warnTime('.inp-until')
+        }
       }
     },
     eventEndDate: {
@@ -361,6 +364,9 @@ export default {
       set (v) {
         // console.debug('set until ', v)
         this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 19)
+        if (!this.isUntilValid) {
+          this.warnTime('.inp-until')
+        }
       }
     },
     pikadayStart () {
@@ -403,6 +409,9 @@ export default {
     },
     rruleAll () {
       return this.rrule.all()
+    },
+    isUntilValid () {
+      return this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)
     }
   },
   methods: {
