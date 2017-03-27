@@ -7,6 +7,7 @@ use App\Http\Requests\DeleteOpeninghoursRequest;
 use App\Http\Requests\StoreOpeninghoursRequest;
 use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ChannelRepository;
+use App\Events\OpeninghoursDeleted;
 
 class OpeninghoursController extends Controller
 {
@@ -136,7 +137,11 @@ class OpeninghoursController extends Controller
      */
     public function destroy(DeleteOpeninghoursRequest $request, $id)
     {
+        $openinghours = $this->openinghours->getFullObjectById($id);
+
         $success = $this->openinghours->delete($id);
+
+        event(new OpeninghoursDeleted($openinghours));
 
         if ($success) {
             return response()->json(['message' => 'De openingsuren werden verwijderd']);

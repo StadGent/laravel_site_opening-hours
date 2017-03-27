@@ -42,6 +42,23 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
+     * Get the full object: openinghours with channel + service
+     *
+     * @param  int   $id
+     * @return array
+     */
+    public function getFullObjectById($id)
+    {
+        $openinghours = $this->model->with('channel.service')->find($id);
+
+        if (empty($openinghours)) {
+            return [];
+        }
+
+        return $openinghours->toArray();
+    }
+
+    /**
      * Store new openinghours
      *
      * @param  array $properties

@@ -20,8 +20,6 @@ class DeleteOpeninghoursRequest extends FormRequest
         // the user is a super admin or is an owner of the service
         $openinghours = Openinghours::with('channel.service')->find($request->openinghour);
 
-        \Log::info($openinghours);
-
         if (empty($openinghours) || empty($openinghours->channel->service)) {
             return false;
         }

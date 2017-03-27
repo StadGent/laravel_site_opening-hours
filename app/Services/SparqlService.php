@@ -41,7 +41,7 @@ class SparqlService
      *
      * @param  string $query
      * @param  string $method
-     * @return string
+     * @return bool
      */
     public function performSparqlQuery(string $query, $method = 'GET')
     {
@@ -90,7 +90,13 @@ class SparqlService
             curl_setopt($curl, CURLOPT_USERPWD, $this->username . ':' . $this->password);
         }
 
-        $uri = $this->makeRequestUri($query);
+        $format = '';
+
+        if ($method == 'GET') {
+            $format = 'turtle';
+        }
+
+        $uri = $this->makeRequestUri($query, $format);
 
         // Make and set the request URI
         curl_setopt($curl, CURLOPT_URL, $uri);
@@ -138,10 +144,17 @@ class SparqlService
      * the passed query and the configured endpoint
      *
      * @param  string $query
+     * @param  string $format
      * @return string
      */
-    private function makeRequestUri(string $query)
+    private function makeRequestUri(string $query, $format = null)
     {
-        return $this->endpoint . '?query=' . $query . '&format=turtle';
+        $requestUri = $this->endpoint . '?query=' . $query;
+
+        if (! empty($format)) {
+            $requestUri .= '&format=' . $format;
+        }
+
+        return $requestUri;
     }
 }

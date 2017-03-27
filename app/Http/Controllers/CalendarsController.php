@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\CalendarRepository;
-use App\Http\Requests\UpdateCalendarRequest;
+use App\Events\CalendarUpdated;
+use App\Events\OpeninghoursUpdated;
 use App\Http\Requests\DeleteCalendarRequest;
 use App\Http\Requests\StoreCalendarRequest;
-use App\Events\CalendarUpdated;
+use App\Http\Requests\UpdateCalendarRequest;
+use App\Repositories\CalendarRepository;
 
 class CalendarsController extends Controller
 {
@@ -142,6 +143,14 @@ class CalendarsController extends Controller
      */
     public function destroy(DeleteCalendarRequest $request, $calendarId)
     {
+        $calendar = $this->calendars->getById($calendarId);
+
+        if (empty($calendar)) {
+            return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
+        }
+
+        event(new OpeninghoursUpdated($calendar['openinghours_id']));
+
         $success = $this->calendars->delete($calendarId);
 
         if ($success) {

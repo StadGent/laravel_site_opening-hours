@@ -19,6 +19,23 @@ class ChannelRepository extends EloquentRepository
     }
 
     /**
+     * Return the channel with its related service
+     *
+     * @param  int   $channelId
+     * @return array
+     */
+    public function getFullObjectById($channelId)
+    {
+        $channel = $this->model->with('service')->find($channelId);
+
+        if (empty($channel)) {
+            return [];
+        }
+
+        return $channel->toArray();
+    }
+
+    /**
      * Checks if a channel has openinghours for the given time interval
      *
      * @param  int     $channelId
