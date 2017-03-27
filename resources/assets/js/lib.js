@@ -138,6 +138,12 @@ const sortMapping = {
   '-services' (a, b) {
     return a.services.length - b.services.length
   },
+  priority(a, b) {
+    return parseInt(a.priority) - parseInt(b.priority)
+  },
+  '-priority' (a, b) {
+    return parseInt(b.priority) - parseInt(a.priority)
+  },
   active(a, b) {
     return compareArray(a, b, 'activeUsers')
   },

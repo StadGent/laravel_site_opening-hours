@@ -65,13 +65,16 @@ class ChannelController extends Controller
      */
     public function show($id)
     {
+        $start = Carbon::now();
+        $end = Carbon::now();
+
         return [
             'label' => 'telefonisch',
             'openinghours' => [
                 [
                     'active' => true,
-                    'start_date' => (Carbon::now())->subMonth()->toDateString(),
-                    'end_date' => (Carbon::now())->subMonth()->addYear()->toDateString(),
+                    'start_date' => $start->subMonth()->toDateString(),
+                    'end_date' => $end->subMonth()->addYear()->toDateString(),
                     'id' => 5
                 ]
             ]

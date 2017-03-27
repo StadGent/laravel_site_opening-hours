@@ -1,13 +1,13 @@
 <template>
   <div @change="sync">
-    <div class="row" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
+    <div class="row" :class="{ 'has-error text-danger': isUntilValid }" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
       <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
         <pikaday class="form-control" v-model="eventStartDate" :options="pikadayStart" />
       </div>
       <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-if="eventUntilSet||show.endDate">
         <label class="control-label">tot en met</label>
-        <pikaday class="form-control" v-model="eventUntil" :options="pikadayUntil" />
+        <pikaday class="form-control inp-until" v-model="eventUntil" :options="pikadayUntil" />
       </div>
       <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-else>
         <label class="control-label"><a href="#" @click.prevent="show.endDate=1">tot en met...</a></label>
@@ -182,13 +182,13 @@
           <div class="close" @click="$emit('rm')">&times;</div>
         </div>
         <div v-if="!nextEventSameLabel">
-          <button class="btn btn-link" @click="$emit('add-event', prop, event)"><b>+</b> Voeg meer dagen toe</button>
+          <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"><b>+</b> Voeg meer dagen toe</button>
         </div>
       </div>
 
       <!-- Dailu -->
       <div v-if="options.freq!=RRule.WEEKLY&&!closinghours">
-        <div class="form-inline-always text-center">
+        <div class="form-inline-always text-center" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
           van
           <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
           tot
@@ -283,7 +283,7 @@ export default {
       },
       set (v) {
         const endDate = toDatetime(this.event.end_date)
-        let startDate = toDatetime(this.event.start_date)
+        const startDate = toDatetime(this.event.start_date)
         const duration = endDate - startDate
         // console.debug('duration', duration)
 
@@ -293,12 +293,16 @@ export default {
         }
         this.event.start_date = v + ((this.event.start_date || '').slice(10, 19) || 'T00:00:00')
         if (duration < 36e5 * 48) {
-          this.event.end_date = dateAfter(toDatetime(this.event.start_date), duration).toJSON().slice(0, 19)
+          // Force end_date to be on same date as start_date
+          this.event.end_date = this.event.start_date.slice(0, 11) + this.event.end_date.slice(11, 19)
           // console.debug('enddate', this.event.end_date)
         }
 
         if (this.options.bymonthday) {
           this.options.bymonthday = toDatetime(this.event.start_date).getDate()
+        }
+        if (!this.isUntilValid) {
+          this.warnTime('.inp-until')
         }
       }
     },
@@ -307,7 +311,8 @@ export default {
         return (this.event.end_date || '').slice(0, 10)
       },
       set () {
-        this.event.end_date = v + ((this.event.end_date || '').slice(10, 19) || 'T00:00:00')
+        // Force end_date to be on same date as start_date
+        this.event.end_date = v + ((this.event.start_date || '').slice(10, 19) || 'T00:00:00')
       }
     },
     eventStartTime: {
@@ -343,7 +348,8 @@ export default {
         if (this.eventStartTime > v) {
           this.warnTime('.inp-endTime')
         }
-        this.event.end_date = this.event.end_date.slice(0, 11) + v + ':00'
+        // Force end_date to be on same date as start_date
+        this.event.end_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
     },
     eventUntilSet () {
@@ -358,6 +364,9 @@ export default {
       set (v) {
         // console.debug('set until ', v)
         this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 19)
+        if (!this.isUntilValid) {
+          this.warnTime('.inp-until')
+        }
       }
     },
     pikadayStart () {
@@ -400,6 +409,9 @@ export default {
     },
     rruleAll () {
       return this.rrule.all()
+    },
+    isUntilValid () {
+      return this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)
     }
   },
   methods: {
