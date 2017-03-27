@@ -83,7 +83,7 @@ export default {
       if (this.events.filter(e => e.start_date > e.end_date).length) {
         return true
       }
-      if (!this.calLabel || this.calLabel === 'Uitzondering') {
+      if (this.cal.label === 'Uitzondering' && (!this.calLabel || this.calLabel === 'Uitzondering')) {
         return true
       }
     }
