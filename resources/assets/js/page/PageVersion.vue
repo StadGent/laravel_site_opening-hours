@@ -125,7 +125,7 @@ export default {
       }
     },
     addCalendar () {
-      if (this.calendars.length > 11) {
+      if (this.calendars.length > 10) {
         return alert('Er kan geen uitzondering toegevoegd worden.\n(Max. 1 normale uren + 10 uitzonderingen)')
       }
 
