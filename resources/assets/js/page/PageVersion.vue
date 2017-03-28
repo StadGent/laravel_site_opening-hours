@@ -131,7 +131,7 @@ export default {
 
       const newCal = this.calendars.length ? createCalendar(this.calendars.length, {
         start_date: toDatetime(this.version.start_date)
-      }) : createFirstCalendar()
+      }) : createFirstCalendar(this.version)
       console.log(inert(newCal))
       Hub.$emit('createCalendar', newCal)
     }

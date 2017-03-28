@@ -103,10 +103,9 @@ export default {
       }))
     },
     pushFirstEvent () {
-      this.cal.events.push(createFirstEvent())
+      this.cal.events.push(createFirstEvent(this.$parent.version))
     },
     addEvent (index, event) {
-      console.log('add yes', index, event)
       event = Object.assign({}, event, { id: null })
       this.cal.events.splice(index, 0, event)
     },
