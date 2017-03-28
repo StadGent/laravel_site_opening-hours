@@ -1,6 +1,6 @@
 <template>
   <div @change="sync">
-    <div class="row" :class="{ 'has-error text-danger': isUntilValid }" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
+    <div class="row" :class="{ 'has-error text-danger': !isUntilValid }" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
       <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
         <pikaday class="form-control" v-model="eventStartDate" :options="pikadayStart" />
@@ -54,7 +54,7 @@
             <option :value="2">om de dag</option>
             <option :value="3">om de drie dagen</option>
             <option :value="4">om de vier dagen</option>
-            <option :value="7">om de vijf dagen</option>
+            <option :value="5">om de vijf dagen</option>
             <option :value="6">om de zes dagen</option>
           </select>
         </div>
@@ -411,7 +411,7 @@ export default {
       return this.rrule.all()
     },
     isUntilValid () {
-      return this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)
+      return this.event.start_date.slice(0, 10) < this.event.until.slice(0, 10)
     }
   },
   methods: {
