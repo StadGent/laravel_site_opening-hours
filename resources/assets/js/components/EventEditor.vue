@@ -5,9 +5,12 @@
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
         <pikaday class="form-control" v-model="eventStartDate" :options="pikadayStart" />
       </div>
-      <div :class="'col-xs-' + (closinghours ? 5 : 6)">
+      <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-if="eventUntilSet||show.endDate">
         <label class="control-label">tot en met</label>
         <pikaday class="form-control inp-until" v-model="eventUntil" :options="pikadayUntil" />
+      </div>
+      <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-else>
+        <label class="control-label"><a href="#" @click.prevent="show.endDate=1">tot en met...</a></label>
       </div>
       <div class="col-xs-2" v-if="closinghours">
         <div class="close close--col" style="padding-top: 30px;" @click="$emit('rm')">&times;</div>
@@ -348,6 +351,10 @@ export default {
         // Force end_date to be on same date as start_date
         this.event.end_date = this.event.start_date.slice(0, 11) + v + ':00'
       }
+    },
+    eventUntilSet () {
+      // console.debug('check until')
+      return this.eventUntil !== this.versionEndDate
     },
     eventUntil: {
       get () {
