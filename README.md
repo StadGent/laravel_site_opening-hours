@@ -18,6 +18,7 @@ Copy the .env.example to .env and
     artisan migrate
     artisan db:seed
 
+    npm install
     gulp build
 
 ## Fetch services
