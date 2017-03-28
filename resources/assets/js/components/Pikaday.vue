@@ -8,7 +8,7 @@ if (Intl && Intl.DateTimeFormat) {
   dateFormatter = date => new Intl.DateTimeFormat('nl', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric' 
+    day: 'numeric'
   }).format(new Date(date))
 }
 
