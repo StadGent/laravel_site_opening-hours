@@ -15,12 +15,13 @@ class LodOpeninghoursRepository
      *
      * @param  string        $service
      * @param  string        $channel
+     * @param  int           $openinghoursId
      * @param  EasyRdf_Graph $graph
      * @return bool
      */
-    public function write($service, $channel, $graph)
+    public function update($service, $channel, $openinghoursId, $graph)
     {
-        $query = $this->makeUpdateSparqlQuery($service, $channel, $graph);
+        $query = $this->makeUpdateSparqlQuery($service, $channel, $openinghoursId, $graph);
 
         return $this->makeSparqlService()->performSparqlQuery($query, 'POST');
     }
@@ -32,7 +33,7 @@ class LodOpeninghoursRepository
      */
     public function deleteChannel($channelId)
     {
-        $channelUri = env('BASE_URI') . '/channel/' . $channelId;
+        $channelUri = createChannelUri($channelId);
         $graph = env('SPARQL_WRITE_GRAPH');
 
         if (empty($graph)) {
@@ -41,7 +42,7 @@ class LodOpeninghoursRepository
             return false;
         }
 
-        $query = "DELETE WHERE { GRAPH <$graph> {?s ?p ?o. FILTER(?s = <$channelUri>)}}";
+        $query = $this->createRemoveChannelQuery($channelId);
 
         $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
     }
@@ -54,7 +55,7 @@ class LodOpeninghoursRepository
      */
     public function deleteOpeninghours($openinghoursId)
     {
-        $openinghoursUri = env('BASE_URI') . '/openinghours/' . $openinghoursId;
+        $openinghoursUri = createOpeninghoursUri($openinghoursId);
         $graph = env('SPARQL_WRITE_GRAPH');
 
         if (empty($graph)) {
@@ -63,7 +64,7 @@ class LodOpeninghoursRepository
             return false;
         }
 
-        $query = "DELETE WHERE { GRAPH <$graph> {?s ?p ?o. FILTER(?s = <$openinghoursUri>)}}";
+        $query = $this->createRemoveOpeninghoursQuery($openinghoursId);
 
         $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
     }
@@ -72,14 +73,16 @@ class LodOpeninghoursRepository
      * Make a SPARQL query that writes openinghours information based
      * on a DELETE/INSERT statement
      *
-     * @param  string $serviceUri
-     * @param  array  $triples
+     * @param  string        $serviceUri
+     * @param  array         $channel
+     * @param  int           $openinghoursId
+     * @param  EasyRdf_Graph $graph
      * @return bool
      */
-    private function makeUpdateSparqlQuery($service, $channel, $graph)
+    private function makeUpdateSparqlQuery($service, $channel, $openinghoursId, $graph)
     {
-        $serviceUri = env('BASE_URI') . '/service/' . $service['id'];
-        $channelUri = env('BASE_URI') . '/channel/' . $channel['id'];
+        $serviceUri = createServiceUri($service['id']);
+        $channelUri = createChannelUri($channel['id']);
 
         // Get the graph to write too
         $graphName = $this->getGraphName();
@@ -90,10 +93,11 @@ class LodOpeninghoursRepository
 
         list($triples, $headers) = $this->splitHeadersAndTriples($triples);
 
+        $deleteQuery = $this->createRemoveOpeninghoursQuery($openinghoursId);
+
         $query = "
             $headers
-            WITH <$graphName>
-            DELETE WHERE { ?s ?p ?o. FILTER(?s = <$channelUri>)}
+            $deleteQuery
             INSERT { $triples }
         ";
 
@@ -150,5 +154,117 @@ class LodOpeninghoursRepository
         }
 
         return $graph;
+    }
+
+    /**
+     * Create and return a SPARQL query that deletes a channel triple
+     * and all of its underlying triples (Openinghours, Vcalendar, Vcomponent, Vevent)
+     *
+     * @param  int    $channelId
+     * @return string
+     */
+    private function createRemoveChannelQuery($channelId)
+    {
+        $channelUri = createChannelUri($channelId);
+        $graph = env('SPARQL_WRITE_GRAPH');
+
+        return "WITH <$graph>
+            delete {
+                ?channel a <http://data.europa.eu/m8g/Channel>.
+                ?channel <http://data.europa.eu/m8g/isOwnedBy> ?service.
+                ?channel ?openinghours ?oh.
+                ?oh ?x ?z.
+                ?oh <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
+                ?calendar a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
+                ?calendar ?rdfcal ?vcal.
+                ?vcal ?icalVcomp ?vevent.
+                ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
+                ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
+                ?vevent ?pVevent ?rrule.
+                ?rrule ?pRrule ?rruleObj.
+                ?rest ?p ?o.
+            }
+            WHERE {
+                ?channel a <http://data.europa.eu/m8g/Channel>.
+                ?channel <http://data.europa.eu/m8g/isOwnedBy> ?service.
+                FILTER(?channel = <$channelUri>)
+                OPTIONAL {
+                    ?channel ?openinghours ?oh.
+                    ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>;
+                    <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
+                    ?oh ?x ?z.
+                    ?list rdf:first* ?calendar.
+                    ?list rdf:rest* ?rest.
+                    OPTIONAL {?rest ?p ?o.}
+                    ?calendar a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
+                    ?calendar ?rdfcal ?vcal.
+                    ?vcal ?icalVcomp ?vevent.
+                    ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
+                    ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
+                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                    OPTIONAL {
+                        ?vevent ?pVevent ?rrule.
+                        ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                     }
+                    OPTIONAL {
+                        ?vevent ?pVevent ?rrule.
+                        ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                        ?rrule ?pRrule ?rruleObj.
+                    }
+                }
+        }";
+    }
+
+    /**
+     * Create and return a SPARQL query that deletes an openinghours triple
+     * and all of its underlying triples (Vcalendar, Vcomponent, Vevent)
+     *
+     * @param  int    $openinghoursId
+     * @return string
+     */
+    private function createRemoveOpeninghoursQuery($openinghoursId)
+    {
+        $openinghoursUri = createOpeninghoursUri($openinghoursId);
+        $graph = env('SPARQL_WRITE_GRAPH');
+
+        return "WITH <$graph>
+            delete {
+                ?oh ?x ?z.
+                ?channel ?openinghours ?oh.
+                ?oh <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
+                ?calendar a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
+                ?calendar ?rdfcal ?vcal.
+                ?vcal ?icalVcomp ?vevent.
+                ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
+                ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
+                ?vevent ?pVevent ?rrule.
+                ?rrule ?pRrule ?rruleObj.
+                ?rest ?p ?o.
+            }
+            WHERE {
+                ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>;
+                <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
+                ?oh ?x ?z.
+                ?channel ?openinghours ?oh.
+                FILTER(?oh = <$openinghoursUri>)
+                ?list rdf:first* ?calendar.
+                ?list rdf:rest* ?rest.
+                OPTIONAL {?rest ?p ?o.}
+                ?calendar a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
+                ?calendar ?rdfcal ?vcal.
+                ?vcal ?icalVcomp ?vevent.
+                ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
+                ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
+                ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                OPTIONAL {
+                    ?vevent ?pVevent ?rrule.
+                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                }
+                OPTIONAL {
+                    ?vevent ?pVevent ?rrule.
+                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                    ?rrule ?pRrule ?rruleObj.
+                }
+        }";
     }
 }
