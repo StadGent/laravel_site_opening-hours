@@ -75,7 +75,6 @@ export default {
       this.$http.post('/api/channels', channel).then(({ data }) => {
         this.fetchServices()
         this.modalClose()
-        console.log(data, data.id)
         this.toChannel(data.id)
       }).catch(fetchError)
     })
@@ -106,7 +105,7 @@ export default {
         this.fetchServices()
         this.modalClose()
         this.toVersion(data.id)
-        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(), {
+        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
           openinghours_id: data.id
         }))
       }).catch(fetchError)
@@ -155,7 +154,7 @@ export default {
           done && this.toVersion(data.openinghours_id)
         }).catch(fetchError)
       } else {
-        this.$http.post('/api/calendars/', calendar).then(({ data }) => {
+        this.$http.post('/api/calendars', calendar).then(({ data }) => {
           if (!this.routeVersion.calendars) {
             this.$set(this.routeVersion, 'calendars', [])
           }
@@ -166,9 +165,9 @@ export default {
     })
     Hub.$on('deleteCalendar', calendar => {
       if (!calendar.id) {
-        return console.warn('deleteCalendar: id is missing')  
+        return console.warn('deleteCalendar: id is missing')
       }
-      if (!confirm('Zeker dat je deze kalender wil verwijderen?')) {
+      if (calendar.label !== 'Uitzondering' && !confirm('Zeker dat je deze kalender wil verwijderen?')) {
         return
       }
 

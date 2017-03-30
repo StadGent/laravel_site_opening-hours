@@ -11,7 +11,7 @@
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
         <p v-if="!cal.events.length">
-          <button @click="pushFirstEvent" class="btn btn-link">+ Voeg weekschema toe</button>
+          <button type="button" @click="pushFirstEvent" class="btn btn-link">+ Voeg weekschema toe</button>
         </p>
       </div>
 
@@ -36,7 +36,7 @@
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
         <p>
-          <button @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
+          <button type="button" @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
         </p>
       </div>
     </div>
@@ -45,12 +45,13 @@
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
         <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
-        <button type="submit" class="btn btn-primary" @click="saveLabel" v-if="cal.label=='Uitzondering'">Volgende stap</button>
-        <button type="submit" class="btn btn-primary" @click="save" v-else>Sla op</button>
+        <button type="button" class="btn btn-danger" v-if="disabled" disabled>Sla op</button>
+        <button type="submit" class="btn btn-primary" @click="saveLabel" v-else-if="cal.label=='Uitzondering'">Sla op</button>
+        <button type="button" class="btn btn-primary" @click="save" v-else>Sla op</button>
       </div>
     </div>
 
-<!-- 
+<!--
     <pre>{{ cal }}</pre>
     <pre class="cal-render" style="margin-top:10em">{{ events }}</pre> -->
   </form>
@@ -59,7 +60,7 @@
 <script>
 import EventEditor from '../components/EventEditor.vue'
 import { createEvent, createFirstEvent } from '../defaults.js'
-import { cleanEmpty, Hub } from '../lib.js'
+import { cleanEmpty, Hub, toDatetime } from '../lib.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 
@@ -77,6 +78,17 @@ export default {
   computed: {
     events () {
       return this.cal.events
+    },
+    disabled () {
+      if (this.events.filter(e => e.start_date > e.end_date).length) {
+        return true
+      }
+      if (this.events.filter(e => e.start_date.slice(0, 10) > e.until.slice(0, 10)).length) {
+        return true
+      }
+      if (this.cal.label === 'Uitzondering' && (!this.calLabel || this.calLabel === 'Uitzondering')) {
+        return true
+      }
     }
   },
   methods: {
@@ -84,13 +96,16 @@ export default {
       this.$set(this.cal, 'closinghours', !this.cal.closinghours)
     },
     pushEvent () {
-      this.cal.events.push(createEvent(this.cal.events.length + 1))
+      const start_date = toDatetime(this.$parent.version.start_date)
+      this.cal.events.push(createEvent({
+        start_date,
+        label: this.cal.events.length + 1
+      }))
     },
     pushFirstEvent () {
-      this.cal.events.push(createFirstEvent())
+      this.cal.events.push(createFirstEvent(this.$parent.version))
     },
     addEvent (index, event) {
-      console.log('add yes', index, event)
       event = Object.assign({}, event, { id: null })
       this.cal.events.splice(index, 0, event)
     },
@@ -98,10 +113,16 @@ export default {
       this.cal.events.splice(index, 1)
     },
     cancel () {
+      if (this.cal.label === 'Uitzondering') {
+        return this.rmCalendar()
+      }
       this.toVersion()
       this.$root.fetchVersion(true)
     },
     save () {
+      if (this.disabled) {
+        return console.warn('Expected valid calendar')
+      }
       Hub.$emit('createCalendar', this.cal, true)
     },
     saveLabel () {

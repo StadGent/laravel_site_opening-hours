@@ -196,13 +196,16 @@ export default {
         customDayRenderer,
         dataSource: this.allEvents,
         language: 'nl',
+        startYear: this.versionStart.slice(0, 4),
         maxDate: toDate(this.versionEnd),
         minDate: toDate(this.versionStart),
         style: 'custom'
       })
       window.fadeInTime = 0
       setTimeout(() => {
-        $('.layer>.day-content').tooltip()
+        $('.layer>.day-content').tooltip({
+          container: '.version-preview'
+        })
       }, 300)
     }, 500, { leading: true }),
     printme () {

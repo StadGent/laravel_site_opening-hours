@@ -21,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\CalendarUpdated' => [
             'App\Listeners\HandleUpdatedCalendar',
+        ],
+        'App\Events\OpeninghoursDeleted' => [
+            'App\Listeners\HandleDeletedOpeninghours'
+        ],
+        'App\Events\ChannelDeleted' => [
+            'App\Listeners\HandleDeletedChannel'
         ]
     ];
 

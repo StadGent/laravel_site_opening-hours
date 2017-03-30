@@ -73,7 +73,7 @@ import YearCalendar from '../components/YearCalendar.vue'
 import CalendarEditor from '../components/CalendarEditor.vue'
 
 import { createCalendar, createFirstCalendar } from '../defaults.js'
-import { orderBy, Hub } from '../lib.js'
+import { orderBy, Hub, toDatetime } from '../lib.js'
 
 export default {
   name: 'page-version',
@@ -117,12 +117,21 @@ export default {
         const p = a.priority
         a.priority = b.priority
         b.priority = p
+
+        Hub.$emit('createCalendar', a)
+        Hub.$emit('createCalendar', b)
       } else {
         console.warn('one of the layers was not found', a, b)
       }
     },
     addCalendar () {
-      const newCal = this.calendars.length ? createCalendar(this.calendars.length) : createFirstCalendar()
+      if (this.calendars.length > 10) {
+        return alert('Er kan geen uitzondering toegevoegd worden.\n(Max. 1 normale uren + 10 uitzonderingen)')
+      }
+
+      const newCal = this.calendars.length ? createCalendar(this.calendars.length, {
+        start_date: toDatetime(this.version.start_date)
+      }) : createFirstCalendar(this.version)
       console.log(inert(newCal))
       Hub.$emit('createCalendar', newCal)
     }

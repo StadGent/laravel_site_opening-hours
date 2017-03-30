@@ -71,22 +71,23 @@ class UpdateLodOpeninghours implements ShouldQueue
      */
     private function createServiceResource($service, $channel, $openinghoursResource)
     {
-        \EasyRdf_Namespace::set('foo', 'http://foo.bar#');
+        \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
 
         $graph = $openinghoursResource->getGraph();
 
         $service = $graph->resource(
             env('BASE_URI') . '/service/' . $service['id'],
-            'foo:Service'
+            'cv:PublicOrganisation'
         );
 
         $channel = $graph->resource(
             env('BASE_URI') . '/channel/' . $channel['id'],
-            'foo:Channel'
+            'cv:Channel'
         );
 
-        $service->addResource('foo:channel', $channel);
+        $channel->addResource('cv:isOwnedBy', $service);
         $channel->addResource('oh:openinghours', $openinghoursResource);
+        $channel->addResource('rdfs:isDefinedBy', $openinghoursResource);
 
         return $service;
     }

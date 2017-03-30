@@ -11,26 +11,72 @@ use EasyRdf_Serialiser_Turtle as TurtleSerialiser;
 class LodOpeninghoursRepository
 {
     /**
-     * Overwrite the triples of the service
+     * Overwrite the triples of a given service
      *
+     * @param  string        $service
+     * @param  string        $channel
+     * @param  EasyRdf_Graph $graph
      * @return bool
      */
     public function write($service, $channel, $graph)
     {
-        $query = $this->makeSparqlQuery($service, $channel, $graph);
+        $query = $this->makeUpdateSparqlQuery($service, $channel, $graph);
+
+        return $this->makeSparqlService()->performSparqlQuery($query, 'POST');
+    }
+
+    /**
+     * Delete channel
+     *
+     * @param int $channelId
+     */
+    public function deleteChannel($channelId)
+    {
+        $channelUri = env('BASE_URI') . '/channel/' . $channelId;
+        $graph = env('SPARQL_WRITE_GRAPH');
+
+        if (empty($graph)) {
+            \Log::warning('No graph was configured, we could not delete the openinghours');
+
+            return false;
+        }
+
+        $query = "DELETE WHERE { GRAPH <$graph> {?s ?p ?o. FILTER(?s = <$channelUri>)}}";
 
         $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
     }
 
     /**
-     * Make a SPARQL query that writes openinghour information based
+     * Delete openinghours
+     *
+     * @param  int  $openinghoursId
+     * @return bool
+     */
+    public function deleteOpeninghours($openinghoursId)
+    {
+        $openinghoursUri = env('BASE_URI') . '/openinghours/' . $openinghoursId;
+        $graph = env('SPARQL_WRITE_GRAPH');
+
+        if (empty($graph)) {
+            \Log::warning('No graph was configured, we could not delete the openinghours');
+
+            return false;
+        }
+
+        $query = "DELETE WHERE { GRAPH <$graph> {?s ?p ?o. FILTER(?s = <$openinghoursUri>)}}";
+
+        $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
+    }
+
+    /**
+     * Make a SPARQL query that writes openinghours information based
      * on a DELETE/INSERT statement
      *
      * @param  string $serviceUri
      * @param  array  $triples
      * @return bool
      */
-    private function makeSparqlQuery($service, $channel, $graph)
+    private function makeUpdateSparqlQuery($service, $channel, $graph)
     {
         $serviceUri = env('BASE_URI') . '/service/' . $service['id'];
         $channelUri = env('BASE_URI') . '/channel/' . $channel['id'];

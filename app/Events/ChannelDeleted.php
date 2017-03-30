@@ -7,34 +7,29 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 
-class OpeninghoursUpdated
+class ChannelDeleted
 {
     use InteractsWithSockets, SerializesModels;
 
     /**
-     * The ID of the updated openinghours object
-     * @var integer
-     */
-    private $openinghoursId;
-
-    /**
      * Create a new event instance.
      *
+     * @param  array $channel The entire channel object
      * @return void
      */
-    public function __construct($openinghoursId)
+    public function __construct(array $channel)
     {
-        $this->openinghoursId = $openinghoursId;
+        $this->channel = $channel;
     }
 
     /**
-     * Return the ID of the updated openinghours object
+     * Return the ID of the updated channel object
      *
      * @return int
      */
-    public function getOpeninghoursId()
+    public function getChannel()
     {
-        return $this->openinghoursId;
+        return $this->channel;
     }
 
     /**

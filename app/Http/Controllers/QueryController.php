@@ -269,6 +269,6 @@ class QueryController extends Controller
             return response()->json(['message' => 'The service was not found.'], 404);
         }
 
-        return $this->formatWeek($service['id']);
+        return $this->formatWeek($service['id'], 'array', $channel);
     }
 }
