@@ -27,6 +27,10 @@ In order to fetch services from the SPARQL endpoint (first configure the endpoin
 
     > php artisan openinghours:fetch-services
 
+## Email
+
+Email is now done through SendGrid, simply add an API key to the .env variable.
+
 # Usage
 
 ## Queries - No APIB or Swagger available
