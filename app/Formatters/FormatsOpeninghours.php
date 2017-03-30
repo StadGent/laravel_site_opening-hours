@@ -22,8 +22,14 @@ trait FormatsOpeninghours
         foreach ($data as $channel => $schedule) {
             $formattedSchedule .= "<span><h4>$channel</h4>";
 
-            foreach ($schedule as $entry) {
-                $formattedSchedule .= "<p>$entry</p>";
+            if (! empty($schedule)) {
+                if (is_array($schedule)) {
+                    foreach ($schedule as $entry) {
+                        $formattedSchedule .= "<p>$entry</p>";
+                    }
+                } else {
+                    $formattedSchedule .= "<p>$schedule</p>";
+                }
             }
         }
 
