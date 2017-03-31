@@ -45,7 +45,7 @@ class LodServicesRepository
      * @param  string $services A string containing the graph data
      * @return array
      */
-    private function transform(string $data)
+    private function transform($data)
     {
         $graph = $this->parseResults($data);
 

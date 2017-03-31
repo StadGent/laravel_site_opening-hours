@@ -25,7 +25,7 @@ class SparqlService
      */
     private $password;
 
-    public function __construct(string $endpoint, $username = '', $password = '')
+    public function __construct($endpoint, $username = '', $password = '')
     {
         if (empty($endpoint)) {
             \Log::warning('No SPARQL endpoint was passed to the SparqlService.');
@@ -38,15 +38,21 @@ class SparqlService
 
     /**
      * Return the response coming from the result of a SPARQL query
+     * If the method was not a GET method, return a boolean indicating
+     * if the query was performed succesful or not
      *
      * @param  string $query
      * @param  string $method
-     * @return bool
+     * @return mixed
      */
-    public function performSparqlQuery(string $query, $method = 'GET')
+    public function performSparqlQuery($query, $method = 'GET')
     {
         try {
-            $this->executeQuery($this->prepareQuery($query), $method);
+            $data = $this->executeQuery($this->prepareQuery($query), $method);
+
+            if ($method == 'GET') {
+                return $data;
+            }
 
             return true;
         } catch (\Exception $ex) {
@@ -64,7 +70,7 @@ class SparqlService
      * @param  string $query
      * @return string
      */
-    private function prepareQuery(string $query)
+    private function prepareQuery($query)
     {
         $query = str_replace('%23', '#', $query);
         $query = urlencode($query);
@@ -80,7 +86,7 @@ class SparqlService
      * @param  string $query
      * @return string
      */
-    private function executeQuery(string $query, $method = 'GET')
+    private function executeQuery($query, $method = 'GET')
     {
         $curl = curl_init();
 
@@ -147,7 +153,7 @@ class SparqlService
      * @param  string $format
      * @return string
      */
-    private function makeRequestUri(string $query, $format = null)
+    private function makeRequestUri($query, $format = null)
     {
         $requestUri = $this->endpoint . '?query=' . $query;
 
