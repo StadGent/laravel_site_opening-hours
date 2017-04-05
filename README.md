@@ -35,13 +35,25 @@ Email is now done through SendGrid, simply add an API key to the .env variable.
 
 ## Queries - No APIB or Swagger available
 
+- The serviceUri parameter is required and must be the URI of a service
+- The channel parameter is optional and must be the name of a specific channel within the given service
+- The format is optional and by default will return a JSON result, other formats can be: html, text, json-ld
+
 ### Get the schedule for the next 7 days
 
 The URI template to get the openinghours for a certain service and a channel within that service (optional).
 If no channel is passed, all channels will be returned with a schedule of the coming 7 days.
 
-- {host}/api/query?q=week&serviceUri={serviceUri}&channel={channel}
+- {host}/api/query?q=week&serviceUri={serviceUri}&channel={channel}&format={format}
 
-## Is something open right now?
+### Get the schedule for this week
 
-- {host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}
+- {host}/api/query?q=this-week&serviceUri={serviceUri}&channel={channel}&format={format}
+
+### Is something open right now?
+
+- {host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}&format={format}
+
+### Get the openinghours for a specific day
+
+- {host}/api/query?q=day&date={mm-dd-yyyy}&serviceUri={serviceUri}&channel={channel}&format={format}

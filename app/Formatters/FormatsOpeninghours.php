@@ -5,6 +5,8 @@ namespace App\Formatters;
 use Carbon\Carbon;
 use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 
+date_default_timezone_set('Europe/Brussels');
+
 /**
  * Returns a textual form of the openinghours of a service
  */
@@ -288,12 +290,9 @@ trait FormatsOpeninghours
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
-            $dtStart = $this->convertIsoToIcal($event->start_date);
-            $dtEnd = $this->convertIsoToIcal($event->end_date);
-
             $icalString .= "BEGIN:VEVENT\n";
-            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $dtStart . "\n";
-            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $dtEnd . "\n";
+            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $this->convertIsoToIcal($event->start_date) . "\n";
+            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $this->convertIsoToIcal($event->end_date) . "\n";
             $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $this->convertIsoToIcal($event->until) . "\n";
             $icalString .= 'UID:' . str_random(32) . "\n";
             $icalString .= "END:VEVENT\n";
@@ -313,9 +312,7 @@ trait FormatsOpeninghours
     protected function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
-        $date = $date->format('Ymd His');
-
-        return str_replace(' ', 'T', $date);
+        return $date->format('YmdTHis');
     }
 
     /**
@@ -337,8 +334,8 @@ trait FormatsOpeninghours
         $hours = [];
 
         foreach ($events as $event) {
-            $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart));
-            $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend));
+            $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart_tz));
+            $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend_tz));
 
             $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
         }
