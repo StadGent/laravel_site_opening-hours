@@ -3,12 +3,87 @@
 namespace App\Formatters;
 
 use Carbon\Carbon;
+use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 
 /**
  * Returns a textual form of the openinghours of a service
  */
 trait FormatsOpeninghours
 {
+    /**
+     * Compute a week schedule for a service
+     *
+     * @param  int    $serviceId
+     * @param  string $channel   The specific channel to print
+     * @return array
+     */
+    protected function formatWeek($serviceId, $format = 'array', $channel = '', $startDate = null)
+    {
+        if (empty($startDate)) {
+            $startDate = Carbon::now();
+        }
+
+        $data = $this->renderWeek($serviceId, $channel, $startDate);
+
+        switch ($format) {
+            case 'html':
+                return $this->makeHtmlForSchedule($data);
+                break;
+            case 'text':
+                return $this->makeTextForSchedule($data);
+                break;
+            case 'json-ld':
+                $serviceUri = createServiceUri($serviceId);
+                return $this->makeJsonLdForSchedule($data, $serviceUri);
+                break;
+            default:
+                return $data;
+                break;
+        }
+    }
+
+    /**
+     * Render a week schedule for a service and a channel (optional)
+     *
+     * @param  int    $serviceId
+     * @param  string $channel
+     * @param  Carbon $startDate
+     * @return array
+     */
+    protected function renderWeek($serviceId, $channel = '', $startDate = null)
+    {
+        if (empty($startDate)) {
+            $startDate = Carbon::now();
+        }
+
+        $service = app('ServicesRepository')->getById($serviceId);
+
+        $channels = [];
+
+        // If no channel is passed, return all channels
+        if (! empty($channel)) {
+            $channels[] = $channel;
+        } else {
+            foreach ($service['channels'] as $object) {
+                $channels[] = $object['label'];
+            }
+        }
+
+        if (empty($channels)) {
+            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
+        }
+
+        $openinghours = [];
+
+        foreach ($channels as $channel) {
+            $weekSchedule = $this->renderWeekForChannel($service['uri'], $channel, $startDate);
+
+            $openinghours[$channel] = $weekSchedule;
+        }
+
+        return $openinghours;
+    }
+
     /**
      * Render a schedule into HTML based on an array structure
      *
@@ -39,61 +114,46 @@ trait FormatsOpeninghours
     }
 
     /**
-     * Compute a week schedule for a service
+     * Return a JSON-LD formatted openinghours schedule
+     * TODO: rework how a schedule is returned, some formats
+     * need more basic info of the openinghours instead of
+     * formatted hours per day, such as this one.
      *
-     * @param  int    $serviceId
-     * @param  string $channel   The specific channel to print
-     * @return array
+     * @param  array  $data
+     * @param  string $serviceUri
+     * @return string
      */
-    protected function formatWeek($serviceId, $format = 'array', $channel = '')
+    protected function makeJsonLdForSchedule($data, $serviceUri)
     {
-        $data = $this->renderWeek($serviceId, $channel);
+        \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
 
-        switch ($format) {
-            case 'html':
-                return $this->makeHtmlForSchedule($data);
-                break;
-            default:
-                return $data;
-                break;
-        }
-    }
+        $graph = new \EasyRdf_Graph();
+        $service = $graph->resource($serviceUri, 'schema:Organization');
 
-    /**
-     * Render a week schedule for a service and a channel (optional)
-     *
-     * @param  int    $serviceId
-     * @param  string $channel
-     * @return array
-     */
-    protected function renderWeek($serviceId, $channel = '')
-    {
-        $service = app('ServicesRepository')->getById($serviceId);
+        // get a raw render for the week:
+        // $channel id + days index in english
+        // for each channel create an openinghours specification
+        // where the channel URI is also set as some sort of context
 
-        $channels = [];
+        foreach ($data as $channelName => $schedule) {
+            $channel = app('ChannelRepository')->getByName($serviceUri, $channelName);
 
-        // If no channel is passed, return all channels
-        if (! empty($channel)) {
-            $channels[] = $channel;
-        } else {
-            foreach ($service['channels'] as $object) {
-                $channels[] = $object['label'];
+            if (empty($channel)) {
+                \Log::error('No channel was found for name:' . $channelName . ' and URI ' . $serviceUri);
+
+                continue;
             }
+
+            $channelSpecification = $graph->newBNode(createChannelUri($channel['id']), 'cv:Channel');
+            $channelSpecification->addLiteral('schema:label', $channelName);
+            $channelSpecification->addLiteral('schema:openingHours', $this->makeTextForDayInfo($schedule));
+
+            $channelSpecification->addResource('cv:isOwnedBy', $service);
         }
 
-        if (empty($channels)) {
-            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
-        }
+        $serialiser = new JsonLdSerialiser();
 
-        $openinghours = [];
-
-        foreach ($channels as $channel) {
-            $weekSchedule = $this->renderWeekForChannel($service['uri'], $channel);
-
-            $openinghours[$channel] = $weekSchedule;
-        }
-
-        return $openinghours;
+        return $serialiser->serialise($graph, 'jsonld');
     }
 
     /**
@@ -103,25 +163,40 @@ trait FormatsOpeninghours
      * @param  array  $data
      * @return string
      */
-    protected function makeHtmlFromSchedule($data)
+    protected function makeTextForSchedule($data)
     {
         $text = '';
 
         foreach ($data as $channel => $info) {
             $text .= $channel . ': ' . PHP_EOL;
 
-            if (is_array($info)) {
-                foreach ($info as $day) {
-                    $text .= $day . PHP_EOL;
-                }
-            } else {
-                $text .= $info . PHP_EOL;
-            }
+            $text .= $this->makeTextForDayInfo($info);
 
             $text .= PHP_EOL . PHP_EOL;
         }
 
         $text = rtrim($text, PHP_EOL);
+
+        return $text;
+    }
+
+    /**
+     * Print a textual representation of a day schedule
+     *
+     * @param  string|array $dayInfo
+     * @return string
+     */
+    protected function makeTextForDayInfo($dayInfo)
+    {
+        $text = '';
+
+        if (is_array($dayInfo)) {
+            foreach ($dayInfo as $day) {
+                $text .= $day . PHP_EOL;
+            }
+        } else {
+            $text .= $dayInfo . PHP_EOL;
+        }
 
         return $text;
     }
@@ -133,7 +208,7 @@ trait FormatsOpeninghours
      * @param  string $channel
      * @return array
      */
-    protected function renderWeekForChannel($serviceUri, $channel)
+    protected function renderWeekForChannel($serviceUri, $channel, $startDate)
     {
         // Check if the service and channel exist
         $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
@@ -148,7 +223,7 @@ trait FormatsOpeninghours
         $relevantOpeninghours = '';
 
         foreach ($openinghours as $openinghoursInstance) {
-            if (Carbon::now()->between(
+            if ($startDate->between(
                 (new Carbon($openinghoursInstance->start_date)),
                 (new Carbon($openinghoursInstance->end_date))
             )) {
@@ -162,9 +237,9 @@ trait FormatsOpeninghours
             return [];
         }
 
-        // Go to the start of the week starting from today and iterate over every day
+        // Go to startDate and iterate over every day of the week after that
         // then check if there are events for that given day in the calendar, by priority
-        $weekDay = Carbon::now();
+        //$startDate = Carbon::now();
 
         $week = [];
 
@@ -179,7 +254,7 @@ trait FormatsOpeninghours
             foreach ($calendars as $calendar) {
                 $ical = $this->createIcalFromCalendar($calendar);
 
-                $extractedDayInfo = $this->extractDayInfo($ical, $weekDay->toDateString(), $weekDay->toDateString());
+                $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
                 if (! empty($extractedDayInfo)) {
                     $dayInfo = $calendar->closinghours ? 'Gesloten' : $extractedDayInfo;
@@ -188,9 +263,9 @@ trait FormatsOpeninghours
                 }
             }
 
-            $week[$weekDay->dayOfWeek] = $dayInfo;
+            $week[$startDate->dayOfWeek] = $dayInfo;
 
-            $weekDay->addDay();
+            $startDate->addDay();
         }
 
         $schedule = [];
