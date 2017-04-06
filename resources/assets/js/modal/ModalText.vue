@@ -145,6 +145,28 @@ export default {
       if (!this.modal.label) {
         this.modal.label = this.nextVersionLabel
       }
+
+      // Align events with start_date and end_date
+      if (this.modal.id && this.modal.calendars) {
+        const version = this.modal
+        this.modal.calendars.forEach(cal => {
+          let changed = false
+          cal.events.forEach(event => {
+            if (!cal.layer || event.start_date.slice(0, 10) < version.start_date) {
+              event.start_date = version.start_date + event.start_date.slice(10)
+              event.end_date = version.start_date + event.end_date.slice(10)
+              changed = true
+            }
+            if (!cal.layer || event.until > version.end_date) {
+              event.until = version.end_date
+              changed = true
+            }
+          })
+          if (changed) {
+            Hub.$emit('createCalendar', cal)
+          }
+        })
+      }
       Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },
     createRole () {

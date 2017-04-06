@@ -363,7 +363,7 @@ export default {
       },
       set (v) {
         // console.debug('set until ', v)
-        this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 19)
+        this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 10)
         if (!this.isUntilValid) {
           this.warnTime('.inp-until')
         }
