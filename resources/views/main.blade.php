@@ -8,7 +8,7 @@
 
   <title>Opening hours</title>
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}?1">
 </head>
 
 <body>
@@ -29,8 +29,8 @@
   var appName = {!! json_encode(config('app.name')) !!};
   </script>
 
-  <script src="{{ asset('js/chunks/vendor.min.js') }}"></script>
-  <script src="{{ asset('js/chunks/lib.js') }}"></script>
+  <script src="{{ asset('js/chunks/vendor.min.js') }}?1"></script>
+  <script src="{{ asset('js/chunks/lib.js') }}?1"></script>
 
   @if (env('APP_DEBUG'))
   <script type="text/javascript">
@@ -39,7 +39,7 @@
   </script>
   @endif
 
-  <script src="{{ asset('js/bundle.js') }}"></script>
+  <script src="{{ asset('js/bundle.js') }}?1"></script>
 </body>
 
 </html>
