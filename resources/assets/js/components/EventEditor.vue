@@ -5,7 +5,7 @@
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
         <pikaday class="form-control" v-model="eventStartDate" :options="pikadayStart" />
       </div>
-      <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-if="eventUntilSet||show.endDate">
+      <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">tot en met</label>
         <pikaday class="form-control inp-until" v-model="eventUntil" :options="pikadayUntil" />
       </div>
