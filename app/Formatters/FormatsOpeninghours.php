@@ -3,6 +3,9 @@
 namespace App\Formatters;
 
 use Carbon\Carbon;
+use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
+
+date_default_timezone_set('Europe/Brussels');
 
 /**
  * Returns a textual form of the openinghours of a service
@@ -10,42 +13,30 @@ use Carbon\Carbon;
 trait FormatsOpeninghours
 {
     /**
-     * Render a schedule into HTML based on an array structure
-     *
-     * @param  array  $schedule
-     * @return string
-     */
-    protected function makeHtmlForSchedule($data)
-    {
-        $formattedSchedule = '<div>';
-
-        foreach ($data as $channel => $schedule) {
-            $formattedSchedule .= "<span><h4>$channel</h4>";
-
-            foreach ($schedule as $entry) {
-                $formattedSchedule .= "<p>$entry</p>";
-            }
-        }
-
-        $formattedSchedule .= '</div>';
-
-        return $formattedSchedule;
-    }
-
-    /**
      * Compute a week schedule for a service
      *
      * @param  int    $serviceId
      * @param  string $channel   The specific channel to print
      * @return array
      */
-    protected function formatWeek($serviceId, $format = 'array', $channel = '')
+    protected function formatWeek($serviceId, $format = 'array', $channel = '', $startDate = null)
     {
-        $data = $this->renderWeek($serviceId, $channel);
+        if (empty($startDate)) {
+            $startDate = Carbon::now();
+        }
+
+        $data = $this->renderWeek($serviceId, $channel, $startDate);
 
         switch ($format) {
             case 'html':
                 return $this->makeHtmlForSchedule($data);
+                break;
+            case 'text':
+                return $this->makeTextForSchedule($data);
+                break;
+            case 'json-ld':
+                $serviceUri = createServiceUri($serviceId);
+                return $this->makeJsonLdForSchedule($data, $serviceUri);
                 break;
             default:
                 return $data;
@@ -58,10 +49,15 @@ trait FormatsOpeninghours
      *
      * @param  int    $serviceId
      * @param  string $channel
+     * @param  Carbon $startDate
      * @return array
      */
-    protected function renderWeek($serviceId, $channel = '')
+    protected function renderWeek($serviceId, $channel = '', $startDate = null)
     {
+        if (empty($startDate)) {
+            $startDate = Carbon::now();
+        }
+
         $service = app('ServicesRepository')->getById($serviceId);
 
         $channels = [];
@@ -82,12 +78,84 @@ trait FormatsOpeninghours
         $openinghours = [];
 
         foreach ($channels as $channel) {
-            $weekSchedule = $this->renderWeekForChannel($service['uri'], $channel);
+            $weekSchedule = $this->renderWeekForChannel($service['uri'], $channel, $startDate);
 
             $openinghours[$channel] = $weekSchedule;
         }
 
         return $openinghours;
+    }
+
+    /**
+     * Render a schedule into HTML based on an array structure
+     *
+     * @param  array  $schedule
+     * @return string
+     */
+    protected function makeHtmlForSchedule($data)
+    {
+        $formattedSchedule = '<div>';
+
+        foreach ($data as $channel => $schedule) {
+            $formattedSchedule .= "<span><h4>$channel</h4>";
+
+            if (! empty($schedule)) {
+                if (is_array($schedule)) {
+                    foreach ($schedule as $entry) {
+                        $formattedSchedule .= "<p>$entry</p>";
+                    }
+                } else {
+                    $formattedSchedule .= "<p>$schedule</p>";
+                }
+            }
+        }
+
+        $formattedSchedule .= '</div>';
+
+        return $formattedSchedule;
+    }
+
+    /**
+     * Return a JSON-LD formatted openinghours schedule
+     * TODO: rework how a schedule is returned, some formats
+     * need more basic info of the openinghours instead of
+     * formatted hours per day, such as this one.
+     *
+     * @param  array  $data
+     * @param  string $serviceUri
+     * @return string
+     */
+    protected function makeJsonLdForSchedule($data, $serviceUri)
+    {
+        \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
+
+        $graph = new \EasyRdf_Graph();
+        $service = $graph->resource($serviceUri, 'schema:Organization');
+
+        // get a raw render for the week:
+        // $channel id + days index in english
+        // for each channel create an openinghours specification
+        // where the channel URI is also set as some sort of context
+
+        foreach ($data as $channelName => $schedule) {
+            $channel = app('ChannelRepository')->getByName($serviceUri, $channelName);
+
+            if (empty($channel)) {
+                \Log::error('No channel was found for name:' . $channelName . ' and URI ' . $serviceUri);
+
+                continue;
+            }
+
+            $channelSpecification = $graph->newBNode(createChannelUri($channel['id']), 'cv:Channel');
+            $channelSpecification->addLiteral('schema:label', $channelName);
+            $channelSpecification->addLiteral('schema:openingHours', $this->makeTextForDayInfo($schedule));
+
+            $channelSpecification->addResource('cv:isOwnedBy', $service);
+        }
+
+        $serialiser = new JsonLdSerialiser();
+
+        return $serialiser->serialise($graph, 'jsonld');
     }
 
     /**
@@ -97,25 +165,40 @@ trait FormatsOpeninghours
      * @param  array  $data
      * @return string
      */
-    protected function makeHtmlFromSchedule($data)
+    protected function makeTextForSchedule($data)
     {
         $text = '';
 
         foreach ($data as $channel => $info) {
             $text .= $channel . ': ' . PHP_EOL;
 
-            if (is_array($info)) {
-                foreach ($info as $day) {
-                    $text .= $day . PHP_EOL;
-                }
-            } else {
-                $text .= $info . PHP_EOL;
-            }
+            $text .= $this->makeTextForDayInfo($info);
 
             $text .= PHP_EOL . PHP_EOL;
         }
 
         $text = rtrim($text, PHP_EOL);
+
+        return $text;
+    }
+
+    /**
+     * Print a textual representation of a day schedule
+     *
+     * @param  string|array $dayInfo
+     * @return string
+     */
+    protected function makeTextForDayInfo($dayInfo)
+    {
+        $text = '';
+
+        if (is_array($dayInfo)) {
+            foreach ($dayInfo as $day) {
+                $text .= $day . PHP_EOL;
+            }
+        } else {
+            $text .= $dayInfo . PHP_EOL;
+        }
 
         return $text;
     }
@@ -127,7 +210,7 @@ trait FormatsOpeninghours
      * @param  string $channel
      * @return array
      */
-    protected function renderWeekForChannel($serviceUri, $channel)
+    protected function renderWeekForChannel($serviceUri, $channel, $startDate)
     {
         // Check if the service and channel exist
         $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
@@ -142,7 +225,7 @@ trait FormatsOpeninghours
         $relevantOpeninghours = '';
 
         foreach ($openinghours as $openinghoursInstance) {
-            if (Carbon::now()->between(
+            if ($startDate->between(
                 (new Carbon($openinghoursInstance->start_date)),
                 (new Carbon($openinghoursInstance->end_date))
             )) {
@@ -156,9 +239,9 @@ trait FormatsOpeninghours
             return [];
         }
 
-        // Go to the start of the week starting from today and iterate over every day
+        // Go to startDate and iterate over every day of the week after that
         // then check if there are events for that given day in the calendar, by priority
-        $weekDay = Carbon::now();
+        //$startDate = Carbon::now();
 
         $week = [];
 
@@ -173,7 +256,7 @@ trait FormatsOpeninghours
             foreach ($calendars as $calendar) {
                 $ical = $this->createIcalFromCalendar($calendar);
 
-                $extractedDayInfo = $this->extractDayInfo($ical, $weekDay->toDateString(), $weekDay->toDateString());
+                $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
                 if (! empty($extractedDayInfo)) {
                     $dayInfo = $calendar->closinghours ? 'Gesloten' : $extractedDayInfo;
@@ -182,9 +265,9 @@ trait FormatsOpeninghours
                 }
             }
 
-            $week[$weekDay->dayOfWeek] = $dayInfo;
+            $week[$startDate->dayOfWeek] = $dayInfo;
 
-            $weekDay->addDay();
+            $startDate->addDay();
         }
 
         $schedule = [];
@@ -207,12 +290,9 @@ trait FormatsOpeninghours
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
-            $dtStart = $this->convertIsoToIcal($event->start_date);
-            $dtEnd = $this->convertIsoToIcal($event->end_date);
-
             $icalString .= "BEGIN:VEVENT\n";
-            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $dtStart . "\n";
-            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $dtEnd . "\n";
+            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $this->convertIsoToIcal($event->start_date) . "\n";
+            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $this->convertIsoToIcal($event->end_date) . "\n";
             $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $this->convertIsoToIcal($event->until) . "\n";
             $icalString .= 'UID:' . str_random(32) . "\n";
             $icalString .= "END:VEVENT\n";
@@ -232,9 +312,7 @@ trait FormatsOpeninghours
     protected function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
-        $date = $date->format('Ymd His');
-
-        return str_replace(' ', 'T', $date);
+        return $date->format('YmdTHis');
     }
 
     /**
@@ -256,8 +334,8 @@ trait FormatsOpeninghours
         $hours = [];
 
         foreach ($events as $event) {
-            $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart));
-            $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend));
+            $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart_tz));
+            $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend_tz));
 
             $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
         }

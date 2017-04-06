@@ -19,10 +19,27 @@ class LodServicesRepository
      */
     public function fetchServices()
     {
-        $data = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery());
+        $limit = 100;
+        $page = 0;
 
-        // Return the services in a compatible model
-        return $this->transform($data);
+        $data = [];
+
+        $graphData = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery($limit, 0));
+
+        // Transform the data in a compatible format
+        $data = $this->transform($graphData);
+
+        while (! empty($graphData)) {
+            $page++;
+            $graphData = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery($limit, ($limit * $page)));
+
+            // Transform the data in a compatible format
+            $data[] = $this->transform($graphData);
+            var_dump($data);
+        }
+
+        dd($data);
+        return $data;
     }
 
     /**
@@ -45,7 +62,7 @@ class LodServicesRepository
      * @param  string $services A string containing the graph data
      * @return array
      */
-    private function transform(string $data)
+    private function transform($data)
     {
         $graph = $this->parseResults($data);
 
@@ -101,11 +118,13 @@ class LodServicesRepository
     /**
      * Return the SPARQL query that fetches all of the available services
      *
+     * @param  int    $limit
+     * @param  int    $offset
      * @return string
      */
-    private function getServicesQuery()
+    private function getServicesQuery($limit, $offset)
     {
-        return 'CONSTRUCT {?agent ?p ?o}
+        return 'SELECT ?agent ?p ?o
                 WHERE {
                     {
                         ?agent a foaf:Agent;
@@ -141,6 +160,6 @@ class LodServicesRepository
                         <http://purl.org/dc/terms/identifier> ?recreatexID.
                         ?agent ?p ?o.
                     }
-                }';
+                } LIMIT ' . $limit . ' OFFSET ' . $offset;
     }
 }

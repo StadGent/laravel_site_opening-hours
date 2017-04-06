@@ -1,5 +1,33 @@
 <?php
 
+/**
+ * Return the english abbreviation of a day passed in dutch
+ * If no abbreviation is found, return the original day
+ *
+ * @param  string $day
+ * @return string
+ */
+function codeForDay($day)
+{
+    $mapping = [
+        'maandag' => 'Mo',
+        'dinsdag' => 'Tu',
+        'woensdag' => 'We',
+        'donderdag' => 'Th',
+        'vrijdag' => 'Fr',
+        'zaterdag' => 'Sa',
+        'zondag' => 'Su',
+    ];
+
+    $code = @$mapping[strtolower($day)];
+
+    if (empty($code)) {
+        return $day;
+    }
+
+    return $code;
+}
+
 function carbonize($datetime = null)
 {
     if (empty($dateTime)) {

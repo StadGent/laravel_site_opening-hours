@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Channel;
 use App\Models\Openinghours;
 use Carbon\Carbon;
+use App\Models\Service;
 
 class ChannelRepository extends EloquentRepository
 {
@@ -16,6 +17,24 @@ class ChannelRepository extends EloquentRepository
     public function getByOpeninghoursId($openinghoursId)
     {
         return Openinghours::find($openinghoursId)->channel;
+    }
+
+    /**
+     * Return the channel by the service ID and the name of the channel
+     *
+     * @param  string $serviceUri
+     * @param  string $name
+     * @return array
+     */
+    public function getByName($serviceUri, $name)
+    {
+        $service = Service::where('uri', $serviceUri)->first();
+
+        if (empty($service)) {
+            return [];
+        }
+
+        return $this->model->where('service_id', $service['id'])->where('label', $name)->first();
     }
 
     /**

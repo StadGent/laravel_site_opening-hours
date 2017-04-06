@@ -17,7 +17,7 @@ class VestaService
      * @param  string $output   The openinghours output
      * @return void
      */
-    public function updateOpeninghours(string $vestaUid, string $output)
+    public function updateOpeninghours($vestaUid, $output)
     {
         // Write the weekschedule to VESTA using a SOAP call
         $userName = base64_encode(env('VESTA_USER', ''));
