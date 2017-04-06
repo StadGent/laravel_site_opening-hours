@@ -58,7 +58,7 @@ class UpdateLodOpeninghours implements ShouldQueue
         // Add the service and the openinghours' channel to the graph
         $graph = $this->createServiceResource($service, $channel, $openinghoursResource);
 
-        app(LodOpeninghoursRepository::class)->write($service, $channel, $graph);
+        app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph);
     }
 
     /**
@@ -76,12 +76,12 @@ class UpdateLodOpeninghours implements ShouldQueue
         $graph = $openinghoursResource->getGraph();
 
         $service = $graph->resource(
-            env('BASE_URI') . '/service/' . $service['id'],
+            createServiceUri($service['id']),
             'cv:PublicOrganisation'
         );
 
         $channel = $graph->resource(
-            env('BASE_URI') . '/channel/' . $channel['id'],
+            createChannelUri($channel['id']),
             'cv:Channel'
         );
 

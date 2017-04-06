@@ -94,7 +94,7 @@
               <option :value="null">-</option>
               <option value="0">maandag</option>
               <option value="1">dinsdag</option>
-              <option value="2">woesndag</option>
+              <option value="2">woensdag</option>
               <option value="3">donderdag</option>
               <option value="4">vrijdag</option>
               <option value="5">zaterdag</option>
@@ -149,7 +149,7 @@
               <option :value="null">-</option>
               <option value="0">maandag</option>
               <option value="1">dinsdag</option>
-              <option value="2">woesndag</option>
+              <option value="2">woensdag</option>
               <option value="3">donderdag</option>
               <option value="4">vrijdag</option>
               <option value="5">zaterdag</option>
