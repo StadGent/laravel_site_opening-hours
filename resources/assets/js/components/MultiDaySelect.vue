@@ -13,25 +13,31 @@ const days = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo']
 
 export default {
   name: 'multi-select',
-  props: ['options', 'parent', 'prop'],
+  props: ['options', 'value'],
   computed: {
     model () {
-      let a = this.parent[this.prop]
+      let a = this.value
       if (typeof a === 'string') {
-        a = a.split(',')
+        a = a.split(',').map(s => parseInt(s))
       }
       return a || []
     }
   },
   methods: {
     change (elem, checked) {
-      this.$emit('change', parseInt(elem.val()))
+      const value = parseInt(elem.val())
+      const index = this.model.indexOf(value)
+      if (index !== -1) {
+        this.model.splice(index, 1)
+      } else {
+        this.model.push(value)
+        this.model.sort((a, b) => a - b)
+      }
+      this.$emit('input', this.model.join(','))
+      console.log('ja', this.model.join(','))
     }
   },
   mounted () {
-    if (!this.parent[this.prop]) {
-      this.parent[this.prop] = []
-    }
     loadScript('bootstrap-multiselect', () => {
       $(this.$el.firstChild).multiselect({
         onChange: this.change,

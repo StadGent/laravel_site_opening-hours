@@ -31,26 +31,24 @@
           </select>
         </div>
         <div class="col-xs-5" v-if="options.freq==RRule.MONTHLY">
-          <select v-model="options.interval" class="form-control">
-            <option :value="null" v-if="options.interval!=1">elke maand</option>
-            <option :value="1" v-if="options.interval==1">elke maand</option>
+          <select v-model="optionInterval" class="form-control">
+            <option :value="null">elke maand</option>
             <option :value="2">tweemaandelijks</option>
             <option :value="3">elk kwartaal</option>
             <option :value="4">viermaandelijks</option>
           </select>
         </div>
         <div class="col-xs-5" v-if="options.freq==RRule.WEEKLY">
-          <select v-model="options.interval" class="form-control">
-            <option :value="null" v-if="options.interval!=1">elke week</option>
-            <option :value="1" v-if="options.interval==1">elke week</option>
+          <select v-model="optionInterval" class="form-control">
+            <option :value="null">elke week</option>
             <option :value="2">tweewekelijks</option>
             <option :value="3">driewekelijks</option>
             <option :value="4">vierwekelijks</option>
           </select>
         </div>
         <div class="col-xs-5" v-if="options.freq==RRule.DAILY">
-          <select v-model="options.interval" class="form-control">
-            <option :value="1">elke dag</option>
+          <select v-model="optionInterval" class="form-control">
+            <option :value="null">elke dag</option>
             <option :value="2">om de dag</option>
             <option :value="3">om de drie dagen</option>
             <option :value="4">om de vier dagen</option>
@@ -161,7 +159,7 @@
       <!-- Weekly -->
       <div v-else-if="options.freq==RRule.WEEKLY">
         <div class="form-inline-always" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
-          <multi-day-select :options="fullDays" :parent="options" prop="byweekday" @change="toggleWeekday"></multi-day-select>
+          <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
           <span v-if="!closinghours">
             van
             <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime" placeholder="_ _ : _ _">
@@ -187,7 +185,8 @@
       </div>
     </div>
 
-    <pre>{{event}}</pre>
+    <pre>{{ event.rrule }}
+{{ options }}</pre>
 
     <div class="row" v-if="!nextEventSameLabel">
       <br>
@@ -394,6 +393,16 @@ export default {
       },
       set (v) {
         this.options.byweekday = v ? v.split(',').map(wd => ({ weekday: parseInt(wd) })) : null
+        this.sync()
+        console.log('why no sync')
+      }
+    },
+    optionInterval: {
+      get () {
+        return this.options.interval > 0 ? this.options.interval : null
+      },
+      set (v) {
+        this.options.interval = v
       }
     },
     weekOrMonth: {
@@ -464,16 +473,17 @@ export default {
     },
     toggleWeekday (day) {
       day = parseInt(day, 10)
+      console.log(day)
       // console.debug(day)
       if (!this.options.byweekday) {
         this.options.byweekday = []
       }
-      const index = this.options.byweekday.indexOf(day)
+      const index = this.options.byweekday.findIndex(d => d.weekday === day)
       if (index !== -1) {
         this.options.byweekday.splice(index, 1)
       } else {
-        this.options.byweekday.push(day)
-        this.options.byweekday.sort((a, b) => a - b)
+        this.options.byweekday.push({ weekday: day })
+        this.options.byweekday.sort((a, b) => a.weekday - b.weekday)
       }
       if (!this.options.byweekday.length) {
         this.options.byweekday = []
@@ -515,14 +525,16 @@ export default {
       }
 console.log(inert(this.options))
       const freq = this.options.freq
-      const byweekday = this.options.byweekday ? inert(this.options.byweekday) : null
+      const byweekday = this.options.byweekday ? inert(this.options.byweekday) : undefined
       this.options = cleanEmpty(this.options)
-      this.options.byweekday = null
+      this.options.byweekday = byweekday
       this.options.freq = freq || 0
     },
     sync () {
+      console.log('start sync')
       // console.log('sync', this.options.freq, new RRule(opts).toString())
-      setTimeout(() => {
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
         this.cleanOptions()
 
         // Clone object because RRule will mutate it
@@ -538,6 +550,7 @@ console.log(inert(this.options))
           .replace(';DTSTART=20160101T000000Z', '')
           .replace(';UNTIL=20160101T000000Z', '')
         this.$set(this.event, 'rrule', rule)
+        console.log('meh', opts)
       }, 100)
     }
   },
