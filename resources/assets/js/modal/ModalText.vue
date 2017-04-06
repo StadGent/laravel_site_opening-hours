@@ -152,7 +152,7 @@ export default {
         this.modal.calendars.forEach(cal => {
           let changed = false
           cal.events.forEach(event => {
-            if (!cal.layer || event.start_date.slice(0, 10) < version.start_date) {
+            if (!cal.layer) {
               event.start_date = version.start_date + event.start_date.slice(10)
               event.end_date = version.start_date + event.end_date.slice(10)
               changed = true
