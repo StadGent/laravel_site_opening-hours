@@ -33,11 +33,11 @@ export default {
       this.parent[this.prop] = []
     }
     loadScript('bootstrap-multiselect', () => {
-      $('.multi-day-select').multiselect({
+      $(this.$el.firstChild).multiselect({
         onChange: this.change,
         buttonText (selected, b) {
           if (!selected.length) {
-            return 'dagen'
+            return 'ongeldig'
           }
           const text = []
           let rangeStart = selected[0].value
