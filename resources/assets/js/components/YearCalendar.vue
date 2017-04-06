@@ -1,9 +1,6 @@
 <template>
   <div>
     <div class="calendar" :class="{'calendar-topview':true}"></div>
-    <p style="text-align: right">
-      <button class="btn btn-default" @click="printme">Print</button>
-    </p>
   </div>
 </template>
 
@@ -14,19 +11,19 @@ const currentYear = new Date().getFullYear();
 
 // Human friendly duration
 function toDuration (n) {
-  n /= 1000 
+  n /= 1000
   if (n < 100) {
     return n + ' seconds'
   }
-  n /= 60 
+  n /= 60
   if (n < 100) {
     return n + ' minutes'
   }
-  n /= 60 
+  n /= 60
   if (n < 100) {
     return n + ' hours'
   }
-  n /= 24 
+  n /= 24
   if (n < 100) {
     return n + ' days'
   }
@@ -95,7 +92,7 @@ function rruleToStarts(rule) {
 // Transform a vevent to an event that bootstrap-year can use
 function expandEvent (e, layer, closinghours, dtstart, until) {
   const startDate = toDatetime(e.start_date)
-  const endDate = toDatetime(e.end_date) 
+  const endDate = toDatetime(e.end_date)
   // Subtract 1000 (1 second) to avoid drawing on the next day
   const duration = ((endDate - startDate) || (36e5 * 24)) - 1000
 

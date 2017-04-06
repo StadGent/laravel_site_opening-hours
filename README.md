@@ -6,7 +6,7 @@ Copy the .env.example to .env and
 
 - Fill in the MySQL (or MariaDb) database credentials
 - Fill in the VESTA API configuration
-- Fill in the Queue driver, for production environments use redis, beanstalkd or SQS. Do not use database or sync
+- Fill in the Queue driver, for production environments use redis, beanstalkd or SQS. DO NOT use sync as a queue, rather use database in testing environments
 - Fill in the base URI that is used to build the LOD version of the openinghours
 - Fill in the SPARQL configuration to read data from
 - Fill in the SPARQL configuration to write data to, don't forget the name of the graph

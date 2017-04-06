@@ -411,7 +411,7 @@ export default {
       return this.rrule.all()
     },
     isUntilValid () {
-      return this.event.start_date.slice(0, 10) < this.event.until.slice(0, 10)
+      return this.event.start_date.slice(0, 10) <= this.event.until.slice(0, 10)
     }
   },
   methods: {
