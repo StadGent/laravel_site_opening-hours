@@ -36,13 +36,16 @@ export default {
         }).catch(fetchError)
     },
     fetchVersion (invalidate) {
-      if (!this.routeVersion) {
+      if (!this.route.version || this.route.version < 1) {
         return console.warn('no route version')
       }
-      if (this.fetchedVersion === this.route.version && !invalidate) {
-        return // console.warn('version already fetched')
+      if (this.routeVersion.fetched && !invalidate) {
+        return // console.warn('version has been fetched')
       }
-      this.fetchedVersion = this.route.version
+      if (this.fetchingVersion === this.route.version && !invalidate) {
+        return // console.warn('version is being fetched')
+      }
+      this.fetchingVersion = this.route.version
       return this.$http.get('/api/openinghours/' + this.route.version)
         .then(this.applyVersionData)
         .catch(fetchError)
@@ -53,8 +56,9 @@ export default {
         this.versionDataQueue.push({ data })
         return // console.warn('version placed in queue', inert(data))
       }
-      Object.assign(data, { fetched: data.id })
+      Object.assign(data, { fetched: true })
       this.$set(this.routeChannel.openinghours, index, data)
+      this.fetchingVersion = 0
     },
     serviceById (id) {
       return this.services.find(s => s.id === id) || {}
