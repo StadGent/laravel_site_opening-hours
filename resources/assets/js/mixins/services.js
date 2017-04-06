@@ -5,7 +5,8 @@ import { createVersion, createFirstCalendar } from '../defaults.js'
 export default {
   data () {
     return {
-      services: window.initialServices || []
+      services: window.initialServices || [],
+      versionDataQueue: []
     }
   },
   computed: {
@@ -30,25 +31,30 @@ export default {
       return this.$http.get('/api/services')
         .then(({ data }) => {
           this.services = data || []
+          this.versionDataQueue.forEach(this.applyVersionData)
+          this.versionDataQueue = []
         }).catch(fetchError)
     },
     fetchVersion (invalidate) {
       if (!this.routeVersion) {
         return console.warn('no route version')
       }
-      if (this.routeVersion.fetched && !invalidate) {
+      if (this.fetchedVersion === this.route.version && !invalidate) {
         return // console.warn('version already fetched')
       }
-      this.routeVersion.fetched = true
+      this.fetchedVersion = this.route.version
       return this.$http.get('/api/openinghours/' + this.route.version)
-        .then(({ data }) => {
-          const index = this.routeChannel.openinghours.findIndex(o => o.id === data.id)
-          if (index === -1) {
-            return console.warn('did not find this version', data)
-          }
-          Object.assign(data, { fetched: true })
-          this.$set(this.routeChannel.openinghours, index, data)
-        }).catch(fetchError)
+        .then(this.applyVersionData)
+        .catch(fetchError)
+    },
+    applyVersionData ({ data }) {
+      const index = this.routeChannel.openinghours ? this.routeChannel.openinghours.findIndex(o => o.id === data.id) : -1
+      if (index === -1) {
+        this.versionDataQueue.push({ data })
+        return // console.warn('version placed in queue', inert(data))
+      }
+      Object.assign(data, { fetched: data.id })
+      this.$set(this.routeChannel.openinghours, index, data)
     },
     serviceById (id) {
       return this.services.find(s => s.id === id) || {}

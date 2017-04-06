@@ -62,7 +62,7 @@
         </div>
       </div>
       <div class="version-preview col-sm-6 col-md-7 col-lg-8">
-        <year-calendar :oh="layeredVersion"></year-calendar>
+        <year-calendar :oh="layeredVersion" v-if="version.id"></year-calendar>
       </div>
     </div>
   </div>
