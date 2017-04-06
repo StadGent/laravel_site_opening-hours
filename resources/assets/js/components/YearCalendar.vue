@@ -168,6 +168,12 @@ export default {
     versionEnd () {
       return this.oh.end_date || '2018-01-01'
     },
+    versionStartYear () {
+      return parseInt(this.versionStart.slice(0, 4))
+    },
+    versionEndYear () {
+      return parseInt(this.versionEnd.slice(0, 4))
+    },
     recurring () {
       return this.oh.calendars.m
     },
@@ -191,14 +197,16 @@ export default {
       if (!this.$el) {
         return console.warn('Not yet mounted')
       }
+
       this.elem = $(this.$el).find('.calendar').calendar({
         customDataSourceRenderer,
         customDayRenderer,
         dataSource: this.allEvents,
         language: 'nl',
-        startYear: this.versionStart.slice(0, 4),
         maxDate: toDate(this.versionEnd),
         minDate: toDate(this.versionStart),
+        renderEnd: this.renderEnd,
+        startYear: Math.min(Math.max(ls('startYear') || 0, this.versionStartYear), this.versionEndYear),
         style: 'custom'
       })
       window.fadeInTime = 0
@@ -208,6 +216,9 @@ export default {
         })
       }, 300)
     }, 500, { leading: true }),
+    renderEnd (evt) {
+      ls('startYear', evt.currentYear)
+    },
     printme () {
       Hub.$emit('printme')
     }
