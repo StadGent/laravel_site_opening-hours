@@ -64,9 +64,9 @@
       <div v-if="options.freq==RRule.YEARLY">
 
         <!-- bymonthday + bymonth -->
-        <div class="form-group" @change="byMonthDay">
+        <div class="form-group" @click="weekOrMonth = 'monthday'">
           <label class="col-xs-3 control-label">
-            <input type="radio" :name="event.start_date" :checked="!options.byweekday" class="pull-left">
+            <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="monthday" class="pull-left">
             op
           </label>
           <div class="col-xs-9" style="padding-top: 8px">
@@ -74,24 +74,23 @@
           </div>
         </div>
         <!-- bysetpos + byweekday + bymonth -->
-        <div class="form-group">
-          <label class="col-xs-3 control-label" @change="byWeekDay">
-            <input type="radio" :name="event.start_date" :checked="!options.bymonthday" class="pull-left">
+        <div class="form-group" @click="weekOrMonth = 'weekday'">
+          <label class="col-xs-3 control-label">
+            <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="weekday" class="pull-left">
             op de
           </label>
-          <div class="col-xs-3" @change="byWeekDay">
+          <div class="col-xs-3">
             <select v-model="options.bysetpos" class="form-control">
-              <option :value="null">-</option>
-              <option value="1" >eerste</option>
-              <option value="2">tweede</option>
-              <option value="3">derde</option>
-              <option value="-2">voorlaatste</option>
-              <option value="-1">laatste</option>
+              <option :value="1">eerste</option>
+              <option :value="2">tweede</option>
+              <option :value="3">derde</option>
+              <option :value="4">vierde</option>
+              <option :value="-2">voorlaatste</option>
+              <option :value="-1">laatste</option>
             </select>
           </div>
           <div class="col-xs-3">
-            <select v-model="options.byweekday" class="form-control">
-              <option :value="null">-</option>
+            <select v-model="optionByweekday" class="form-control">
               <option value="0">maandag</option>
               <option value="1">dinsdag</option>
               <option value="2">woensdag</option>
@@ -101,14 +100,12 @@
               <option value="6">zondag</option>
               <option value="0,1,2,3,4,5,6">dag</option>
               <option value="0,1,2,3,4">weekdag</option>
-              <option value="5,6">weekend</option>
+              <option value="5,6">weekenddag</option>
             </select>
           </div>
-          <div class="col-xs-3">
+          <div class="col-xs-3" @click="weekOrMonth = 'weekday'">
             <select v-model="options.bymonth" class="form-control">
-              <option value="1">januari</option>
-              <option value="2">februari</option>
-              <option value="3">maart</option>
+              <option v-for="(month, index) in fullMonths" :value="index + 1">{{ month }}</option>
             </select>
           </div>
         </div>
@@ -116,11 +113,11 @@
 
       <!-- Monthly -->
       <div v-else-if="options.freq==RRule.MONTHLY">
-      <div>
+
         <!-- bymonthday + bymonth -->
-        <div class="form-group" @change="byMonthDay">
+        <div class="form-group" @click="weekOrMonth = 'monthday'">
           <label class="col-xs-3 control-label">
-            <input type="radio" :name="event.start_date" :checked="!options.byweekday" class="pull-left">
+            <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="monthday" class="pull-left">
             op dag
           </label>
           <div class="col-xs-9" style="padding-top: 8px">
@@ -128,25 +125,24 @@
           </div>
         </div>
         <!-- bysetpos + byweekday + bymonth -->
-        <div class="form-group">
-          <label class="col-xs-3 control-label" @change="byWeekDay">
-            <input type="radio" :name="event.start_date" :checked="!options.bymonthday" class="pull-left">
+        <div class="form-group" @click="weekOrMonth = 'weekday'">
+          <label class="col-xs-3 control-label">
+            <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="weekday" class="pull-left">
             op de
           </label>
-          <div class="col-xs-3">
+          <div class="col-xs-3" @click="weekOrMonth = 'weekday'">
             <select v-model="options.bysetpos" class="form-control">
               <option :value="null">-</option>
-              <option value="0" >-</option>
-              <option value="1" >eerste</option>
+              <option value="0">-</option>
+              <option value="1">eerste</option>
               <option value="2">tweede</option>
               <option value="3">derde</option>
               <option value="-2">voorlaatste</option>
               <option value="-1">laatste</option>
             </select>
           </div>
-          <div class="col-xs-3">
-            <select v-model="options.byweekday" class="form-control">
-              <option :value="null">-</option>
+          <div class="col-xs-3" @click="weekOrMonth = 'weekday'">
+            <select v-model="optionByweekday" class="form-control">
               <option value="0">maandag</option>
               <option value="1">dinsdag</option>
               <option value="2">woensdag</option>
@@ -159,14 +155,7 @@
               <option value="5,6">weekend</option>
             </select>
           </div>
-          <div class="col-xs-3">
-            <select v-model="options.bymonth" class="form-control">
-              <option value="1">januari</option>
-              <option value="2">februari</option>
-              <option value="3">maart</option>
-            </select>
-          </div>
-        </div></div>
+        </div>
       </div>
 
       <!-- Weekly -->
@@ -198,7 +187,7 @@
       </div>
     </div>
 
-    <!-- <pre>{{event}}</pre> -->
+    <pre>{{event}}</pre>
 
     <div class="row" v-if="!nextEventSameLabel">
       <br>
@@ -239,7 +228,8 @@ export default {
       show: {
         endDate: 0
       },
-      fullDays
+      fullDays,
+      fullMonths
     }
   },
   computed: {
@@ -389,12 +379,44 @@ export default {
       if (!this.event.rrule) {
         return {}
       }
-      var opts = RRule.parseString(this.event.rrule) || {}
-      if(opts.byweekday) {
-        opts.byweekday = opts.byweekday.map(d => typeof d === 'number' ? d : d.weekday)
+      if (this.event.rrule.includes('BYDAY=;')) {
+        this.event.rrule = this.event.rrule.replace('BYDAY=;', '')
       }
-      opts.wkst = null
-      return opts
+      return Object.assign({
+        wkst: null,
+        bysetpos: null,
+        byweekday: null
+      }, RRule.parseString(this.event.rrule) || {})
+    },
+    optionByweekday: {
+      get () {
+        return this.options.byweekday ? this.options.byweekday.map(wd => wd.weekday || 0).join(',') : '0'
+      },
+      set (v) {
+        this.options.byweekday = v ? v.split(',').map(wd => ({ weekday: parseInt(wd) })) : null
+      }
+    },
+    weekOrMonth: {
+      get () {
+        return this.options.bymonthday ? 'monthday' : 'weekday'
+      },
+      set (v) {
+        console.log('change', v)
+        if (v === 'weekday') {
+          if (!this.options.byweekday) {
+            this.optionByweekday = '0'
+          }
+          if (!this.options.bysetpos || this.options.bysetpos > 4) {
+            this.options.bysetpos = 1
+          }
+          delete this.options.bymonthday
+        } else if (v === 'monthday') {
+          this.options.bymonthday = parseInt(this.event.start_date.slice(8, 10), 10)
+          this.options.bymonth = this.options.freq < 1 ? parseInt(this.event.start_date.slice(5, 7), 10) : null
+          this.options.byweekday = null
+          delete this.options.bysetpos
+        }
+      }
     },
     versionEndDate() {
       // console.debug(toDateString(this.$parent.$parent.version.end_date))
@@ -402,6 +424,7 @@ export default {
     },
     // RRule object based on options
     rrule () {
+      this.cleanOptions()
       return new RRule(this.options)
     },
     rruleString () {
@@ -439,17 +462,6 @@ export default {
       delete this.options.byweekday
       this.options.bymonthday = toDatetime(this.event.start_date).getDate()
     },
-    byWeekDay () {
-      // console.debug('weekday')
-      delete this.options.bymonthday
-      this.options.byweekday = this.options.byweekday || 0
-      this.options.bysetpos = this.options.bysetpos && this.options.bysetpos < 8 ? this.options.bysetpos : 1
-    },
-    toggleRecurring () {
-      const rule = this.event.rrule
-      this.event.rrule = this.event.rrule ? '' : this.event.oldrrule || 'FREQ=WEEKLY'
-      this.event.oldrrule = rule
-    },
     toggleWeekday (day) {
       day = parseInt(day, 10)
       // console.debug(day)
@@ -469,32 +481,63 @@ export default {
       // console.debug(this.options.byweekday)
       this.sync()
     },
+    cleanOptions () {
+      delete this.options.byhour
+      delete this.options.bysecond
+      delete this.options.byminute
+      if (this.options.interval < 2) {
+        delete this.options.interval
+      }
+
+      if (this.options.bymonthday) {
+        delete this.options.byweekday
+      }
+      if (this.options.freq > 2) {
+        delete this.options.byweekday
+      }
+      if (this.options.freq > 1) {
+        delete this.options.bysetpos
+        delete this.options.bymonthday
+      }
+      if (this.options.freq > 0) {
+        delete this.options.bymonth
+      }
+
+      if (this.options.freq === 0) {
+        // Month must be set
+        if (!this.options.bymonth) {
+          this.options.bymonth = 1
+        }
+        console.log(inert(this.options))
+        if (!this.options.byweekday && !this.options.bymonthday) {
+          this.optionsByweekday = '0'
+        }
+      }
+console.log(inert(this.options))
+      const freq = this.options.freq
+      const byweekday = this.options.byweekday ? inert(this.options.byweekday) : null
+      this.options = cleanEmpty(this.options)
+      this.options.byweekday = null
+      this.options.freq = freq || 0
+    },
     sync () {
       // console.log('sync', this.options.freq, new RRule(opts).toString())
       setTimeout(() => {
-        delete this.options.byhour
-        delete this.options.bysecond
-        delete this.options.byminute
-        if (this.options.interval < 2) {
-          delete this.options.interval
+        this.cleanOptions()
+
+        // Clone object because RRule will mutate it
+        const opts = inert(this.options)
+
+        // Fix weekday issue
+        if (Array.isArray(opts.byweekday)) {
+          opts.byweekday = opts.byweekday.map(b => parseInt(b.weekday || 0))
         }
-        if (!this.options.byweekday || !this.options.byweekday.length) {
-          delete this.options.byweekday
-        }
-        if (this.options.freq > 1) {
-          delete this.options.bymonthday
-        }
-        const freq = this.options.freq
-        const byweekday = this.options.byweekday
-        this.options = cleanEmpty(this.options)
-        this.options.byweekday = byweekday || []
-        this.options.freq = freq || 0
-        this.options.until = this.options.dtstart = new Date(Date.UTC(2016, 0, 1))
-        let rule = new RRule(this.options).toString()
+
+        opts.until = opts.dtstart = new Date(Date.UTC(2016, 0, 1))
+        let rule = new RRule(opts).toString()
           .replace(';DTSTART=20160101T000000Z', '')
           .replace(';UNTIL=20160101T000000Z', '')
         this.$set(this.event, 'rrule', rule)
-        // console.debug(rule)
       }, 100)
     }
   },
