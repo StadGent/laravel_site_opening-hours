@@ -15,8 +15,8 @@ function date(d) {
     return 'invalid'
   }
   var diff = new Date().valueOf() - d
-  if (diff > 1000 * 60 * 60 * 24) {
-    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + pad(d.getHours()) + ':' + pad(d.getSeconds())
+  if (diff < 0 || diff > 1000 * 60 * 60 * 24) {
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear()
   }
   if (diff > 1000 * 60 * 60) {
     return Math.round(diff / 36e5) + ' uur geleden'

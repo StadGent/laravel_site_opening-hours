@@ -29,8 +29,8 @@
             <td>
               <a :href="'#!version/'+[srv.id,route.channel,version.id].join('/')">{{ version.label || 'Zonder label' }}</a>
             </td>
-            <td>{{ version.start_date }}</td>
-            <td>{{ version.end_date }}</td>
+            <td :title="version.start_date">{{ version.start_date | date }}</td>
+            <td :title="version.end_date">{{ version.end_date | date }}</td>
             <td class="td-btn text-right" @click.stop>
               <button class="btn btn-icon btn-default" @click="deleteVersion(version)">
                 <i class="glyphicon glyphicon-trash"></i>

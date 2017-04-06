@@ -1,7 +1,7 @@
 <template>
   <tbody @click="href('#!service/'+s.id)">
     <tr>
-      <td >
+      <td>
         <a :href="'#!service/'+s.id">{{ s.label }}</a>
       </td>
       <td>

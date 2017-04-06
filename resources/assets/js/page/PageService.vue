@@ -61,7 +61,7 @@
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')">{{ channel.label }}</a>
             </td>
             <td>{{ channel | toChannelStatus }}</td>
-            <td class="text-muted">
+            <td class="text-muted" :title="channel.updated_at">
               <div>{{ channel.updated_at | date }}</div>
               <div>{{ channel.updated_by }}</div>
             </td>
