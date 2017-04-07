@@ -15,16 +15,21 @@ export default {
   name: 'multi-select',
   props: ['options', 'value'],
   computed: {
-    model () {
-      let a = this.value
-      if (typeof a === 'string') {
-        a = a.split(',').map(s => parseInt(s))
+    model: {
+      get () {
+        let a = this.value
+        if (typeof a === 'string') {
+          a = a.split(',').map(s => parseInt(s))
+        }
+        return a || []
+      },
+      set (v) {
+        this.$emit('input', v && v.join(',') || null)
       }
-      return a || []
     }
   },
   methods: {
-    change (elem, checked) {
+    change (elem) {
       const value = parseInt(elem.val())
       const index = this.model.indexOf(value)
       if (index !== -1) {
@@ -33,15 +38,14 @@ export default {
         this.model.push(value)
         this.model.sort((a, b) => a - b)
       }
-      this.$emit('input', this.model.join(','))
-      console.log('ja', this.model.join(','))
+      this.model = this.model
     }
   },
   mounted () {
     loadScript('bootstrap-multiselect', () => {
       $(this.$el.firstChild).multiselect({
         onChange: this.change,
-        buttonText (selected, b) {
+        buttonText (selected) {
           if (!selected.length) {
             return 'ongeldig'
           }

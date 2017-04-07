@@ -22,8 +22,8 @@
       <!-- Choose the period -->
       <div class="form-group" v-if="!prevEventSameLabel && $parent.cal.layer">
         <label class="col-xs-3 control-label">Regelmaat</label>
-        <div class="col-xs-4" @change="setFreq">
-          <select v-model="options.freq" class="form-control">
+        <div class="col-xs-4">
+          <select v-model="optionFreq" class="form-control">
             <option :value="RRule.YEARLY">Jaarlijks</option>
             <option :value="RRule.MONTHLY">Maandelijks</option>
             <option :value="RRule.WEEKLY">Wekelijks</option>
@@ -78,13 +78,14 @@
             op de
           </label>
           <div class="col-xs-3">
-            <select v-model="options.bysetpos" class="form-control">
-              <option :value="1">eerste</option>
-              <option :value="2">tweede</option>
-              <option :value="3">derde</option>
-              <option :value="4">vierde</option>
-              <option :value="-2">voorlaatste</option>
-              <option :value="-1">laatste</option>
+            <select v-model="optionBysetpos" class="form-control">
+              <option value="-" disabled></option>
+              <option value="1">eerste</option>
+              <option value="2">tweede</option>
+              <option value="3">derde</option>
+              <option value="4">vierde</option>
+              <option value="-2">voorlaatste</option>
+              <option value="-1">laatste</option>
             </select>
           </div>
           <div class="col-xs-3">
@@ -128,18 +129,18 @@
             <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="weekday" class="pull-left">
             op de
           </label>
-          <div class="col-xs-3" @click="weekOrMonth = 'weekday'">
-            <select v-model="options.bysetpos" class="form-control">
-              <option :value="null">-</option>
-              <option value="0">-</option>
+          <div class="col-xs-4" @click="weekOrMonth = 'weekday'">
+            <select v-model="optionBysetpos" class="form-control">
+              <option value="-" disabled></option>
               <option value="1">eerste</option>
               <option value="2">tweede</option>
               <option value="3">derde</option>
+              <option value="4">vierde</option>
               <option value="-2">voorlaatste</option>
               <option value="-1">laatste</option>
             </select>
           </div>
-          <div class="col-xs-3" @click="weekOrMonth = 'weekday'">
+          <div class="col-xs-5" @click="weekOrMonth = 'weekday'">
             <select v-model="optionByweekday" class="form-control">
               <option value="0">maandag</option>
               <option value="1">dinsdag</option>
@@ -166,14 +167,15 @@
             tot
             <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime" placeholder="_ _ : _ _">
           </span>
-          <div class="close" @click="$emit('rm')">&times;</div>
+          <span v-else>hele dag gesloten</span>
+          <div class="close" @click="$emit('rm')" v-if="!$parent.cal.layer">&times;</div>
         </div>
-        <div v-if="!nextEventSameLabel">
+        <div v-if="!$parent.cal.layer">
           <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"><b>+</b> Voeg meer dagen toe</button>
         </div>
       </div>
 
-      <!-- Dailu -->
+      <!-- Daily -->
       <div v-if="options.freq!=RRule.WEEKLY&&!closinghours">
         <div class="form-inline-always text-center" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
           van
@@ -185,8 +187,8 @@
       </div>
     </div>
 
-    <pre>{{ event.rrule }}
-{{ options }}</pre>
+<!--     <pre>{{ event.rrule }}
+{{ options }}</pre> -->
 
     <div class="row" v-if="!nextEventSameLabel">
       <br>
@@ -387,14 +389,32 @@ export default {
         byweekday: null
       }, RRule.parseString(this.event.rrule) || {})
     },
+    optionBysetpos: {
+      get () {
+        return this.options.bysetpos ? this.options.bysetpos.toString() : '-'
+      },
+      set (v) {
+        this.options.bysetpos = parseInt(v) || 1
+      }
+    },
     optionByweekday: {
       get () {
         return this.options.byweekday ? this.options.byweekday.map(wd => wd.weekday || 0).join(',') : '0'
       },
       set (v) {
-        this.options.byweekday = v ? v.split(',').map(wd => ({ weekday: parseInt(wd) })) : null
-        this.sync()
-        console.log('why no sync')
+        if (v) {
+          this.options.byweekday = v.split(',').map(wd => ({ weekday: parseInt(wd) }))
+          this.sync()
+        }
+      }
+    },
+    optionFreq: {
+      get () {
+        return this.options.freq || 3
+      },
+      set (v) {
+        this.options.freq = v
+        this.cleanOptions()
       }
     },
     optionInterval: {
@@ -410,7 +430,7 @@ export default {
         return this.options.bymonthday ? 'monthday' : 'weekday'
       },
       set (v) {
-        console.log('change', v)
+        // console.debug('weekOrMonth', v)
         if (v === 'weekday') {
           if (!this.options.byweekday) {
             this.optionByweekday = '0'
@@ -471,26 +491,6 @@ export default {
       delete this.options.byweekday
       this.options.bymonthday = toDatetime(this.event.start_date).getDate()
     },
-    toggleWeekday (day) {
-      day = parseInt(day, 10)
-      console.log(day)
-      // console.debug(day)
-      if (!this.options.byweekday) {
-        this.options.byweekday = []
-      }
-      const index = this.options.byweekday.findIndex(d => d.weekday === day)
-      if (index !== -1) {
-        this.options.byweekday.splice(index, 1)
-      } else {
-        this.options.byweekday.push({ weekday: day })
-        this.options.byweekday.sort((a, b) => a.weekday - b.weekday)
-      }
-      if (!this.options.byweekday.length) {
-        this.options.byweekday = []
-      }
-      // console.debug(this.options.byweekday)
-      this.sync()
-    },
     cleanOptions () {
       delete this.options.byhour
       delete this.options.bysecond
@@ -504,6 +504,11 @@ export default {
       }
       if (this.options.freq > 2) {
         delete this.options.byweekday
+      } else {
+        if (!this.options.bymonthday && !this.options.byweekday) {
+          this.options.byweekday = [{ weekday: 0 }]
+          this.options.bysetpos = 1
+        }
       }
       if (this.options.freq > 1) {
         delete this.options.bysetpos
@@ -518,21 +523,12 @@ export default {
         if (!this.options.bymonth) {
           this.options.bymonth = 1
         }
-        console.log(inert(this.options))
         if (!this.options.byweekday && !this.options.bymonthday) {
           this.optionsByweekday = '0'
         }
       }
-console.log(inert(this.options))
-      const freq = this.options.freq
-      const byweekday = this.options.byweekday ? inert(this.options.byweekday) : undefined
-      this.options = cleanEmpty(this.options)
-      this.options.byweekday = byweekday
-      this.options.freq = freq || 0
     },
     sync () {
-      console.log('start sync')
-      // console.log('sync', this.options.freq, new RRule(opts).toString())
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         this.cleanOptions()
@@ -550,7 +546,6 @@ console.log(inert(this.options))
           .replace(';DTSTART=20160101T000000Z', '')
           .replace(';UNTIL=20160101T000000Z', '')
         this.$set(this.event, 'rrule', rule)
-        console.log('meh', opts)
       }, 100)
     }
   },
