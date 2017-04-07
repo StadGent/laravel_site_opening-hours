@@ -27,7 +27,7 @@
         <br>
         <transition name="slideup">
           <div v-if="showPresets">
-            <h3>Voeg voorgedefineerde momenten toe (geldig vanaf 2017)</h3>
+            <h3>Voeg voorgedefineerde momenten toe</h3>
             <p class="text-muted">
               Klik op
               <em>Bewaar</em>
@@ -35,8 +35,12 @@
             </p>
 
             <div class="form-group">
+             <h4>Herhalende vakantiedagen</h4>
               <div class="checkbox checkbox--preset" v-for="(preset, index) in presets">
                 <hr v-if="preset.group" />
+                <p class="text-muted" v-if="preset.group">
+                  Geldig voor jaar {{preset.group}}
+                </p>
                 <label>
                   <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
                   <input type="checkbox" name="preset" :value="index" v-model="presetSelection"> {{ preset.label }}
@@ -91,8 +95,8 @@ const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zat
 
 presets.sort((a, b) => a.start_date > b.start_date ? 1 : -1)
 for (var i = presets.length - 2; i >= 0; i--) {
-  const year = (presets[i].start_date || '').slice(0, 4)
-  if (year !== (presets[i + 1].start_date || '').slice(0, 4)) {
+  const year = (presets[i + 1].start_date || '').slice(0, 4)
+  if (year !== (presets[i].start_date || '').slice(0, 4)) {
     presets[i + 1].group = year
   }
 }
