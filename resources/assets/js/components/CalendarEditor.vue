@@ -67,7 +67,7 @@
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
         <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
-        <button type="button" class="btn btn-primary" @click.prevent="showPresets = true" v-if="cal.label == 'Uitzondering' && !showPresets">Volgende</button>
+        <button type="submit" class="btn btn-primary" @click.prevent="showPresets = true" v-if="cal.label == 'Uitzondering' && !showPresets">Volgende</button>
         <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
         <button type="submit" class="btn btn-primary" @click="saveLabel" v-else-if="cal.label == 'Uitzondering'">Bewaar</button>
         <button type="button" class="btn btn-primary" @click="save" v-else>Bewaar</button>
