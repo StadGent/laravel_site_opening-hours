@@ -194,10 +194,16 @@ export default {
         .forEach(({ start_date, rrule, until, ended }) => {
           // Repeating events
           if (rrule) {
+            const start = toDatetime(start_date)
+            const versionStart = toDatetime(this.$parent.version.start_date)
+            start.setFullYear(versionStart.getFullYear())
+            if (start < versionStart) {
+              start.setFullYear(start.getFullYear() + 1)
+            }
             this.cal.events.push(createEvent({
-              start_date: toDatetime(start_date),
+              start_date: start,
               until: toDatetime(this.$parent.version.end_date),
-              rrule: rrule + (rrule === 'FREQ=YEARLY' ? ';BYMONTH=' + (toDatetime(start_date).getMonth() + 1) + ';BYMONTHDAY=' + toDatetime(start_date).getDate() : '')
+              rrule: rrule + (rrule === 'FREQ=YEARLY' ? ';BYMONTH=' + (start.getMonth() + 1) + ';BYMONTHDAY=' + start.getDate() : '')
             }))
           }
 

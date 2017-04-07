@@ -187,8 +187,8 @@
       </div>
     </div>
 
-    <pre>{{ event.rrule }}
-{{ options }}</pre>
+<!--<pre>{{ event.rrule }}
+{{ options }}</pre>-->
 
     <div class="row" v-if="!nextEventSameLabel">
       <br>
