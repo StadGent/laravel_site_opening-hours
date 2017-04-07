@@ -27,9 +27,9 @@
         <br>
         <transition name="slideup">
           <div v-if="showPresets">
-            <h3>Voeg voorgedefineerde momenten toe</h3>
+            <h3>Voeg voorgedefineerde momenten toe (geldig vanaf 2017)</h3>
             <p class="text-muted">
-              Klik op 
+              Klik op
               <em>Bewaar</em>
               om ook andere momenten toe te voegen
             </p>
