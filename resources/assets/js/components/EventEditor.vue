@@ -291,6 +291,7 @@ export default {
 
         if (this.options.bymonthday) {
           this.options.bymonthday = toDatetime(this.event.start_date).getDate()
+          this.options.bymonth = toDatetime(this.event.start_date).getMonth() + 1
         }
         if (!this.isUntilValid) {
           this.warnTime('.inp-until')
