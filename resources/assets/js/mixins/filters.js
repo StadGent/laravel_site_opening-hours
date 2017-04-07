@@ -1,6 +1,6 @@
 window.Vue.filter('date', date)
 
-const MONTHS = 'jan,feb,maart,apr,mei,juni,juli,aug,sept,okt,nov,dec'.split(',')
+export const MONTHS = 'jan,feb,maart,apr,mei,juni,juli,aug,sept,okt,nov,dec'.split(',')
 
 function date(d) {
   if (!d) {

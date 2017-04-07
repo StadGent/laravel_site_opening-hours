@@ -15,14 +15,36 @@
         </p>
       </div>
 
-      <!-- Other calendars must be renamed -->
-      <div v-else-if="cal.label=='Uitzondering'">
+      <!-- Exception calendars must be renamed -->
+      <!-- Choose from presets -->
+      <div v-else-if="cal.label == 'Uitzondering'">
         <h3>Stel de uitzondering in.</h3>
-        <div class="form-group">
+        <div class="form-group required">
           <label>Naam uitzondering</label>
           <input type="text" class="form-control" v-model="calLabel" placeholder="Brugdagen, collectieve sluitingsdagen, ..." autofocus>
           <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
         </div>
+        <br>
+        <transition name="slideup">
+          <div v-if="showPresets">
+            <h3>Voeg voorgedefineerde momenten toe</h3>
+            <p class="text-muted">
+              Klik op 
+              <em>Bewaar</em>
+              om ook andere momenten toe te voegen
+            </p>
+
+            <div class="form-group">
+              <div class="checkbox checkbox--preset" v-for="(preset, index) in presets">
+                <hr v-if="preset.group" />
+                <label>
+                  <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
+                  <input type="checkbox" name="preset" :value="index" v-model="presetSelection"> {{ preset.label }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </transition>
       </div>
 
       <!-- Other calendars have more options -->
@@ -45,9 +67,10 @@
       <div class="col-xs-12 text-right">
         <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
         <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
-        <button type="button" class="btn btn-danger" v-if="disabled" disabled>Sla op</button>
-        <button type="submit" class="btn btn-primary" @click="saveLabel" v-else-if="cal.label=='Uitzondering'">Sla op</button>
-        <button type="button" class="btn btn-primary" @click="save" v-else>Sla op</button>
+        <button type="button" class="btn btn-primary" @click.prevent="showPresets = true" v-if="cal.label == 'Uitzondering' && !showPresets">Volgende</button>
+        <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
+        <button type="submit" class="btn btn-primary" @click="saveLabel" v-else-if="cal.label == 'Uitzondering'">Bewaar</button>
+        <button type="button" class="btn btn-primary" @click="save" v-else>Bewaar</button>
       </div>
     </div>
 
@@ -59,10 +82,20 @@
 
 <script>
 import EventEditor from '../components/EventEditor.vue'
-import { createEvent, createFirstEvent } from '../defaults.js'
+import { createEvent, createFirstEvent, presets } from '../defaults.js'
 import { cleanEmpty, Hub, toDatetime } from '../lib.js'
+import { MONTHS } from '../mixins/filters.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
+
+
+presets.sort((a, b) => a.start_date > b.start_date ? 1 : -1)
+for (var i = presets.length - 2; i >= 0; i--) {
+  const year = (presets[i].start_date || '').slice(0, 4)
+  if (year !== (presets[i + 1].start_date || '').slice(0, 4)) {
+    presets[i + 1].group = year
+  }
+}
 
 export default {
   name: 'calendar-editor',
@@ -72,7 +105,10 @@ export default {
       // options: {}
       calLabel: '',
       days: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'],
-      fullDays
+      fullDays,
+      presets,
+      presetSelection: [],
+      showPresets: false,
     }
   },
   computed: {
@@ -143,6 +179,46 @@ export default {
     this.$set(this.cal, 'closinghours', !!this.cal.closinghours)
     if (!this.cal.events) {
       this.$set(this.cal, 'events', [])
+    }
+  },
+  watch: {
+    presetSelection (selection) {
+      this.cal.events = []
+
+      selection
+        .map(s => this.presets[s])
+        .forEach(({ start_date, rrule, until, ended }) => {
+          // Repeating events
+          if (rrule) {
+            this.cal.events.push(createEvent({
+              start_date: toDatetime(start_date),
+              until: toDatetime(this.$parent.version.end_date),
+              rrule: rrule + (rrule === 'FREQ=YEARLY' ? ';BYMONTH=' + (toDatetime(start_date).getMonth() + 1) + ';BYMONTHDAY=' + toDatetime(start_date).getDate() : '')
+            }))
+          }
+
+          // Specific events
+          if (ended) {
+            this.cal.events.push(createEvent({
+              start_date: toDatetime(start_date),
+              until: new Date(toDatetime(ended).valueOf() - 36e5),
+              rrule: 'FREQ=DAILY'
+            }))
+          }
+        })
+    }
+  },
+  filters: {
+    dayMonth (d) {
+      const start = toDatetime(d.start_date)
+      const until = d.ended ? new Date(toDatetime(d.ended).valueOf() - 23 * 36e5) : start
+      if (start.getMonth() === until.getMonth()) {
+        if (start.getDate() === until.getDate()) {
+          return start.getDate() + ' ' + MONTHS[start.getMonth()]
+        }
+        return start.getDate() + ' - ' + until.getDate() + ' ' + MONTHS[start.getMonth()]
+      }
+      return start.getDate() + ' ' + MONTHS[start.getMonth()] + ' - ' + until.getDate() + ' ' + MONTHS[until.getMonth()]
     }
   },
   components: {

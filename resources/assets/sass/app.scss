@@ -436,3 +436,23 @@ h1+h3 {
     white-space: pre;
   }
 }
+
+.checkbox--preset {
+  margin: 0;
+  label {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: block;
+  }
+  .pull-right {
+    opacity: .5;
+  }
+}
+
+.required {
+  label::after {
+    content: '*';
+    color: red;
+    margin-left: 5px;
+  }
+}
