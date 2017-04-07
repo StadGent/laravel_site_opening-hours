@@ -51,3 +51,13 @@ function createServiceUri($serviceId)
 {
     return env('BASE_URI') . '/service/' . $serviceId;
 }
+
+function version($path)
+{
+    try {
+        return $path . (strpos($path, '?') ? '&' : '?') . 'v=' . filemtime(public_path() . '/' . $path);
+    } catch (\Exception $ex) {
+        // Failsafe when filemtime should fail
+        return $path;
+    }
+}
