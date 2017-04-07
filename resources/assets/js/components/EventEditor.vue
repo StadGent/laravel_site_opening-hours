@@ -187,8 +187,8 @@
       </div>
     </div>
 
-<!--     <pre>{{ event.rrule }}
-{{ options }}</pre> -->
+    <pre>{{ event.rrule }}
+{{ options }}</pre>
 
     <div class="row" v-if="!nextEventSameLabel">
       <br>
@@ -410,7 +410,7 @@ export default {
     },
     optionFreq: {
       get () {
-        return this.options.freq || 3
+        return this.options.freq
       },
       set (v) {
         this.options.freq = v
