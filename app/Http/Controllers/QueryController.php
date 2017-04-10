@@ -91,7 +91,7 @@ class QueryController extends Controller
             return response()->json(['message' => 'The service was not found.'], 404);
         }
 
-        return $this->formatWeek($service['id'], 'array', $channel, Carbon::now()->startOfWeek());
+        return $this->formatWeek($service['id'], 'array', $channel, Carbon::today()->startOfWeek());
     }
 
     /**
@@ -166,7 +166,7 @@ class QueryController extends Controller
                 // Iterate all calendars for the day of the week
                 foreach ($calendars as $calendar) {
                     $ical = $this->createIcalFromCalendar($calendar);
-
+                    //dd($ical);
                     $dayInfo = $this->extractDayInfo($ical, $day->toDateString(), $day->toDateString());
 
                     if (! empty($dayInfo)) {

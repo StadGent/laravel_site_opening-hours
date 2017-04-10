@@ -29,16 +29,16 @@ class LodServicesRepository
         // Transform the data in a compatible format
         $data = $this->transform($graphData);
 
-        while (! empty($graphData)) {
+        while (! empty($graphData) && false) {
             $page++;
             $graphData = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery($limit, ($limit * $page)));
 
             // Transform the data in a compatible format
             $data[] = $this->transform($graphData);
-            var_dump($data);
+
+            continue;
         }
 
-        dd($data);
         return $data;
     }
 
@@ -117,6 +117,7 @@ class LodServicesRepository
 
     /**
      * Return the SPARQL query that fetches all of the available services
+     * TODO: transform everything to a SELECT statement with paging + change transform accordingly
      *
      * @param  int    $limit
      * @param  int    $offset
@@ -124,42 +125,14 @@ class LodServicesRepository
      */
     private function getServicesQuery($limit, $offset)
     {
-        return 'SELECT ?agent ?p ?o
+        return 'CONSTRUCT { ?agent ?p ?o }
                 WHERE {
                     {
-                        ?agent a foaf:Agent;
-                        <http://purl.org/dc/terms/source> "VESTA"^^xsd:string ;
-                        <http://purl.org/dc/terms/type> "Stad Gent"^^<http://www.w3.org/2001/XMLSchema#string>;
-                        <http://purl.org/dc/terms/type> "Dienst"^^<http://www.w3.org/2001/XMLSchema#string>;
-                        <http://purl.org/dc/terms/identifier> ?vestaId;
-                        foaf:name ?name.
-                        ?agent ?p ?o.
-                    }
-                    UNION
-                    {
-                        ?agent a foaf:Agent;
-                        <http://purl.org/dc/terms/source> "VESTA"^^xsd:string;
-                        <http://purl.org/dc/terms/type> "Stad Gent"^^<http://www.w3.org/2001/XMLSchema#string>;
-                        <http://purl.org/dc/terms/type> "Departement"^^<http://www.w3.org/2001/XMLSchema#string>;
-                        <http://purl.org/dc/terms/identifier> ?vestaId;
-                        foaf:name ?name.
-                        ?agent ?p ?o.
-                    }
-                    UNION
-                    {
-                        ?agent a foaf:Agent;
-                        <http://purl.org/dc/terms/source> "VESTA"^^xsd:string;
-                        <http://purl.org/dc/terms/type> "OCMW"^^<http://www.w3.org/2001/XMLSchema#string>;
-                        <http://purl.org/dc/terms/identifier> ?vestaId;
-                        foaf:name ?name.
-                        ?agent ?p ?o.
-                    }
-                    UNION {
                         ?agent a foaf:Agent;
                         <http://purl.org/dc/terms/source> "RECREATEX"^^xsd:string ;
                         <http://purl.org/dc/terms/identifier> ?recreatexID.
                         ?agent ?p ?o.
                     }
-                } LIMIT ' . $limit . ' OFFSET ' . $offset;
+                }';
     }
 }
