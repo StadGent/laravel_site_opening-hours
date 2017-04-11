@@ -250,11 +250,15 @@ trait FormatsOpeninghours
                 return $calendar->priority;
             });
 
+            // Default status of a day is "Closed"
             $dayInfo = 'Gesloten';
+
+            // Add the max timestamp
+            $maxTimestamp = Carbon::today()->addDays(7);
 
             // Iterate all calendars for the day of the week
             foreach ($calendars as $calendar) {
-                $ical = $this->createIcalFromCalendar($calendar);
+                $ical = $this->createIcalFromCalendar($calendar, $maxTimestamp);
 
                 $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
@@ -283,24 +287,36 @@ trait FormatsOpeninghours
      * Create ICal from a calendar object
      *
      * @param  Calendar $calendar
+     * @param  Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, for performance
      * @return ICal
      */
-    protected function createIcalFromCalendar($calendar)
+    protected function createIcalFromCalendar($calendar, $maxTimestamp = null)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
+            $startDate = $this->convertIsoToIcal($event->start_date);
+            $endDate = $this->convertIsoToIcal($event->end_date);
+
+            $until = $event->until;
+
+            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
+                $until = $maxTimestamp->toDateString();
+            }
+
+            $until = $this->convertIsoToIcal($until);
+
             $icalString .= "BEGIN:VEVENT\n";
-            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $this->convertIsoToIcal($event->start_date) . "\n";
-            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $this->convertIsoToIcal($event->end_date) . "\n";
-            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $this->convertIsoToIcal($event->until) . "\n";
+            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
+            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until . "\n";
             $icalString .= 'UID:' . str_random(32) . "\n";
             $icalString .= "END:VEVENT\n";
         }
 
         $icalString .= 'END:VCALENDAR';
 
-        return new \ICal\ICal(explode(PHP_EOL, $icalString), 'MO');
+        return new \ICal\ICal(explode(PHP_EOL, $icalString));
     }
 
     /**
@@ -334,8 +350,14 @@ trait FormatsOpeninghours
         $hours = [];
 
         foreach ($events as $event) {
-            $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart_tz));
-            $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend_tz));
+            $start = str_replace('CEST', 'T', $event->dtstart);
+            $end = str_replace('CEST', 'T', $event->dtend);
+
+            $start = str_replace('CET', 'T', $start);
+            $end = str_replace('CET', 'T', $end);
+
+            $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
+            $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
 
             $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
         }

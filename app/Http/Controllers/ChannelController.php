@@ -66,8 +66,8 @@ class ChannelController extends Controller
      */
     public function show($id)
     {
-        $start = Carbon::now();
-        $end = Carbon::now();
+        $start = Carbon::today();
+        $end = Carbon::today();
 
         return [
             'label' => 'telefonisch',
