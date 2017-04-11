@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Events\OpeninghoursUpdated;
 use App\Models\Calendar;
 use App\Models\Channel;
 use App\Models\Event;
@@ -142,6 +143,8 @@ class FetchRecreatex extends Command
 
                         $sequenceNumber++;
                     }
+
+                    event(new OpeninghoursUpdated($openinghours->id));
                 } else {
                     $this->info('The service ' . $recreatexService->identifier . " already has a channel 'Algemeen', therefore we did not import any openinghours for this specific service.");
                 }

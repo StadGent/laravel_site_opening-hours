@@ -49,7 +49,13 @@ function createChannelUri($channelId)
 
 function createServiceUri($serviceId)
 {
-    return env('BASE_URI') . '/service/' . $serviceId;
+    $service = app('ServicesRepository')->getById($serviceId);
+
+    if (empty($service)) {
+        return env('BASE_URI') . '/service/' . $serviceId;
+    }
+
+    return $service['uri'];
 }
 
 function version($path)

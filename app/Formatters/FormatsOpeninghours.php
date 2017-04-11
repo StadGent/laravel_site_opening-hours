@@ -242,8 +242,6 @@ trait FormatsOpeninghours
 
         // Go to startDate and iterate over every day of the week after that
         // then check if there are events for that given day in the calendar, by priority
-        //$startDate = Carbon::now();
-
         $week = [];
 
         for ($day = 0; $day <= 6; $day++) {
