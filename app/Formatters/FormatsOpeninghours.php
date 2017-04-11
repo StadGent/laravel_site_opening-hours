@@ -209,6 +209,7 @@ trait FormatsOpeninghours
      *
      * @param  string $serviceUri
      * @param  string $channel
+     * @param  Carbon $startDate
      * @return array
      */
     protected function renderWeekForChannel($serviceUri, $channel, $startDate)
@@ -254,8 +255,11 @@ trait FormatsOpeninghours
             $dayInfo = 'Gesloten';
 
             // Add the max timestamp, allow for a margin
-            $maxTimestamp = Carbon::today()->addDays(8);
-            $minTimestamp = Carbon::today()->subDays(2)->startOfDay();
+            $maxTimestamp = $startDate;
+            $maxTimestamp->addDays(2)->endOfDay();
+
+            $minTimestamp = $startDate;
+            $minTimestamp->subDays(2)->startOfDay();
 
             // Iterate all calendars for the day of the week
             foreach ($calendars as $calendar) {

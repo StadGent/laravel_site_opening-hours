@@ -43,12 +43,13 @@ class SparqlService
      *
      * @param  string $query
      * @param  string $method
+     * @param  string $format
      * @return mixed
      */
-    public function performSparqlQuery($query, $method = 'GET')
+    public function performSparqlQuery($query, $method = 'GET', $format = 'turtle')
     {
         try {
-            $data = $this->executeQuery($this->prepareQuery($query), $method);
+            $data = $this->executeQuery($this->prepareQuery($query), $method, $format);
 
             if ($method == 'GET') {
                 return $data;
@@ -84,9 +85,11 @@ class SparqlService
      * pass query and request method, then return the result.
      *
      * @param  string $query
+     * @param  string $method
+     * @param  string $format Default format is turtle
      * @return string
      */
-    private function executeQuery($query, $method = 'GET')
+    private function executeQuery($query, $method = 'GET', $format = 'turtle')
     {
         $curl = curl_init();
 
@@ -96,10 +99,10 @@ class SparqlService
             curl_setopt($curl, CURLOPT_USERPWD, $this->username . ':' . $this->password);
         }
 
-        $format = '';
-
-        if ($method == 'GET') {
+        if ($method == 'GET' && empty($format)) {
             $format = 'turtle';
+        } elseif ($method != 'GET') {
+            $format = '';
         }
 
         $uri = $this->makeRequestUri($query, $format);
