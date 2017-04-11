@@ -5,6 +5,7 @@ namespace App\Formatters;
 use Carbon\Carbon;
 use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 
+// Set the default timezone to Brussels
 date_default_timezone_set('Europe/Brussels');
 
 /**
@@ -235,7 +236,6 @@ trait FormatsOpeninghours
         }
 
         if (empty($relevantOpeninghours)) {
-            // abort(404, 'No relevant openinghours found for this week.');
             return [];
         }
 
@@ -255,10 +255,11 @@ trait FormatsOpeninghours
 
             // Add the max timestamp
             $maxTimestamp = Carbon::today()->addDays(7);
+            $minTimestamp = Carbon::today()->startOfDay();
 
             // Iterate all calendars for the day of the week
             foreach ($calendars as $calendar) {
-                $ical = $this->createIcalFromCalendar($calendar, $maxTimestamp);
+                $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
                 $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
@@ -288,23 +289,38 @@ trait FormatsOpeninghours
      *
      * @param  Calendar $calendar
      * @param  Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, for performance
+     * @param  Carbon   $minTimestamp Optional, the max timestamp of the range to create the ical for, for performance
      * @return ICal
      */
-    protected function createIcalFromCalendar($calendar, $maxTimestamp = null)
+    protected function createIcalFromCalendar($calendar, $minTimestamp = null, $maxTimestamp = null)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
+            $until = carbonize($event->until);
+
+            // If we have an event of which the start date (and until date)
+            // falls out of the boundaries of min/max, skip it
+            $startDate = Carbon::createFromFormat('Y-m-d H:i:s', $event->start_date);
+
+            if (! empty($maxTimestamp)
+                && ! empty($minTimestamp)
+                && ! $startDate->between($minTimestamp, $maxTimestamp->endOfDay())) {
+                continue;
+            }
+
+            // If the until date is later than the max timestamp, move it to the
+            // max timestamp to avoid unnecessary calculations of events we're never
+            // going to use, another performance enhancement can be that we move the
+            // start date as well (this hasn't happened yet)
+            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
+                $until = $maxTimestamp;
+            }
+
             $startDate = $this->convertIsoToIcal($event->start_date);
             $endDate = $this->convertIsoToIcal($event->end_date);
 
-            $until = $event->until;
-
-            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
-                $until = $maxTimestamp->toDateString();
-            }
-
-            $until = $this->convertIsoToIcal($until);
+            $until = $this->convertIsoToIcal($until->toDateString());
 
             $icalString .= "BEGIN:VEVENT\n";
             $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";

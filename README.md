@@ -23,9 +23,19 @@ Copy the .env.example to .env and
 
 ## Fetch services
 
-In order to fetch services from the SPARQL endpoint (first configure the endpoint in the .env), you can run the following command:
+In order to fetch a list of services from the SPARQL endpoint you'll need to configure the SPARQL endpoint (READ). You can then run the following command:
 
     > php artisan openinghours:fetch-services
+
+This will fill the services table with the identifiers, labels of the available services from the SPARQL endpoint.
+
+## Fetch recreatex
+
+In order to add openinghours from the Recreatex application to services that are present in the Recreatex application, you can run the following command, after configuring the Recreatex variables in the .env file:
+
+    > php artisan openinghours:fetch-recreatex
+
+Note: this will import openinghours from 2017 up until 2020.
 
 ## Email
 

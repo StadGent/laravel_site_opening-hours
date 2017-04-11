@@ -39,6 +39,7 @@ class QueryController extends Controller
                     $data = $this->isOpenOnDay($day, $request);
                 } catch (\Exception $ex) {
                     \Log::error($ex->getMessage());
+                    \Log::error($ex->getTraceAsString());
                     return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
                 }
                 break;
@@ -155,7 +156,7 @@ class QueryController extends Controller
                 }
             }
 
-            if (! empty($openinghours)) {
+            if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
                     return $calendar->priority;
@@ -166,7 +167,7 @@ class QueryController extends Controller
                 // Iterate all calendars for the day of the week
                 foreach ($calendars as $calendar) {
                     $ical = $this->createIcalFromCalendar($calendar);
-                    //dd($ical);
+
                     $dayInfo = $this->extractDayInfo($ical, $day->toDateString(), $day->toDateString());
 
                     if (! empty($dayInfo)) {
