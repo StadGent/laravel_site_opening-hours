@@ -56,7 +56,7 @@ trait FormatsOpeninghours
     protected function renderWeek($serviceId, $channel = '', $startDate = null)
     {
         if (empty($startDate)) {
-            $startDate = Carbon::now();
+            $startDate = Carbon::today();
         }
 
         $service = app('ServicesRepository')->getById($serviceId);
@@ -253,9 +253,9 @@ trait FormatsOpeninghours
             // Default status of a day is "Closed"
             $dayInfo = 'Gesloten';
 
-            // Add the max timestamp
-            $maxTimestamp = Carbon::today()->addDays(7);
-            $minTimestamp = Carbon::today()->startOfDay();
+            // Add the max timestamp, allow for a margin
+            $maxTimestamp = Carbon::today()->addDays(8);
+            $minTimestamp = Carbon::today()->subDays(2)->startOfDay();
 
             // Iterate all calendars for the day of the week
             foreach ($calendars as $calendar) {
@@ -285,7 +285,7 @@ trait FormatsOpeninghours
     }
 
     /**
-     * Create ICal from a calendar object
+     * Create an ICal object from a calendar object
      *
      * @param  Calendar $calendar
      * @param  Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, for performance
@@ -297,15 +297,23 @@ trait FormatsOpeninghours
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
-            $until = carbonize($event->until);
-
             // If we have an event of which the start date (and until date)
             // falls out of the boundaries of min/max, skip it
             $startDate = Carbon::createFromFormat('Y-m-d H:i:s', $event->start_date);
+            $until = Carbon::createFromFormat('Y-m-d', $event->until)->endOfDay();
 
+            // If the event falls within the range of min/max, add the event
+            // otherwise continue with the following event
             if (! empty($maxTimestamp)
                 && ! empty($minTimestamp)
-                && ! $startDate->between($minTimestamp, $maxTimestamp->endOfDay())) {
+                && (
+                    ($startDate->toDateString() < $minTimestamp->startOfDay()->toDateString()
+                        && $event->until < $minTimestamp->toDateString())
+                    ||
+                    ($event->until > $maxTimestamp->toDateString()
+                        && $startDate->toDateString() > $maxTimestamp->toDateString())
+                    )
+                ) {
                 continue;
             }
 
@@ -314,7 +322,7 @@ trait FormatsOpeninghours
             // going to use, another performance enhancement can be that we move the
             // start date as well (this hasn't happened yet)
             if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
-                $until = $maxTimestamp;
+                $until = $maxTimestamp->endOfDay();
             }
 
             $startDate = $this->convertIsoToIcal($event->start_date);
@@ -344,7 +352,7 @@ trait FormatsOpeninghours
     protected function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
-        return $date->format('YmdTHis');
+        return $date->format('Ymd\THis');
     }
 
     /**

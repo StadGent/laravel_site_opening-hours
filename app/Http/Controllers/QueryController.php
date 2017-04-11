@@ -156,6 +156,13 @@ class QueryController extends Controller
                 }
             }
 
+            // Add the max timestamp, foresee a window of margin
+            $maxTimestamp = $day;
+            $maxTimestamp->addDays(2);
+
+            $minTimestamp = $day;
+            $minTimestamp->subDay(2);
+
             if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
@@ -166,7 +173,7 @@ class QueryController extends Controller
 
                 // Iterate all calendars for the day of the week
                 foreach ($calendars as $calendar) {
-                    $ical = $this->createIcalFromCalendar($calendar);
+                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
                     $dayInfo = $this->extractDayInfo($ical, $day->toDateString(), $day->toDateString());
 
@@ -246,6 +253,10 @@ class QueryController extends Controller
                 }
             }
 
+            // Add the min/max timestamp for performance increase, allow for margin
+            $maxTimestamp = Carbon::today()->addDays(2);
+            $minTimestamp = Carbon::today()->subDays(2)->startOfDay();
+
             if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
@@ -254,7 +265,7 @@ class QueryController extends Controller
 
                 // Iterate all calendars for the day of the week
                 foreach ($calendars as $calendar) {
-                    $ical = $this->createIcalFromCalendar($calendar);
+                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
                     if ($this->hasEventForRange($ical, $now->toIso8601String(), $now->toIso8601String())) {
                         $status = $calendar->closinghours == 0 ? 'Open' : 'Gesloten';
