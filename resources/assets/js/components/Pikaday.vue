@@ -50,7 +50,7 @@ export default {
     this.pikaday.destroy()
   },
   watch: {
-    value (date, old) {
+    value (date) {
       this.$nextTick(() => {
         if (this.pikaday && this.pikaday.getDate().toJSON().slice(0, 10) !== date) {
           this.pikaday.setDate(date)
