@@ -5,7 +5,6 @@ namespace App\Formatters;
 use Carbon\Carbon;
 use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 
-// Set the default timezone to Brussels
 date_default_timezone_set('Europe/Brussels');
 
 /**
@@ -56,7 +55,7 @@ trait FormatsOpeninghours
     protected function renderWeek($serviceId, $channel = '', $startDate = null)
     {
         if (empty($startDate)) {
-            $startDate = Carbon::today();
+            $startDate = Carbon::now();
         }
 
         $service = app('ServicesRepository')->getById($serviceId);
@@ -209,7 +208,6 @@ trait FormatsOpeninghours
      *
      * @param  string $serviceUri
      * @param  string $channel
-     * @param  Carbon $startDate
      * @return array
      */
     protected function renderWeekForChannel($serviceUri, $channel, $startDate)
@@ -237,11 +235,14 @@ trait FormatsOpeninghours
         }
 
         if (empty($relevantOpeninghours)) {
+            // abort(404, 'No relevant openinghours found for this week.');
             return [];
         }
 
         // Go to startDate and iterate over every day of the week after that
         // then check if there are events for that given day in the calendar, by priority
+        //$startDate = Carbon::now();
+
         $week = [];
 
         for ($day = 0; $day <= 6; $day++) {
@@ -252,16 +253,12 @@ trait FormatsOpeninghours
             // Default status of a day is "Closed"
             $dayInfo = 'Gesloten';
 
-            // Add the max timestamp, allow for a margin
-            $maxTimestamp = $startDate;
-            $maxTimestamp->addDays(2)->endOfDay();
-
-            $minTimestamp = $startDate;
-            $minTimestamp->subDays(2)->startOfDay();
+            // Add the max timestamp
+            $maxTimestamp = Carbon::today()->addDays(7);
 
             // Iterate all calendars for the day of the week
             foreach ($calendars as $calendar) {
-                $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
+                $ical = $this->createIcalFromCalendar($calendar, $maxTimestamp);
 
                 $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
@@ -287,60 +284,39 @@ trait FormatsOpeninghours
     }
 
     /**
-     * Create an ICal object from a calendar object
+     * Create ICal from a calendar object
      *
      * @param  Calendar $calendar
      * @param  Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, for performance
-     * @param  Carbon   $minTimestamp Optional, the max timestamp of the range to create the ical for, for performance
      * @return ICal
      */
-    protected function createIcalFromCalendar($calendar, $minTimestamp = null, $maxTimestamp = null)
+    protected function createIcalFromCalendar($calendar, $maxTimestamp = null)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
-            // If we have an event of which the start date (and until date)
-            // falls out of the boundaries of min/max, skip it
-            $startDate = Carbon::createFromFormat('Y-m-d H:i:s', $event->start_date);
-            $until = Carbon::createFromFormat('Y-m-d', $event->until)->endOfDay();
-
-            // If the event falls within the range of min/max, add the event
-            // otherwise continue with the following event
-            if (! empty($maxTimestamp)
-                && ! empty($minTimestamp)
-                && (
-                    ($startDate->toDateString() < $minTimestamp->startOfDay()->toDateString()
-                        && $event->until < $minTimestamp->toDateString())
-                    ||
-                    ($event->until > $maxTimestamp->toDateString()
-                        && $startDate->toDateString() > $maxTimestamp->toDateString())
-                    )
-                ) {
-                continue;
-            }
-
-            // If the until date is later than the max timestamp, move it to the
-            // max timestamp to avoid unnecessary calculations of events we're never
-            // going to use, another performance enhancement can be that we move the
-            // start date as well (this hasn't happened yet)
-            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
-                $until = $maxTimestamp->endOfDay();
-            }
-
             $startDate = $this->convertIsoToIcal($event->start_date);
             $endDate = $this->convertIsoToIcal($event->end_date);
 
-            $until = $this->convertIsoToIcal($until->toDateString());
+            $until = $event->until;
+
+            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
+                $until = $maxTimestamp->toDateString();
+            }
+
+            $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
 
             $icalString .= "BEGIN:VEVENT\n";
             $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
             $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
-            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until . "\n";
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('YmdTHis') . "\n";
             $icalString .= 'UID:' . str_random(32) . "\n";
             $icalString .= "END:VEVENT\n";
         }
 
         $icalString .= 'END:VCALENDAR';
+
+        \Log::info($icalString);
 
         return new \ICal\ICal(explode(PHP_EOL, $icalString));
     }
@@ -354,7 +330,7 @@ trait FormatsOpeninghours
     protected function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
-        return $date->format('Ymd\THis');
+        return $date->format('YmdTHis');
     }
 
     /**

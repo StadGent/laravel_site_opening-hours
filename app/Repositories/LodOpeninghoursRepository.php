@@ -21,9 +21,10 @@ class LodOpeninghoursRepository
      */
     public function update($service, $channel, $openinghoursId, $graph)
     {
-        $query = $this->makeUpdateSparqlQuery($service, $channel, $openinghoursId, $graph);
+        list($deleteQuery, $newTriples) = $this->makeDeleteAndInsertSparqlQuery($service, $channel, $openinghoursId, $graph);
 
-        return $this->makeSparqlService()->performSparqlQuery($query, 'POST');
+        $this->makeSparqlService()->performSparqlQuery($deleteQuery, 'GET');
+        $this->makeSparqlService()->performSparqlQuery($newTriples, 'POST');
     }
 
     /**
@@ -44,7 +45,7 @@ class LodOpeninghoursRepository
 
         $query = $this->createRemoveChannelQuery($channelId);
 
-        $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
+        $result = $this->makeSparqlService()->performSparqlQuery($query, 'GET');
     }
 
     /**
@@ -66,20 +67,19 @@ class LodOpeninghoursRepository
 
         $query = $this->createRemoveOpeninghoursQuery($openinghoursId);
 
-        $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
+        $result = $this->makeSparqlService()->performSparqlQuery($query, 'GET');
     }
 
     /**
-     * Make a SPARQL query that writes openinghours information based
-     * on a DELETE/INSERT statement
+     * Make a SPARQL delete statement and return new triples that need to be inserted
      *
      * @param  string        $serviceUri
      * @param  array         $channel
      * @param  int           $openinghoursId
      * @param  EasyRdf_Graph $graph
-     * @return bool
+     * @return array
      */
-    private function makeUpdateSparqlQuery($service, $channel, $openinghoursId, $graph)
+    private function makeDeleteAndInsertSparqlQuery($service, $channel, $openinghoursId, $graph)
     {
         $serviceUri = createServiceUri($service['id']);
         $channelUri = createChannelUri($channel['id']);
@@ -95,13 +95,7 @@ class LodOpeninghoursRepository
 
         $deleteQuery = $this->createRemoveOpeninghoursQuery($openinghoursId);
 
-        $query = "
-            $headers
-            $deleteQuery
-            INSERT { $triples }
-        ";
-
-        return $query;
+        return [$headers . ' ' . $deleteQuery, $headers . ' ' . $triples];
     }
 
     /**
@@ -202,14 +196,12 @@ class LodOpeninghoursRepository
                     ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
                     ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
                     ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                    ?vevent ?pVevent ?rrule.
+                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
                     OPTIONAL {
                         ?vevent ?pVevent ?rrule.
                         ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                     }
-                    OPTIONAL {
-                        ?vevent ?pVevent ?rrule.
-                        ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                        ?rrule ?pRrule ?rruleObj.
+                        OPTIONAL {?rrule ?pRrule ?rruleObj.}
                     }
                 }
         }";
@@ -256,15 +248,11 @@ class LodOpeninghoursRepository
                 ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
                 ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
                 ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                OPTIONAL {
-                    ?vevent ?pVevent ?rrule.
-                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                }
-                OPTIONAL {
-                    ?vevent ?pVevent ?rrule.
-                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                    ?rrule ?pRrule ?rruleObj.
-                }
+                    OPTIONAL {
+                        ?vevent ?pVevent ?rrule.
+                        ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
+                        OPTIONAL {?rrule ?pRrule ?rruleObj.}
+                    }
         }";
     }
 }

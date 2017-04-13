@@ -42,6 +42,11 @@ function createOpeninghoursUri($openinghoursId)
     return env('BASE_URI') . '/openinghours/' . $openinghoursId;
 }
 
+function createCalendarUri($openinghoursId, $calendarId)
+{
+    return env('BASE_URI') . '/openinghours/' . $openinghoursId . '/calendar/' . $calendarId;
+}
+
 function createChannelUri($channelId)
 {
     return env('BASE_URI') . '/channel/' . $channelId;

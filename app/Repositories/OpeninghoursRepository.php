@@ -145,7 +145,11 @@ class OpeninghoursRepository extends EloquentRepository
             $openinghoursResource->addResource('oh:calendar', $calendarList);
 
             foreach ($calendars as $calendar) {
-                $calendarResource = $openinghoursGraph->newBNode('oh:Calendar');
+                $calendarResource = $openinghoursGraph->resource(
+                    createCalendarUri($openinghoursId, $calendar['id']),
+                    'oh:Calendar'
+                );
+
                 $calendarList->addResource('rdf:first', $calendarResource);
 
                 // Make a calendar Resource
