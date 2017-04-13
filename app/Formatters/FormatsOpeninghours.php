@@ -316,8 +316,6 @@ trait FormatsOpeninghours
 
         $icalString .= 'END:VCALENDAR';
 
-        \Log::info($icalString);
-
         return new \ICal\ICal(explode(PHP_EOL, $icalString));
     }
 

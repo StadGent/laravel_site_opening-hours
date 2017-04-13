@@ -25,6 +25,11 @@ class OpeninghourModelInitialSetup extends Migration
             $table->string('label', 255);
             $table->integer('service_id')->unsigned();
             $table->timestamps();
+
+            $table->foreign('service_id')
+                ->references('id')
+                ->on('services')
+                ->onDelete('cascade');
         });
 
         Schema::create('openinghours', function ($table) {
@@ -35,6 +40,11 @@ class OpeninghourModelInitialSetup extends Migration
             $table->string('label', 255);
             $table->integer('channel_id')->unsigned();
             $table->timestamps();
+
+            $table->foreign('channel_id')
+                ->references('id')
+                ->on('channels')
+                ->onDelete('cascade');
         });
 
         Schema::create('calendars', function ($table) {
@@ -44,6 +54,11 @@ class OpeninghourModelInitialSetup extends Migration
             $table->string('label', 255);
             $table->integer('openinghours_id')->unsigned();
             $table->timestamps();
+
+             $table->foreign('openinghours_id')
+                ->references('id')
+                ->on('openinghours')
+                ->onDelete('cascade');
         });
 
         Schema::create('events', function ($table) {
@@ -53,6 +68,11 @@ class OpeninghourModelInitialSetup extends Migration
             $table->timestamp('end_date');
             $table->integer('calendar_id')->unsigned();
             $table->timestamps();
+
+            $table->foreign('calendar_id')
+                ->references('id')
+                ->on('calendars')
+                ->onDelete('cascade');
         });
     }
 

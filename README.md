@@ -16,7 +16,7 @@ Copy the .env.example to .env and
 
     composer install
     artisan migrate
-    artisan db:seed
+    artisan db:seed # This will generate an admin user with a random generated password that's outputted to the command line, the default email is admin@foo.bar.
 
     npm install
     gulp build

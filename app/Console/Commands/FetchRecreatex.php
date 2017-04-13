@@ -148,6 +148,7 @@ class FetchRecreatex extends Command
                         }
 
                         event(new OpeninghoursUpdated($openinghours->id));
+
                     } else {
                         if (empty($openinghoursList)) {
                             $this->info('The service ' . $recreatexService->identifier . " has no events for year $year.");
