@@ -93,6 +93,13 @@ import { MONTHS } from '../mixins/filters.js'
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 
 
+// Returns 10 character ISO string if date is valid
+// or empty string if not
+function toDateString (date, otherwise) {
+  return !date ? toDateString(otherwise, new Date()) : typeof date === 'string' ? date.slice(0, 10) :
+    date.toJSON ? date.toJSON().slice(0, 10) : toDateString(otherwise, new Date())
+}
+
 presets.sort((a, b) => a.start_date > b.start_date ? 1 : -1)
 for (var i = presets.length - 2; i >= 0; i--) {
   const year = (presets[i + 1].start_date || '').slice(0, 4)
@@ -120,15 +127,31 @@ export default {
       return this.cal.events
     },
     disabled () {
+      // Start before end
       if (this.events.filter(e => e.start_date > e.end_date).length) {
         return true
       }
+
+      // Start before until
       if (this.events.filter(e => e.start_date.slice(0, 10) > e.until.slice(0, 10)).length) {
         return true
       }
+
+      // Start before versionStart or end before versionEnd
+      if (this.events.filter(e => e.start_date.slice(0, 10) < this.versionStartDate || e.until.slice(0, 10) > this.versionEndDate).length) {
+        return true
+      }
+
+      // Name cannot be 'Uitzondering'
       if (this.cal.label === 'Uitzondering' && (!this.calLabel || this.calLabel === 'Uitzondering')) {
         return true
       }
+    },
+    versionStartDate() {
+      return toDateString(this.$parent.version.start_date)
+    },
+    versionEndDate() {
+      return toDateString(this.$parent.version.end_date)
     }
   },
   methods: {

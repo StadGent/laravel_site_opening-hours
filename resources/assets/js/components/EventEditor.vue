@@ -3,7 +3,7 @@
     <div class="row" :class="{ 'has-error text-danger': !isUntilValid }" v-if="event.rrule && $parent.cal.layer" style="margin-bottom:15px;">
       <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig' }} {{ options.freq==RRule.DAILY ? 'van' : 'op' }}</label>
-        <pikaday class="form-control" v-model="eventStartDate" :options="pikadayStart" />
+        <pikaday class="form-control inp-startDate" v-model="eventStartDate" :options="pikadayStart" />
       </div>
       <div :class="'col-xs-' + (closinghours ? 5 : 6)">
         <label class="control-label">tot en met</label>
@@ -256,12 +256,6 @@ export default {
       if (!event.until) {
         this.$set(event, 'until', this.versionEndDate)
       }
-      if (event.start_date < this.versionStartDate) {
-        this.$set(event, 'start_date', this.versionStartDate)
-      }
-      if (event.until > this.versionEndDate) {
-        this.$set(event, 'until', this.versionEndDate)
-      }
 
       return event
     },
@@ -293,8 +287,8 @@ export default {
           this.options.bymonthday = toDatetime(this.event.start_date).getDate()
           this.options.bymonth = toDatetime(this.event.start_date).getMonth() + 1
         }
-        if (!this.isUntilValid) {
-          this.warnTime('.inp-until')
+        if (this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)) {
+          this.warnTime('.inp-startDate', 'Dit tijdstip moet voor het eindtijdstip liggen.')
         }
       }
     },
@@ -356,22 +350,18 @@ export default {
       set (v) {
         // console.debug('set until ', v)
         this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 10)
-        if (!this.isUntilValid) {
-          this.warnTime('.inp-until')
+        if (this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)) {
+          this.warnTime('.inp-until', 'Dit tijdstip moet na het start tijdstip liggen.')
+        } else if (this.$root.routeVersion.end_date < this.event.until) {
+          this.warnTime('.inp-until', 'Dit tijdstip moet voor het einde van de kalender liggen.')
         }
       }
     },
     pikadayStart () {
-      return {
-        minDate: toDatetime(this.$root.routeVersion.start_date),
-        maxDate: toDatetime(this.$root.routeVersion.end_date)
-      }
+      return {}
     },
     pikadayUntil () {
-      return {
-        minDate: toDatetime(this.$root.routeVersion.start_date),
-        maxDate: toDatetime(this.$root.routeVersion.end_date)
-      }
+      return {}
     },
     hasDates () {
       return typeof this.options.freq === 'number'
@@ -465,13 +455,14 @@ export default {
     },
     isUntilValid () {
       return this.event.start_date.slice(0, 10) <= this.event.until.slice(0, 10)
+        && this.$root.routeVersion.end_date >= this.event.until
     }
   },
   methods: {
-    warnTime (selector) {
+    warnTime (selector, message) {
       const elem = $(this.$el).find(selector)
       elem.tooltip({
-        title: 'Het begintijdstip moet vroeger vallen dan het eindtijdstip.',
+        title: message || 'Het begintijdstip moet vroeger vallen dan het eindtijdstip.',
         toggle: 'manual'
       })
       setTimeout(() => {
