@@ -232,6 +232,7 @@ class FetchRecreatex extends Command
 
         $firstWeek = key($weekBuffer);
 
+        // Parse weekly RRULEs from the week schedules
         $recurringBuffer = $weekBuffer[$firstWeek]['schedules'];
         unset($weekBuffer[$firstWeek]);
 

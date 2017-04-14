@@ -31,7 +31,11 @@ This will fill the services table with the identifiers, labels of the available 
 
 ## Fetch recreatex
 
-In order to add openinghours from the Recreatex application to services that are present in the Recreatex application, you can run the following command, after configuring the Recreatex variables in the .env file:
+In order to add openinghours from the Recreatex application to services that are present in the Recreatex application, you can command below, after configuring the Recreatex variables in the .env file:
+This command will fetch services that are available in the application and have a recreatex source, a property fetched during the retrieval of services from the SPARQL endpoint using the fetch-services command.
+The recreatex command will fetch services using the configured recreatex endpoint and shop-id and will do so, year by year, currently configured to fetch from 2017 until 2020. The channels that are made are called
+Infrastructuur-YYYY where YYYY is the year for which events were fetched. Because Recreatex doesn't save it's events in a calendar standard, rather it saves every single day as an array of 2 events (maximum).
+This would result in 365 events per channel, which is far from optimal to work with without additional tweaking, therefore a small algorithm was written that parses weekly RRULEs from the yearly event list.
 
     > php artisan openinghours:fetch-recreatex
 
