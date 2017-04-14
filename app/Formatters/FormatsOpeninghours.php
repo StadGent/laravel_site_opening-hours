@@ -308,9 +308,6 @@ trait FormatsOpeninghours
             /*$startDate = $this->convertIsoToIcal($event->start_date);
             $endDate = $this->convertIsoToIcal($event->end_date);*/
 
-            $startDate = new Carbon($event->start_date);
-            $endDate = new Carbon($event->end_date);
-
             $until = $event->until;
 
             if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
@@ -329,7 +326,7 @@ trait FormatsOpeninghours
 
                 if ($endDate->toDateString() > $until && $endDate->toDateString() > $startDate->toDateString()) {
                     $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
-                    $endDate->month = $until->month;
+                    $endDate->month = $untilDate->month;
                 }
 
                 $startDate = $this->convertCarbonToIcal($startDate);
