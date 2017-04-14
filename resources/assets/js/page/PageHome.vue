@@ -150,6 +150,12 @@ export default {
       return this.sortedUsers.slice(this.route.offset || 0, this.route.offset + pageSize)
     }
   },
+  watch: {
+    draft () {
+      // Reset offset on tab change
+      this.route.offset = 0
+    }
+  },
   components: {
     Pagination,
     RowService,
