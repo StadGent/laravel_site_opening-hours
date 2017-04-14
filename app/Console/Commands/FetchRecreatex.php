@@ -147,8 +147,9 @@ class FetchRecreatex extends Command
                             $sequenceNumber++;
                         }
 
-                        event(new OpeninghoursUpdated($openinghours->id));
+                        $this->info('Imported calendar for year ' . $year . ' for service ' . $recreatexService->label . '(' . $recreatexService->identifier . ')');
 
+                        event(new OpeninghoursUpdated($openinghours->id));
                     } else {
                         if (empty($openinghoursList)) {
                             $this->info('The service ' . $recreatexService->identifier . " has no events for year $year.");
@@ -158,7 +159,6 @@ class FetchRecreatex extends Command
                     }
                 }
             }
-            dd("don't forget to remove meh");
         }
     }
 
