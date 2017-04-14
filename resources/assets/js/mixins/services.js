@@ -111,13 +111,19 @@ export default {
       }
       console.log('Create version', inert(version))
 
+      // This will trigger 4 API requests
+      // * create new version
+      // * refresh all services/channels/versions
+      // * create first calendar in newly created version
+      // * get first calendar
+      // The user can now edit the first calendar of the new version
       this.$http.post('/api/openinghours', version).then(({ data }) => {
-        this.fetchServices()
         this.modalClose()
-        this.toVersion(data.id)
-        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
-          openinghours_id: data.id
-        }))
+        this.fetchServices().then(() => {
+          Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
+            openinghours_id: data.id
+          }), true)
+        })
       }).catch(fetchError)
     })
 
@@ -170,6 +176,7 @@ export default {
           }
           this.routeVersion.calendars.push(data)
           this.toCalendar(data.id)
+          done && this.toVersion(data.openinghours_id)
         }).catch(fetchError)
       }
     })
