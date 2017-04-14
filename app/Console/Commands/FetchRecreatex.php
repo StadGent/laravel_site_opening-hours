@@ -65,12 +65,12 @@ class FetchRecreatex extends Command
         $this->recreatexUri = env('RECREATEX_URI');
 
         if (empty($this->shopId)) {
-            throw new \Exception("No shop ID was found, we can't fetch openinghours from the RECREATEX webservice without it.
+            \Log::error("No shop ID was found, we can't fetch openinghours from the RECREATEX webservice without it.
                 You can configure a shop ID in the .env file.");
         }
 
         if (empty($this->recreatexUri)) {
-            throw new \Exception("No recreatexUri was found, we can't fetch openinghours from the RECREATEX webservice without it.
+            \Log::error("No recreatexUri was found, we can't fetch openinghours from the RECREATEX webservice without it.
                 You can configure a recreatexUri in the .env file.");
         }
     }
