@@ -157,10 +157,10 @@ class QueryController extends Controller
             }
 
             // Add the max timestamp, foresee a window of margin
-            $maxTimestamp = $day;
+            $maxTimestamp = clone $day;
             $maxTimestamp->addDays(2);
 
-            $minTimestamp = $day;
+            $minTimestamp = clone $day;
             $minTimestamp->subDay(2);
 
             if (! empty($relevantOpeninghours)) {

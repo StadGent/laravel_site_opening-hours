@@ -145,14 +145,14 @@ class FetchRecreatex extends Command
                                 $sequenceNumber++;
                             }
 
-                            $this->info('Imported calendar for year ' . $year . ' for service ' . $recreatexService->label . '(' . $recreatexService->identifier . ')');
+                            $this->info('Imported calendar for year ' . $year . ' for service ' . $recreatexService->label . ' (' . $recreatexService->identifier . ')');
 
                             event(new OpeninghoursUpdated($openinghours->id));
                         } else {
                             if (empty($openinghoursList)) {
-                                $this->info('The service ' . $recreatexService->identifier . " has no events for year $year.");
+                                $this->info('The service ' . $recreatexService->label . ' (' . $recreatexService->identifier . ") has no events for year $year.");
                             } else {
-                                $this->info('The service ' . $recreatexService->identifier . " already has a channel $channelName, therefore we did not import any openinghours for this specific service.");
+                                $this->info('The service ' . $recreatexService->label . ' (' . $recreatexService->identifier . ") already has a channel $channelName, therefore we did not import any openinghours for this specific service.");
                             }
                         }
                     }
@@ -167,9 +167,10 @@ class FetchRecreatex extends Command
      * from a list of daily (!!) events over 1 year.
      *
      * @param  array $openinghoursList
+     * @param  int   $year             The year to parse the events for
      * @return array
      */
-    private function transformOpeninghours($openinghoursList)
+    private function transformOpeninghours($openinghoursList, $year)
     {
         $transformedList = [];
 
@@ -181,18 +182,49 @@ class FetchRecreatex extends Command
 
             $until = '';
 
+            // Make sure the events are daily events
+            $nextEventPossible = true;
+
+            // Recreatex tends to give the last day of the previous year even though the requests
+            // asks specifically to start from the first day of the given year
+            $eventDay = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['Date']);
+
+            if ($eventDay->year != $year) {
+                continue;
+            }
+
             if (! empty($openinghoursEvent['From1']) && ! empty($openinghoursEvent['To1'])) {
-                $from = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['From1']);
-                $to = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['To1']);
+                $fromTimestamp = $openinghoursEvent['From1'];
+
+                if (str_contains($fromTimestamp, '00:00:00')) {
+                    $from = clone $eventDay;
+                    $from->startOfDay();
+                } else {
+                    $from = Carbon::createFromFormat('Y-m-d\TH:i:s', $fromTimestamp);
+                }
+
+                // Catch the 00:00 case, the feed is supposed to deliver daily events
+                // but to make a "full day open" 2 days are passed with the second day
+                // having 00:00
+                $toTimestamp = $openinghoursEvent['To1'];
+
+                if (str_contains($toTimestamp, '00:00:00')) {
+                    $nextEventPossible = false;
+
+                    $to = clone $eventDay;
+                    $to->endOfDay();
+                } else {
+                    $to = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['To1']);
+                }
 
                 $key = $from->format('H:i') . '-' . $to->format('H:i');
 
                 $timespans[$key] = $from->dayOfWeek;
                 $parsedWeek = $from->weekOfYear;
-                $until = $to;
+                $until = clone $from;
             }
 
-            if (! empty($openinghoursEvent['From2']) && ! empty($openinghoursEvent['To2'])) {
+            if (! empty($openinghoursEvent['From2']) && ! empty($openinghoursEvent['To2']) && $nextEventPossible) {
                 $from = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['From2']);
                 $to = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['To2']);
 
@@ -200,26 +232,40 @@ class FetchRecreatex extends Command
 
                 $timespans[$key] = $from->dayOfWeek;
                 $parsedWeek = $from->weekOfYear;
-                $until = $to;
+                $until = $from;
             }
 
             // Add the timespans to the week schedule
             if (! empty($timespans)) {
                 foreach ($timespans as $timespan => $day) {
-                    if (empty($weekBuffer[$parsedWeek]['schedules'])) {
-                        $weekBuffer[$parsedWeek] = [];
-                        $weekBuffer[$parsedWeek]['schedules'] = [];
-                    }
-
-                    if (empty($weekBuffer[$parsedWeek]['schedules'][$timespan])) {
-                        $weekBuffer[$parsedWeek]['schedules'][$timespan] = ['days' => [$day], 'start' => $from, 'end' => $to, 'until' => $to];
+                    // Week 1 and 52 can overlap, spanning a year
+                    // keep them separate and add them as daily events
+                    if ($parsedWeek == 52 || $parsedWeek == 1) {
+                        $transformedList[] = [
+                            'days' => [$day],
+                            'start' => clone $from,
+                            'end' => clone $to,
+                            'until' => clone $eventDay
+                        ];
                     } else {
-                        $weekBuffer[$parsedWeek]['schedules'][$timespan]['days'][] = $day;
-                        asort($weekBuffer[$parsedWeek]['schedules'][$timespan]['days']);
-                        $weekBuffer[$parsedWeek]['schedules'][$timespan]['until'] = $to;
-                    }
+                        if (empty($weekBuffer[$parsedWeek]['schedules'])) {
+                            $weekBuffer[$parsedWeek] = [];
+                            $weekBuffer[$parsedWeek]['schedules'] = [];
+                        }
 
-                    $weekBuffer[$parsedWeek]['until'] = $until;
+                        if (empty($weekBuffer[$parsedWeek]['schedules'][$timespan])) {
+                            $weekBuffer[$parsedWeek]['schedules'][$timespan] = ['days' => [$day], 'start' => clone $from, 'end' => clone $to, 'until' => clone $eventDay];
+                        } else {
+                            $weekBuffer[$parsedWeek]['schedules'][$timespan]['days'][] = $day;
+                            $days = $weekBuffer[$parsedWeek]['schedules'][$timespan]['days'];
+                            $days = array_unique($days);
+
+                            $weekBuffer[$parsedWeek]['schedules'][$timespan]['days'] = $days;
+                            $weekBuffer[$parsedWeek]['schedules'][$timespan]['until'] = clone $eventDay;
+                        }
+
+                        $weekBuffer[$parsedWeek]['until'] = clone $eventDay;
+                    }
                 }
             }
         }
@@ -242,7 +288,7 @@ class FetchRecreatex extends Command
             $newBuffer = [];
 
             foreach ($schedule as $timespan => $timespanConfig) {
-                if (array_key_exists($timespan, $recurringBuffer) && $timespanConfig['days'] == $recurringBuffer[$timespan]['days']) {
+                if (array_key_exists($timespan, $recurringBuffer) && array_values($timespanConfig['days']) == array_values($recurringBuffer[$timespan]['days'])) {
                     $recurringBuffer[$timespan]['until'] = $until;
                 } else {
                     $newBuffer[$timespan] = $timespanConfig;

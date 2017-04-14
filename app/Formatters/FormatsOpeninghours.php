@@ -254,10 +254,10 @@ trait FormatsOpeninghours
             $dayInfo = 'Gesloten';
 
             // Add the max timestamp
-            $maxTimestamp = $startDate;
+            $maxTimestamp = clone $startDate;
             $maxTimestamp = $maxTimestamp->addDay(2);
 
-            $minTimestamp = $startDate;
+            $minTimestamp = clone $startDate;
             $minTimestamp = $minTimestamp->subDay(2);
 
             // Iterate all calendars for the day of the week
