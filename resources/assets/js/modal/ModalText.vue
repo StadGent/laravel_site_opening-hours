@@ -115,7 +115,7 @@ export default {
       if (!this.modal.start_date || !this.modal.end_date) {
         return 'Nieuwe versie'
       }
-      return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + (parseInt(this.modal.end_date.slice(0, 4), 10) - 1)
+      return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + this.modal.end_date.slice(0, 4))
     },
 
     allowedServices () {
