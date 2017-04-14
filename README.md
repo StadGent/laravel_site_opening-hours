@@ -9,9 +9,12 @@ Copy the .env.example to .env and
 - Fill in the Queue driver, for production environments use redis, beanstalkd or SQS. DO NOT use sync as a queue, rather use database in testing environments
 - Fill in the base URI that is used to build the LOD version of the openinghours
 - Fill in the SPARQL configuration to read data from
-- Fill in the SPARQL configuration to write data to, don't forget the name of the graph
+- Fill in the SPARQL configuration to write data to, don't forget the name of the graph and the specific endpoint of the sparql-graph-crud-auth, which is used to
+write (possibly) larger amounts of triples to.
 - Mails are sent through sendgrid, if available use an API key, if not implement a version of AppMailer and create a binding in the IoC
-- Set session driver to database
+- Set session driver to database for testing (use any other for production apart from database and sync https://laravel.com/docs/5.4/queues)
+- Set 1 worker in supervisor (https://laravel.com/docs/5.4/queues#supervisor-configuration) to handle the writes to the different systems
+    Only using 1 will make sure no dirty read/writes will happen to the SPARQL endpoint, to improve this one can configure different queues for each of the event tubes (vesta, virtuoso)
 - Build the back & front-end
 
     composer install
