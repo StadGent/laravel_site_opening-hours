@@ -122,7 +122,7 @@ export default {
         this.fetchServices().then(() => {
           Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
             openinghours_id: data.id
-          }), true)
+          }), 'calendar')
         })
       }).catch(fetchError)
     })
@@ -175,8 +175,8 @@ export default {
             this.$set(this.routeVersion, 'calendars', [])
           }
           this.routeVersion.calendars.push(data)
+          this.toVersion(data.openinghours_id)
           this.toCalendar(data.id)
-          done && this.toVersion(data.openinghours_id)
         }).catch(fetchError)
       }
     })
