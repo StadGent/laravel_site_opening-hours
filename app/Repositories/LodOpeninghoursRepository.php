@@ -76,7 +76,6 @@ class LodOpeninghoursRepository
         $queries = $this->createRemoveOpeninghoursQueries($openinghoursId);
 
         foreach ($queries as $query) {
-            \Log::info($query);
             $result = $this->makeSparqlService()->performSparqlQuery($query, 'GET');
         }
     }
