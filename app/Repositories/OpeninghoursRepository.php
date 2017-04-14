@@ -160,7 +160,7 @@ class OpeninghoursRepository extends EloquentRepository
                 foreach ($calendar['events'] as $event) {
                     $eventResource = $openinghoursGraph->newBNode('ical:Vevent');
                     $eventResource->addLiteral('ical:dtend', $event['end_date']);
-                    $eventResource->addLiteral('ical:dtstart', $event['end_date']);
+                    $eventResource->addLiteral('ical:dtstart', $event['start_date']);
 
                     $rruleResource = $openinghoursGraph->newBNode();
                     $eventResource->addResource('ical:rrule', $rruleResource);

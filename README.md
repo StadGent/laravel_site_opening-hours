@@ -9,23 +9,40 @@ Copy the .env.example to .env and
 - Fill in the Queue driver, for production environments use redis, beanstalkd or SQS. DO NOT use sync as a queue, rather use database in testing environments
 - Fill in the base URI that is used to build the LOD version of the openinghours
 - Fill in the SPARQL configuration to read data from
-- Fill in the SPARQL configuration to write data to, don't forget the name of the graph
+- Fill in the SPARQL configuration to write data to, don't forget the name of the graph and the specific endpoint of the sparql-graph-crud-auth, which is used to
+write (possibly) larger amounts of triples to.
 - Mails are sent through sendgrid, if available use an API key, if not implement a version of AppMailer and create a binding in the IoC
-- Set session driver to database
+- Set session driver to database for testing (use any other for production apart from database and sync https://laravel.com/docs/5.4/queues)
+- Set 1 worker in supervisor (https://laravel.com/docs/5.4/queues#supervisor-configuration) to handle the writes to the different systems
+    Only using 1 will make sure no dirty read/writes will happen to the SPARQL endpoint, to improve this one can configure different queues for each of the event tubes (vesta, virtuoso)
 - Build the back & front-end
 
     composer install
     artisan migrate
-    artisan db:seed
+    artisan db:seed # This will generate an admin user with a random generated password that's outputted to the command line, the default email is admin@foo.bar.
 
     npm install
     gulp build
 
 ## Fetch services
 
-In order to fetch services from the SPARQL endpoint (first configure the endpoint in the .env), you can run the following command:
+In order to fetch a list of services from the SPARQL endpoint you'll need to configure the SPARQL endpoint (READ). You can then run the following command:
 
     > php artisan openinghours:fetch-services
+
+This will fill the services table with the identifiers, labels of the available services from the SPARQL endpoint.
+
+## Fetch recreatex
+
+In order to add openinghours from the Recreatex application to services that are present in the Recreatex application, you can command below, after configuring the Recreatex variables in the .env file:
+This command will fetch services that are available in the application and have a recreatex source, a property fetched during the retrieval of services from the SPARQL endpoint using the fetch-services command.
+The recreatex command will fetch services using the configured recreatex endpoint and shop-id and will do so, year by year, currently configured to fetch from 2017 until 2020. The channels that are made are called
+Infrastructuur-YYYY where YYYY is the year for which events were fetched. Because Recreatex doesn't save it's events in a calendar standard, rather it saves every single day as an array of 2 events (maximum).
+This would result in 365 events per channel, which is far from optimal to work with without additional tweaking, therefore a small algorithm was written that parses weekly RRULEs from the yearly event list.
+
+    > php artisan openinghours:fetch-recreatex
+
+Note: this will import openinghours from 2017 up until 2020.
 
 ## Email
 

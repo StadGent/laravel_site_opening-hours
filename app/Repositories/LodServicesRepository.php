@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Services\SparqlService;
 use EasyRdf_Graph as Graph;
-use EasyRdf_Parser_Turtle as Parser;
 
 /**
  * This class is responsible for fetching services from a SPARQL endpoint
@@ -15,28 +14,35 @@ class LodServicesRepository
      * Return the services fetched from the SPARQL endpoint
      * in a structure that is compatible with our internal Service model
      *
+     * @param  string $type recreatex or vesta
      * @return array
      */
-    public function fetchServices()
+    public function fetchServices($type)
     {
         $limit = 100;
         $page = 0;
 
         $data = [];
 
-        $graphData = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery($limit, 0));
+        $fetchFunction = 'get' . ucfirst($type) . 'ServicesQuery';
+
+        $semanticResults = $this->makeSparqlService()->performSparqlQuery($this->$fetchFunction($limit, 0), 'GET', 'json');
 
         // Transform the data in a compatible format
-        $data = $this->transform($graphData);
+        $transformedData = $this->transform($semanticResults);
 
-        while (! empty($graphData) && false) {
+        $data = array_merge($data, array_values($transformedData));
+
+        while (! empty($transformedData)) {
             $page++;
-            $graphData = $this->makeSparqlService()->performSparqlQuery($this->getServicesQuery($limit, ($limit * $page)));
+            $semanticResults = $this->makeSparqlService()->performSparqlQuery($this->$fetchFunction($limit, ($limit * $page)), 'GET', 'json');
 
             // Transform the data in a compatible format
-            $data[] = $this->transform($graphData);
+            $transformedData = $this->transform($semanticResults);
 
-            continue;
+            if (! empty($transformedData)) {
+                $data = array_merge($data, array_values($transformedData));
+            }
         }
 
         return $data;
@@ -64,75 +70,87 @@ class LodServicesRepository
      */
     private function transform($data)
     {
-        $graph = $this->parseResults($data);
-
         $services = [];
 
-        collect($graph->allOfType('foaf:Agent'))
-                        ->each(function ($agent) use (&$services) {
-                            $services[] = [
-                                'label' => $this->getLiteral($agent, 'foaf:name'),
-                                'uri' => $agent->getUri(),
-                                'identifier' => $this->getLiteral($agent, 'dcterms:identifier'),
-                                'source' => strtolower($this->getLiteral($agent, 'dcterms:source'))
-                            ];
-                        });
+        $data = json_decode($data, true);
+        $data = array_get($data, 'results.bindings', []);
+
+        if (empty($data)) {
+            return $services;
+        }
+
+        collect($data)->each(function ($agent) use (&$services) {
+            $identifier = array_get($agent, 'identifier.value', '');
+
+            if (! empty($identifier)) {
+                $services[] = [
+                    'label' => array_get($agent, 'name.value', ''),
+                    'uri' => array_get($agent, 'agent.value', ''),
+                    'identifier' => $identifier
+                ];
+            }
+        });
 
         return $services;
     }
 
     /**
-     * Get the literal value from a resource
-     *
-     * @param  EasyRdf_Resource $resource
-     * @return string
-     */
-    private function getLiteral($resource, string $property)
-    {
-        $literal = $resource->getLiteral($property);
-
-        if (empty($literal)) {
-            return '';
-        }
-
-        return $literal->getValue();
-    }
-
-    /**
-     * Parse the graph results and return an internal model compatible list
-     * of the services (e.g. conform our Eloquent model)
-     *
-     * @param  Graph  $graph
-     * @return [type]
-     */
-    private function parseResults($data)
-    {
-        $graph = new Graph();
-
-        $parser = new Parser();
-        $parser->parse($graph, $data, 'turtle', null);
-
-        return $graph;
-    }
-
-    /**
      * Return the SPARQL query that fetches all of the available services
-     * TODO: transform everything to a SELECT statement with paging + change transform accordingly
+     * coming from VESTA
      *
      * @param  int    $limit
      * @param  int    $offset
      * @return string
      */
-    private function getServicesQuery($limit, $offset)
+    private function getVestaServicesQuery($limit, $offset)
     {
-        return 'CONSTRUCT { ?agent ?p ?o }
+        return 'SELECT ?agent ?identifier ?name
                 WHERE {
-                    {
-                        ?agent a foaf:Agent;
-                        <http://purl.org/dc/terms/source> "RECREATEX"^^xsd:string ;
-                        <http://purl.org/dc/terms/identifier> ?recreatexID.
-                        ?agent ?p ?o.
-                    }
-                }';
+                {
+                    ?agent a foaf:Agent;
+                    <http://purl.org/dc/terms/source> "VESTA"^^xsd:string ;
+                    <http://purl.org/dc/terms/type> "Stad Gent"^^<http://www.w3.org/2001/XMLSchema#string>;
+                    <http://purl.org/dc/terms/type> "Dienst"^^<http://www.w3.org/2001/XMLSchema#string>;
+                    <http://purl.org/dc/terms/identifier> ?identifier;
+                    foaf:name ?name.
+                }
+                UNION
+                {
+                    ?agent a foaf:Agent;
+                    <http://purl.org/dc/terms/source> "VESTA"^^xsd:string;
+                    <http://purl.org/dc/terms/type> "Stad Gent"^^<http://www.w3.org/2001/XMLSchema#string>;
+                    <http://purl.org/dc/terms/type> "Departement"^^<http://www.w3.org/2001/XMLSchema#string>;
+                    <http://purl.org/dc/terms/identifier> ?identifier;
+                    foaf:name ?name.
+                }
+                UNION
+                {
+                    ?agent a foaf:Agent;
+                    <http://purl.org/dc/terms/source> "VESTA"^^xsd:string;
+                    <http://purl.org/dc/terms/type> "OCMW"^^<http://www.w3.org/2001/XMLSchema#string>;
+                    <http://purl.org/dc/terms/identifier> ?identifier;
+                    foaf:name ?name.
+                }
+                } ' . " LIMIT $limit OFFSET $offset";
+    }
+
+    /**
+     * Return the SPARQL query that fetches services of the available services
+     * coming from RECREATEX
+     *
+     * @param  int    $limit
+     * @param  int    $offset
+     * @return string
+     */
+    private function getRecreatexServicesQuery($limit, $offset)
+    {
+        return 'SELECT ?agent ?identifier ?name
+                WHERE
+                {
+                    ?agent a foaf:Agent;
+                    <http://purl.org/dc/terms/source> "RECREATEX"^^xsd:string ;
+                    <http://purl.org/dc/terms/identifier> ?identifier.
+                    ?agent foaf:name ?name.
+                } ' . " LIMIT $limit OFFSET $offset";
     }
 }

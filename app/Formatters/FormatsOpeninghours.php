@@ -304,12 +304,12 @@ trait FormatsOpeninghours
                 $until = $maxTimestamp->toDateString();
             }
 
-            $until = $this->convertIsoToIcal($until);
+            $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
 
             $icalString .= "BEGIN:VEVENT\n";
             $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
             $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
-            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until . "\n";
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('YmdTHis') . "\n";
             $icalString .= 'UID:' . str_random(32) . "\n";
             $icalString .= "END:VEVENT\n";
         }

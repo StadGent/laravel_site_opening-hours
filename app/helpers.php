@@ -42,6 +42,11 @@ function createOpeninghoursUri($openinghoursId)
     return env('BASE_URI') . '/openinghours/' . $openinghoursId;
 }
 
+function createCalendarUri($openinghoursId, $calendarId)
+{
+    return env('BASE_URI') . '/openinghours/' . $openinghoursId . '/calendar/' . $calendarId;
+}
+
 function createChannelUri($channelId)
 {
     return env('BASE_URI') . '/channel/' . $channelId;
@@ -49,7 +54,13 @@ function createChannelUri($channelId)
 
 function createServiceUri($serviceId)
 {
-    return env('BASE_URI') . '/service/' . $serviceId;
+    $service = app('ServicesRepository')->getById($serviceId);
+
+    if (empty($service)) {
+        return env('BASE_URI') . '/service/' . $serviceId;
+    }
+
+    return $service['uri'];
 }
 
 function version($path)

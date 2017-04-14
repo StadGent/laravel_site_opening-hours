@@ -39,15 +39,21 @@ class FetchServices implements ShouldQueue
     {
         $services = app('ServicesRepository');
 
-        collect((new LodServicesRepository())->fetchServices())->each(function ($service) use ($services) {
-            $uniqueProperties = array_only($service, ['uri', 'identifier']);
+        $types = ['vesta', 'recreatex'];
 
-            try {
-                $services->updateOrCreate($uniqueProperties, $service);
-            } catch (\Exception $ex) {
-                \Log::error('An error occured while upserting services: ' . $ex->getMessage());
-                \Log::error($ex->getTraceAsString());
-            }
-        });
+        foreach ($types as $type) {
+            collect((new LodServicesRepository())->fetchServices($type))->each(function ($service) use ($services, $type) {
+                $uniqueProperties = array_only($service, ['uri', 'identifier']);
+
+                $service['source'] = $type;
+
+                try {
+                    $services->updateOrCreate($uniqueProperties, $service);
+                } catch (\Exception $ex) {
+                    \Log::error('An error occured while upserting services: ' . $ex->getMessage());
+                    \Log::error($ex->getTraceAsString());
+                }
+            });
+        }
     }
 }

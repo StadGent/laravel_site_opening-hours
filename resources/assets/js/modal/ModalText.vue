@@ -115,7 +115,7 @@ export default {
       if (!this.modal.start_date || !this.modal.end_date) {
         return 'Nieuwe versie'
       }
-      return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + (parseInt(this.modal.end_date.slice(0, 4), 10) - 1)
+      return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + this.modal.end_date.slice(0, 4)
     },
 
     allowedServices () {
@@ -149,6 +149,21 @@ export default {
       // Align events with start_date and end_date
       if (this.modal.id && this.modal.calendars) {
         const version = this.modal
+
+        // Look for events that pose problems
+        let invalid = false
+        this.modal.calendars.forEach(cal => {
+          cal.events.forEach(event => {
+            if (cal.layer && event.start_date < version.start_date) {
+              invalid = true
+            }
+          })
+        })
+        if (invalid) {
+          return alert('Er mogen geen events beginnen voor de start van de versie.\n\nDe wijziging werd niet doorgevoerd.')
+        }
+
+        // Update the event until date
         this.modal.calendars.forEach(cal => {
           let changed = false
           cal.events.forEach(event => {
