@@ -254,11 +254,15 @@ trait FormatsOpeninghours
             $dayInfo = 'Gesloten';
 
             // Add the max timestamp
-            $maxTimestamp = Carbon::today()->addDays(7);
+            $maxTimestamp = $startDate;
+            $maxTimestamp = $maxTimestamp->addDay(2);
+
+            $minTimestamp = $startDate;
+            $minTimestamp = $minTimestamp->subDay(2);
 
             // Iterate all calendars for the day of the week
             foreach ($calendars as $calendar) {
-                $ical = $this->createIcalFromCalendar($calendar, $maxTimestamp);
+                $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
                 $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
@@ -286,17 +290,26 @@ trait FormatsOpeninghours
     /**
      * Create ICal from a calendar object
      *
-     * @param  Calendar $calendar
-     * @param  Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, for performance
+     * @param Calendar $calendar
+     * @param Carbon   $minTimestamp Optional, the min timestamp of the range to create the ical for, used for performance
+     * @param Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, used for performance
+     *
+     * Note: possible performance tweak is to edit the start/enddate so that the amount of events remains small for long lasting recurrences
+     * CAVEAT: make sure that the start/enddate is edit correctly to avoid unwanted behaviour, e.g. if the startdate was originally on a monday
+     * keep it on a monday as close as possible to the min/max range.
+     *
      * @return ICal
      */
-    protected function createIcalFromCalendar($calendar, $maxTimestamp = null)
+    protected function createIcalFromCalendar($calendar, $minTimestamp = null, $maxTimestamp = null)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
-            $startDate = $this->convertIsoToIcal($event->start_date);
-            $endDate = $this->convertIsoToIcal($event->end_date);
+            /*$startDate = $this->convertIsoToIcal($event->start_date);
+            $endDate = $this->convertIsoToIcal($event->end_date);*/
+
+            $startDate = new Carbon($event->start_date);
+            $endDate = new Carbon($event->end_date);
 
             $until = $event->until;
 
@@ -304,14 +317,32 @@ trait FormatsOpeninghours
                 $until = $maxTimestamp->toDateString();
             }
 
-            $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
+            if ($until >= $minTimestamp->toDateString() || empty($minTimestamp)) {
+                // Performance tweak
+                $startDate = new Carbon($event->start_date);
+                $endDate = new Carbon($event->end_date);
+                $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
 
-            $icalString .= "BEGIN:VEVENT\n";
-            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
-            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
-            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('YmdTHis') . "\n";
-            $icalString .= 'UID:' . str_random(32) . "\n";
-            $icalString .= "END:VEVENT\n";
+                if ($startDate < $minTimestamp && $startDate->day <= 28) {
+                    $startDate->month = $minTimestamp->month;
+                }
+
+                if ($endDate->toDateString() > $until && $endDate->toDateString() > $startDate->toDateString()) {
+                    $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
+                    $endDate->month = $until->month;
+                }
+
+                $startDate = $this->convertCarbonToIcal($startDate);
+                $endDate = $this->convertCarbonToIcal($endDate);
+                $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
+
+                $icalString .= "BEGIN:VEVENT\n";
+                $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
+                $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
+                $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('YmdTHis') . "\n";
+                $icalString .= 'UID:' . str_random(32) . "\n";
+                $icalString .= "END:VEVENT\n";
+            }
         }
 
         $icalString .= 'END:VCALENDAR';
@@ -320,10 +351,21 @@ trait FormatsOpeninghours
     }
 
     /**
+     * Format a Carbon date to YYYYmmddThhmmss
+     *
+     * @param  Carbon $date
+     * @return string
+     */
+    protected function convertCarbonToIcal($date)
+    {
+        return $date->format('YmdTHis');
+    }
+
+    /**
      * Format an ISO date to YYYYmmddThhmmss
      *
-     * @param string $date
-     * @return
+     * @param  string $date
+     * @return string
      */
     protected function convertIsoToIcal($date)
     {
