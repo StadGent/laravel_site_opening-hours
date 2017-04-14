@@ -160,7 +160,7 @@ export default {
           })
         })
         if (invalid) {
-          return alert('Er mogen geen events beginnen voor de start van de versie.\n\nDe wijziging werd niet doorgevoerd.')
+          return alert('Er mogen geen uitzonderingen beginnen voor de start van de versie.\n\nDe wijziging werd niet doorgevoerd.')
         }
 
         // Update the event until date
