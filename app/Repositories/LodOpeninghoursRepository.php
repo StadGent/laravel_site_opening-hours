@@ -178,7 +178,6 @@ class LodOpeninghoursRepository
                 ?channel a <http://data.europa.eu/m8g/Channel>.
                 ?channel <http://data.europa.eu/m8g/isOwnedBy> ?service.
                 ?channel ?openinghours ?oh.
-                ?oh ?x ?z.
                 ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>.
                 ?channel ?openinghours ?oh.
                 ?oh <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
