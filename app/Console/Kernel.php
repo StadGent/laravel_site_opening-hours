@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('openinghours:fetch-services')->weekly();
+        //$schedule->command('openinghours:fetch-services')->weekly();
     }
 
     /**

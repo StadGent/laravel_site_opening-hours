@@ -14,11 +14,10 @@ write (possibly) larger amounts of triples to.
 - Mails are sent through sendgrid, if available use an API key, if not implement a version of AppMailer and create a binding in the IoC
 - Set session driver to database for testing (use any other for production apart from database and sync https://laravel.com/docs/5.4/queues)
 - Set 1 worker in supervisor (https://laravel.com/docs/5.4/queues#supervisor-configuration) to handle the writes to the different systems
-    Only using 1 will make sure no dirty read/writes will happen to the SPARQL endpoint, to improve this one can configure different queues for each of the event tubes (vesta, virtuoso)
+    Only using 1 will make sure no dirty read/writes will happen to the SPARQL endpoint, you can use supervisor or a custom system that keeps a Laravel worker up and running. Make sure that the worker is restarted after an update on the software. (php artisan queue:restart)
 - Build the back & front-end
 
     composer install
-    php artisan cache:table
     artisan migrate
     artisan db:seed # This will generate an admin user with a random generated password that's outputted to the command line, the default email is admin@foo.bar.
 
