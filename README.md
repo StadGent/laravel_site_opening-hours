@@ -18,11 +18,23 @@ write (possibly) larger amounts of triples to.
 - Build the back & front-end
 
     composer install
+    php artisan cache:table
     artisan migrate
     artisan db:seed # This will generate an admin user with a random generated password that's outputted to the command line, the default email is admin@foo.bar.
 
     npm install
     gulp build
+
+## Maintenance
+
+When updating the software the commands you'll want to run are the following:
+
+    composer install
+    composer update
+    gulp build
+    php artisan migrate
+    php artisan cache:clear
+    php artisan queue:restart
 
 ## Fetch services
 
