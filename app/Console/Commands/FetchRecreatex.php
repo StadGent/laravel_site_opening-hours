@@ -375,7 +375,7 @@ class FetchRecreatex extends Command
         'Accept: text/xml',
         'Cache-Control: no-cache',
         'Pragma: no-cache',
-        'SOAPAction:  http://www.recreatex.be/webshop/v3.8/IWebShop/FindInfrastructureOpenings',
+        'SOAPAction:  http://www.recreatex.be/webshop/IWebShop/FindInfrastructureOpenings',
         'Content-length: ' . strlen($soapBody),
         ];
 
@@ -407,18 +407,20 @@ class FetchRecreatex extends Command
 
     private function makeSoapBody($recreatexId, $year)
     {
-        return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v3="http://www.recreatex.be/webshop/v3.8/">
-                <soapenv:Header/>
-                <soapenv:Body>
-                <v3:Context>
-                <v3:ShopId>' . $this->shopId . '</v3:ShopId>
-            </v3:Context>
-            <v3:InfrastructureOpeningsSearchCriteria>
-            <v3:InfrastructureId>' . $recreatexId . '</v3:InfrastructureId>
-            <v3:From>' . $year . '-01-01T00:00:00.8115784+02:00</v3:From>
-            <v3:Until>' . ++$year . '-01-01T00:00:00.8115784+02:00</v3:Until>
-        </v3:InfrastructureOpeningsSearchCriteria>
-        </soapenv:Body>
-        </soapenv:Envelope>';
+        return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v3="http://www.recreatex.be/webshop/">
+                  <soapenv:Header/>
+                  <soapenv:Body>
+                    <v3:FindInfrastructureOpeningsRequest>
+                      <v3:Context>
+                        <v3:ShopId>' . $this->shopId . '</v3:ShopId>
+                      </v3:Context>
+                      <v3:InfrastructureOpeningsSearchCriteria>
+                        <v3:InfrastructureId>' . $recreatexId . '</v3:InfrastructureId>
+                        <v3:From>' . $year . '-01-01T00:00:00.8115784+02:00</v3:From>
+                        <v3:Until>' . ++$year . '-01-01T00:00:00.8115784+02:00</v3:Until>
+                      </v3:InfrastructureOpeningsSearchCriteria>
+                    </v3:FindInfrastructureOpeningsRequest>
+                  </soapenv:Body>
+                </soapenv:Envelope>';
     }
 }
