@@ -402,7 +402,7 @@ class FetchRecreatex extends Command
         $fullJson = json_decode($json, true);
 
         // Parse the InfrastructureOpeningHours from the body
-        return array_get($fullJson, 'InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour', []);
+        return array_get($fullJson, 'InfrastructureOpenings.InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour', []);
     }
 
     private function makeSoapBody($recreatexId, $year)
