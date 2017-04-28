@@ -9,6 +9,23 @@ engines:
       languages:
       - php
       - javascript
+  phpcodesniffer:
+    enabled: true
+    config:
+      standard: "PSR1,PSR2"
+  phpmd:
+    enabled: true
+    checks:
+      CleanCode/StaticAccess:
+        enabled: false
+      Naming/ShortVariable:
+        enabled: false
+      Naming/ShortMethodName:
+        enabled: false
+      Naming/BooleanGetMethodName:
+        enabled: false
+      CleanCode/BooleanArgumentFlag:
+        enabled: false
 exclude_paths:
 - public/js/chunks/*
 - resources/assets/sass/vendor/*
