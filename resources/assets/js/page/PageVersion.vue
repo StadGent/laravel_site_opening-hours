@@ -46,7 +46,7 @@
           <!-- Encourage to add calendars after first one -->
           <div class="text-center" v-if="reversedCalendars.length===1">
             <p style="padding-top:3em">
-              Je normale openingsuren zijn ingesteld.  
+              Je normale openingsuren zijn ingesteld.
             </p>
             <p>
               Om vakantieperiodes, nationale feestdagen of andere uitzondering in te stellen, druk op "<a href="#" @click.prevent="addCalendar">Voeg uitzonderingen toe</a>".
@@ -111,8 +111,8 @@ export default {
   },
   methods: {
     swapLayers (a, b) {
-      a = this.calendars.find(c => c.layer === a) 
-      b = this.calendars.find(c => c.layer === b) 
+      a = this.calendars.find(c => c.layer === a)
+      b = this.calendars.find(c => c.layer === b)
       if (a && b) {
         const p = a.priority
         a.priority = b.priority
@@ -132,7 +132,7 @@ export default {
       const newCal = this.calendars.length ? createCalendar(this.calendars.length, {
         start_date: toDatetime(this.version.start_date)
       }) : createFirstCalendar(this.version)
-      console.log(inert(newCal))
+
       Hub.$emit('createCalendar', newCal)
     }
   },

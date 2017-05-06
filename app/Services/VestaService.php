@@ -4,7 +4,7 @@ namespace App\Services;
 
 /**
  * This class writes text to the VESTA application based on a certain VESTA UID
- * Kudos: http://stackoverflow.com/questions/14770898/soapenvelope-soap-envenvelope-php
+ * Kudos to stackoverflow so that ancient protocols can still be used: http://stackoverflow.com/questions/14770898/soapenvelope-soap-envenvelope-php
  */
 class VestaService
 {

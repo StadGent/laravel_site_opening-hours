@@ -22,30 +22,34 @@ class QueryController extends Controller
     {
         $type = $request->input('q');
 
-        switch ($type) {
-            case 'this-week':
-                $data = $this->renderThisWeekSchedule($request);
-                break;
-            case 'week':
-                $data = $this->renderWeekSchedule($request);
-                break;
-            case 'now':
-                $data = $this->isOpenNow($request);
-                break;
-            case 'day':
-                try {
-                    $day = new Carbon($request->input('date'));
+        try {
+            switch ($type) {
+                case 'this-week':
+                    $data = $this->renderThisWeekSchedule($request);
+                    break;
+                case 'week':
+                    $data = $this->renderWeekSchedule($request);
+                    break;
+                case 'now':
+                    $data = $this->isOpenNow($request);
+                    break;
+                case 'day':
+                    try {
+                        $day = new Carbon($request->input('date'));
 
-                    $data = $this->isOpenOnDay($day, $request);
-                } catch (\Exception $ex) {
-                    \Log::error($ex->getMessage());
-                    \Log::error($ex->getTraceAsString());
-                    return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
-                }
-                break;
-            default:
-                abort(400, 'The endpoint did not find a handler for your query.');
-                break;
+                        $data = $this->isOpenOnDay($day, $request);
+                    } catch (\Exception $ex) {
+                        \Log::error($ex->getMessage());
+                        \Log::error($ex->getTraceAsString());
+                        return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
+                    }
+                    break;
+                default:
+                    abort(400, 'The endpoint did not find a handler for your query.');
+                    break;
+            }
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], 400);
         }
 
         // Check if the format paramater is passed and supported

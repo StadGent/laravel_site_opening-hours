@@ -72,7 +72,7 @@ trait FormatsOpeninghours
         }
 
         if (empty($channels)) {
-            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
+            throw new \Exception('Deze dienst heeft geen enkel kanaal met openingsuren.');
         }
 
         $openinghours = [];
