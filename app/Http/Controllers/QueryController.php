@@ -24,8 +24,8 @@ class QueryController extends Controller
 
         try {
             switch ($type) {
-                case 'this-week':
-                    $data = $this->renderThisWeekSchedule($request);
+                case 'fullWeek':
+                    $data = $this->renderFullWeekSchedule($request);
                     break;
                 case 'week':
                     $data = $this->renderWeekSchedule($request);
@@ -81,13 +81,22 @@ class QueryController extends Controller
      * @param  Request $request
      * @return array
      */
-    private function renderThisWeekSchedule($request)
+    private function renderFullWeekSchedule($request)
     {
         $services = app('ServicesRepository');
 
         // Get the service URI for which we need to compute the week schedule
         $serviceUri = $request->input('serviceUri');
         $channel = $request->input('channel');
+
+        // Check if there's a specific date passed to get the week number for
+        $date = $request->input('date');
+
+        if (empty($date)) {
+            $date = Carbon::today();
+        } else {
+            $date = new Carbon($date);
+        }
 
         // Get the service
         $service = $services->where('uri', $serviceUri)->first();
@@ -96,7 +105,7 @@ class QueryController extends Controller
             return response()->json(['message' => 'The service was not found.'], 404);
         }
 
-        return $this->formatWeek($service['id'], 'array', $channel, Carbon::today()->startOfWeek());
+        return $this->formatWeek($service['id'], 'array', $channel, $date->startOfWeek());
     }
 
     /**

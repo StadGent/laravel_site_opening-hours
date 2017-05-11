@@ -74,9 +74,9 @@ If no channel is passed, all channels will be returned with a schedule of the co
 
 - {host}/api/query?q=week&serviceUri={serviceUri}&channel={channel}&format={format}
 
-### Get the schedule for this week
+### Get a week schedule starting on monday, passing a date is optional and if passed will return the monday-sunday schedule of the week that the date falls in
 
-- {host}/api/query?q=this-week&serviceUri={serviceUri}&channel={channel}&format={format}
+- {host}/api/query?q=fullWeek&serviceUri={serviceUri}&channel={channel}&date=dd-mm-yyyy&format={format}
 
 ### Is something open right now?
 

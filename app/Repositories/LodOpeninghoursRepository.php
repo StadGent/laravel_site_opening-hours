@@ -178,6 +178,7 @@ class LodOpeninghoursRepository
                 ?channel a <http://data.europa.eu/m8g/Channel>.
                 ?channel <http://data.europa.eu/m8g/isOwnedBy> ?service.
                 ?channel ?openinghours ?oh.
+                ?channel <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> ?representation.
                 ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>.
                 ?channel ?openinghours ?oh.
                 ?oh <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
@@ -196,6 +197,7 @@ class LodOpeninghoursRepository
             WHERE {
                 ?channel a <http://data.europa.eu/m8g/Channel>.
                 ?channel <http://data.europa.eu/m8g/isOwnedBy> ?service.
+                ?channel <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> ?representation.
                 FILTER(?channel = <$channelUri>)
                 OPTIONAL {
                     ?channel ?openinghours ?oh.
