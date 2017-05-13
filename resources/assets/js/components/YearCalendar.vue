@@ -176,7 +176,7 @@ export default {
     },
     allEvents () {
       if (!this.oh || !this.oh.calendars) {
-        return 'meh'
+        return ''
       }
       return this.oh.calendars.reduce(
         (list, c) => list.concat(
