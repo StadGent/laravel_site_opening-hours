@@ -53,7 +53,7 @@ This would result in 365 events per channel, which is far from optimal to work w
 
     > php artisan openinghours:fetch-recreatex
 
-Note: this will import openinghours from 2017 up until 2020.
+Note: this will import openinghours from 2017 up until 2020, make sure you refresh the application in the browser after fetching the recreatex openinghours.
 
 ## Email
 

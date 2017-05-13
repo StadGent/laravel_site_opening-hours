@@ -282,8 +282,7 @@ trait FormatsOpeninghours
      * @param Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, used for performance
      *
      * Note: possible performance tweak is to edit the start/enddate so that the amount of events remains small for long lasting recurrences
-     * CAVEAT: make sure that the start/enddate is edit correctly to avoid unwanted behaviour, e.g. if the startdate was originally on a monday
-     * keep it on a monday as close as possible to the min/max range.
+     * CAVEAT: make sure that the start/enddate is edit correctly to avoid unwanted behaviour, e.g. if the startdate was originally on a monday keep it on a monday as close as possible to the min/max range.
      *
      * @return ICal
      */
