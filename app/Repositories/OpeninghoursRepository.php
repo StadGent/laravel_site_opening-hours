@@ -42,7 +42,7 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Get the full object: openinghours with channel + service
+     * Get the full object: openinghours with related channel and service
      *
      * @param  int   $id
      * @return array
@@ -220,7 +220,7 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Get all of the active openinghours for a channel and service
+     * Get all of the openinghours for a channel and service
      *
      * @param  string $serviceUri The URI of the service
      * @param  string $channel    The name of the channel
@@ -244,5 +244,33 @@ class OpeninghoursRepository extends EloquentRepository
         }
 
         return $this->model->whereIn('id', $openinghoursIds)->get();
+    }
+
+    /**
+     * Get active openinghours for a service and channel for a given day
+     *
+     * @param  string $serviceUri The URI of the service
+     * @param  string $channel    The name of the channel
+     * @param  Carbon $day
+     * @return array
+     */
+    public function getForServiceAndChannel($serviceUri, $channel, $day)
+    {
+        $results = DB::select(
+            'SELECT openinghours.id
+            FROM openinghours
+            JOIN channels ON channels.id = openinghours.channel_id
+            JOIN services ON services.id = channels.service_id
+            WHERE services.uri = ? AND channels.label = ? AND (openinghours.start_date <= ? AND openinghours.end_date >= ?)',
+            [$serviceUri, $channel, $day->startOfDay()->toIso8601String(), $day->startOfDay()->toIso8601String()]
+        );
+
+        $openinghoursIds = [];
+
+        if (empty($results)) {
+            return [];
+        }
+
+        return $this->model->find($results[0]->id);
     }
 }

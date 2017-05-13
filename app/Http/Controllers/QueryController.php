@@ -39,8 +39,8 @@ class QueryController extends Controller
 
                         $data = $this->isOpenOnDay($day, $request);
                     } catch (\Exception $ex) {
-                        \Log::error($ex->getMessage());
-                        \Log::error($ex->getTraceAsString());
+                        \Log::warning($ex->getMessage());
+                        \Log::warning($ex->getTraceAsString());
                         return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
                     }
                     break;
@@ -49,6 +49,8 @@ class QueryController extends Controller
                     break;
             }
         } catch (\Exception $ex) {
+            \Log::error($ex->getMessage());
+            \Log::error($ex->getTraceAsString());
             return response()->json(['message' => $ex->getMessage()], 400);
         }
 
@@ -171,10 +173,10 @@ class QueryController extends Controller
 
             // Add the max timestamp, foresee a window of margin
             $maxTimestamp = clone $day;
-            $maxTimestamp->addDays(2);
+            //$maxTimestamp->addDays(2);
 
             $minTimestamp = clone $day;
-            $minTimestamp->subDay(2);
+            //$minTimestamp->subDay(2);
 
             if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe

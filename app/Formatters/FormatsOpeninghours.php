@@ -221,59 +221,46 @@ trait FormatsOpeninghours
 
         $weekDays = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
 
-        // Get the openinghours that is active now
-        $relevantOpeninghours = '';
-
-        foreach ($openinghours as $openinghoursInstance) {
-            if ($startDate->between(
-                (new Carbon($openinghoursInstance->start_date)),
-                (new Carbon($openinghoursInstance->end_date))
-            )) {
-                $relevantOpeninghours = $openinghoursInstance;
-                break;
-            }
-        }
-
-        if (empty($relevantOpeninghours)) {
-            // abort(404, 'No relevant openinghours found for this week.');
-            return [];
-        }
-
         // Go to startDate and iterate over every day of the week after that
         // then check if there are events for that given day in the calendar, by priority
-        //$startDate = Carbon::now();
-
         $week = [];
 
         for ($day = 0; $day <= 6; $day++) {
-            $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
-                return $calendar->priority;
-            });
+            // Get the openinghours for the schedule
+            $relevantOpeninghours = app('OpeninghoursRepository')->getForServiceAndChannel($serviceUri, $channel, $startDate);
 
-            // Default status of a day is "Closed"
-            $dayInfo = 'Gesloten';
+            if (empty($relevantOpeninghours)) {
+                $week[$startDate->dayOfWeek] = 'Gesloten';
+            } else {
+                $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
+                    return $calendar->priority;
+                });
 
-            // Add the max timestamp
-            $maxTimestamp = clone $startDate;
-            $maxTimestamp = $maxTimestamp->addDay(2);
+                // Default status of a day is "Closed"
+                $dayInfo = 'Gesloten';
 
-            $minTimestamp = clone $startDate;
-            $minTimestamp = $minTimestamp->subDay(2);
+                // Add the max timestamp
+                $maxTimestamp = clone $startDate;
+                //$maxTimestamp = $maxTimestamp->addDay(2);
 
-            // Iterate all calendars for the day of the week
-            foreach ($calendars as $calendar) {
-                $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
+                $minTimestamp = clone $startDate;
+                //$minTimestamp = $minTimestamp->subDay(2);
 
-                $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
+                // Iterate all calendars for the day of the week
+                foreach ($calendars as $calendar) {
+                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
-                if (! empty($extractedDayInfo)) {
-                    $dayInfo = $calendar->closinghours ? 'Gesloten' : $extractedDayInfo;
+                    $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
-                    break;
+                    if (! empty($extractedDayInfo)) {
+                        $dayInfo = $calendar->closinghours ? 'Gesloten' : $extractedDayInfo;
+
+                        break;
+                    }
                 }
-            }
 
-            $week[$startDate->dayOfWeek] = $dayInfo;
+                $week[$startDate->dayOfWeek] = $dayInfo;
+            }
 
             $startDate->addDay();
         }
@@ -305,12 +292,9 @@ trait FormatsOpeninghours
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
         foreach ($calendar->events as $event) {
-            /*$startDate = $this->convertIsoToIcal($event->start_date);
-            $endDate = $this->convertIsoToIcal($event->end_date);*/
-
             $until = $event->until;
 
-            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString()) {
+            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString() && $maxTimestamp > $event->start_date) {
                 $until = $maxTimestamp->toDateString();
             }
 
@@ -320,18 +304,25 @@ trait FormatsOpeninghours
                 $endDate = new Carbon($event->end_date);
                 $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
 
-                if ($startDate < $minTimestamp && $startDate->day <= 28) {
+                // We can do the tweak because the until date is later than the minTimestamp
+                if ($startDate < $minTimestamp && $startDate->day <= 28 &&
+                    (str_contains($event->rrule, 'DAILY') || str_contains($event->rrule, 'WEEKLY'))) {
                     $startDate->month = $minTimestamp->month;
                 }
 
                 if ($endDate->toDateString() > $until && $endDate->toDateString() > $startDate->toDateString()) {
                     $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
                     $endDate->month = $untilDate->month;
+                } elseif ($endDate->toDateString() < $startDate->toDateString()) {
+                    $endDate->month = $startDate->month;
                 }
+
+                // Make sure the events start/end in the same year as the until date to avoid
+                // unnecessary creation of events
+                $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
 
                 $startDate = $this->convertCarbonToIcal($startDate);
                 $endDate = $this->convertCarbonToIcal($endDate);
-                $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
 
                 $icalString .= "BEGIN:VEVENT\n";
                 $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";

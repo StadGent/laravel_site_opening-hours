@@ -59,6 +59,13 @@ Note: this will import openinghours from 2017 up until 2020.
 
 Email is now done through SendGrid, simply add an API key to the .env variable.
 
+## VESTA
+
+Output can be written to VESTA on a weekly basis by using a predefined command. This will write a weekschedule to VESTA
+starting on monday of the week that the timestamp of execution falls in. e.g. If it's called friday at 5PM, the output will below monday-sunday of that week friday falls into. Scheduling it monday mornings will produce a schedule for that entire week.
+
+    > php artisan openinghours:update-vesta
+
 # Usage
 
 ## Queries - No APIB or Swagger available
