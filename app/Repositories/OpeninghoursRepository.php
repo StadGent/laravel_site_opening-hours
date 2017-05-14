@@ -266,9 +266,9 @@ class OpeninghoursRepository extends EloquentRepository
             JOIN services ON services.id = channels.service_id
             WHERE services.uri = ? AND channels.label = ? AND
             (
-                (openinghours.start_date >= ? OR openinghours.start_date <= ?)
+                (openinghours.start_date >= ? AND openinghours.start_date <= ?)
                 OR
-                (openinghours.end_date >= ? OR openinghours.end_date <= ?)
+                (openinghours.end_date >= ? AND openinghours.end_date <= ?)
                 OR
                 (openinghours.start_date <= ? AND openinghours.end_date >= ?)
             )',
