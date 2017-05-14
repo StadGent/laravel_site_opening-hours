@@ -247,30 +247,44 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Get active openinghours for a service and channel for a given day
+     * Get active openinghours for a service and channel for a given timerange
      *
      * @param  string $serviceUri The URI of the service
      * @param  string $channel    The name of the channel
-     * @param  Carbon $day
+     * @param  Carbon $start
+     * @param  Carbon $end
      * @return array
      */
-    public function getForServiceAndChannel($serviceUri, $channel, $day)
+    public function getForServiceAndChannel($serviceUri, $channel, $start, $end)
     {
+        // Get the openinghours in which the start/end either lays partially in the given
+        // start-end range or where the given start-end lays in openinghours start-end range
         $results = DB::select(
             'SELECT openinghours.id
             FROM openinghours
             JOIN channels ON channels.id = openinghours.channel_id
             JOIN services ON services.id = channels.service_id
-            WHERE services.uri = ? AND channels.label = ? AND (openinghours.start_date <= ? AND openinghours.end_date >= ?)',
-            [$serviceUri, $channel, $day->startOfDay()->toIso8601String(), $day->startOfDay()->toIso8601String()]
+            WHERE services.uri = ? AND channels.label = ? AND
+            (
+                (openinghours.start_date >= ? OR openinghours.start_date <= ?)
+                OR
+                (openinghours.end_date >= ? OR openinghours.end_date <= ?)
+                OR
+                (openinghours.start_date <= ? AND openinghours.end_date >= ?)
+            )',
+            [$serviceUri, $channel,
+            $start->startOfDay()->toIso8601String(), $end->startOfDay()->toIso8601String(),
+            $start->startOfDay()->toIso8601String(), $end->startOfDay()->toIso8601String(),
+            $start->startOfDay()->toIso8601String(), $end->startOfDay()->toIso8601String()
+            ]
         );
 
         $openinghoursIds = [];
 
-        if (empty($results)) {
-            return [];
+        foreach ($results as $result) {
+            $openinghoursIds[] = $result->id;
         }
 
-        return $this->model->find($results[0]->id);
+        return $this->model->whereIn('id', $openinghoursIds)->get();
     }
 }

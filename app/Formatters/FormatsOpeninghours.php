@@ -225,42 +225,34 @@ trait FormatsOpeninghours
         // then check if there are events for that given day in the calendar, by priority
         $week = [];
 
+        // TESTS
+        $endDate = clone $startDate;
+        $endDate->addWeek();
+
+        $relevantOpeninghours = app('OpeninghoursRepository')->getForServiceAndChannel($serviceUri, $channel, $startDate, $endDate);
+
+        $calendars = collect([]);
+
+        foreach ($relevantOpeninghours as $relevantOpeninghour) {
+            $calendars = $calendars->merge($relevantOpeninghour->calendars);
+        }
+
+        $calendars = array_sort($calendars, function ($calendar) {
+            return $calendar['priority'];
+        });
+
+        $ical = $this->createIcalFromCalendars($calendars, $startDate, $endDate);
+
         for ($day = 0; $day <= 6; $day++) {
-            // Get the openinghours for the schedule
-            $relevantOpeninghours = app('OpeninghoursRepository')->getForServiceAndChannel($serviceUri, $channel, $startDate);
+            $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
-            if (empty($relevantOpeninghours)) {
-                $week[$startDate->dayOfWeek] = 'Gesloten';
-            } else {
-                $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
-                    return $calendar->priority;
-                });
+            $dayInfo = 'Gesloten';
 
-                // Default status of a day is "Closed"
-                $dayInfo = 'Gesloten';
-
-                // Add the max timestamp
-                $maxTimestamp = clone $startDate;
-                //$maxTimestamp = $maxTimestamp->addDay(2);
-
-                $minTimestamp = clone $startDate;
-                //$minTimestamp = $minTimestamp->subDay(2);
-
-                // Iterate all calendars for the day of the week
-                foreach ($calendars as $calendar) {
-                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
-
-                    $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
-
-                    if (! empty($extractedDayInfo)) {
-                        $dayInfo = $calendar->closinghours ? 'Gesloten' : $extractedDayInfo;
-
-                        break;
-                    }
-                }
-
-                $week[$startDate->dayOfWeek] = $dayInfo;
+            if (! empty($extractedDayInfo)) {
+                $dayInfo = $extractedDayInfo;
             }
+
+            $week[$startDate->dayOfWeek] = $dayInfo;
 
             $startDate->addDay();
         }
@@ -289,6 +281,36 @@ trait FormatsOpeninghours
     protected function createIcalFromCalendar($calendar, $minTimestamp = null, $maxTimestamp = null)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+        $icalString .= $this->createIcalEventStringFromCalendar($calendar, $minTimestamp, $maxTimestamp);
+        $icalString .= 'END:VCALENDAR';
+
+        return new \ICal\ICal(explode(PHP_EOL, $icalString));
+    }
+
+    protected function createIcalFromCalendars($calendars, $minTimestamp, $maxTimestamp)
+    {
+        $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+        foreach ($calendars as $calendar) {
+            $icalString .= $this->createIcalEventStringFromCalendar($calendar, $minTimestamp, $maxTimestamp);
+        }
+
+        $icalString .= 'END:VCALENDAR';
+
+        $ical = new \ICal\ICal();
+
+        $ical->initString($icalString);
+
+        return $ical;
+    }
+
+    /**
+     *
+     * @param  Calendar $calendar
+     * @return string
+     */
+    protected function createIcalEventStringFromCalendar($calendar, $minTimestamp = null, $maxTimestamp = null)
+    {
+        $icalString = '';
 
         foreach ($calendar->events as $event) {
             $until = $event->until;
@@ -305,7 +327,7 @@ trait FormatsOpeninghours
 
                 // We can do the tweak because the until date is later than the minTimestamp
                 if ($startDate < $minTimestamp && $startDate->day <= 28 &&
-                    (str_contains($event->rrule, 'DAILY') || str_contains($event->rrule, 'WEEKLY'))) {
+                    (str_contains($event->rrule, 'DAILY'))) {
                     $startDate->month = $minTimestamp->month;
                 }
 
@@ -316,8 +338,6 @@ trait FormatsOpeninghours
                     $endDate->month = $startDate->month;
                 }
 
-                // Make sure the events start/end in the same year as the until date to avoid
-                // unnecessary creation of events
                 $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
 
                 $startDate = $this->convertCarbonToIcal($startDate);
@@ -327,14 +347,15 @@ trait FormatsOpeninghours
                 $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
                 $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
                 $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('YmdTHis') . "\n";
-                $icalString .= 'UID:' . str_random(32) . "\n";
+
+                // Build a UID based on priority and closinghours
+                $closed = $calendar->closinghours == 0 ? 'OPEN' : 'CLOSED';
+                $icalString .= 'UID:' . 'PRIOR_' . $calendar->priority . '_' . $closed . '_RND_' . str_random(32) . "\n";
                 $icalString .= "END:VEVENT\n";
             }
         }
 
-        $icalString .= 'END:VCALENDAR';
-
-        return new \ICal\ICal(explode(PHP_EOL, $icalString));
+        return $icalString;
     }
 
     /**
@@ -361,7 +382,7 @@ trait FormatsOpeninghours
     }
 
     /**
-     * Check if there are events in a given range (day)
+     * Check if there are events for a given day
      *
      * @param  ICal   $ical
      * @param  string $start date string YYYY-mm-dd
@@ -372,6 +393,10 @@ trait FormatsOpeninghours
     {
         $events = $ical->eventsFromRange($start, $end);
 
+        $events = array_sort($events, function ($event) {
+            return $event->uid;
+        });
+
         if (empty($events)) {
             return '';
         }
@@ -379,17 +404,24 @@ trait FormatsOpeninghours
         $hours = [];
 
         foreach ($events as $event) {
-            $start = str_replace('CEST', 'T', $event->dtstart);
-            $end = str_replace('CEST', 'T', $event->dtend);
+            if (str_contains($event->uid, 'CLOSED')) {
+                $hours[] = 'Gesloten';
+                break;
+            } else {
+                $start = str_replace('CEST', 'T', $event->dtstart);
+                $end = str_replace('CEST', 'T', $event->dtend);
 
-            $start = str_replace('CET', 'T', $start);
-            $end = str_replace('CET', 'T', $end);
+                $start = str_replace('CET', 'T', $start);
+                $end = str_replace('CET', 'T', $end);
 
-            $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
-            $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
+                $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
+                $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
 
-            $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+            }
         }
+
+        $hours = array_unique($hours);
 
         return rtrim(implode($hours, ', '), ',');
     }

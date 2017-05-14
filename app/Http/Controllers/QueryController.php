@@ -41,7 +41,7 @@ class QueryController extends Controller
                     } catch (\Exception $ex) {
                         \Log::warning($ex->getMessage());
                         \Log::warning($ex->getTraceAsString());
-                        return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
+                        return response()->json(['message' => 'Something went wrong, the message was: ' . $ex->getMessage()], 400);
                     }
                     break;
                 default:
