@@ -10,6 +10,8 @@ date_default_timezone_set('Europe/Brussels');
 /**
  * Provides functionality to parse Calendar objects into ICAL objects
  * and provides a means to format the outcome of the ICAL events into text, json-ld, html and json
+ *
+ * TODO split functionality of parsing calendar into ICAL and formatting schedules
  */
 trait FormatsOpeninghours
 {
@@ -404,11 +406,18 @@ trait FormatsOpeninghours
         return $date->format('YmdTHis');
     }
 
+    /**
+     * Sort events by their UID, where the priority of the calendar
+     * where the event is part of, is concatenated into
+     *
+     * @param  array $events
+     * @return array
+     */
     protected function sortEvents($events)
     {
-        return array_sort($events, function ($event) {
+        return collect($events)->sortByDesc(function ($event) {
             return $event->uid;
-        });
+        })->toArray();
     }
 
     /**

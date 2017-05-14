@@ -209,6 +209,8 @@ class QueryController extends Controller
     /**
      * Calculate if a service is open now
      *
+     * TODO: move to trait formatsopeninghours
+     *
      * @param  Request $request
      * @return array
      */
