@@ -250,10 +250,8 @@ class QueryController extends Controller
         $now = Carbon::now();
 
         foreach ($channels as $channel) {
-            $status = 'Gesloten';
-
             // Get the openinghours for the channel
-            $openinghours = $openinghoursRepo->getAllForServiceAndChannel($serviceUri, $channel);
+            $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
 
             // Get the openinghours that is active now
             $relevantOpeninghours = '';
@@ -272,6 +270,8 @@ class QueryController extends Controller
             $maxTimestamp = Carbon::today()->addDays(2);
             $minTimestamp = Carbon::today()->subDays(2)->startOfDay();
 
+            $status = 'Gesloten';
+
             if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
@@ -282,7 +282,7 @@ class QueryController extends Controller
                 foreach ($calendars as $calendar) {
                     $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
-                    if ($this->hasEventForRange($ical, $now->toIso8601String(), $now->toIso8601String())) {
+                    if (! empty($ical->eventsFromRange())) {
                         $status = $calendar->closinghours == 0 ? 'Open' : 'Gesloten';
 
                         continue;
@@ -294,19 +294,6 @@ class QueryController extends Controller
         }
 
         return $result;
-    }
-
-    /**
-     * Check if the ICal object has events in the given range
-     *
-     * @param  ICal    $ical
-     * @param  string  $start
-     * @param  string  $end
-     * @return boolean
-     */
-    private function hasEventForRange($ical, $start, $end)
-    {
-        return ! empty($ical->eventsFromRange($start, $end));
     }
 
     /**

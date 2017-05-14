@@ -8,7 +8,8 @@ use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 date_default_timezone_set('Europe/Brussels');
 
 /**
- * Returns a textual form of the openinghours of a service
+ * Provides functionality to parse Calendar objects into ICAL objects
+ * and provides a means to format the outcome of the ICAL events into text, json-ld, html and json
  */
 trait FormatsOpeninghours
 {
@@ -225,23 +226,10 @@ trait FormatsOpeninghours
         // then check if there are events for that given day in the calendar, by priority
         $week = [];
 
-        // TESTS
         $endDate = clone $startDate;
         $endDate->addWeek();
 
-        $relevantOpeninghours = app('OpeninghoursRepository')->getForServiceAndChannel($serviceUri, $channel, $startDate, $endDate);
-
-        $calendars = collect([]);
-
-        foreach ($relevantOpeninghours as $relevantOpeninghour) {
-            $calendars = $calendars->merge($relevantOpeninghour->calendars);
-        }
-
-        $calendars = array_sort($calendars, function ($calendar) {
-            return $calendar['priority'];
-        });
-
-        $ical = $this->createIcalFromCalendars($calendars, $startDate, $endDate);
+        $ical = $this->createIcalForServiceAndChannel($serviceUri, $channel, $startDate, $endDate);
 
         for ($day = 0; $day <= 6; $day++) {
             $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
@@ -267,14 +255,38 @@ trait FormatsOpeninghours
     }
 
     /**
+     * Create an Ical object based on the service URI, channel and time range
+     * by fetching the relevant openinghours objects and parsing the related calendars
+     *
+     * @param  string $serviceUri
+     * @param  string $channel
+     * @param  Carbon $startDate
+     * @param  Carbon $endDate
+     * @return ICal
+     */
+    protected function createIcalForServiceAndChannel($serviceUri, $channel, $startDate, $endDate)
+    {
+        $relevantOpeninghours = app('OpeninghoursRepository')->getForServiceAndChannel($serviceUri, $channel, $startDate, $endDate);
+
+        $calendars = collect([]);
+
+        foreach ($relevantOpeninghours as $relevantOpeninghour) {
+            $calendars = $calendars->merge($relevantOpeninghour->calendars);
+        }
+
+        $calendars = array_sort($calendars, function ($calendar) {
+            return $calendar['priority'];
+        });
+
+        return $this->createIcalFromCalendars($calendars, $startDate, $endDate);
+    }
+
+    /**
      * Create ICal from a calendar object
      *
      * @param Calendar $calendar
      * @param Carbon   $minTimestamp Optional, the min timestamp of the range to create the ical for, used for performance
      * @param Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, used for performance
-     *
-     * Note: possible performance tweak is to edit the start/enddate so that the amount of events remains small for long lasting recurrences
-     * CAVEAT: make sure that the start/enddate is edit correctly to avoid unwanted behaviour, e.g. if the startdate was originally on a monday keep it on a monday as close as possible to the min/max range.
      *
      * @return ICal
      */
@@ -284,9 +296,21 @@ trait FormatsOpeninghours
         $icalString .= $this->createIcalEventStringFromCalendar($calendar, $minTimestamp, $maxTimestamp);
         $icalString .= 'END:VCALENDAR';
 
-        return new \ICal\ICal(explode(PHP_EOL, $icalString));
+        $ical = new \ICal\ICal();
+        $ical->initString($icalString);
+
+        return $ical;
     }
 
+    /**
+     * Create ICal from calendars object
+     *
+     * @param Calendar $calendar
+     * @param Carbon   $minTimestamp Optional, the min timestamp of the range to create the ical for, used for performance
+     * @param Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, used for performance
+     *
+     * @return ICal
+     */
     protected function createIcalFromCalendars($calendars, $minTimestamp, $maxTimestamp)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
@@ -297,14 +321,13 @@ trait FormatsOpeninghours
         $icalString .= 'END:VCALENDAR';
 
         $ical = new \ICal\ICal();
-
         $ical->initString($icalString);
 
         return $ical;
     }
 
     /**
-     *
+     * Create an ICAL string from a calendar
      * @param  Calendar $calendar
      * @return string
      */
@@ -328,7 +351,7 @@ trait FormatsOpeninghours
                 // We can do the tweak because the until date is later than the minTimestamp
                 if ($startDate < $minTimestamp && $startDate->day <= 28 &&
                     (str_contains($event->rrule, 'DAILY'))) {
-                    $startDate->month = $minTimestamp->month;
+                    //$startDate->month = $minTimestamp->month;
                 }
 
                 if ($endDate->toDateString() > $until && $endDate->toDateString() > $startDate->toDateString()) {
@@ -350,7 +373,7 @@ trait FormatsOpeninghours
 
                 // Build a UID based on priority and closinghours
                 $closed = $calendar->closinghours == 0 ? 'OPEN' : 'CLOSED';
-                $icalString .= 'UID:' . 'PRIOR_' . $calendar->priority . '_' . $closed . '_RND_' . str_random(32) . "\n";
+                $icalString .= 'UID:' . 'PRIOR_' . ($calendar->priority * -1) . '_' . $closed . '_RND_' . str_random(32) . "\n";
                 $icalString .= "END:VEVENT\n";
             }
         }
@@ -381,8 +404,17 @@ trait FormatsOpeninghours
         return $date->format('YmdTHis');
     }
 
+    protected function sortEvents($events)
+    {
+        return array_sort($events, function ($event) {
+            return $event->uid;
+        });
+    }
+
     /**
      * Check if there are events for a given day
+     * Use the UIDs to get information on which calendar the events are from
+     * (e.g. closed or open calendar)
      *
      * @param  ICal   $ical
      * @param  string $start date string YYYY-mm-dd
@@ -393,9 +425,7 @@ trait FormatsOpeninghours
     {
         $events = $ical->eventsFromRange($start, $end);
 
-        $events = array_sort($events, function ($event) {
-            return $event->uid;
-        });
+        $events = $this->sortEvents($events);
 
         if (empty($events)) {
             return '';
