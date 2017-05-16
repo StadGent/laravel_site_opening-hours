@@ -12,7 +12,12 @@
         <button type="button" class="btn btn-primary" :class="{active: route.tab=='users'}" @click="route.tab='users'">Toon gebruikers</button>
       </div>
       <!-- <button type="button" class="btn btn-link btn-disabled" :class="{active: route.tab=='admin'}" @click="route.tab='admin'" disabled>Toon administrators</button> -->
-      <button type="button" class="btn btn-default" :class="{'btn-warning': draft, 'btn-success': ! draft}" @click="draft = !draft" v-if="!route.tab">{{draft?'in':''}}actieve diensten</button>
+
+      <div class="btn-group" v-if="!route.tab">
+        <button type="button" class="btn btn-default" :class="{ 'btn-success': !draft }" @click="draft = false">Toon actieve diensten</button>
+        <button type="button" class="btn btn-default" :class="{ 'btn-warning': draft }" @click="draft = true">Toon inactieve diensten</button>
+      </div>
+
       <button type="button" class="btn btn-success" @click="newUser" v-if="route.tab == 'users'">Gebruiker uitnodigen</button>
 
     </div>
