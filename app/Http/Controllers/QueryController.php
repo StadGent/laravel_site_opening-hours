@@ -284,7 +284,7 @@ class QueryController extends Controller
                 foreach ($calendars as $calendar) {
                     $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
-                    if (! empty($ical->eventsFromRange())) {
+                    if (! empty($ical->eventsFromRange(Carbon::now()->toIso8601String(), Carbon::now()->addMinute()->toIso8601String()))) {
                         $status = $calendar->closinghours == 0 ? 'Open' : 'Gesloten';
 
                         continue;
