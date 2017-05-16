@@ -7,10 +7,12 @@
       </div>
     </form>
     <div v-if="isAdmin">
-      <div class="btn-group">
-        <button type="button" class="btn btn-primary" :class="{active: !route.tab}" @click="route.tab=0">Toon diensten</button>
-        <button type="button" class="btn btn-primary" :class="{active: route.tab=='users'}" @click="route.tab='users'">Toon gebruikers</button>
-      </div>
+      <p>
+        <span class="btn-group">
+          <button type="button" class="btn btn-default" :class="{ 'btn-primary': !route.tab }" @click="route.tab=0">Toon diensten</button>
+          <button type="button" class="btn btn-default" :class="{ 'btn-primary': route.tab=='users' }" @click="route.tab='users'">Toon gebruikers</button>
+        </span>
+      </p>
       <!-- <button type="button" class="btn btn-link btn-disabled" :class="{active: route.tab=='admin'}" @click="route.tab='admin'" disabled>Toon administrators</button> -->
 
       <div class="btn-group" v-if="!route.tab">
