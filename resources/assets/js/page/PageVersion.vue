@@ -100,8 +100,8 @@ export default {
     calendars () {
       const calendars = (this.version.calendars || [])
       calendars.sort(orderBy('-priority'))
-      return calendars.map((c, i) => {
-        c.layer = i
+      return calendars.map(c => {
+        c.layer = -c.priority
         return c
       })
     },
