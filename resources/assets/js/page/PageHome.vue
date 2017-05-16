@@ -70,7 +70,7 @@
         <thead>
           <tr>
             <th width="50">Activeer</th>
-            <th-sort by="label">Dienst</th-sort>
+            <th-sort by="label">Inactieve dienst</th-sort>
           </tr>
         </thead>
         <tbody is="row-service-draft" v-for="s in pagedServices" :s="s"></tbody>
@@ -78,7 +78,7 @@
       <table v-else-if="isAdmin" class="table table-hover table-service-admin">
         <thead>
           <tr>
-            <th-sort by="label">Dienst</th-sort>
+            <th-sort by="label">Actieve dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
           </tr>
