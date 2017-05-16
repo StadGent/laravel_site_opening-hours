@@ -161,7 +161,7 @@ export default {
         })
 
         if (invalid) {
-          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde van de versie.\n\nDe wijziging werd niet doorgevoerd.')
+          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.')
         }
 
         // Update the event until date
