@@ -171,7 +171,7 @@
           <div class="close" @click="$emit('rm')" v-if="!$parent.cal.layer">&times;</div>
         </div>
         <div v-if="!$parent.cal.layer">
-          <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"><b>+</b> Voeg meer dagen toe</button>
+          <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)" :disabled="$root.isRecreatex"><b>+</b> Voeg meer dagen toe</button>
         </div>
       </div>
 

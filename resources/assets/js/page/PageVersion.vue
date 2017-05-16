@@ -12,7 +12,7 @@
 
     <!-- Calender view options -->
     <p>
-      <button type="button" class="btn btn-default" @click="editVersion(version)">Bewerk naam en geldigheidsperiode</button>
+      <button type="button" class="btn btn-default" @click="editVersion(version)" :disabled="$root.isRecreatex">Bewerk naam en geldigheidsperiode</button>
     </p>
 
     <div class="version-split">
@@ -27,7 +27,7 @@
             De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
           </p>
           <p>
-            <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length">Voeg uitzonderingen toe</button>
+            <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length" :disabled="$root.isRecreatex">Voeg uitzonderingen toe</button>
           </p>
           <transition-group name="list" tag="div">
             <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
@@ -44,7 +44,7 @@
           </transition-group>
 
           <!-- Encourage to add calendars after first one -->
-          <div class="text-center" v-if="reversedCalendars.length===1">
+          <div class="text-center" v-if="reversedCalendars.length === 1 && !$root.isRecreatex">
             <p style="padding-top:3em">
               Je normale openingsuren zijn ingesteld.
             </p>
@@ -56,7 +56,7 @@
           <!-- This should never happen -->
           <div v-if="!reversedCalendars.length">
             <p>
-              <button class="btn btn-link" @click="addCalendar">voeg openingsuren toe</button>
+              <button class="btn btn-link" @click="addCalendar" :disabled="$root.isRecreatex">Voeg openingsuren toe</button>
             </p>
           </div>
         </div>

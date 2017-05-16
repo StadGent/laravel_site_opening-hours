@@ -77,11 +77,11 @@
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
-            <button type="submit" class="btn btn-primary" @click="createChannel">Voeg toe</button>
+            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex">Voeg toe</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
-            <button type="submit" class="btn btn-primary" @click="createVersion">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">

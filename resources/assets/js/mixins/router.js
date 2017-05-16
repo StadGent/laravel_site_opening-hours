@@ -43,7 +43,7 @@ export const rootRouterMixin = {
         route.tab = null
       }
 
-      if (this.route.page === 'user') {
+      if (this.route.page === 'user' || this.route.page === 'home') {
         route.service = -1
         route.channel = -1
         route.version = -1

@@ -10,6 +10,9 @@ export default {
     }
   },
   computed: {
+    isRecreatex () {
+      return this.routeService.source === 'recreatex'
+    },
     routeService () {
       return this.services.find(s => s.id === this.route.service) || {}
     },
