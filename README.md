@@ -5,16 +5,17 @@
 Copy the .env.example to .env and
 
 - Fill in the MySQL (or MariaDb) database credentials
-- Fill in the VESTA API configuration
-- Fill in the Queue driver, for production environments use redis, beanstalkd or SQS. DO NOT use sync as a queue, rather use database in testing environments
-- Fill in the base URI that is used to build the LOD version of the openinghours
+- Fill in the VESTA API configuration (make sure it's not base64 encoded)
+- Fill in the Queue driver, for production environments use redis, beanstalkd or SQS. DO NOT use sync as a queue, rather use database in testing environments (https://laravel.com/docs/5.4/queues)
+- Fill in the base URI that is used to build the LOD version of the openinghours triple (=BASE_URI)
+- Fill in the base URI that is used to link to a data representation of something (=DATA_REPRESENTATION_URI)
 - Fill in the SPARQL configuration to read data from
-- Fill in the SPARQL configuration to write data to, don't forget the name of the graph and the specific endpoint of the sparql-graph-crud-auth, which is used to
-write (possibly) larger amounts of triples to.
+- Fill in the SPARQL configuration to write data to, don't forget the name of the graph and the specific endpoint of the sparql-graph-crud-auth, which is used to write (possibly) larger amounts of triples to.
 - Mails are sent through sendgrid, if available use an API key, if not implement a version of AppMailer and create a binding in the IoC
-- Set session driver to database for testing (use any other for production apart from database and sync https://laravel.com/docs/5.4/queues)
-- Set 1 worker in supervisor (https://laravel.com/docs/5.4/queues#supervisor-configuration) to handle the writes to the different systems
+- Set session driver to database (anything but file)
+- Set 1 worker in supervisor (https://laravel.com/docs/5.4/queues#supervisor-configuration) to handle the writes to the different systems (VESTA, LOD)
     Only using 1 will make sure no dirty read/writes will happen to the SPARQL endpoint, you can use supervisor or a custom system that keeps a Laravel worker up and running. Make sure that the worker is restarted after an update on the software. (php artisan queue:restart)
+
 - Build the back & front-end
 
     composer install
@@ -24,7 +25,7 @@ write (possibly) larger amounts of triples to.
     npm install
     gulp build
 
-## Maintenance
+## Maintenance and deployment
 
 When updating the software the commands you'll want to run are the following:
 
@@ -34,6 +35,8 @@ When updating the software the commands you'll want to run are the following:
     php artisan migrate
     php artisan cache:clear
     php artisan queue:restart
+
+    > Caveat: Keep an eye out for the johngrogg/ics-parser releases, currently this dependency is set to dev-master, because the branch contains an implementation that we use in order to provide correct API responses. This is an actively maintained library so (patch) releases are in play.
 
 ## Fetch services
 
@@ -53,7 +56,7 @@ This would result in 365 events per channel, which is far from optimal to work w
 
     > php artisan openinghours:fetch-recreatex
 
-Note: this will import openinghours from 2017 up until 2020, make sure you refresh the application in the browser after fetching the recreatex openinghours.
+Note: this will import openinghours from 2017 up until 2020, make sure you refresh the application in the browser after fetching the recreatex openinghours, because the front-end caches responses by default.
 
 ## Email
 
@@ -62,7 +65,7 @@ Email is now done through SendGrid, simply add an API key to the .env variable.
 ## VESTA
 
 Output can be written to VESTA on a weekly basis by using a predefined command. This will write a weekschedule to VESTA
-starting on monday of the week that the timestamp of execution falls in. e.g. If it's called friday at 5PM, the output will below monday-sunday of that week friday falls into. Scheduling it monday mornings will produce a schedule for that entire week.
+starting on monday of the week that the timestamp of execution falls in. e.g. If it's called friday at 5PM, the output will contain the schedule monday-sunday of that week that friday falls into. Scheduling it monday mornings will produce a schedule for that entire week.
 
     > php artisan openinghours:update-vesta
 

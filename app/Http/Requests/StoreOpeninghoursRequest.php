@@ -21,7 +21,10 @@ class StoreOpeninghoursRequest extends FormRequest
         // Get the service of the calendar
         $channel = Channel::with('service')->find($request->channel_id);
 
-        if (empty($channel) || empty($channel->service->id)) {
+        if (empty($channel)
+            || empty($channel->service->id)
+            || (! empty($channel->service->source) && $channel->service->source == 'recreatex')
+        ) {
             return false;
         }
 

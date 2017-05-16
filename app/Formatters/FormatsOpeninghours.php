@@ -232,7 +232,6 @@ trait FormatsOpeninghours
         $endDate->addWeek();
 
         $ical = $this->createIcalForServiceAndChannel($serviceUri, $channel, $startDate, $endDate);
-
         for ($day = 0; $day <= 6; $day++) {
             $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
 
@@ -316,6 +315,7 @@ trait FormatsOpeninghours
     protected function createIcalFromCalendars($calendars, $minTimestamp, $maxTimestamp)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+
         foreach ($calendars as $calendar) {
             $icalString .= $this->createIcalEventStringFromCalendar($calendar, $minTimestamp, $maxTimestamp);
         }
@@ -350,12 +350,6 @@ trait FormatsOpeninghours
                 $endDate = new Carbon($event->end_date);
                 $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
 
-                // We can do the tweak because the until date is later than the minTimestamp
-                if ($startDate < $minTimestamp && $startDate->day <= 28 &&
-                    (str_contains($event->rrule, 'DAILY'))) {
-                    //$startDate->month = $minTimestamp->month;
-                }
-
                 if ($endDate->toDateString() > $until && $endDate->toDateString() > $startDate->toDateString()) {
                     $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
                     $endDate->month = $untilDate->month;
@@ -373,9 +367,12 @@ trait FormatsOpeninghours
                 $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
                 $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('YmdTHis') . "\n";
 
-                // Build a UID based on priority and closinghours
+                // Build a UID based on priority and closinghours, make sure the priority is numeric and positive
+                // the layers can range from -13 to 13 as priority values because of the maximum of 12 layers in the front-end
                 $closed = $calendar->closinghours == 0 ? 'OPEN' : 'CLOSED';
-                $icalString .= 'UID:' . 'PRIOR_' . ($calendar->priority * -1) . '_' . $closed . '_RND_' . str_random(32) . "\n";
+                $priority = (int)$calendar->priority + 100;
+
+                $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 100) . '_' . $closed . '_CAL_' . $calendar->id . "\n";
                 $icalString .= "END:VEVENT\n";
             }
         }
@@ -416,6 +413,15 @@ trait FormatsOpeninghours
     protected function sortEvents($events)
     {
         return collect($events)->sortByDesc(function ($event) {
+            // Parse the priority from the UID
+            /*preg_match('#PRIOR_(\d{1,})_.*#', $event->uid, $matches);
+
+            $priority = 0;
+
+            if (! empty($matches[1])) {
+                $priority = $matches[1];
+            }*/
+
             return $event->uid;
         })->toArray();
     }
@@ -433,7 +439,6 @@ trait FormatsOpeninghours
     protected function extractDayInfo($ical, $start, $end)
     {
         $events = $ical->eventsFromRange($start, $end);
-
         $events = $this->sortEvents($events);
 
         if (empty($events)) {
@@ -442,13 +447,22 @@ trait FormatsOpeninghours
 
         $hours = [];
 
+        // Make sure we only get hours of the same calendar
+        $uid = '';
+
         foreach ($events as $event) {
+            // Make sure we only get hours of the same calendar
+            if (! empty($uid) && $event->uid != $uid) {
+                break;
+            }
+
+            // If closinghours are passed, "closed" is always the last value
             if (str_contains($event->uid, 'CLOSED')) {
                 $hours[] = 'Gesloten';
                 break;
             } else {
                 $start = str_replace('CEST', 'T', $event->dtstart);
-                $end = str_replace('CEST', 'T', $event->dtend);
+                $end =  str_replace('CEST', 'T', $event->dtend);
 
                 $start = str_replace('CET', 'T', $start);
                 $end = str_replace('CET', 'T', $end);
@@ -456,7 +470,23 @@ trait FormatsOpeninghours
                 $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
                 $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
 
-                $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                // Check for the one-off chance that there are overlapping hours (=events)
+                // within one layer (=calendar)
+                if (! empty($hours)) {
+                    $lastHourRange = end($hours);
+
+                    $lastHourRangeEnd = explode('-', $lastHourRange);
+
+                    if (trim(array_get($lastHourRangeEnd, 1, '')) < $dtStart->format('H:i')) {
+                        $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                    }
+                } else {
+                    $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                }
+            }
+
+            if (empty($uid)) {
+                $uid = $event->uid;
             }
         }
 

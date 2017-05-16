@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "783a995f61c5c507e056d4bd7369f5e6",
-    "content-hash": "f326d0059bd9087742c2afbfccd49a60",
+    "hash": "cd1a8f7e318b0848fab7e4b704a1b493",
+    "content-hash": "d110d31ed295857a8ba21b6c75d5f5b5",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -872,13 +872,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/u01jmg3/ics-parser.git",
-                "reference": "9e4850ddd2d8aeffc8a6b38bad8fd8b4f2be29fd"
+                "url": "https://github.com/weconnectdata/ics-parser.git",
+                "reference": "49bb0d5188d5f5b9bee4dfb9c797520ab36300e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/u01jmg3/ics-parser/zipball/9e4850ddd2d8aeffc8a6b38bad8fd8b4f2be29fd",
-                "reference": "9e4850ddd2d8aeffc8a6b38bad8fd8b4f2be29fd",
+                "url": "https://api.github.com/repos/weconnectdata/ics-parser/zipball/49bb0d5188d5f5b9bee4dfb9c797520ab36300e2",
+                "reference": "49bb0d5188d5f5b9bee4dfb9c797520ab36300e2",
                 "shasum": ""
             },
             "require": {
@@ -893,7 +893,6 @@
                     "ICal": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -919,7 +918,10 @@
                 "ical",
                 "ics"
             ],
-            "time": "2017-05-14 12:34:44"
+            "support": {
+                "source": "https://github.com/weconnectdata/ics-parser/tree/master"
+            },
+            "time": "2017-05-16 18:47:59"
         },
         {
             "name": "kkszymanowski/traitor",
