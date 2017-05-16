@@ -22,9 +22,7 @@ class StoreOpeninghoursRequest extends FormRequest
         $channel = Channel::with('service')->find($request->channel_id);
 
         if (empty($channel)
-            || empty($channel->service->id)
-            || (! empty($channel->service->source) && $channel->service->source == 'recreatex')
-        ) {
+            || empty($channel->service->id)) {
             return false;
         }
 

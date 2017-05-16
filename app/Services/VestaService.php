@@ -18,8 +18,6 @@ class VestaService
      */
     public function updateOpeninghours($vestaUid, $output)
     {
-        \Log::info($output);
-        return;
         // Write the weekschedule to VESTA using a SOAP call
         $userName = base64_encode(env('VESTA_USER', ''));
         $password = base64_encode(env('VESTA_PASSWORD', ''));
