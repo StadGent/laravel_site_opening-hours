@@ -129,7 +129,7 @@ export default {
         return alert('Er kan geen uitzondering toegevoegd worden.\n(Max. 1 normale uren + 10 uitzonderingen)')
       }
 
-      const maxLayer = -1 * Math.min.apply(0, this.calendars.map(c => parseInt(c.priority)))
+      const maxLayer = Math.max.apply(0, this.calendars.map(c => parseInt(c.layer)))
 
       const newCal = this.calendars.length ? createCalendar(maxLayer + 1, {
         start_date: toDatetime(this.version.start_date)
