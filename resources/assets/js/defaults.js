@@ -1,9 +1,9 @@
 const startYear = new Date().getFullYear()
-const untilYear = startYear + 4
+const untilYear = startYear + 2
 
 const defaultStart = startYear + '-01-01T00:00:00'
 const defaultEnd = startYear + '-01-02T00:00:00'
-const defaultUntil = untilYear + '-12-31'
+const defaultUntil = (untilYear - 1) + '-12-31'
 
 const firstEventStart = startYear + '-01-01T09:00:00'
 const firstEventEnd = startYear + '-01-01T17:00:00'
