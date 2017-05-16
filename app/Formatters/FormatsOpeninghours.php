@@ -447,9 +447,11 @@ trait FormatsOpeninghours
 
         $events = collect($events)->filter(function($event) use ($uid) {
             return $event->uid == $uid;
-        })->sort(function ($event) {
-            return $event->dtstart;
         })->toArray();
+
+        usort($events, function ($a, $b) {
+            return strcmp($a->dtstart, $b->dtstart);
+        });
 
         foreach ($events as $event) {
             // Make sure we only get hours of the same calendar
