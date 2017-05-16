@@ -154,13 +154,14 @@ export default {
         let invalid = false
         this.modal.calendars.forEach(cal => {
           cal.events.forEach(event => {
-            if (cal.layer && event.start_date < version.start_date) {
+            if (cal.layer && (event.start_date < version.start_date || event.until > version.end_date)) {
               invalid = true
             }
           })
         })
+
         if (invalid) {
-          return alert('Er mogen geen uitzonderingen beginnen voor de start van de versie.\n\nDe wijziging werd niet doorgevoerd.')
+          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde van de versie.\n\nDe wijziging werd niet doorgevoerd.')
         }
 
         // Update the event until date
@@ -170,9 +171,6 @@ export default {
             if (!cal.layer) {
               event.start_date = version.start_date + event.start_date.slice(10)
               event.end_date = version.start_date + event.end_date.slice(10)
-              changed = true
-            }
-            if (!cal.layer || event.until > version.end_date) {
               event.until = version.end_date
               changed = true
             }
