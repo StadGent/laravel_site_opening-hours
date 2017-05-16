@@ -404,7 +404,8 @@ trait FormatsOpeninghours
 
     /**
      * Sort events by their UID, where the priority of the calendar
-     * where the event is part of, is concatenated into
+     * where the event is part of, is concatenated into and take the start date into account
+     * multiple events can start in one day
      *
      * @param  array $events
      * @return array
@@ -428,6 +429,8 @@ trait FormatsOpeninghours
      */
     protected function extractDayInfo($ical, $start, $end)
     {
+        // Get the events from the calendar for the given range and
+        // sort them by priority, after that only keep those of the highest priority
         $events = $ical->eventsFromRange($start, $end);
         $events = $this->sortEvents($events);
 
@@ -437,8 +440,16 @@ trait FormatsOpeninghours
 
         $hours = [];
 
-        // Make sure we only get hours of the same calendar
-        $uid = '';
+        // Make sure we only get hours of the same calendar, with the highest priority
+        // make sure to use collect/first because the keys will be switched as well,
+        // so fetching events[0] will result in fetching the value with key 0, not the first element per se
+        $uid = collect($events)->first()->uid;
+
+        $events = collect($events)->filter(function($event) use ($uid) {
+            return $event->uid == $uid;
+        })->sort(function ($event) {
+            return $event->dtstart;
+        })->toArray();
 
         foreach ($events as $event) {
             // Make sure we only get hours of the same calendar
@@ -448,8 +459,7 @@ trait FormatsOpeninghours
 
             // If closinghours are passed, "closed" is always the last value
             if (str_contains($event->uid, 'CLOSED')) {
-                $hours[] = 'Gesloten';
-                break;
+                return 'Gesloten';
             } else {
                 $start = str_replace('CEST', 'T', $event->dtstart);
                 $end =  str_replace('CEST', 'T', $event->dtend);

@@ -873,12 +873,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/weconnectdata/ics-parser.git",
-                "reference": "49bb0d5188d5f5b9bee4dfb9c797520ab36300e2"
+                "reference": "3d409601d6f599f4a0a15521efb640afd435f144"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/weconnectdata/ics-parser/zipball/49bb0d5188d5f5b9bee4dfb9c797520ab36300e2",
-                "reference": "49bb0d5188d5f5b9bee4dfb9c797520ab36300e2",
+                "url": "https://api.github.com/repos/weconnectdata/ics-parser/zipball/3d409601d6f599f4a0a15521efb640afd435f144",
+                "reference": "3d409601d6f599f4a0a15521efb640afd435f144",
                 "shasum": ""
             },
             "require": {
@@ -921,7 +921,7 @@
             "support": {
                 "source": "https://github.com/weconnectdata/ics-parser/tree/master"
             },
-            "time": "2017-05-16 18:47:59"
+            "time": "2017-05-16 20:52:53"
         },
         {
             "name": "kkszymanowski/traitor",
