@@ -74,7 +74,6 @@ export const presets = [
   { start_date: '2016-01-01', rrule: 'FREQ=YEARLY', label: 'Nieuwjaarsdag' },
   { start_date: '2016-02-14', rrule: 'FREQ=YEARLY', label: 'Valentijn' },
   { start_date: '2016-05-01', rrule: 'FREQ=YEARLY', label: 'Feest vd Arbeid' },
-  { start_date: '2016-07-01', rrule: 'FREQ=YEARLY', label: 'Zomervakantie' },
   { start_date: '2016-07-11', rrule: 'FREQ=YEARLY', label: 'Feest Vlaamse Gemeenschap' },
   { start_date: '2016-07-21', rrule: 'FREQ=YEARLY', label: 'Nationale Feestdag' },
   { start_date: '2016-08-15', rrule: 'FREQ=YEARLY', label: 'OLV Hemelvaart' },
@@ -101,6 +100,7 @@ export const presets = [
   { start_date: '2017-06-04', ended: '2017-06-05', label: 'Pinksteren (Pinksterdag) 2017' },
   { start_date: '2017-06-05', ended: '2017-06-06', label: 'Pinkstermaandag 2017' },
   { start_date: '2017-06-11', ended: '2017-06-12', label: 'Vaderdag 2017' },
+  { start_date: '2017-07-01', ended: '2017-09-01', label: 'Zomervakantie 2017' },
   { start_date: '2017-10-29', ended: '2017-10-30', label: 'Winteruur 2017' },
   { start_date: '2017-10-30', ended: '2017-11-06', label: 'Herfstvakantie 2017' },
   { start_date: '2017-12-25', ended: '2018-01-08', label: 'Kerstvakantie 2017' },
@@ -111,6 +111,7 @@ export const presets = [
   { start_date: '2018-05-10', ended: '2018-05-14', label: 'Hemelvaartvakantie 2018' },
   { start_date: '2018-05-20', ended: '2018-05-21', label: 'Pinksteren (Pinksterdag) 2018' },
   { start_date: '2018-05-21', ended: '2018-05-22', label: 'Pinkstermaandag 2018' },
+  { start_date: '2018-07-01', ended: '2018-09-01', label: 'Zomervakantie 2018' },
   { start_date: '2018-10-29', ended: '2018-11-05', label: 'Herfstvakantie 2018' },
   { start_date: '2018-12-24', ended: '2019-01-07', label: 'Kerstvakantie 2018' },
 ]
