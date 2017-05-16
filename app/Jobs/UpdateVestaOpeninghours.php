@@ -33,7 +33,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
     public function __construct($vestaUid, $serviceId)
     {
         $this->vestaUid = $vestaUid;
-
         $this->serviceId = $serviceId;
     }
 

@@ -34,20 +34,19 @@ class HandleUpdatedOpeninghours
         // If the openinghours object represented the active openinghours,
         // update the VESTA openinghours of the service entirely, if that service
         // is linked to a VESTA UID
-        // otherwise, don't do anything
+        // otherwise, don't do anything, but make sure the updated openinghours are stored in LOD
+        $openinghours = $this->openinghours->getById($event->getOpeninghoursId());
+        $service = $this->getServiceThroughChannel($openinghours['channel_id']);
+
         if ($this->openinghours->isActive($event->getOpeninghoursId())) {
-            $openinghours = $this->openinghours->getById($event->getOpeninghoursId());
-
-            $service = $this->getServiceThroughChannel($openinghours['channel_id']);
-
             // Update VESTA if the service is linked to a VESTA UID
             if (! empty($service) && $service['source'] == 'vesta') {
                 dispatch((new UpdateVestaOpeninghours($service['identifier'], $service['id'])));
             }
-
-            // Update the LOD repository with the new openinghours information
-            dispatch(new UpdateLodOpeninghours($service['id'], $event->getOpeninghoursId()));
         }
+
+        // Update the LOD repository with the new openinghours information
+        dispatch(new UpdateLodOpeninghours($service['id'], $event->getOpeninghoursId(), $openinghours['channel_id']));
     }
 
     /**

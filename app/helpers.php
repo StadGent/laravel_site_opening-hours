@@ -30,11 +30,11 @@ function codeForDay($day)
 
 function carbonize($datetime = null)
 {
-    if (empty($dateTime)) {
+    if (empty($datetime)) {
         return \Carbon\Carbon::now();
     }
 
-    return \Carbon\Carbon::createFromFormat('Y-m-d', $dateTime);
+    return \Carbon\Carbon::createFromFormat('Y-m-d', $datetime);
 }
 
 function createOpeninghoursUri($openinghoursId)

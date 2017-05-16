@@ -38,7 +38,7 @@ class HandleDeletedOpeninghours
 
         $service = $openinghours['channel']['service'];
 
-        if ($this->openinghours->isActive($openinghours['id'])) {
+        if ($event->wasOpeninghoursActive()) {
             // Update VESTA if the service is linked to a VESTA UID
             if (! empty($service) && $service['source'] == 'vesta') {
                 dispatch((new UpdateVestaOpeninghours($service['identifier'], $service['id'])));

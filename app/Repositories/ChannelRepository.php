@@ -16,7 +16,18 @@ class ChannelRepository extends EloquentRepository
 
     public function getByOpeninghoursId($openinghoursId)
     {
-        return Openinghours::find($openinghoursId)->channel;
+        $openinghours = Openinghours::find($openinghoursId);
+
+        if (! empty($openinghours)) {
+            return $openinghours->channel;
+        }
+
+        return;
+    }
+
+    public function getByIdWithOpeninghours($channelId)
+    {
+        return $this->model->with('openinghours')->find($channelId);
     }
 
     /**
