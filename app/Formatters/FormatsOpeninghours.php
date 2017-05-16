@@ -370,7 +370,6 @@ trait FormatsOpeninghours
                 // Build a UID based on priority and closinghours, make sure the priority is numeric and positive
                 // the layers can range from -13 to 13 as priority values because of the maximum of 12 layers in the front-end
                 $closed = $calendar->closinghours == 0 ? 'OPEN' : 'CLOSED';
-                $priority = (int)$calendar->priority + 100;
 
                 $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 100) . '_' . $closed . '_CAL_' . $calendar->id . "\n";
                 $icalString .= "END:VEVENT\n";
@@ -413,15 +412,6 @@ trait FormatsOpeninghours
     protected function sortEvents($events)
     {
         return collect($events)->sortByDesc(function ($event) {
-            // Parse the priority from the UID
-            /*preg_match('#PRIOR_(\d{1,})_.*#', $event->uid, $matches);
-
-            $priority = 0;
-
-            if (! empty($matches[1])) {
-                $priority = $matches[1];
-            }*/
-
             return $event->uid;
         })->toArray();
     }
