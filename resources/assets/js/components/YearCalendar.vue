@@ -207,14 +207,14 @@ export default {
         style: 'custom'
       })
       window.fadeInTime = 0
+    }, 500, { leading: true }),
+    renderEnd (evt) {
+      ls('startYear', evt.currentYear)
       setTimeout(() => {
         $('.layer>.day-content').tooltip({
           container: '.version-preview'
         })
       }, 300)
-    }, 500, { leading: true }),
-    renderEnd (evt) {
-      ls('startYear', evt.currentYear)
     },
     printme () {
       Hub.$emit('printme')
