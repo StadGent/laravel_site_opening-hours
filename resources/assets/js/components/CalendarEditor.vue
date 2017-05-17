@@ -188,18 +188,23 @@ export default {
       this.$root.fetchVersion(true)
     },
     save () {
+      // Set start_date to first occurrence of rrule
       this.cal.events.forEach(e => {
         const limitedRule = keepRuleWithin(e)
         const date = rruleToStarts(limitedRule + ';COUNT=1')[0]
-        date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
-        if (e.start_date.slice(0, 10) !== date.toJSON().slice(0, 10)) {
-          e.start_date = date.toJSON().slice(0, 10) + e.start_date.slice(10)
-          e.end_date = date.toJSON().slice(0, 10) + e.end_date.slice(10)
+        if (date) {
+          date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+          if (e.start_date.slice(0, 10) !== date.toJSON().slice(0, 10)) {
+            e.start_date = date.toJSON().slice(0, 10) + e.start_date.slice(10)
+            e.end_date = date.toJSON().slice(0, 10) + e.end_date.slice(10)
+          }
         }
       })
+
       if (this.disabled) {
         return console.warn('Expected valid calendar')
       }
+
       Hub.$emit('createCalendar', this.cal, true)
     },
     saveLabel () {
