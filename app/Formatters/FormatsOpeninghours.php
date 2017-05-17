@@ -211,6 +211,7 @@ trait FormatsOpeninghours
      *
      * @param  string $serviceUri
      * @param  string $channel
+     * @param  Carbon $startDate
      * @return array
      */
     protected function renderWeekForChannel($serviceUri, $channel, $startDate)
@@ -228,12 +229,16 @@ trait FormatsOpeninghours
         // then check if there are events for that given day in the calendar, by priority
         $week = [];
 
+        // Deep copy is passed through Carbon
+        $start = clone $startDate;
+
         $endDate = clone $startDate;
         $endDate->addWeek();
 
-        $ical = $this->createIcalForServiceAndChannel($serviceUri, $channel, $startDate, $endDate);
+        $ical = $this->createIcalForServiceAndChannel($serviceUri, $channel, $start, $endDate);
+
         for ($day = 0; $day <= 6; $day++) {
-            $extractedDayInfo = $this->extractDayInfo($ical, $startDate->toDateString(), $startDate->toDateString());
+            $extractedDayInfo = $this->extractDayInfo($ical, $start->toDateString(), $start->toDateString());
 
             $dayInfo = 'Gesloten';
 
@@ -241,9 +246,9 @@ trait FormatsOpeninghours
                 $dayInfo = $extractedDayInfo;
             }
 
-            $week[$startDate->dayOfWeek] = $dayInfo;
+            $week[$start->dayOfWeek] = $dayInfo;
 
-            $startDate->addDay();
+            $start->addDay();
         }
 
         $schedule = [];
