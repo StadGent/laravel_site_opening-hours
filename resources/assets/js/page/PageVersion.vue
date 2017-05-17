@@ -32,13 +32,13 @@
           <transition-group name="list" tag="div">
             <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
               <header class="cal-header">
-                <div class="cal-action cal-info" @click="toCalendar(cal.id)">
+                <div class="cal-action cal-info" @click="toCalendar($root.isRecreatex ? -1 : cal.id)">
                   <div class="cal-img" :class="'layer-'+cal.layer"></div>
                   <div class="cal-name">{{ cal.label }}</div>
-                  <div class="cal-view">Bekijk</div>
+                  <div class="cal-view" v-if="!$root.isRecreatex">Bekijk</div>
                 </div>
-                <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)">Lager</div>
-                <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)">Hoger</div>
+                <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)" v-if="!$root.isRecreatex">Lager</div>
+                <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)" v-if="!$root.isRecreatex">Hoger</div>
               </header>
             </div>
           </transition-group>
