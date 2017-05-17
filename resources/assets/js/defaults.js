@@ -1,5 +1,7 @@
+export const VERSION_YEARS = 2
+
 const startYear = new Date().getFullYear()
-const untilYear = startYear + 2
+const untilYear = startYear + VERSION_YEARS
 
 const defaultStart = startYear + '-01-01T00:00:00'
 const defaultEnd = startYear + '-01-02T00:00:00'
