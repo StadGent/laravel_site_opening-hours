@@ -371,7 +371,7 @@ trait FormatsOpeninghours
                 // the layers can range from -13 to 13 as priority values because of the maximum of 12 layers in the front-end
                 $closed = $calendar->closinghours == 0 ? 'OPEN' : 'CLOSED';
 
-                $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 100) . '_' . $closed . '_CAL_' . $calendar->id . "\n";
+                $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 99) . '_' . $closed . '_CAL_' . $calendar->id . "\n";
                 $icalString .= "END:VEVENT\n";
             }
         }
@@ -412,9 +412,12 @@ trait FormatsOpeninghours
      */
     protected function sortEvents($events)
     {
-        return collect($events)->sortByDesc(function ($event) {
+        return usort($events, function ($a, $b) {
+            return strcmp($a->dtstart, $b->dtstart);
+        });
+        /*return collect($events)->sort(function ($event) {
             return $event->uid;
-        })->toArray();
+        })->toArray();*/
     }
 
     /**
@@ -432,7 +435,10 @@ trait FormatsOpeninghours
         // Get the events from the calendar for the given range and
         // sort them by priority, after that only keep those of the highest priority
         $events = $ical->eventsFromRange($start, $end);
-        $events = $this->sortEvents($events);
+        //$events = $this->sortEvents($events);
+        usort($events, function ($a, $b) {
+            return strcmp($a->uid, $b->uid);
+        });
 
         if (empty($events)) {
             return '';
