@@ -6,88 +6,9 @@
 
 <script>
 import { _throttle, Hub, toTime, dateAfter } from '../lib.js'
+import { rruleToStarts, keepRuleWithin, toDate, toDatetime, toIcsDate, toIcsDatetime } from '../util/rrule-helpers.js'
 
 const currentYear = new Date().getFullYear();
-
-// Human friendly duration
-function toDuration (n) {
-  n /= 1000
-  if (n < 100) {
-    return n + ' seconds'
-  }
-  n /= 60
-  if (n < 100) {
-    return n + ' minutes'
-  }
-  n /= 60
-  if (n < 100) {
-    return n + ' hours'
-  }
-  n /= 24
-  if (n < 100) {
-    return n + ' days'
-  }
-}
-
-// Cast strings, ints and dates to date only
-function toDate (str) {
-  if (str && str.toJSON) {
-    return toDate(str.toJSON())
-  }
-  if (typeof str === 'number') {
-    return new Date(str)
-  }
-  if (typeof str !== 'string') {
-    console.warn('Unexpected type in toDate', typeof str)
-    return str
-  }
-  return new Date(str.slice(0, 4), parseInt(str.slice(5, 7), 10) - 1, parseInt(str.slice(8, 10), 10))
-}
-
-// Cast strings, ints and dates to datetime
-function toDatetime (str) {
-  if (str && str.toJSON) {
-    return str
-  }
-  if (typeof str === 'number') {
-    return new Date(str)
-  }
-  if (typeof str !== 'string') {
-    console.warn('Unexpected type in toDatetime', typeof str)
-    return str
-  }
-  return new Date(Date.parse(str))
-}
-
-// Transform a date to ICS format
-function toIcsDate (str) {
-  let obj = toDate(str)
-  if (!obj) {
-    obj = new Date()
-  }
-  str = obj.toJSON()
-  return str.slice(0, 4) + str.slice(5, 7) + str.slice(8, 10) + 'T020000Z'
-}
-
-// Transform a datetime to ICS format
-function toIcsDatetime (str) {
-  let obj = toDate(str)
-  if (!obj) {
-    obj = new Date()
-  }
-  str = obj.toJSON()
-  return str.slice(0, 4) + str.slice(5, 7) + str.slice(8, 13) + str.slice(14, 16) + str.slice(17, 19) + 'Z'
-}
-
-// RRule can be expensive to calculate
-const rruleCache = {}
-function rruleToStarts(rule) {
-  if (rule.indexOf('undefined') > 0 || rule.indexOf('BYMINUTE') > 0 || rule.indexOf('BYSECOND') > 0) {
-    return console.error('Bad rules!', rule) || []
-  }
-  const cache = rruleCache[rule]
-  return cache /* || console.debug('miss', rule) */ || (rruleCache[rule] = rrulestr(rule).all())
-}
 
 // Transform a vevent to an event that bootstrap-year can use
 function expandEvent (e, layer, closinghours, dtstart, until) {
@@ -115,12 +36,6 @@ function expandEvent (e, layer, closinghours, dtstart, until) {
   const limitedRule = keepRuleWithin(e)
   return rruleToStarts(limitedRule).map(start => {
     const end = dateAfter(start, duration)
-    if (e.rrule.includes('WEEKLY')) {
-      // console.log(e, start)
-    }
-    if (e.rrule.includes('DAILY')) {
-      // console.log(duration, start.toISOString(), end.toISOString())
-    }
     return {
       layer: layer,
       startDate: start,
@@ -129,22 +44,6 @@ function expandEvent (e, layer, closinghours, dtstart, until) {
     }
   })
   return []
-}
-
-// Add dtstart and until
-function keepRuleWithin (e) {
-  let rule = e.rrule
-  if (rule.indexOf('DTSTART=') === -1) {
-    rule += ';DTSTART=' + toIcsDatetime(e.start_date)
-  }
-  if (rule.indexOf('UNTIL=') === -1) {
-    rule += ';UNTIL=' + toIcsDatetime(e.until)
-  }
-  return rule
-}
-
-// Callback for every day that is currently visible
-function customDayRenderer(elem, date) {
 }
 
 // Callback for every day that contains events
@@ -176,7 +75,7 @@ export default {
     },
     allEvents () {
       if (!this.oh || !this.oh.calendars) {
-        return 'meh'
+        return ''
       }
       return this.oh.calendars.reduce(
         (list, c) => list.concat(
@@ -197,7 +96,6 @@ export default {
 
       this.elem = $(this.$el).find('.calendar').calendar({
         customDataSourceRenderer,
-        customDayRenderer,
         dataSource: this.allEvents,
         language: 'nl',
         maxDate: toDate(this.versionEnd),
@@ -207,14 +105,14 @@ export default {
         style: 'custom'
       })
       window.fadeInTime = 0
+    }, 500, { leading: true }),
+    renderEnd (evt) {
+      ls('startYear', evt.currentYear)
       setTimeout(() => {
         $('.layer>.day-content').tooltip({
           container: '.version-preview'
         })
       }, 300)
-    }, 500, { leading: true }),
-    renderEnd (evt) {
-      ls('startYear', evt.currentYear)
     },
     printme () {
       Hub.$emit('printme')

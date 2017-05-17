@@ -456,3 +456,17 @@ h1+h3 {
     margin-left: 5px;
   }
 }
+
+.btn[disabled] {
+  color: #aaa!important;
+  background-color: #eee!important;
+  border-color: #ccc!important;
+  opacity: 1;
+  text-decoration: line-through;
+}
+
+.recreatex-read-only {
+  float: right;
+  margin-top: 6px;
+  font-size: 16px;
+}

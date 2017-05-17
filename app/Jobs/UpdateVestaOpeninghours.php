@@ -33,7 +33,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
     public function __construct($vestaUid, $serviceId)
     {
         $this->vestaUid = $vestaUid;
-
         $this->serviceId = $serviceId;
     }
 
@@ -48,7 +47,7 @@ class UpdateVestaOpeninghours implements ShouldQueue
         $output = '';
 
         try {
-            $output = $this->formatWeek($this->serviceId, 'html');
+            $output = $this->formatWeek($this->serviceId, 'html', '', \Carbon\Carbon::today()->startOfWeek());
         } catch (\Exception $ex) {
             \Log::warning('No output was created for VESTA for service with UID ' . $this->vestaUid);
         }

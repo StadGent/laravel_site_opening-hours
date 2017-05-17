@@ -141,9 +141,9 @@ class OpeninghoursController extends Controller
 
         $success = $this->openinghours->delete($id);
 
-        event(new OpeninghoursDeleted($openinghours));
-
         if ($success) {
+            event(new OpeninghoursDeleted($openinghours, $this->openinghours->isOpeninghoursRelevantNow($openinghours)));
+
             return response()->json(['message' => 'De openingsuren werden verwijderd']);
         }
 

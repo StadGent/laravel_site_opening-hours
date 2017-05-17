@@ -77,11 +77,11 @@
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
-            <button type="submit" class="btn btn-primary" @click="createChannel">Voeg toe</button>
+            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex">Voeg toe</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
-            <button type="submit" class="btn btn-primary" @click="createVersion">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">
@@ -154,13 +154,14 @@ export default {
         let invalid = false
         this.modal.calendars.forEach(cal => {
           cal.events.forEach(event => {
-            if (cal.layer && event.start_date < version.start_date) {
+            if (cal.layer && (event.start_date < version.start_date || event.until > version.end_date)) {
               invalid = true
             }
           })
         })
+
         if (invalid) {
-          return alert('Er mogen geen uitzonderingen beginnen voor de start van de versie.\n\nDe wijziging werd niet doorgevoerd.')
+          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.')
         }
 
         // Update the event until date
@@ -170,9 +171,6 @@ export default {
             if (!cal.layer) {
               event.start_date = version.start_date + event.start_date.slice(10)
               event.end_date = version.start_date + event.end_date.slice(10)
-              changed = true
-            }
-            if (!cal.layer || event.until > version.end_date) {
               event.until = version.end_date
               changed = true
             }

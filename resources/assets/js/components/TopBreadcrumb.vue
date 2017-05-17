@@ -1,5 +1,6 @@
 <template>
   <div class="container container-breadcrumb">
+    <span class="label label-warning recreatex-read-only" v-if="$root.isRecreatex">Alleen-lezen (Recreatex)</span>
     <ol class="breadcrumb">
       <li v-if="route.page=='home'">
         {{ route.tab === 'admin' ? 'Administrators' : route.tab ? 'Gebruikers' : 'Diensten' }}

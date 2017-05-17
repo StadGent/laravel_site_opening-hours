@@ -39,9 +39,9 @@ class QueryController extends Controller
 
                         $data = $this->isOpenOnDay($day, $request);
                     } catch (\Exception $ex) {
-                        \Log::error($ex->getMessage());
-                        \Log::error($ex->getTraceAsString());
-                        return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
+                        \Log::warning($ex->getMessage());
+                        \Log::warning($ex->getTraceAsString());
+                        return response()->json(['message' => 'Something went wrong, the message was: ' . $ex->getMessage()], 400);
                     }
                     break;
                 default:
@@ -49,6 +49,8 @@ class QueryController extends Controller
                     break;
             }
         } catch (\Exception $ex) {
+            \Log::error($ex->getMessage());
+            \Log::error($ex->getTraceAsString());
             return response()->json(['message' => $ex->getMessage()], 400);
         }
 
@@ -171,10 +173,10 @@ class QueryController extends Controller
 
             // Add the max timestamp, foresee a window of margin
             $maxTimestamp = clone $day;
-            $maxTimestamp->addDays(2);
+            //$maxTimestamp->addDays(2);
 
             $minTimestamp = clone $day;
-            $minTimestamp->subDay(2);
+            //$minTimestamp->subDay(2);
 
             if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
@@ -206,6 +208,8 @@ class QueryController extends Controller
 
     /**
      * Calculate if a service is open now
+     *
+     * TODO: move to trait formatsopeninghours
      *
      * @param  Request $request
      * @return array
@@ -248,10 +252,8 @@ class QueryController extends Controller
         $now = Carbon::now();
 
         foreach ($channels as $channel) {
-            $status = 'Gesloten';
-
             // Get the openinghours for the channel
-            $openinghours = $openinghoursRepo->getAllForServiceAndChannel($serviceUri, $channel);
+            $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
 
             // Get the openinghours that is active now
             $relevantOpeninghours = '';
@@ -270,6 +272,8 @@ class QueryController extends Controller
             $maxTimestamp = Carbon::today()->addDays(2);
             $minTimestamp = Carbon::today()->subDays(2)->startOfDay();
 
+            $status = 'Gesloten';
+
             if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
@@ -280,7 +284,7 @@ class QueryController extends Controller
                 foreach ($calendars as $calendar) {
                     $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
-                    if ($this->hasEventForRange($ical, $now->toIso8601String(), $now->toIso8601String())) {
+                    if (! empty($ical->eventsFromRange(Carbon::now()->toIso8601String(), Carbon::now()->addMinute()->toIso8601String()))) {
                         $status = $calendar->closinghours == 0 ? 'Open' : 'Gesloten';
 
                         continue;
@@ -292,19 +296,6 @@ class QueryController extends Controller
         }
 
         return $result;
-    }
-
-    /**
-     * Check if the ICal object has events in the given range
-     *
-     * @param  ICal    $ical
-     * @param  string  $start
-     * @param  string  $end
-     * @return boolean
-     */
-    private function hasEventForRange($ical, $start, $end)
-    {
-        return ! empty($ical->eventsFromRange($start, $end));
     }
 
     /**

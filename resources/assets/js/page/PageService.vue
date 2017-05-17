@@ -9,7 +9,7 @@
       </div>
       <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
     </span>
-    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
+    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)" :disabled="$root.isRecreatex">+ Nieuw kanaal</button>
 
     <div v-if="isOwner&&route.tab2==='users'" class="row">
       <div v-if="!filteredUsers.length" class="table-message">
@@ -36,7 +36,7 @@
       <div v-if="!channels||!channels.length" class="table-message">
         <h3 class="text-muted">Er werden nog geen kanalen voor deze dienst aangemaakt.</h3>
         <p>
-          <button class="btn btn-primary btn-lg" @click="newChannel(srv)">Voeg een nieuw kanaal toe</button>
+          <button class="btn btn-primary btn-lg" @click="newChannel(srv)" :disabled="$root.isRecreatex">Voeg een nieuw kanaal toe</button>
         </p>
       </div>
       <div v-else-if="!filteredChannels" class="table-message">
@@ -66,7 +66,7 @@
               <div>{{ channel.updated_by }}</div>
             </td>
             <td class="td-btn text-right" @click.stop>
-              <button @click="rmChannel(channel)" class="btn btn-icon btn-default">
+              <button @click="rmChannel(channel)" class="btn btn-icon btn-default" :disabled="$root.isRecreatex">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </td>

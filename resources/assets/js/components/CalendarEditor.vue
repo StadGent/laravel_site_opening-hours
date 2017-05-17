@@ -11,7 +11,7 @@
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
         <p v-if="!cal.events.length">
-          <button type="button" @click="pushFirstEvent" class="btn btn-link">+ Voeg weekschema toe</button>
+          <button type="button" @click="pushFirstEvent" class="btn btn-link" :disabled="$root.isRecreatex">+ Voeg weekschema toe</button>
         </p>
       </div>
 
@@ -62,14 +62,14 @@
         <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)" @rm="rmEvent(i)"></event-editor>
 
         <p>
-          <button type="button" @click="pushEvent" class="btn btn-link">+ Voeg nieuwe periode of dag toe</button>
+          <button type="button" @click="pushEvent" class="btn btn-link" :disabled="$root.isRecreatex">+ Voeg nieuwe periode of dag toe</button>
         </p>
       </div>
     </div>
 
     <div class="wrapper-save-btn">
       <div class="col-xs-12 text-right">
-        <button type="button" class="btn btn-default pull-left" @click="rmCalendar()">Verwijder</button>
+        <button type="button" class="btn btn-default pull-left" @click="rmCalendar()" :disabled="$root.isRecreatex">Verwijder</button>
         <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
         <button type="submit" class="btn btn-primary" @click.prevent="showPresets = true" v-if="cal.label == 'Uitzondering' && !showPresets">Volgende</button>
         <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
@@ -89,6 +89,7 @@ import EventEditor from '../components/EventEditor.vue'
 import { createEvent, createFirstEvent, presets } from '../defaults.js'
 import { cleanEmpty, Hub, toDatetime } from '../lib.js'
 import { MONTHS } from '../mixins/filters.js'
+import { rruleToStarts, keepRuleWithin } from '../util/rrule-helpers.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 
@@ -127,6 +128,10 @@ export default {
       return this.cal.events
     },
     disabled () {
+      if (this.$root.isRecreatex) {
+        return true
+      }
+
       // Start before end
       if (this.events.filter(e => e.start_date > e.end_date).length) {
         return true
@@ -183,9 +188,23 @@ export default {
       this.$root.fetchVersion(true)
     },
     save () {
+      // Set start_date to first occurrence of rrule
+      this.cal.events.forEach(e => {
+        const limitedRule = keepRuleWithin(e)
+        const date = rruleToStarts(limitedRule + ';COUNT=1')[0]
+        if (date) {
+          date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+          if (e.start_date.slice(0, 10) !== date.toJSON().slice(0, 10)) {
+            e.start_date = date.toJSON().slice(0, 10) + e.start_date.slice(10)
+            e.end_date = date.toJSON().slice(0, 10) + e.end_date.slice(10)
+          }
+        }
+      })
+
       if (this.disabled) {
         return console.warn('Expected valid calendar')
       }
+
       Hub.$emit('createCalendar', this.cal, true)
     },
     saveLabel () {
