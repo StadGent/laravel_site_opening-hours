@@ -89,6 +89,7 @@ import EventEditor from '../components/EventEditor.vue'
 import { createEvent, createFirstEvent, presets } from '../defaults.js'
 import { cleanEmpty, Hub, toDatetime } from '../lib.js'
 import { MONTHS } from '../mixins/filters.js'
+import { rruleToStarts, keepRuleWithin } from '../util/rrule-helpers.js'
 
 const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
 
@@ -187,6 +188,15 @@ export default {
       this.$root.fetchVersion(true)
     },
     save () {
+      this.cal.events.forEach(e => {
+        const limitedRule = keepRuleWithin(e)
+        const date = rruleToStarts(limitedRule + ';COUNT=1')[0]
+        date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+        if (e.start_date.slice(0, 10) !== date.toJSON().slice(0, 10)) {
+          e.start_date = date.toJSON().slice(0, 10) + e.start_date.slice(10)
+          e.end_date = date.toJSON().slice(0, 10) + e.end_date.slice(10)
+        }
+      })
       if (this.disabled) {
         return console.warn('Expected valid calendar')
       }
