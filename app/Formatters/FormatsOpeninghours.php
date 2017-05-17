@@ -149,7 +149,7 @@ trait FormatsOpeninghours
                 continue;
             }
 
-            $channelSpecification = $graph->newBNode(createChannelUri($channel['id']), 'cv:Channel');
+            $channelSpecification = $graph->resource(createChannelUri($channel['id']), 'cv:Channel');
             $channelSpecification->addLiteral('schema:label', $channelName);
             $channelSpecification->addLiteral('schema:openingHours', $this->makeTextForDayInfo($schedule));
 
