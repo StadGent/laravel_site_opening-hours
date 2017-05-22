@@ -19,3 +19,10 @@ If no channel is passed, all channels will be returned with a schedule of the co
 ## Is something open right now?
 
 - {host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}
+
+## Contributions
+
+The first iteration codebase has been written by [weconnectdata](https://github.com/weconnectdata), more specifically by [@thgh](https://github.com/thgh) and [@coreation](https://github.com/coreation).
+The design and functional analysis has been performed by [@mietcls](https://github.com/mietcls)
+
+Codeclimate set-up, code review and further maintenance will be done by [@daften](https://github.com/daften) and the Digipolis team.
