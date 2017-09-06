@@ -9,10 +9,10 @@
       </div>
       <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
     </span>
-    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)">+ Nieuw kanaal</button>
+    <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)" :disabled="$root.isRecreatex">+ Nieuw kanaal</button>
 
     <div v-if="isOwner&&route.tab2==='users'" class="row">
-      <div v-if="!filteredUsers.length" style="padding:5em 0;">
+      <div v-if="!filteredUsers.length" class="table-message">
         <h3 class="text-muted">Er werden nog geen gebruikers aan deze dienst toegevoegd.</h3>
         <p>
           <button class="btn btn-primary btn-lg" @click="newRole(srv)">Nodig een gebruiker uit</button>
@@ -25,7 +25,6 @@
             <th-sort by="email">E-mailadres</th-sort>
             <th>Gebruikers beheren</th>
             <th-sort by="verified">Actief</th-sort>
-            <th class="text-right">Nodig uit</th>
             <th class="text-right">Ontzeg toegang tot dienst</th>
           </tr>
         </thead>
@@ -34,44 +33,42 @@
     </div>
 
     <div v-else class="row">
-      <div v-if="!channels||!channels.length" style="padding:5em 0;">
+      <div v-if="!channels||!channels.length" class="table-message">
         <h3 class="text-muted">Er werden nog geen kanalen voor deze dienst aangemaakt.</h3>
         <p>
-          <button class="btn btn-primary btn-lg" @click="newChannel(srv)">Voeg een nieuw kanaal toe</button>
+          <button class="btn btn-primary btn-lg" @click="newChannel(srv)" :disabled="$root.isRecreatex">Voeg een nieuw kanaal toe</button>
         </p>
       </div>
-      <div v-else-if="!filteredChannels" style="padding:5em 0;">
+      <div v-else-if="!filteredChannels" class="table-message">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
       </div>
       <table v-else class="table table-hover">
         <thead>
           <tr>
             <th-sort by="label">Kanaal</th-sort>
-            <th-sort by="status">Status</th-sort>
+            <th>Status</th>
             <th-sort by="updated_at">Laatst aangepast</th-sort>
             <th class="text-right">Verwijder</th>
-            <th class="text-right">Bewerk</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="channel in filteredChannels" @click="href('#!channel/'+[srv.id,channel.id].join('/'))">
+          <tr
+            v-for="channel in sortedChannels"
+            @click="href('#!channel/'+[srv.id,channel.id].join('/'))"
+            :class="{ 'success text-success': hasActiveOh(channel).length  }"
+          >
             <td>
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')">{{ channel.label }}</a>
             </td>
             <td>{{ channel | toChannelStatus }}</td>
-            <td class="text-muted">
+            <td class="text-muted" :title="channel.updated_at">
               <div>{{ channel.updated_at | date }}</div>
               <div>{{ channel.updated_by }}</div>
             </td>
             <td class="td-btn text-right" @click.stop>
-              <button @click="rmChannel(channel)" class="btn btn-icon btn-default">
+              <button @click="rmChannel(channel)" class="btn btn-icon btn-default" :disabled="$root.isRecreatex">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
-            </td>
-            <td class="td-btn text-right" @click.stop>
-              <a :href="'#!channel/'+[srv.id,channel.id].join('/')" class="btn btn-icon btn-primary">
-                <i class="glyphicon glyphicon-pencil"></i>
-              </a>
             </td>
           </tr>
         </tbody>
@@ -89,7 +86,7 @@
 import ThSort from '../components/ThSort.vue'
 import RowUserOwner from '../components/RowUserOwner.vue'
 
-import { toChannelStatus, orderBy, Hub } from '../lib.js'
+import { toChannelStatus, hasActiveOh, orderBy, Hub } from '../lib.js'
 
 export default {
   name: 'dienst',
@@ -98,13 +95,13 @@ export default {
     return {
       order: '',
       query: '',
-      msg: 'Hello dienst!',
+      msg: '',
       service: null
     }
   },
   computed: {
     srv () {
-      return this.$parent.routeService
+      return this.$root.routeService
     },
     channels () {
       return this.srv.channels || []
@@ -125,6 +122,7 @@ export default {
     }
   },
   methods: {
+    hasActiveOh,
     banUser (user) {
       Hub.$emit('deleteRole', {
         user_id: user.id,

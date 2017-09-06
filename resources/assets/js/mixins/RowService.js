@@ -1,4 +1,11 @@
-import { hasChannels, hasCal, toChannelStatus } from '../lib.js'
+import {
+  hasActiveOh,
+  hasOh,
+  hasCal,
+  hasChannels,
+  toChannelAlert,
+  toChannelStatus
+} from '../lib.js'
 
 var exampleChannel = {
   "@type": "Channel",
@@ -43,31 +50,48 @@ export default {
       return this.s.updated_at ? (Date.now() - new Date(this.s.updated_at)) / 1000 / 3600 / 24 : 0
     },
     statusClass() {
-      return this.statusMessage === '✓ In orde' ? 'text-success' : 'warning'
+      return {
+        'text-success': this.statusMessage === '✓ Volledig',
+        'warning': this.statusMessage !== '✓ Volledig'
+      }
     },
     statusMessage() {
-      if (this.user.admin) {
-        // if (!this.activeUsers.length && !this.ghostUsers.length) {
-        //   return 'Geen gebruikers'
-        // }
-        if (!this.ghostUsers) {
-          return 'Geen actieve gebruikers'
-        }
-      }
-      const status = this.hasChannels.map(toChannelStatus).join('\n')
-      if (status) {
-        return status
-      }
+      // Service without channels
       if (!this.countChannels) {
         return 'Geen kanalen'
       }
-      if (!this.countCals) {
-        return 'Niet ingevoerd'
+
+      // Not every channel of the service has at least 1 version
+      if (this.hasChannels.filter(ch => !hasOh(ch).length).length) {
+        return 'Ontbrekende kalender(s)'
       }
-      if (this.old > 200) {
-        return 'Verouderd'
+
+      // Not every channel of the service has at least 1 active version
+      if (this.hasChannels.filter(ch => !hasActiveOh(ch).length).length) {
+        return 'Ontbrekende actieve kalender(s)'
       }
-      return '✓ In orde'
+
+      return '✓ Volledig'
+    },
+
+    // TODO: refactor into structured set of messages
+    statusTooltip() {
+      switch (this.statusMessage) {
+        case 'Geen kanalen': return 'Deze dienst heeft geen kanalen.'
+        case 'Ontbrekende kalender(s)': return 'Minstens 1 van de kanalen van deze dienst heeft geen versie.'
+        case 'Ontbrekende actieve kalender(s)': return 'Alle kanalen hebben een versie maar minstens 1 kanaal heeft geen versie die nu geldt. Een versie geldt niet als deze verlopen is of pas in de toekomst actief wordt.'
+        case '✓ Volledig': return 'Alle kanalen hebben minstens een kalenderversie die nu geldig is.'
+      }
     }
+  },
+  methods: {
+    newRoleFromOverview () {
+      this.newRole(this.s)
+      this.href('#!service/' + this.s.id)
+      this.route.tab2 = 'users'
+    }
+  },
+  mounted () {
+    $('[data-toggle="tooltip"]').tooltip()
   }
 }

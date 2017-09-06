@@ -7,23 +7,18 @@
       <td>
         {{ u.email }}
       </td>
-      <td @click.stop>
-        <div class="pull-left">{{ u.roles.length }}: </div>
-        <div style="margin-left:20px;">
+      <td @click.stop class="td-clickstop">
+        <div v-if="! u.roles.length">-</div>
+        <div>
           <div v-for="r in u.roles">
-          {{ r.service }}
-          <input type="radio" value="Owner" v-model="r.role">
-          <input type="radio" value="Member" v-model="r.role">
+            {{ r.role === 'Owner' ? 'Eigenaar' : 'Lid' }}
+            &nbsp;
+            <a :href="'#!service/' + r.service_id">{{ $root.serviceById(r.service_id).label }}</a>
           </div>
         </div>
       </td>
       <td v-if="u.verified" class="text-success">&checkmark;</td>
       <td v-else class="text-warning">&cross;</td>
-      <td class="td-btn text-right" @click.stop>
-        <button @click="invite" class="btn btn-default btn-icon" v-if="!u.verified">
-          <i class="glyphicon glyphicon-envelope"></i>
-        </button>
-      </td>
       <td class="td-btn text-right" @click.stop>
         <button @click="rm" class="btn btn-default btn-icon">
           <i class="glyphicon glyphicon-trash"></i>

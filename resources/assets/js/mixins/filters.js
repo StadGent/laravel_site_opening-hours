@@ -1,6 +1,6 @@
 window.Vue.filter('date', date)
 
-const MONTHS = 'jan,feb,maart,apr,mei,juni,juli,aug,sept,okt,nov,dec'.split(',')
+export const MONTHS = 'jan,feb,maart,apr,mei,juni,juli,aug,sept,okt,nov,dec'.split(',')
 
 function date(d) {
   if (!d) {
@@ -14,9 +14,9 @@ function date(d) {
     console.error('Report invalid updated_at')
     return 'invalid'
   }
-  var diff = new Date() - d
-  if (diff > 1000 * 60 * 60 * 24) {
-    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + pad(d.getHours()) + ':' + pad(d.getSeconds())
+  var diff = new Date().valueOf() - d
+  if (diff < 0 || diff > 1000 * 60 * 60 * 24) {
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear()
   }
   if (diff > 1000 * 60 * 60) {
     return Math.round(diff / 36e5) + ' uur geleden'

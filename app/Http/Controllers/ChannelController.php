@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChannelDeleted;
+use App\Http\Requests\StoreChannelRequest;
+use App\Repositories\ChannelRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Repositories\ChannelRepository;
-use App\Http\Requests\StoreChannelRequest;
 
 class ChannelController extends Controller
 {
@@ -65,13 +66,16 @@ class ChannelController extends Controller
      */
     public function show($id)
     {
+        $start = Carbon::today();
+        $end = Carbon::today();
+
         return [
             'label' => 'telefonisch',
             'openinghours' => [
                 [
                     'active' => true,
-                    'start_date' => (Carbon::now())->subMonth()->toDateString(),
-                    'end_date' => (Carbon::now())->subMonth()->addYear()->toDateString(),
+                    'start_date' => $start->subMonth()->toDateString(),
+                    'end_date' => $end->subMonth()->addYear()->toDateString(),
                     'id' => 5
                 ]
             ]
@@ -117,6 +121,16 @@ class ChannelController extends Controller
      */
     public function destroy($id)
     {
+        $channel = $this->channels->getFullObjectById($id);
+
+        if (empty($channel)) {
+            return response()->json(['message' => 'Het kanaal werd niet gevonden.'], 400);
+        }
+
+        event(new ChannelDeleted($channel));
+
         $this->channels->delete($id);
+
+        return response()->json(['Het kanaal werd verwijderd.']);
     }
 }

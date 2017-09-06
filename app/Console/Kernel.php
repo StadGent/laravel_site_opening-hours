@@ -2,6 +2,9 @@
 
 namespace App\Console;
 
+use App\Console\Commands\FetchServices;
+use App\Console\Commands\FetchRecreatex;
+use App\Console\Commands\UpdateSchedulesInVesta;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,19 +16,21 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        FetchServices::class,
+        FetchRecreatex::class,
+        UpdateSchedulesInVesta::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        //$schedule->command('openinghours:fetch-services')->weekly();
+        //$schedule->command('openinghours:update-vesta')->weekly()->mondays()->at('02:00');
     }
 
     /**

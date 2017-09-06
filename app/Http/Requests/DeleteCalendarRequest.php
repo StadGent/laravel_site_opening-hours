@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Repositories\UserRepository;
+use App\Models\Calendar;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
@@ -17,10 +18,15 @@ class DeleteCalendarRequest extends FormRequest
     {
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
-        \Log::info($request->service_id);
+        $calendar = Calendar::with('openinghours.channel.service')->find($request->calendar);
+
+        if (empty($calendar) || empty($calendar->openinghours->channel->service)) {
+            return false;
+        }
+
         return $this->user()->hasRole('Admin')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Member');
+        || $users->hasRoleInService($this->user()->id, $calendar->openinghours->channel->service->id, 'Owner')
+        || $users->hasRoleInService($this->user()->id, $calendar->openinghours->channel->service->id, 'Member');
     }
 
     /**

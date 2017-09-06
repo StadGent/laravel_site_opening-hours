@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\CalendarRepository;
-use App\Http\Requests\StoreCalendarRequest;
+use App\Events\CalendarUpdated;
+use App\Events\OpeninghoursUpdated;
 use App\Http\Requests\DeleteCalendarRequest;
+use App\Http\Requests\StoreCalendarRequest;
+use App\Http\Requests\UpdateCalendarRequest;
+use App\Repositories\CalendarRepository;
 
 class CalendarsController extends Controller
 {
@@ -49,7 +52,7 @@ class CalendarsController extends Controller
 
         // If events are passed, bulk upsert them
         if (! empty($input['events']) && ! empty($id)) {
-            $this->bulkUpsertEvents($id, $input['events']);
+            $this->bulkInsert($id, $input['events']);
         }
 
         if (! empty($id)) {
@@ -90,7 +93,7 @@ class CalendarsController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreCalendarRequest $request, $id)
+    public function update(UpdateCalendarRequest $request, $id)
     {
         $input = $request->input();
 
@@ -98,10 +101,12 @@ class CalendarsController extends Controller
 
         // If events are passed, bulk upsert them
         if (! empty($input['events'])) {
-            $this->bulkUpsertEvents($id, $input['events']);
+            $this->bulkInsert($id, $input['events']);
         }
 
         if ($success) {
+            event(new CalendarUpdated($id));
+
             return response()->json($this->calendars->getById($id));
         }
 
@@ -115,28 +120,38 @@ class CalendarsController extends Controller
      * @param  array   $events The events that need to be upserted
      * @return void
      */
-    private function bulkUpsertEvents($id, $events)
+    private function bulkInsert($calendarId, $events)
     {
         // Make sure the calendar_id is passed with the event
         // so it gets linked properly
-        array_walk($events, function (&$event) use ($id) {
-            $event['calendar_id'] = $id;
+        array_walk($events, function (&$event) use ($calendarId) {
+            $event['calendar_id'] = $calendarId;
         });
 
-        $eventsRepo = app()->make('EventRepository');
+        // Detach the current events from the calendar, then bulk insert them
+        app('EventRepository')->deleteForCalendar($calendarId);
 
-        return $eventsRepo->bulkUpsert($events);
+        return app('EventRepository')->bulkInsert($events);
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     * @param  DeleteCalendarRequest     $request
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteCalendarRequest $id)
+    public function destroy(DeleteCalendarRequest $request, $calendarId)
     {
-        $success = $this->calendars->delete($id);
+        $calendar = $this->calendars->getById($calendarId);
+
+        if (empty($calendar)) {
+            return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
+        }
+
+        event(new OpeninghoursUpdated($calendar['openinghours_id']));
+
+        $success = $this->calendars->delete($calendarId);
 
         if ($success) {
             return response()->json(['message' => 'De kalender werd verwijderd.']);

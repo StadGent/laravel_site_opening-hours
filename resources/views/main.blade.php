@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 
 <head>
   <meta charset="utf-8">
@@ -7,8 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Opening hours</title>
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}?2">
 </head>
 
 <body>
@@ -26,10 +26,11 @@
   var initialUser = {!! json_encode(Auth::user()) !!};
   initialUser.admin = {!! json_encode(Auth::user()->hasRole('Admin')) !!};
   Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
+  var appName = {!! json_encode(config('app.name')) !!};
   </script>
 
-  <script src="{{ asset('js/chunks/vendor.min.js') }}"></script>
-  <script src="{{ asset('js/chunks/lib.js') }}"></script>
+  <script src="{{ asset('js/chunks/vendor.min.js') }}?2"></script>
+  <script src="{{ asset('js/chunks/lib.js') }}?2"></script>
 
   @if (env('APP_DEBUG'))
   <script type="text/javascript">
@@ -38,7 +39,7 @@
   </script>
   @endif
 
-  <script src="{{ asset('js/bundle.js') }}"></script>
+  <script src="{{ asset('js/bundle.js') }}?2"></script>
 </body>
 
 </html>

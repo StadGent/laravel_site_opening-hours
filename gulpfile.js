@@ -1,19 +1,15 @@
-const elixir = require('laravel-elixir');
+var gulp = require('gulp');
+var spawn = require('child_process').spawn;
 
-require('laravel-elixir-vue-2');
+gulp.task('build', function() {
+  spawn('npm', ['run', 'build'], { stdio: 'inherit' });
+  spawn('npm', ['run', 'sass'], { stdio: 'inherit' });
+})
+gulp.task('watch', function() {
+  spawn('npm', ['run', 'dev'], { stdio: 'inherit' });
+  spawn('npm', ['run', 'devsass'], { stdio: 'inherit' });
+})
 
-/*
- |--------------------------------------------------------------------------
- | Elixir Asset Management
- |--------------------------------------------------------------------------
- |
- | Elixir provides a clean, fluent API for defining some basic Gulp tasks
- | for your Laravel application. By default, we are compiling the Sass
- | file for your application as well as publishing vendor resources.
- |
- */
-
-elixir((mix) => {
-    mix.sass('app.scss')
-       .webpack('app.js');
-});
+gulp.task('default', ['watch']);
+gulp.task('validate', ['build']);
+gulp.task('compile', ['build']);

@@ -1,4 +1,5 @@
 import { hasActiveOh, expiresOn } from '../lib.js'
+import { VERSION_YEARS, createVersion } from '../defaults.js'
 
 export const modal = {
   email: null,
@@ -42,18 +43,15 @@ export default {
       this.modal.srv = srv
     },
     newVersion(srv) {
+      this.modal = Object.assign(this.modal, createVersion())
       this.modal.text = 'newVersion'
-      this.modal.label = ''
-      this.modal.start_date = '2016-01-01'
-      this.modal.end_date = '2021-01-01'
       this.modal.srv = srv
 
-      const expires = expiresOn(hasActiveOh(this.$parent.routeChannel))
-      console.log(expires)
-      console.log(inert(this.$parent.routeVersion))
+      const expires = expiresOn(hasActiveOh(this.$root.routeChannel))
       if (expires) {
         this.modal.start_date = expires.slice(0, 4) + '-01-01'
-        this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + 5) + '-01-01'
+        this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + VERSION_YEARS - 1) + '-12-31'
+        this.modal.label = ''
       }
     },
     newCalendar(srv) {
@@ -68,11 +66,16 @@ export default {
 
     newUser(srv) {
       this.modal.text = 'newUser'
-      this.modal.srv = srv
+      this.modal.role = 'Member'
     },
     newRole(srv) {
       this.modal.text = 'newRole'
       this.modal.srv = srv
+    },
+    newRoleForUser(usr) {
+      this.modal.text = 'newRoleForUser'
+      this.modal.usr = usr
+      this.modal.role = 'Member'
     }
   }
 }

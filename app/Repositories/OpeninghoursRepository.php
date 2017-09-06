@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Openinghours;
 use EasyRdf_Graph as Graph;
-use EasyRdf_Serialiser_Turtle as TurtleSerialiser;
 use EasyRdf_Literal as Literal;
 use EasyRdf_Literal_Boolean as BooleanLiteral;
 use EasyRdf_Literal_Integer as IntegerLiteral;
@@ -26,10 +25,10 @@ class OpeninghoursRepository extends EloquentRepository
             return [];
         }
 
+        $calendars = app('CalendarRepository');
+
         $result = $openinghours->toArray();
         $result['calendars'] = [];
-
-        $calendars = app()->make('CalendarRepository');
 
         $openinghours->with('calendars');
 
@@ -43,7 +42,72 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Create a graph from the openinghours object
+     * Get the full object: openinghours with related channel and service
+     *
+     * @param  int   $id
+     * @return array
+     */
+    public function getFullObjectById($id)
+    {
+        $openinghours = $this->model->with('channel.service')->find($id);
+
+        if (empty($openinghours)) {
+            return [];
+        }
+
+        return $openinghours->toArray();
+    }
+
+    /**
+     * Store new openinghours
+     *
+     * @param  array $properties
+     * @return int   The ID of the new openinghours object
+     */
+    public function store(array $properties)
+    {
+        $properties['active'] = $this->isOpeninghoursRelevantNow($properties);
+
+        return parent::store($properties);
+    }
+
+    /**
+     * Return a boolean indicating if an openinghours object is "active",
+     * meaning that its timespan is relevant "now".
+     *
+     * @param  integer $openinghoursId The id of the openinghours object
+     * @return boolean
+     */
+    public function isActive($openinghoursId)
+    {
+        $openinghours = $this->getById($openinghoursId);
+
+        if (empty($openinghours)) {
+            return false;
+        }
+
+        return $this->isOpeninghoursRelevantNow($openinghours);
+    }
+
+    /**
+     * Check if the openinghours timestamp covers "today",
+     * meaning the timespan is relevant now.
+     *
+     * @param  array $openinghours
+     * @return bool
+     */
+    public function isOpeninghoursRelevantNow($openinghours)
+    {
+        if (empty($openinghours['start_date'])) {
+            // If no start date is passed we can assume it starts from today or earlier
+            $openinghours['start_date'] = carbonize()->subMonth()->toDateString();
+        }
+
+        return carbonize()->between(carbonize($openinghours['start_date']), carbonize($openinghours['end_date']));
+    }
+
+    /**
+     * Create a semantic data structure representing the openinghours
      * containing calendar and event data
      *
      * @param  integer        $openinghoursId
@@ -52,8 +116,10 @@ class OpeninghoursRepository extends EloquentRepository
     public function getOpeninghoursGraph($openinghoursId)
     {
         $openinghours = $this->model->find($openinghoursId);
+
         $calendars = $openinghours->calendars();
         $calendars = $calendars->with('events')->get()->toArray();
+
         $channel = $openinghours->channel->toArray();
 
         $openinghoursGraph = new Graph();
@@ -66,8 +132,6 @@ class OpeninghoursRepository extends EloquentRepository
                 env('BASE_URI') . '/openinghours/' . $openinghoursId,
                 'oh:OpeningHours'
             );
-
-            $openinghoursResource->addResource('oh:type', env('BASE_URI') . '/channel/' . $channel['label']);
 
             // Add the calendars taken into account the priority of the calendar
             // Sort the calendars first
@@ -96,7 +160,7 @@ class OpeninghoursRepository extends EloquentRepository
                 foreach ($calendar['events'] as $event) {
                     $eventResource = $openinghoursGraph->newBNode('ical:Vevent');
                     $eventResource->addLiteral('ical:dtend', $event['end_date']);
-                    $eventResource->addLiteral('ical:dtstart', $event['end_date']);
+                    $eventResource->addLiteral('ical:dtstart', $event['start_date']);
 
                     $rruleResource = $openinghoursGraph->newBNode();
                     $eventResource->addResource('ical:rrule', $rruleResource);
@@ -123,10 +187,107 @@ class OpeninghoursRepository extends EloquentRepository
                 // Move the current list to the new list (= rdf:rest)
                 $calendarList = $calendarListRest;
             }
+
+            return $openinghoursResource;
         }
 
-        $serialiser = new TurtleSerialiser();
-        dd($serialiser->serialise($openinghoursGraph, 'turtle'));
+        return null;
+    }
+
+    /**
+     * Create a semantic data structure containing all openinghours for the channel
+     *
+     * @param  integer        $channelId
+     * @return \EasyRdf_Graph
+     */
+    public function getOpeninghoursGraphForChannel($channelId)
+    {
+        $channel = app('ChannelRepository')->getByIdWithOpeninghours($channelId);
+
+        $openinghoursGraph = new Graph();
+
+        $channelResource = $openinghoursGraph->resource(
+            createChannelUri($channelId),
+            'cv:Channel'
+        );
+
+        if (empty($channel->openinghours)) {
+            return $openinghoursGraph;
+        }
+
+        foreach ($channel->openinghours as $openinghours) {
+            $calendars = $openinghours->calendars();
+            $calendars = $calendars->with('events')->get()->toArray();
+
+            $channel = $openinghours->channel->toArray();
+
+            \EasyRdf_Namespace::set('oh', 'http://semweb.datasciencelab.be/ns/oh#');
+            \EasyRdf_Namespace::set('ical', 'http://www.w3.org/2002/12/cal/ical#');
+
+            if (! empty($openinghours)) {
+                $openinghoursResource = $openinghoursGraph->resource(
+                    createOpeninghoursUri($openinghours->id),
+                    'oh:OpeningHours'
+                    );
+
+                $channelResource->addResource('oh:openinghours', $openinghoursResource);
+
+                // Add the calendars taken into account the priority of the calendar
+                // Sort the calendars first
+                $calendars = array_sort($calendars, function ($calendar) {
+                    return $calendar['priority'];
+                });
+
+                $calendarList = $openinghoursGraph->newBNode('rdf:List');
+
+                // Add the List to the openinghours object
+                $openinghoursResource->addResource('oh:calendar', $calendarList);
+
+                foreach ($calendars as $calendar) {
+                    $calendarResource = $openinghoursGraph->newBNode('oh:Calendar');
+                    $calendarList->addResource('rdf:first', $calendarResource);
+
+                    // Make a calendar Resource
+                    $rdfCalendarResource = $openinghoursGraph->newBNode('ical:Vcalendar');
+
+                    if ($calendar['closinghours']) {
+                        $rdfCalendarResource->addLiteral('oh:closinghours', $this->createLiteral('boolean', true));
+                    } else {
+                        $rdfCalendarResource->addLiteral('oh:closinghours', $this->createLiteral('boolean', false));
+                    }
+
+                    foreach ($calendar['events'] as $event) {
+                        $eventResource = $openinghoursGraph->newBNode('ical:Vevent');
+                        $eventResource->addLiteral('ical:dtend', $event['end_date']);
+                        $eventResource->addLiteral('ical:dtstart', $event['start_date']);
+
+                        $rruleResource = $openinghoursGraph->newBNode();
+                        $eventResource->addResource('ical:rrule', $rruleResource);
+
+                        // Add the rrule properties
+                        $pieces = explode(';', $event['rrule']);
+
+                        foreach ($pieces as $rrulePiece) {
+                            $parts = explode('=', $rrulePiece);
+
+                            $rruleResource->addLiteral('ical:' . strtolower($parts[0]), $parts[1]);
+                        }
+
+                        // Add the event resource to the calendar
+                        $rdfCalendarResource->addResource('ical:Vcomponent', $eventResource);
+                    }
+
+                    $calendarResource->addResource('oh:rdfcal', $rdfCalendarResource);
+
+                    // Add a new list as the 'rest' of the existing list
+                    $calendarListRest = $openinghoursGraph->newBNode('rdf:List');
+                    $calendarList->addResource('rdf:rest', $calendarListRest);
+
+                    // Move the current list to the new list (= rdf:rest)
+                    $calendarList = $calendarListRest;
+                }
+            }
+        }
 
         return $openinghoursGraph;
     }
@@ -157,7 +318,7 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Get all of the active openinghours for a channel and service
+     * Get all of the openinghours for a channel and service
      *
      * @param  string $serviceUri The URI of the service
      * @param  string $channel    The name of the channel
@@ -172,6 +333,48 @@ class OpeninghoursRepository extends EloquentRepository
             JOIN services ON services.id = channels.service_id
             WHERE services.uri = ? AND channels.label = ? AND openinghours.active = 1',
             [$serviceUri, $channel]
+        );
+
+        $openinghoursIds = [];
+
+        foreach ($results as $result) {
+            $openinghoursIds[] = $result->id;
+        }
+
+        return $this->model->whereIn('id', $openinghoursIds)->get();
+    }
+
+    /**
+     * Get active openinghours for a service and channel for a given timerange
+     *
+     * @param  string $serviceUri The URI of the service
+     * @param  string $channel    The name of the channel
+     * @param  Carbon $start
+     * @param  Carbon $end
+     * @return array
+     */
+    public function getForServiceAndChannel($serviceUri, $channel, $start, $end)
+    {
+        // Get the openinghours in which the start/end either lays partially in the given
+        // start-end range or where the given start-end lays in openinghours start-end range
+        $results = DB::select(
+            'SELECT openinghours.id
+            FROM openinghours
+            JOIN channels ON channels.id = openinghours.channel_id
+            JOIN services ON services.id = channels.service_id
+            WHERE services.uri = ? AND channels.label = ? AND
+            (
+                (openinghours.start_date >= ? AND openinghours.start_date <= ?)
+                OR
+                (openinghours.end_date >= ? AND openinghours.end_date <= ?)
+                OR
+                (openinghours.start_date <= ? AND openinghours.end_date >= ?)
+            )',
+            [$serviceUri, $channel,
+            $start->startOfDay()->toIso8601String(), $end->startOfDay()->toIso8601String(),
+            $start->startOfDay()->toIso8601String(), $end->startOfDay()->toIso8601String(),
+            $start->startOfDay()->toIso8601String(), $end->startOfDay()->toIso8601String()
+            ]
         );
 
         $openinghoursIds = [];

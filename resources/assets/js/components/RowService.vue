@@ -4,20 +4,21 @@
       <td>
         <a :href="'#!service/'+s.id">{{ s.label }}</a>
       </td>
-      <td class="pre-wrap" :class="statusClass" :rowspan="rowspan" v-text="statusMessage"></td>
-      <td :rowspan="rowspan" class="text-muted">
+      <td
+        :class="statusClass"
+        :rowspan="rowspan"
+      >
+        <span
+          data-toggle="tooltip"
+          :title="statusTooltip"
+        >
+          <span class="pre-wrap">{{ statusMessage }}</span> &nbsp;
+          <i class="glyphicon glyphicon-info-sign" v-if="statusTooltip"></i>
+        </span>
+      </td>
+      <td :rowspan="rowspan" class="text-muted" :title="s.updated_at">
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>
-      </td>
-      <td class="td-btn text-right" @click="route.tab2='users'">
-        <button class="btn btn-default btn-icon" v-if="isOwnerOf(s)">
-          <i class="glyphicon glyphicon-user"></i>
-        </button>
-      </td>
-      <td class="td-btn text-right">
-        <button class="btn btn-primary btn-icon">
-          <i class="glyphicon glyphicon-pencil"></i>
-        </button>
       </td>
     </tr>
   </tbody>
