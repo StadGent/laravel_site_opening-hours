@@ -17,7 +17,7 @@ class ChannelDeleted
      * @param  array $channel The entire channel object
      * @return void
      */
-    public function __construct(array $channel)
+    public function __construct($channel)
     {
         $this->channel = $channel;
     }

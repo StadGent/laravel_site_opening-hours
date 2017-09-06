@@ -2,12 +2,12 @@
   <div class="container">
     <h1>Versies <small>{{ channel.label }}</small></h1>
 
-    <button type="button" class="btn btn-primary" @click="newVersion">+ Nieuwe versie</button>
+    <button type="button" class="btn btn-primary" @click="newVersion" :disabled="$root.isRecreatex">+ Nieuwe versie</button>
 
     <div v-if="!versions||!versions.length" class="table-message">
       <h3 class="text-muted">Er werden nog geen versies voor dit kanaal aangemaakt.</h3>
       <p>
-        <button class="btn btn-primary btn-lg" @click="newVersion">Voeg een eerste versie toe</button>
+        <button class="btn btn-primary btn-lg" @click="newVersion" :disabled="$root.isRecreatex">Voeg een eerste versie toe</button>
       </p>
     </div>
     <div v-else class="row">
@@ -29,10 +29,10 @@
             <td>
               <a :href="'#!version/'+[srv.id,route.channel,version.id].join('/')">{{ version.label || 'Zonder label' }}</a>
             </td>
-            <td>{{ version.start_date }}</td>
-            <td>{{ version.end_date }}</td>
+            <td :title="version.start_date">{{ version.start_date | date }}</td>
+            <td :title="version.end_date">{{ version.end_date | date }}</td>
             <td class="td-btn text-right" @click.stop>
-              <button class="btn btn-icon btn-default" @click="deleteVersion(version)">
+              <button class="btn btn-icon btn-default" @click="deleteVersion(version)" :disabled="$root.isRecreatex">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
             </td>

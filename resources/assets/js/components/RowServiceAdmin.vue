@@ -16,7 +16,7 @@
           <i class="glyphicon glyphicon-info-sign" v-if="statusTooltip"></i>
         </span>
       </td>
-      <td  class="text-muted">
+      <td  class="text-muted" :title="s.updated_at">
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>
       </td>

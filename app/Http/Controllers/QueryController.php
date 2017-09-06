@@ -22,26 +22,36 @@ class QueryController extends Controller
     {
         $type = $request->input('q');
 
-        switch ($type) {
-            case 'week':
-                $data = $this->renderWeekSchedule($request);
-                break;
-            case 'now':
-                $data = $this->isOpenNow($request);
-                break;
-            case 'day':
-                try {
-                    $day = new Carbon($request->input('date'));
+        try {
+            switch ($type) {
+                case 'fullWeek':
+                    $data = $this->renderFullWeekSchedule($request);
+                    break;
+                case 'week':
+                    $data = $this->renderWeekSchedule($request);
+                    break;
+                case 'now':
+                    $data = $this->isOpenNow($request);
+                    break;
+                case 'day':
+                    try {
+                        $day = new Carbon($request->input('date'));
 
-                    $data = $this->isOpenOnDay($day, $request);
-                } catch (\Exception $ex) {
-                    \Log::error($ex->getMessage());
-                    return response()->json(['message' => 'Something went wrong, are you sure the date is in the expected YYYY-mm-dd format?'], 400);
-                }
-                break;
-            default:
-                abort(400, 'The endpoint did not find a handler for your query.');
-                break;
+                        $data = $this->isOpenOnDay($day, $request);
+                    } catch (\Exception $ex) {
+                        \Log::warning($ex->getMessage());
+                        \Log::warning($ex->getTraceAsString());
+                        return response()->json(['message' => 'Something went wrong, the message was: ' . $ex->getMessage()], 400);
+                    }
+                    break;
+                default:
+                    abort(400, 'The endpoint did not find a handler for your query.');
+                    break;
+            }
+        } catch (\Exception $ex) {
+            \Log::error($ex->getMessage());
+            \Log::error($ex->getTraceAsString());
+            return response()->json(['message' => $ex->getMessage()], 400);
         }
 
         // Check if the format paramater is passed and supported
@@ -51,13 +61,53 @@ class QueryController extends Controller
         switch ($format) {
             case 'html':
                 $data = $this->makeHtmlForSchedule($data);
-
+                return response()->make($data);
+                break;
+            case 'text':
+                $data = $this->makeTextForSchedule($data);
+                return response()->make($data);
+                break;
+            case 'json-ld':
+                $data = $this->makeJsonLdForSchedule($data, $request->input('serviceUri'));
                 return response()->make($data);
                 break;
             default:
                 return response()->json($data);
                 break;
         }
+    }
+
+    /**
+     * Return the week schedule starting from monday
+     *
+     * @param  Request $request
+     * @return array
+     */
+    private function renderFullWeekSchedule($request)
+    {
+        $services = app('ServicesRepository');
+
+        // Get the service URI for which we need to compute the week schedule
+        $serviceUri = $request->input('serviceUri');
+        $channel = $request->input('channel');
+
+        // Check if there's a specific date passed to get the week number for
+        $date = $request->input('date');
+
+        if (empty($date)) {
+            $date = Carbon::today();
+        } else {
+            $date = new Carbon($date);
+        }
+
+        // Get the service
+        $service = $services->where('uri', $serviceUri)->first();
+
+        if (empty($service)) {
+            return response()->json(['message' => 'The service was not found.'], 404);
+        }
+
+        return $this->formatWeek($service['id'], 'array', $channel, $date->startOfWeek());
     }
 
     /**
@@ -121,7 +171,14 @@ class QueryController extends Controller
                 }
             }
 
-            if (! empty($openinghours)) {
+            // Add the max timestamp, foresee a window of margin
+            $maxTimestamp = clone $day;
+            //$maxTimestamp->addDays(2);
+
+            $minTimestamp = clone $day;
+            //$minTimestamp->subDay(2);
+
+            if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
                     return $calendar->priority;
@@ -131,7 +188,7 @@ class QueryController extends Controller
 
                 // Iterate all calendars for the day of the week
                 foreach ($calendars as $calendar) {
-                    $ical = $this->createIcalFromCalendar($calendar);
+                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
                     $dayInfo = $this->extractDayInfo($ical, $day->toDateString(), $day->toDateString());
 
@@ -151,6 +208,8 @@ class QueryController extends Controller
 
     /**
      * Calculate if a service is open now
+     *
+     * TODO: move to trait formatsopeninghours
      *
      * @param  Request $request
      * @return array
@@ -193,10 +252,8 @@ class QueryController extends Controller
         $now = Carbon::now();
 
         foreach ($channels as $channel) {
-            $status = 'Gesloten';
-
             // Get the openinghours for the channel
-            $openinghours = $openinghoursRepo->getAllForServiceAndChannel($serviceUri, $channel);
+            $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
 
             // Get the openinghours that is active now
             $relevantOpeninghours = '';
@@ -211,6 +268,12 @@ class QueryController extends Controller
                 }
             }
 
+            // Add the min/max timestamp for performance increase, allow for margin
+            $maxTimestamp = Carbon::today()->addDays(2);
+            $minTimestamp = Carbon::today()->subDays(2)->startOfDay();
+
+            $status = 'Gesloten';
+
             if (! empty($relevantOpeninghours)) {
                 // Check if any calendar has an event that falls within the timeframe
                 $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
@@ -219,9 +282,9 @@ class QueryController extends Controller
 
                 // Iterate all calendars for the day of the week
                 foreach ($calendars as $calendar) {
-                    $ical = $this->createIcalFromCalendar($calendar);
+                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
 
-                    if ($this->hasEventForRange($ical, $now->toIso8601String(), $now->toIso8601String())) {
+                    if (! empty($ical->eventsFromRange(Carbon::now()->toIso8601String(), Carbon::now()->addMinute()->toIso8601String()))) {
                         $status = $calendar->closinghours == 0 ? 'Open' : 'Gesloten';
 
                         continue;
@@ -233,19 +296,6 @@ class QueryController extends Controller
         }
 
         return $result;
-    }
-
-    /**
-     * Check if the ICal object has events in the given range
-     *
-     * @param  ICal    $ical
-     * @param  string  $start
-     * @param  string  $end
-     * @return boolean
-     */
-    private function hasEventForRange($ical, $start, $end)
-    {
-        return ! empty($ical->eventsFromRange($start, $end));
     }
 
     /**

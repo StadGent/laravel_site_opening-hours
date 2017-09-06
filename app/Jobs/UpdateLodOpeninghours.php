@@ -27,18 +27,24 @@ class UpdateLodOpeninghours implements ShouldQueue
     protected $openinghoursId;
 
     /**
+     * @var int
+     */
+    protected $channelId;
+
+    /**
      * Create a new job instance.
      *
      * @param int $serviceId
      * @param int $openinghoursId
+     * @param int $channelId
      *
      * @return void
      */
-    public function __construct($serviceId, $openinghoursId)
+    public function __construct($serviceId, $openinghoursId, $channelId)
     {
         $this->serviceId = $serviceId;
-
         $this->openinghoursId = $openinghoursId;
+        $this->channelId = $channelId;
     }
 
     /**
@@ -50,15 +56,15 @@ class UpdateLodOpeninghours implements ShouldQueue
     {
         $service = app(ServicesRepository::class)->getById($this->serviceId);
 
-        $openinghoursResource = app(OpeninghoursRepository::class)->getOpeninghoursGraph($this->openinghoursId);
+        $openinghoursGraph = app(OpeninghoursRepository::class)->getOpeninghoursGraphForChannel($this->channelId);
 
         // Get the channel of the openinghours model
         $channel = app(ChannelRepository::class)->getByOpeninghoursId($this->openinghoursId);
 
         // Add the service and the openinghours' channel to the graph
-        $graph = $this->createServiceResource($service, $channel, $openinghoursResource);
+        $graph = $this->createServiceResource($service, $channel, $openinghoursGraph);
 
-        app(LodOpeninghoursRepository::class)->write($service, $channel, $graph);
+        app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph);
     }
 
     /**
@@ -66,28 +72,33 @@ class UpdateLodOpeninghours implements ShouldQueue
      *
      * @param  array            $service
      * @param  array            $channel
-     * @param  EasyRdf_Resource $openinghoursResource
+     * @param  EasyRdf_Graph    $openinghoursGraph
      * @return EasyRdf_Resource
      */
-    private function createServiceResource($service, $channel, $openinghoursResource)
+    private function createServiceResource($service, $channel, $openinghoursGraph)
     {
         \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
 
-        $graph = $openinghoursResource->getGraph();
+        //$graph = $openinghoursGraph->getGraph();
 
-        $service = $graph->resource(
-            env('BASE_URI') . '/service/' . $service['id'],
+        $service = $openinghoursGraph->resource(
+            createServiceUri($service['id']),
             'cv:PublicOrganisation'
         );
 
-        $channel = $graph->resource(
-            env('BASE_URI') . '/channel/' . $channel['id'],
+        $channelId = $channel['id'];
+
+        $channel = $openinghoursGraph->resource(
+            createChannelUri($channelId),
             'cv:Channel'
         );
 
         $channel->addResource('cv:isOwnedBy', $service);
-        $channel->addResource('oh:openinghours', $openinghoursResource);
-        $channel->addResource('rdfs:isDefinedBy', $openinghoursResource);
+        //$channel->addResource('oh:openinghours', $openinghoursGraph);
+
+        if (! empty(env('DATA_REPRESENTATION_URI'))) {
+            $channel->addResource('rdfs:isDefinedBy', env('DATA_REPRESENTATION_URI') . '/channel/' . $channelId);
+        }
 
         return $service;
     }

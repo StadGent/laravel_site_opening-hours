@@ -21,7 +21,8 @@ class StoreOpeninghoursRequest extends FormRequest
         // Get the service of the calendar
         $channel = Channel::with('service')->find($request->channel_id);
 
-        if (empty($channel) || empty($channel->service->id)) {
+        if (empty($channel)
+            || empty($channel->service->id)) {
             return false;
         }
 

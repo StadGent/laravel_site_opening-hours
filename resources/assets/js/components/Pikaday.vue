@@ -3,15 +3,6 @@
 </template>
 
 <script>
-var dateFormatter = date => new Date(date).toDateString()
-if (Intl && Intl.DateTimeFormat) {
-  dateFormatter = date => new Intl.DateTimeFormat('nl', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  }).format(new Date(date))
-}
-
 const pikadayOptions = {
   i18n: {
     previousMonth : 'Vorige maand',
@@ -31,7 +22,7 @@ export default {
     opts () {
       return Object.assign({
         firstDay: 1,
-        format: dateFormatter,
+        format: 'DD-MM-YYYY',
         onSelect: (date) => {
           // Correct for timezone
           date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
@@ -49,9 +40,7 @@ export default {
     render () {
       this.pikaday && this.pikaday.destroy()
       this.pikaday = new Pikaday(this.opts)
-      this.$nextTick(() => {
-        this.$el.value = this.opts.format(this.value)
-      })
+      this.pikaday.setDate(this.value)
     }
   },
   mounted () {
@@ -61,11 +50,10 @@ export default {
     this.pikaday.destroy()
   },
   watch: {
-    value (date, old) {
+    value (date) {
       this.$nextTick(() => {
         if (this.pikaday && this.pikaday.getDate().toJSON().slice(0, 10) !== date) {
           this.pikaday.setDate(date)
-          this.$el.value = this.opts.format(date)
         }
       })
     },

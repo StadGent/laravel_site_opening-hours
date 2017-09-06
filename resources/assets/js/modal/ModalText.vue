@@ -77,11 +77,11 @@
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
-            <button type="submit" class="btn btn-primary" @click="createChannel">Voeg toe</button>
+            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex">Voeg toe</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
-            <button type="submit" class="btn btn-primary" @click="createVersion">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
             <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">
@@ -115,7 +115,7 @@ export default {
       if (!this.modal.start_date || !this.modal.end_date) {
         return 'Nieuwe versie'
       }
-      return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + (parseInt(this.modal.end_date.slice(0, 4), 10) - 1)
+      return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + this.modal.end_date.slice(0, 4)
     },
 
     allowedServices () {
@@ -144,6 +144,41 @@ export default {
     createVersion () {
       if (!this.modal.label) {
         this.modal.label = this.nextVersionLabel
+      }
+
+      // Align events with start_date and end_date
+      if (this.modal.id && this.modal.calendars) {
+        const version = this.modal
+
+        // Look for events that pose problems
+        let invalid = false
+        this.modal.calendars.forEach(cal => {
+          cal.events.forEach(event => {
+            if (cal.layer && (event.start_date < version.start_date || event.until > version.end_date)) {
+              invalid = true
+            }
+          })
+        })
+
+        if (invalid) {
+          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.')
+        }
+
+        // Update the event until date
+        this.modal.calendars.forEach(cal => {
+          let changed = false
+          cal.events.forEach(event => {
+            if (!cal.layer) {
+              event.start_date = version.start_date + event.start_date.slice(10)
+              event.end_date = version.start_date + event.end_date.slice(10)
+              event.until = version.end_date
+              changed = true
+            }
+          })
+          if (changed) {
+            Hub.$emit('createCalendar', cal)
+          }
+        })
       }
       Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },

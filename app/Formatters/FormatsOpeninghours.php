@@ -3,35 +3,18 @@
 namespace App\Formatters;
 
 use Carbon\Carbon;
+use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
+
+date_default_timezone_set('Europe/Brussels');
 
 /**
- * Returns a textual form of the openinghours of a service
+ * Provides functionality to parse Calendar objects into ICAL objects
+ * and provides a means to format the outcome of the ICAL events into text, json-ld, html and json
+ *
+ * TODO split functionality of parsing calendar into ICAL and formatting schedules
  */
 trait FormatsOpeninghours
 {
-    /**
-     * Render a schedule into HTML based on an array structure
-     *
-     * @param  array  $schedule
-     * @return string
-     */
-    protected function makeHtmlForSchedule($data)
-    {
-        $formattedSchedule = '<div>';
-
-        foreach ($data as $channel => $schedule) {
-            $formattedSchedule .= "<span><h4>$channel</h4>";
-
-            foreach ($schedule as $entry) {
-                $formattedSchedule .= "<p>$entry</p>";
-            }
-        }
-
-        $formattedSchedule .= '</div>';
-
-        return $formattedSchedule;
-    }
-
     /**
      * Compute a week schedule for a service
      *
@@ -39,13 +22,24 @@ trait FormatsOpeninghours
      * @param  string $channel   The specific channel to print
      * @return array
      */
-    protected function formatWeek($serviceId, $format = 'array', $channel = '')
+    protected function formatWeek($serviceId, $format = 'array', $channel = '', $startDate = null)
     {
-        $data = $this->renderWeek($serviceId, $channel);
+        if (empty($startDate)) {
+            $startDate = Carbon::now();
+        }
+
+        $data = $this->renderWeek($serviceId, $channel, $startDate);
 
         switch ($format) {
             case 'html':
                 return $this->makeHtmlForSchedule($data);
+                break;
+            case 'text':
+                return $this->makeTextForSchedule($data);
+                break;
+            case 'json-ld':
+                $serviceUri = createServiceUri($serviceId);
+                return $this->makeJsonLdForSchedule($data, $serviceUri);
                 break;
             default:
                 return $data;
@@ -58,10 +52,15 @@ trait FormatsOpeninghours
      *
      * @param  int    $serviceId
      * @param  string $channel
+     * @param  Carbon $startDate
      * @return array
      */
-    protected function renderWeek($serviceId, $channel = '')
+    protected function renderWeek($serviceId, $channel = '', $startDate = null)
     {
+        if (empty($startDate)) {
+            $startDate = Carbon::now();
+        }
+
         $service = app('ServicesRepository')->getById($serviceId);
 
         $channels = [];
@@ -76,18 +75,90 @@ trait FormatsOpeninghours
         }
 
         if (empty($channels)) {
-            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
+            throw new \Exception('Deze dienst heeft geen enkel kanaal met openingsuren.');
         }
 
         $openinghours = [];
 
         foreach ($channels as $channel) {
-            $weekSchedule = $this->renderWeekForChannel($service['uri'], $channel);
+            $weekSchedule = $this->renderWeekForChannel($service['uri'], $channel, $startDate);
 
             $openinghours[$channel] = $weekSchedule;
         }
 
         return $openinghours;
+    }
+
+    /**
+     * Render a schedule into HTML based on an array structure
+     *
+     * @param  array  $schedule
+     * @return string
+     */
+    protected function makeHtmlForSchedule($data)
+    {
+        $formattedSchedule = '<div>';
+
+        foreach ($data as $channel => $schedule) {
+            $formattedSchedule .= "<span><h4>$channel</h4>";
+
+            if (! empty($schedule)) {
+                if (is_array($schedule)) {
+                    foreach ($schedule as $entry) {
+                        $formattedSchedule .= "<p>$entry</p>";
+                    }
+                } else {
+                    $formattedSchedule .= "<p>$schedule</p>";
+                }
+            }
+        }
+
+        $formattedSchedule .= '</div>';
+
+        return $formattedSchedule;
+    }
+
+    /**
+     * Return a JSON-LD formatted openinghours schedule
+     * TODO: rework how a schedule is returned, some formats
+     * need more basic info of the openinghours instead of
+     * formatted hours per day, such as this one.
+     *
+     * @param  array  $data
+     * @param  string $serviceUri
+     * @return string
+     */
+    protected function makeJsonLdForSchedule($data, $serviceUri)
+    {
+        \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
+
+        $graph = new \EasyRdf_Graph();
+        $service = $graph->resource($serviceUri, 'schema:Organization');
+
+        // get a raw render for the week:
+        // $channel id + days index in english
+        // for each channel create an openinghours specification
+        // where the channel URI is also set as some sort of context
+
+        foreach ($data as $channelName => $schedule) {
+            $channel = app('ChannelRepository')->getByName($serviceUri, $channelName);
+
+            if (empty($channel)) {
+                \Log::error('No channel was found for name:' . $channelName . ' and URI ' . $serviceUri);
+
+                continue;
+            }
+
+            $channelSpecification = $graph->resource(createChannelUri($channel['id']), 'cv:Channel');
+            $channelSpecification->addLiteral('schema:label', $channelName);
+            $channelSpecification->addLiteral('schema:openingHours', $this->makeTextForDayInfo($schedule));
+
+            $channelSpecification->addResource('cv:isOwnedBy', $service);
+        }
+
+        $serialiser = new JsonLdSerialiser();
+
+        return $serialiser->serialise($graph, 'jsonld');
     }
 
     /**
@@ -97,20 +168,14 @@ trait FormatsOpeninghours
      * @param  array  $data
      * @return string
      */
-    protected function makeHtmlFromSchedule($data)
+    protected function makeTextForSchedule($data)
     {
         $text = '';
 
         foreach ($data as $channel => $info) {
             $text .= $channel . ': ' . PHP_EOL;
 
-            if (is_array($info)) {
-                foreach ($info as $day) {
-                    $text .= $day . PHP_EOL;
-                }
-            } else {
-                $text .= $info . PHP_EOL;
-            }
+            $text .= $this->makeTextForDayInfo($info);
 
             $text .= PHP_EOL . PHP_EOL;
         }
@@ -121,13 +186,35 @@ trait FormatsOpeninghours
     }
 
     /**
+     * Print a textual representation of a day schedule
+     *
+     * @param  string|array $dayInfo
+     * @return string
+     */
+    protected function makeTextForDayInfo($dayInfo)
+    {
+        $text = '';
+
+        if (is_array($dayInfo)) {
+            foreach ($dayInfo as $day) {
+                $text .= $day . PHP_EOL;
+            }
+        } else {
+            $text .= $dayInfo . PHP_EOL;
+        }
+
+        return $text;
+    }
+
+    /**
      * Return the week schedule for a service and channel
      *
      * @param  string $serviceUri
      * @param  string $channel
+     * @param  Carbon $startDate
      * @return array
      */
-    protected function renderWeekForChannel($serviceUri, $channel)
+    protected function renderWeekForChannel($serviceUri, $channel, $startDate)
     {
         // Check if the service and channel exist
         $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
@@ -138,53 +225,30 @@ trait FormatsOpeninghours
 
         $weekDays = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
 
-        // Get the openinghours that is active now
-        $relevantOpeninghours = '';
-
-        foreach ($openinghours as $openinghoursInstance) {
-            if (Carbon::now()->between(
-                (new Carbon($openinghoursInstance->start_date)),
-                (new Carbon($openinghoursInstance->end_date))
-            )) {
-                $relevantOpeninghours = $openinghoursInstance;
-                break;
-            }
-        }
-
-        if (empty($relevantOpeninghours)) {
-            // abort(404, 'No relevant openinghours found for this week.');
-            return [];
-        }
-
-        // Go to the start of the week starting from today and iterate over every day
+        // Go to startDate and iterate over every day of the week after that
         // then check if there are events for that given day in the calendar, by priority
-        $weekDay = Carbon::now();
-
         $week = [];
 
+        // Deep copy is passed through Carbon
+        $start = clone $startDate;
+
+        $endDate = clone $startDate;
+        $endDate->addWeek();
+
+        $ical = $this->createIcalForServiceAndChannel($serviceUri, $channel, $start, $endDate);
+
         for ($day = 0; $day <= 6; $day++) {
-            $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
-                return $calendar->priority;
-            });
+            $extractedDayInfo = $this->extractDayInfo($ical, $start->toDateString(), $start->toDateString());
 
             $dayInfo = 'Gesloten';
 
-            // Iterate all calendars for the day of the week
-            foreach ($calendars as $calendar) {
-                $ical = $this->createIcalFromCalendar($calendar);
-
-                $extractedDayInfo = $this->extractDayInfo($ical, $weekDay->toDateString(), $weekDay->toDateString());
-
-                if (! empty($extractedDayInfo)) {
-                    $dayInfo = $calendar->closinghours ? 'Gesloten' : $extractedDayInfo;
-
-                    break;
-                }
+            if (! empty($extractedDayInfo)) {
+                $dayInfo = $extractedDayInfo;
             }
 
-            $week[$weekDay->dayOfWeek] = $dayInfo;
+            $week[$start->dayOfWeek] = $dayInfo;
 
-            $weekDay->addDay();
+            $start->addDay();
         }
 
         $schedule = [];
@@ -197,48 +261,156 @@ trait FormatsOpeninghours
     }
 
     /**
-     * Create ICal from a calendar object
+     * Create an Ical object based on the service URI, channel and time range
+     * by fetching the relevant openinghours objects and parsing the related calendars
      *
-     * @param  Calendar $calendar
+     * @param  string $serviceUri
+     * @param  string $channel
+     * @param  Carbon $startDate
+     * @param  Carbon $endDate
      * @return ICal
      */
-    protected function createIcalFromCalendar($calendar)
+    protected function createIcalForServiceAndChannel($serviceUri, $channel, $startDate, $endDate)
+    {
+        $relevantOpeninghours = app('OpeninghoursRepository')->getForServiceAndChannel($serviceUri, $channel, $startDate, $endDate);
+
+        $calendars = collect([]);
+
+        foreach ($relevantOpeninghours as $relevantOpeninghour) {
+            $calendars = $calendars->merge($relevantOpeninghour->calendars);
+        }
+
+        $calendars = array_sort($calendars, function ($calendar) {
+            return $calendar['priority'];
+        });
+
+        return $this->createIcalFromCalendars($calendars, $startDate, $endDate);
+    }
+
+    /**
+     * Create ICal from a calendar object
+     *
+     * @param Calendar $calendar
+     * @param Carbon   $minTimestamp Optional, the min timestamp of the range to create the ical for, used for performance
+     * @param Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, used for performance
+     *
+     * @return ICal
+     */
+    protected function createIcalFromCalendar($calendar, $minTimestamp = null, $maxTimestamp = null)
+    {
+        $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+        $icalString .= $this->createIcalEventStringFromCalendar($calendar, $minTimestamp, $maxTimestamp);
+        $icalString .= 'END:VCALENDAR';
+
+        $ical = new \ICal\ICal();
+        $ical->initString($icalString);
+
+        return $ical;
+    }
+
+    /**
+     * Create ICal from calendars object
+     *
+     * @param Calendar $calendar
+     * @param Carbon   $minTimestamp Optional, the min timestamp of the range to create the ical for, used for performance
+     * @param Carbon   $maxTimestamp Optional, the max timestamp of the range to create the ical for, used for performance
+     *
+     * @return ICal
+     */
+    protected function createIcalFromCalendars($calendars, $minTimestamp, $maxTimestamp)
     {
         $icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
 
-        foreach ($calendar->events as $event) {
-            $dtStart = $this->convertIsoToIcal($event->start_date);
-            $dtEnd = $this->convertIsoToIcal($event->end_date);
-
-            $icalString .= "BEGIN:VEVENT\n";
-            $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $dtStart . "\n";
-            $icalString .= 'DTEND;TZID=Europe/Brussels:' . $dtEnd . "\n";
-            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $this->convertIsoToIcal($event->until) . "\n";
-            $icalString .= 'UID:' . str_random(32) . "\n";
-            $icalString .= "END:VEVENT\n";
+        foreach ($calendars as $calendar) {
+            $icalString .= $this->createIcalEventStringFromCalendar($calendar, $minTimestamp, $maxTimestamp);
         }
 
         $icalString .= 'END:VCALENDAR';
 
-        return new \ICal\ICal(explode(PHP_EOL, $icalString), 'MO');
+        $ical = new \ICal\ICal();
+        $ical->initString($icalString);
+
+        return $ical;
+    }
+
+    /**
+     * Create an ICAL string from a calendar
+     * @param  Calendar $calendar
+     * @return string
+     */
+    protected function createIcalEventStringFromCalendar($calendar, $minTimestamp = null, $maxTimestamp = null)
+    {
+        $icalString = '';
+
+        foreach ($calendar->events as $event) {
+            $until = $event->until;
+
+            if (! empty($maxTimestamp) && $event->until > $maxTimestamp->toDateString() && $maxTimestamp > $event->start_date) {
+                $until = $maxTimestamp->toDateString();
+            }
+
+            if ($until >= $minTimestamp->toDateString() || empty($minTimestamp)) {
+                // Performance tweak
+                $startDate = new Carbon($event->start_date);
+                $endDate = new Carbon($event->end_date);
+                $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
+
+                if ($endDate->toDateString() > $until && $endDate->toDateString() > $startDate->toDateString()) {
+                    $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
+                    $endDate->month = $untilDate->month;
+                } elseif ($endDate->toDateString() < $startDate->toDateString()) {
+                    $endDate->month = $startDate->month;
+                }
+
+                $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
+
+                $startDate = $this->convertCarbonToIcal($startDate);
+                $endDate = $this->convertCarbonToIcal($endDate);
+
+                $icalString .= "BEGIN:VEVENT\n";
+                $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
+                $icalString .= 'DTEND;TZID=Europe/Brussels:' . $endDate . "\n";
+                $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . "\n";
+
+                // Build a UID based on priority and closinghours, make sure the priority is numeric and positive
+                // the layers can range from -13 to 13 as priority values because of the maximum of 12 layers in the front-end
+                $closed = $calendar->closinghours == 0 ? 'OPEN' : 'CLOSED';
+
+                $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 99) . '_' . $closed . '_CAL_' . $calendar->id . "\n";
+                $icalString .= "END:VEVENT\n";
+            }
+        }
+
+        return $icalString;
+    }
+
+    /**
+     * Format a Carbon date to YYYYmmddThhmmss
+     *
+     * @param  Carbon $date
+     * @return string
+     */
+    protected function convertCarbonToIcal($date)
+    {
+        return $date->format('Ymd\THis');
     }
 
     /**
      * Format an ISO date to YYYYmmddThhmmss
      *
-     * @param string $date
-     * @return
+     * @param  string $date
+     * @return string
      */
     protected function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
-        $date = $date->format('Ymd His');
-
-        return str_replace(' ', 'T', $date);
+        return $date->format('Ymd\THis');
     }
 
     /**
-     * Check if there are events in a given range (day)
+     * Check if there are events for a given day
+     * Use the UIDs to get information on which calendar the events are from
+     * (e.g. closed or open calendar)
      *
      * @param  ICal   $ical
      * @param  string $start date string YYYY-mm-dd
@@ -247,7 +419,13 @@ trait FormatsOpeninghours
      */
     protected function extractDayInfo($ical, $start, $end)
     {
+        // Get the events from the calendar for the given range and
+        // sort them by priority, after that only keep those of the highest priority
         $events = $ical->eventsFromRange($start, $end);
+
+        usort($events, function ($a, $b) {
+            return strcmp($a->uid, $b->uid);
+        });
 
         if (empty($events)) {
             return '';
@@ -255,12 +433,56 @@ trait FormatsOpeninghours
 
         $hours = [];
 
-        foreach ($events as $event) {
-            $dtStart = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtstart));
-            $dtEnd = Carbon::createFromTimestamp($ical->iCalDateToUnixTimestamp($event->dtend));
+        // Make sure we only get hours of the same calendar, with the highest priority
+        // make sure to use collect/first because the keys will be switched as well,
+        // so fetching events[0] will result in fetching the value with key 0, not the first element per se
+        $uid = collect($events)->first()->uid;
 
-            $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+        $events = collect($events)->filter(function($event) use ($uid) {
+            return $event->uid == $uid;
+        })->toArray();
+
+        usort($events, function ($a, $b) {
+            return strcmp($a->dtstart, $b->dtstart);
+        });
+
+        foreach ($events as $event) {
+            // Make sure we only get hours of the same calendar
+            if (! empty($uid) && $event->uid != $uid) {
+                break;
+            }
+
+            // If closinghours are passed, "closed" is always the last value
+            if (str_contains($event->uid, 'CLOSED')) {
+                return 'Gesloten';
+            } else {
+                $start = $event->dtstart;
+                $end =  $event->dtend;
+
+                $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
+                $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
+
+                // Check for the one-off chance that there are overlapping hours (=events)
+                // within one layer (=calendar)
+                if (! empty($hours)) {
+                    $lastHourRange = end($hours);
+
+                    $lastHourRangeEnd = explode('-', $lastHourRange);
+
+                    if (trim(array_get($lastHourRangeEnd, 1, '')) < $dtStart->format('H:i')) {
+                        $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                    }
+                } else {
+                    $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                }
+            }
+
+            if (empty($uid)) {
+                $uid = $event->uid;
+            }
         }
+
+        $hours = array_unique($hours);
 
         return rtrim(implode($hours, ', '), ',');
     }

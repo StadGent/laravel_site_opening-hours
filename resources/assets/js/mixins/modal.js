@@ -1,5 +1,5 @@
 import { hasActiveOh, expiresOn } from '../lib.js'
-import { createVersion } from '../defaults.js'
+import { VERSION_YEARS, createVersion } from '../defaults.js'
 
 export const modal = {
   email: null,
@@ -50,7 +50,7 @@ export default {
       const expires = expiresOn(hasActiveOh(this.$root.routeChannel))
       if (expires) {
         this.modal.start_date = expires.slice(0, 4) + '-01-01'
-        this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + 5) + '-01-01'
+        this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + VERSION_YEARS - 1) + '-12-31'
         this.modal.label = ''
       }
     },

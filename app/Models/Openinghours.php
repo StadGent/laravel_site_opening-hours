@@ -34,7 +34,7 @@ class Openinghours extends Model
 
     public function getActiveAttribute()
     {
-        $today = Carbon::now()->toDateString();
+        $today = Carbon::today()->toDateString();
 
         return $this->start_date <= $today && (empty($this->end_date) || $this->end_date >= $today);
     }

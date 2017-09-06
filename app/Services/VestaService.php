@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-//http://stackoverflow.com/questions/14770898/soapenvelope-soap-envenvelope-php
-
 /**
  * This class writes text to the VESTA application based on a certain VESTA UID
+ * Kudos to stackoverflow so that ancient protocols can still be used: http://stackoverflow.com/questions/14770898/soapenvelope-soap-envenvelope-php
  */
 class VestaService
 {
@@ -17,7 +16,7 @@ class VestaService
      * @param  string $output   The openinghours output
      * @return void
      */
-    public function updateOpeninghours(string $vestaUid, string $output)
+    public function updateOpeninghours($vestaUid, $output)
     {
         // Write the weekschedule to VESTA using a SOAP call
         $userName = base64_encode(env('VESTA_USER', ''));

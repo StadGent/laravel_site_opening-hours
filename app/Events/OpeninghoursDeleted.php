@@ -18,14 +18,26 @@ class OpeninghoursDeleted
     private $openinghours;
 
     /**
+     * @var boolean
+     */
+    private $wasActive;
+
+    /**
      * Create a new event instance.
      *
-     * @param  array $openinghours The entire openinghours object
+     * @param  array   $openinghours The entire openinghours object
+     * @param  boolean $wasActive    Boolean indicating if the openinghours was active "now"
      * @return void
      */
-    public function __construct(array $openinghours)
+    public function __construct($openinghours, $wasActive)
     {
         $this->openinghours = $openinghours;
+        $this->wasActive = $wasActive;
+    }
+
+    public function wasOpeninghoursActive()
+    {
+        return $this->wasActive;
     }
 
     /**
