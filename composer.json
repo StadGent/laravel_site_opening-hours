@@ -4,7 +4,6 @@
     "keywords": ["framework", "laravel"],
     "license": "AGPLv3",
     "type": "Web application",
-    "minimum-stability": "dev",
     "repositories": [
         {
             "type": "vcs",
