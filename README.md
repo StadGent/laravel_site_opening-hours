@@ -95,3 +95,10 @@ If no channel is passed, all channels will be returned with a schedule of the co
 ### Get the openinghours for a specific day
 
 - {host}/api/query?q=day&date={mm-dd-yyyy}&serviceUri={serviceUri}&channel={channel}&format={format}
+
+## Contributions
+
+The first iteration codebase has been written by [weconnectdata](https://github.com/weconnectdata), more specifically by [@thgh](https://github.com/thgh) and [@coreation](https://github.com/coreation).
+The design and functional analysis has been performed by [@mietcls](https://github.com/mietcls)
+
+Codeclimate set-up, code review and further maintenance will be done by [@daften](https://github.com/daften) and the Digipolis team.
