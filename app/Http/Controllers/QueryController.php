@@ -2,50 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Formatters\FormatsOpeninghours;
+use App\Formatters\Openinghours;
+use App\Http\Requests\GetQueryRequest;
+use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-
-date_default_timezone_set('Europe/Brussels');
 
 class QueryController extends Controller
 {
-    use FormatsOpeninghours;
-
     /**
      * Handle an openinghours query
      *
-     * @param  Request  $request
-     * @return Response
+     * @todo make the q input sepperate actions on controller
+     * @param  GetQueryRequest $request [extends FormRequest]
+     * @return [type]                   [description]
      */
-    public function query(Request $request)
+    public function query(GetQueryRequest $request, Openinghours $formatter)
     {
-        $type = $request->input('q');
+        if ($request->input('lang')) {
+            \App::setLocale($request->input('lang'));
+        }
+        // set service uri as service unique key
+        $serviceModel        = Service::where(['uri' => $request->input('serviceUri')])->first();
+        $openinghoursService = app('OpeninghoursService');
+        $openinghoursService->setServiceModel($serviceModel);
 
+
+        // set channel if available
+        $channelModel = null;
+        if ($request->input('channel')) {
+            $channelModel = $serviceModel->channels()->where('label', '=', $request->input('channel'))->first();
+            $openinghoursService->setChannelModel($channelModel);
+        }
+
+        $date = null;
+        if ($request->input('date')) {
+            $splitDate = explode('-', $request->input('date'));
+            $date      = Carbon::createFromDate($splitDate[2], $splitDate[1], $splitDate[0])->startOfDay();
+        }
+        /** @todo make these sepperate actions on controller */
         try {
-            switch ($type) {
-                case 'fullWeek':
-                    $data = $this->renderFullWeekSchedule($request);
-                    break;
-                case 'week':
-                    $data = $this->renderWeekSchedule($request);
-                    break;
+            switch ($request->input('q')) {
                 case 'now':
-                    $data = $this->isOpenNow($request);
+                    $openinghoursService->isOpenNow();
                     break;
                 case 'day':
-                    try {
-                        $day = new Carbon($request->input('date'));
-
-                        $data = $this->isOpenOnDay($day, $request);
-                    } catch (\Exception $ex) {
-                        \Log::warning($ex->getMessage());
-                        \Log::warning($ex->getTraceAsString());
-                        return response()->json(['message' => 'Something went wrong, the message was: ' . $ex->getMessage()], 400);
-                    }
+                    $openinghoursService->isOpenOnDay($date);
                     break;
-                default:
-                    abort(400, 'The endpoint did not find a handler for your query.');
+                case 'week':
+                    $openinghoursService->isOpenForNextSevenDays();
+                    break;
+                case 'fullWeek':
+                    $openinghoursService->isOpenForFullWeek($date);
                     break;
             }
         } catch (\Exception $ex) {
@@ -54,271 +61,13 @@ class QueryController extends Controller
             return response()->json(['message' => $ex->getMessage()], 400);
         }
 
-        // Check if the format paramater is passed and supported
-        $format = $request->input('format');
-
-        // The default format is JSON
-        switch ($format) {
-            case 'html':
-                $data = $this->makeHtmlForSchedule($data);
-                return response()->make($data);
-                break;
-            case 'text':
-                $data = $this->makeTextForSchedule($data);
-                return response()->make($data);
-                break;
-            case 'json-ld':
-                $data = $this->makeJsonLdForSchedule($data, $request->input('serviceUri'));
-                return response()->make($data);
-                break;
-            default:
-                return response()->json($data);
-                break;
-        }
-    }
-
-    /**
-     * Return the week schedule starting from monday
-     *
-     * @param  Request $request
-     * @return array
-     */
-    private function renderFullWeekSchedule($request)
-    {
-        $services = app('ServicesRepository');
-
-        // Get the service URI for which we need to compute the week schedule
-        $serviceUri = $request->input('serviceUri');
-        $channel = $request->input('channel');
-
-        // Check if there's a specific date passed to get the week number for
-        $date = $request->input('date');
-
-        if (empty($date)) {
-            $date = Carbon::today();
-        } else {
-            $date = new Carbon($date);
-        }
-
-        // Get the service
-        $service = $services->where('uri', $serviceUri)->first();
-
-        if (empty($service)) {
-            return response()->json(['message' => 'The service was not found.'], 404);
-        }
-
-        return $this->formatWeek($service['id'], 'array', $channel, $date->startOfWeek());
-    }
-
-    /**
-     * Get the openinghours for a specific day
-     *
-     * @param  Carbon  $day
-     * @param  Request $request
-     * @return array
-     */
-    private function isOpenOnDay($day, $request)
-    {
-        $services = app('ServicesRepository');
-        $openinghoursRepo = app('OpeninghoursRepository');
-
-        // Get the service URI for which we need to compute the week schedule
-        $serviceUri = $request->input('serviceUri');
-        $channel = $request->input('channel');
-
-        // Get the service
-        $service = $services->where('uri', $serviceUri)->first();
-
-        if (empty($service)) {
-            return response()->json(['message' => 'The service was not found.'], 404);
-        }
-
-        $channels = [];
-
-        // If no channel is passed, return all channels
-        if (! empty($channel)) {
-            $channels[] = $channel;
-        } else {
-            $channelObjects = $service->channels->toArray();
-
-            foreach ($channelObjects as $object) {
-                $channels[] = $object['label'];
-            }
-        }
-
-        if (empty($channels)) {
-            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
-        }
-
-        $result = [];
-
-        foreach ($channels as $channel) {
-            $status = 'Gesloten';
-
-            // Get the openinghours for the channel
-            $openinghours = $openinghoursRepo->getAllForServiceAndChannel($serviceUri, $channel);
-
-            // Get the openinghours that is active now
-            $relevantOpeninghours = '';
-
-            foreach ($openinghours as $openinghoursInstance) {
-                if ($day->between(
-                    (new Carbon($openinghoursInstance->start_date)),
-                    (new Carbon($openinghoursInstance->end_date))
-                )) {
-                    $relevantOpeninghours = $openinghoursInstance;
-                    break;
-                }
-            }
-
-            // Add the max timestamp, foresee a window of margin
-            $maxTimestamp = clone $day;
-            //$maxTimestamp->addDays(2);
-
-            $minTimestamp = clone $day;
-            //$minTimestamp->subDay(2);
-
-            if (! empty($relevantOpeninghours)) {
-                // Check if any calendar has an event that falls within the timeframe
-                $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
-                    return $calendar->priority;
-                });
-
-                $status = 'Gesloten';
-
-                // Iterate all calendars for the day of the week
-                foreach ($calendars as $calendar) {
-                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
-
-                    $dayInfo = $this->extractDayInfo($ical, $day->toDateString(), $day->toDateString());
-
-                    if (! empty($dayInfo)) {
-                        $status = $calendar->closinghours ? 'Gesloten' : $dayInfo;
-
-                        break;
-                    }
-                }
-            }
-
-            $result[$channel] = $status;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Calculate if a service is open now
-     *
-     * TODO: move to trait formatsopeninghours
-     *
-     * @param  Request $request
-     * @return array
-     */
-    private function isOpenNow($request)
-    {
-        $services = app('ServicesRepository');
-        $openinghoursRepo = app('OpeninghoursRepository');
-
-        // Get the service URI for which we need to compute the week schedule
-        $serviceUri = $request->input('serviceUri');
-        $channel = $request->input('channel');
-
-        // Get the service
-        $service = $services->where('uri', $serviceUri)->first();
-
-        if (empty($service)) {
-            abort(404, 'The service was not found.');
-        }
-
-        $channels = [];
-
-        // If no channel is passed, return all channels
-        if (! empty($channel)) {
-            $channels[] = $channel;
-        } else {
-            $channelObjects = $service->channels->toArray();
-
-            foreach ($channelObjects as $object) {
-                $channels[] = $object['label'];
-            }
-        }
-
-        if (empty($channels)) {
-            abort(404, 'Deze dienst heeft geen enkel kanaal met openingsuren.');
-        }
-
-        $result = [];
-
-        $now = Carbon::now();
-
-        foreach ($channels as $channel) {
-            // Get the openinghours for the channel
-            $openinghours = app('OpeninghoursRepository')->getAllForServiceAndChannel($serviceUri, $channel);
-
-            // Get the openinghours that is active now
-            $relevantOpeninghours = '';
-
-            foreach ($openinghours as $openinghoursInstance) {
-                if ($now->between(
-                    (new Carbon($openinghoursInstance->start_date)),
-                    (new Carbon($openinghoursInstance->end_date))
-                )) {
-                    $relevantOpeninghours = $openinghoursInstance;
-                    break;
-                }
-            }
-
-            // Add the min/max timestamp for performance increase, allow for margin
-            $maxTimestamp = Carbon::today()->addDays(2);
-            $minTimestamp = Carbon::today()->subDays(2)->startOfDay();
-
-            $status = 'Gesloten';
-
-            if (! empty($relevantOpeninghours)) {
-                // Check if any calendar has an event that falls within the timeframe
-                $calendars = array_sort($relevantOpeninghours->calendars, function ($calendar) {
-                    return $calendar->priority;
-                });
-
-                // Iterate all calendars for the day of the week
-                foreach ($calendars as $calendar) {
-                    $ical = $this->createIcalFromCalendar($calendar, $minTimestamp, $maxTimestamp);
-
-                    if (! empty($ical->eventsFromRange(Carbon::now()->toIso8601String(), Carbon::now()->addMinute()->toIso8601String()))) {
-                        $status = $calendar->closinghours == 0 ? 'Open' : 'Gesloten';
-
-                        continue;
-                    }
-                }
-            }
-
-            $result[$channel] = $status;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Compute a week schedule for a service
-     *
-     * @param  Request $request
-     * @return array
-     */
-    private function renderWeekSchedule($request)
-    {
-        $services = app('ServicesRepository');
-
-        // Get the service URI for which we need to compute the week schedule
-        $serviceUri = $request->input('serviceUri');
-        $channel = $request->input('channel');
-
-        // Get the service
-        $service = $services->where('uri', $serviceUri)->first();
-
-        if (empty($service)) {
-            return response()->json(['message' => 'The service was not found.'], 404);
-        }
-
-        return $this->formatWeek($service['id'], 'array', $channel);
+        /** return rendered output **/
+        // output format with json as default
+        $format = $request->input('format') ?: 'json';
+        // special for parent obj in json-ld
+        $formatter->serviceUri = $request->input('serviceUri');
+        // return rendered data
+        $output = $formatter->render($format, $openinghoursService->getData());
+        return response()->make($output);
     }
 }

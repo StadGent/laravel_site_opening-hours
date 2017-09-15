@@ -1,11 +1,14 @@
 <?php
 
-use Illuminate\Database\Seeder;
+use App\Models\Channel;
 use App\Models\Role;
+use App\Models\Service;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+
     /**
      * Run the database seeds.
      *
@@ -13,27 +16,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        // $this->call('xxxTableSeeder');
+
         // Seed the roles and give the admin the admin role
         $roles = [
             [
-                'name' => 'Admin',
+                'name'         => 'Admin',
                 'display_name' => 'Admin',
-                'description' => 'The admin of the application, can basically do anything.'
+                'description'  => 'The admin of the application, can basically do anything.',
             ],
             [
-                'name' => 'AppUser',
+                'name'         => 'AppUser',
                 'display_name' => 'Applicatie gebruiker',
-                'description' => 'Een gebruiker van de applicatie'
+                'description'  => 'Een gebruiker van de applicatie',
             ],
             [
-                'name' => 'Owner',
+                'name'         => 'Owner',
                 'display_name' => 'Beheerder van een dienst',
-                'description' => 'Beheerder van een dienst'
+                'description'  => 'Beheerder van een dienst',
             ],
             [
-                'name' => 'Member',
+                'name'         => 'Member',
                 'display_name' => 'Lid van een dienst',
-                'description' => 'Lid van een dienst'
+                'description'  => 'Lid van een dienst',
             ],
         ];
 
@@ -42,9 +47,9 @@ class DatabaseSeeder extends Seeder
 
             if (empty($role)) {
                 $role = Role::create([
-                    'name' => $roleConfig['name'],
+                    'name'         => $roleConfig['name'],
                     'display_name' => $roleConfig['display_name'],
-                    'description' => $roleConfig['description']
+                    'description'  => $roleConfig['description'],
                 ]);
 
                 $role->save();
@@ -55,12 +60,12 @@ class DatabaseSeeder extends Seeder
         $admin = User::where('email', 'admin@foo.bar')->first();
 
         if (empty($admin)) {
-            $password = str_random();
+            $password = 'openingadmin';
 
             $admin = User::create([
-                'name' => 'admin',
-                'email' => 'admin@foo.bar',
-                'password' => bcrypt($password)
+                'name'     => 'admin',
+                'email'    => 'admin@foo.bar',
+                'password' => bcrypt($password),
             ]);
 
             $admin->save();
@@ -71,6 +76,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed dummy services
         $this->seedDummyServices();
+        $this->seedDummyChannels();
     }
 
     private function seedDummyServices()
@@ -103,8 +109,8 @@ class DatabaseSeeder extends Seeder
 
         $servicesData = array_map(function ($name) {
             return [
-                'uri' => 'http://dev.foo/' . str_slug($name),
-                'label' => $name,
+                'uri'         => 'http://dev.foo/' . str_slug($name),
+                'label'       => $name,
                 'description' => '',
             ];
         }, $sampleServiceNames);
@@ -115,6 +121,15 @@ class DatabaseSeeder extends Seeder
             if (empty($service)) {
                 $services->store($serviceConfig);
             }
+        }
+    }
+
+    private function seedDummyChannels()
+    {
+
+        $services = Service::all();
+        foreach ($services as $service) {
+            $service->channels()->saveMany(factory(Channel::class, rand(3, 7))->make(['service_id' => $service]));
         }
     }
 }
