@@ -43,7 +43,7 @@ function expandEvent (e, layer, closinghours, dtstart, until) {
       hours: hours
     }
   })
-  return []
+//  return []
 }
 
 // Callback for every day that contains events

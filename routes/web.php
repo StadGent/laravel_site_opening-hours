@@ -27,3 +27,5 @@ Route::post('/api/roles', 'RolesController@update');
 Route::delete('/api/roles', 'RolesController@destroy');
 
 Route::get('/api/query', 'QueryController@query');
+
+Route::get('api/presets', 'PresetsController@index');
