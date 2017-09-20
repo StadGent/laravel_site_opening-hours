@@ -21,7 +21,6 @@ class OpeninghoursObserver
      */
     public function saved(Openinghours $openinghours)
     {
-        \Log::info('OpeninghoursObserver saved fired');
         $channel = $openinghours->channel;
         $service = $channel->service;
 
@@ -37,7 +36,6 @@ class OpeninghoursObserver
      */
     public function deleting(Openinghours $openinghours)
     {
-        \Log::info('OpeninghoursObserver deleting fired');
         $service = $openinghours->channel->service;
 
         $this->updateVestaWithOpeninghours($openinghours, $service);
