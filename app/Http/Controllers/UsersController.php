@@ -8,12 +8,11 @@ use App\Http\Requests\DeleteUserRequest;
 use Auth;
 use Illuminate\Http\Request;
 
+
 class UsersController extends Controller
 {
     public function __construct(UserRepository $users)
     {
-        $this->middleware('auth');
-
         $this->users = $users;
     }
 

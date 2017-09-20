@@ -13,8 +13,6 @@ class OpeninghoursController extends Controller
 {
     public function __construct(OpeninghoursRepository $openinghours)
     {
-        $this->middleware('auth');
-
         $this->openinghours = $openinghours;
     }
 

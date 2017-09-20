@@ -9,8 +9,6 @@ class ServicesController extends Controller
 {
     public function __construct(ServicesRepository $services)
     {
-        $this->middleware('auth');
-
         $this->services = $services;
     }
 

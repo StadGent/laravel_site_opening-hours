@@ -14,8 +14,6 @@ class RolesController extends Controller
 {
     public function __construct(UserRepository $users)
     {
-        $this->middleware('auth');
-
         $this->users = $users;
     }
 
