@@ -21,6 +21,7 @@ Route::group(['middleware'=>'auth:api'],
         Route::resource ('/channels', 'ChannelController');
         Route::post     ('/roles', 'RolesController@update');
         Route::delete   ('/roles', 'RolesController@destroy');
+        Route::get      ('api/presets', 'PresetsController@index');
     }
 );
 
