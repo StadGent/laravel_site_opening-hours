@@ -34,6 +34,6 @@ class HandleUpdatedCalendar
     {
         $calendar = $this->calendars->getById($event->getCalendarId());
 
-        event(new OpeninghoursUpdated($calendar['openinghours_id']));
+        // event(new OpeninghoursUpdated($calendar['openinghours_id']));
     }
 }
