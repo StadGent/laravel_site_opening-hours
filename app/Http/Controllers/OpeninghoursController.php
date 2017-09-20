@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\OpeninghoursUpdated;
 use App\Http\Requests\DeleteOpeninghoursRequest;
 use App\Http\Requests\StoreOpeninghoursRequest;
-use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ChannelRepository;
-use App\Events\OpeninghoursDeleted;
+use App\Repositories\OpeninghoursRepository;
 
 class OpeninghoursController extends Controller
 {
@@ -64,8 +62,6 @@ class OpeninghoursController extends Controller
         $openinghours = $this->openinghours->getById($id);
 
         if (! empty($openinghours)) {
-            event(new OpeninghoursUpdated($id));
-
             return response()->json($openinghours);
         }
 
@@ -120,8 +116,6 @@ class OpeninghoursController extends Controller
         $success = $this->openinghours->update($id, $input);
 
         if ($success) {
-            event(new OpeninghoursUpdated($id));
-
             return response()->json($this->openinghours->getById($id));
         }
 
@@ -142,8 +136,6 @@ class OpeninghoursController extends Controller
         $success = $this->openinghours->delete($id);
 
         if ($success) {
-            event(new OpeninghoursDeleted($openinghours, $this->openinghours->isOpeninghoursRelevantNow($openinghours)));
-
             return response()->json(['message' => 'De openingsuren werden verwijderd']);
         }
 

@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Events\ChannelDeleted;
-use App\Events\OpeninghoursUpdated;
 use App\Models\Calendar;
 use App\Models\Channel;
 use App\Models\Event;
@@ -151,8 +150,6 @@ class FetchRecreatex extends Command
                         }
 
                         $this->info('Imported calendar for year ' . $year . ' for service ' . $recreatexService->label . ' (' . $recreatexService->identifier . ')');
-
-                        event(new OpeninghoursUpdated($openinghours->id));
                     } else {
                         if (empty($openinghoursList)) {
                             $this->info('The service ' . $recreatexService->label . ' (' . $recreatexService->identifier . ") has no events for year $year.");

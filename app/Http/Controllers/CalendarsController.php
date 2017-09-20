@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\CalendarUpdated;
-use App\Events\OpeninghoursUpdated;
 use App\Http\Requests\DeleteCalendarRequest;
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
@@ -148,8 +147,6 @@ class CalendarsController extends Controller
         if (empty($calendar)) {
             return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
         }
-
-        event(new OpeninghoursUpdated($calendar['openinghours_id']));
 
         $success = $this->calendars->delete($calendarId);
 
