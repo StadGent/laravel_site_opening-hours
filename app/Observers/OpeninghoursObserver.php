@@ -23,7 +23,7 @@ class OpeninghoursObserver
      */
     public function saved(Openinghours $openinghours)
     {
-        $openinghours->initSyncJobsForExternalServices('update');
+        app('OpeninghoursService')->makeSyncJobsForExternalServices($openinghours, 'update');
     }
 
     /**
@@ -36,6 +36,6 @@ class OpeninghoursObserver
      */
     public function deleting(Openinghours $openinghours)
     {
-        $openinghours->initSyncJobsForExternalServices('delete');
+        app('OpeninghoursService')->makeSyncJobsForExternalServices($openinghours, 'delete');
     }
 }

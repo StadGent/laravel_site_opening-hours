@@ -6,6 +6,7 @@ use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Channel;
+use App\Models\Openinghours;
 use App\Models\Service;
 use Carbon\Carbon;
 
@@ -240,17 +241,27 @@ class OpeninghoursService
         return $this;
     }
 
-    public function initSyncJobsForExternalServices($type)
+    /**
+     * Creat Jobs to sync data to external services
+     *
+     * Make job for VESTA update when given openinghours is active
+     * and hase vesta source.
+     * Make job update LOD or delete LOD
+     *
+     * @param  Openinghours $openinghours
+     * @param  string       $type
+     * @return void
+     */
+    public function makeSyncJobsForExternalServices(Openinghours $openinghours, $type)
     {
-
-        $channel = $this->channel;
-        $service = $channel->service;
-
         if (!in_array($type, ['update', 'delete'])) {
             throw new \Exception('Define correct type of sync to external services', 1);
         }
 
-        if ($this->active) {
+        $channel = $openinghours->channel;
+        $service = $channel->service;
+
+        if ($openinghours->active) {
             if (!empty($service) && $service->source == 'vesta') {
                 dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
             }
@@ -258,10 +269,10 @@ class OpeninghoursService
 
         switch ($type) {
             case 'update':
-                dispatch(new UpdateLodOpeninghours($service->id, $this->id, $channel->id));
+                dispatch(new UpdateLodOpeninghours($service->id, $openinghours->id, $channel->id));
                 break;
             case 'delete':
-                dispatch(new DeleteLodOpeninghours($service->id, $this->id));
+                dispatch(new DeleteLodOpeninghours($service->id, $openinghours->id));
                 break;
         }
     }
