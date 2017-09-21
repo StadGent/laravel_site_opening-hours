@@ -7,30 +7,33 @@ use App\Models\Service;
 use Carbon\Carbon;
 
 /**
- *
+ * Internal Business logic Service for ICal
  */
 class OpeninghoursService
 {
     /**
-     * erviceModel in scope
+     * ServiceModel in scope
+     *
      * @var App\Models\Service
      */
     private $serviceModel;
 
     /**
-     * channelModel in scope
+     * ChannelModel in scope
+     *
      * @var \App\Models\Channel
      */
     private $channelModel;
 
     /**
-     * computed data
+     * Computed data
+     *
      * @var array
      */
     private $data;
 
     /**
-     * Compute or the channel(s) are open or closed on this moment
+     * Compute or the channel(s) are open or closed on this moment.
      *
      * @return OpeninghoursService  $this
      */
@@ -61,7 +64,7 @@ class OpeninghoursService
     }
 
     /**
-     * Compute or the channel(s) have openinghours or are closed for a given day
+     * Compute or the channel(s) have openinghours or are closed for a given day.
      *
      * @param  Carbon|null $date    date to see the data from
      * @return OpeninghoursService  $this
@@ -176,6 +179,7 @@ class OpeninghoursService
 
     /**
      * Collect for the channel(s) the openingshours per day between a start and end date
+     *
      * @param  Carbon $start        start date for calculations
      * @param  Carbon $end          end date for calculations
      * @return OpeninghoursService  $this
@@ -235,6 +239,7 @@ class OpeninghoursService
 
     /**
      * Getter the collected data
+     *
      * @return arrary
      */
     public function getData()
@@ -244,8 +249,10 @@ class OpeninghoursService
 
     /**
      * Setter App\Models\Service
+     *
      * + reset $this->channelModel
      * + reset $this->data with channels of the Service as default;
+     *
      * @param Service $serviceModel [description]
      */
     public function setServiceModel(Service $serviceModel)
@@ -259,7 +266,9 @@ class OpeninghoursService
 
     /**
      * Setter  App\Models\Channel
+     *
      * + reset $this->data with this channel;
+     *
      * @param Channel $channelModel [description]
      */
     public function setChannelModel(Channel $channelModel)

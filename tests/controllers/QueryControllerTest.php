@@ -4,7 +4,7 @@ namespace Tests\Controllers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class QueryContrtollerTest extends \TestCase
+class QueryControllerTest extends \TestCase
 {
     use DatabaseTransactions;
 
@@ -53,7 +53,7 @@ class QueryContrtollerTest extends \TestCase
      * @group validation
      * @dataProvider requestTypeProvider
      **/
-    public function validate_no_serviceUri_parameter_is_a_fail($typeParams)
+    public function testValidateNoServiceUriParameterIsAFail($typeParams)
     {
         // undo service setter
         // will be restored for next test by setup
@@ -70,7 +70,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function validate_wrong_serviceUri_parameter_is_a_fail()
+    public function testValidateWrongServiceUriParameterIsAFail()
     {
         // undo service setter
         // will be restored for next test by setup
@@ -87,7 +87,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function validate_service_without_channels_returns_not_found_error()
+    public function testValidateServiceWithoutChannelsReturnsNotFoundError()
     {
         $this->service = factory(\App\Models\Service::class)->create();
         $call          = $this->doRequest('GET', ['q' => 'now', 'date' => date('d-m-Y')]);
@@ -103,7 +103,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function validate_no_q_parameter_is_a_fail()
+    public function testValidateNoQParameterIsAFail()
     {
         // {host}/api/query?serviceUri={serviceUri}&format={format}
         $call = $this->doRequest('GET', []);
@@ -117,7 +117,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function validate_wrong_q_parameter_is_a_fail()
+    public function testValidateWrongQParameterIsAFail()
     {
         // {host}/api/query?q=norealq&serviceUri={serviceUri}&format={format}
         $call = $this->doRequest('GET', ['q' => 'noreal_q']);
@@ -133,12 +133,12 @@ class QueryContrtollerTest extends \TestCase
      * @group content
      * @dataProvider requestTypeProvider
      **/
-    public function it_has_only_one_channelkey_when_channel_param_is_given($typeParams)
+    public function testItHasOnlyOneChannelkeyWhenChannelParamIsGiven($typeParams)
     {
         // {host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}&format={format}
         $this->channelKeys = array_shift($this->channelKeys);
-        $call    = $this->doRequest('GET', $typeParams);
-        $content = $this->getContentStructureTested($call);
+        $call              = $this->doRequest('GET', $typeParams);
+        $content           = $this->getContentStructureTested($call);
         $this->assertCount(1, $content);
     }
 
@@ -146,7 +146,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group content
      */
-    public function it_returns_good_results_on_type_now()
+    public function testItReturnsGoodResultsOnTypeNow()
     {
         // {host}/api/query?q=now&serviceUri={serviceUri}&format={format}
         $call    = $this->doRequest('GET', ['q' => 'now']);
@@ -157,7 +157,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group content
      */
-    public function it_returns_good_results_on_type_day_with_date_param()
+    public function testItReturnsGoodResultsOnTypeDayWithDateParam()
     {
         // {host}/api/query?q=day&date={mm-dd-yyyy}&serviceUri={serviceUri}&format={format}
         $call    = $this->doRequest('GET', ['q' => 'day', 'date' => date('d-m-Y')]);
@@ -168,7 +168,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group content
      */
-    public function it_gives_seven_days_or_null_per_channel_on_type_week()
+    public function testItGivesSevenDaysOrNullPerChannelOnTypeWeek()
     {
         // {host}/api/query?q=week&serviceUri={serviceUri}&format={format}
         $call    = $this->doRequest('GET', ['q' => 'week']);
@@ -180,13 +180,13 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group content
      */
-    public function it_gives_seven_days_or_null_per_channel_on_type_fullWeek()
+    public function testItGivesSevenDaysOrNullPerChannelOnTypeFullWeek()
     {
         // {host}/api/query?q=fullWeek&serviceUri={serviceUri}&format={format}
-        
+
         $dateParam = date('d-m-Y', strtotime('tomorrow'));
-        $call    = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => $dateParam]);
-        $content = $this->getContentStructureTested($call);
+        $call      = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => $dateParam]);
+        $content   = $this->getContentStructureTested($call);
         $this->checkSevenDaysOrNullPerChannel($content);
     }
 
@@ -194,7 +194,7 @@ class QueryContrtollerTest extends \TestCase
      * @test
      * @group content
      */
-    public function it_gives_seven_days_or_null_per_channel_on_type_fullWeek_with_date_param()
+    public function testItGivesSevenDaysOrNullPerChannelOnTypeFullWeekWithDateParam()
     {
         // {host}/api/query?q=fullWeek&serviceUri={serviceUri}&date=dd-mm-yyyy&format={format}
         $call    = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => date('d-m-Y')]);

@@ -6,9 +6,12 @@ use App\Services\Contracts\Service;
 use Carbon\Carbon;
 
 /**
- * @todo  this service has been pulled out of original App\Formatters\FormatsOpeninghours trait
+ * Internal Business logic Service for ICal
+ *
  * code is not reviewed
  * deeper analyses  and perhaps refactoring is needed here
+ *
+ * @todo  this service has been pulled out of original App\Formatters\FormatsOpeninghours trait
  */
 class ICalService
 {

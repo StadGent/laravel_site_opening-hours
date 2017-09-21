@@ -7,14 +7,22 @@ use App\Http\Requests\GetQueryRequest;
 use App\Models\Service;
 use Carbon\Carbon;
 
+/**
+ * Controller for query request
+ */
 class QueryController extends Controller
 {
     /**
-     * Handle an openinghours query
+     * Action for query
      *
-     * @todo make the q input sepperate actions on controller
-     * @param  GetQueryRequest $request [extends FormRequest]
-     * @return [type]                   [description]
+     * Check the parameters and load models.
+     * Compute data by OpeninghoursService according to param q
+     * Send data to formatter by given param format
+     * Return formated data as output
+     *
+     * @param  GetQueryRequest $request
+     * @param  Openinghours    $formatter
+     * @return mixed
      */
     public function query(GetQueryRequest $request, Openinghours $formatter)
     {
@@ -26,7 +34,6 @@ class QueryController extends Controller
         $openinghoursService = app('OpeninghoursService');
         $openinghoursService->setServiceModel($serviceModel);
 
-
         // set channel if available
         $channelModel = null;
         if ($request->input('channel')) {
@@ -36,8 +43,7 @@ class QueryController extends Controller
 
         $date = null;
         if ($request->input('date')) {
-            $splitDate = explode('-', $request->input('date'));
-            $date      = Carbon::createFromDate($splitDate[2], $splitDate[1], $splitDate[0])->startOfDay();
+            $date = Carbon::createFromFormat('d-m-Y', $request->input('date'));
         }
         /** @todo make these sepperate actions on controller */
         try {
