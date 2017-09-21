@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Jobs\DeleteLodOpeninghours;
+use App\Jobs\UpdateLodOpeninghours;
+use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Channel;
 use App\Models\Service;
 use Carbon\Carbon;
 
 /**
- * Internal Business logic Service for ICal
+ * Internal Business logic Service for Openinghours
  */
 class OpeninghoursService
 {
@@ -235,6 +238,32 @@ class OpeninghoursService
         }
 
         return $this;
+    }
+
+    public function initSyncJobsForExternalServices($type)
+    {
+
+        $channel = $this->channel;
+        $service = $channel->service;
+
+        if (!in_array($type, ['update', 'delete'])) {
+            throw new \Exception('Define correct type of sync to external services', 1);
+        }
+
+        if ($this->active) {
+            if (!empty($service) && $service->source == 'vesta') {
+                dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
+            }
+        }
+
+        switch ($type) {
+            case 'update':
+                dispatch(new UpdateLodOpeninghours($service->id, $this->id, $channel->id));
+                break;
+            case 'delete':
+                dispatch(new DeleteLodOpeninghours($service->id, $this->id));
+                break;
+        }
     }
 
     /**
