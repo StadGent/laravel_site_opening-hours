@@ -112,6 +112,9 @@ body {
 
     &:first-child {
       padding-left: 3em;
+      &.td-sortable{
+        padding-left: calc(3em + 20px);
+      }
     }
     &:last-child {
       padding-right: 3em;

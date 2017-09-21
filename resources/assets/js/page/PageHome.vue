@@ -1,32 +1,36 @@
 <template>
   <div class="container">
     <h1>{{ isAdmin ? 'Admin' : 'Mijn diensten' }}</h1>
-    <div v-if="isAdmin">
-      <p>
+      <div>
+        <span v-if="isAdmin">
+
         <span class="btn-group">
-          <button type="button" class="btn btn-default" :class="{ 'btn-primary': !route.tab }" @click="route.tab=0">Toon diensten</button>
-          <button type="button" class="btn btn-default" :class="{ 'btn-primary': route.tab=='users' }" @click="route.tab='users'">Toon gebruikers</button>
+          <button type="button" class="btn btn-primary" :class="{ 'active': !route.tab }" @click="route.tab=0">Beheer diensten</button>
+          <button type="button" class="btn btn-primary" :class="{ 'active': route.tab=='users' }" @click="route.tab='users'">Beheer gebruikers</button>
         </span>
-      </p>
+
+          <button type="button" class="btn btn-primary" @click="newUser" v-if="route.tab == 'users'">+ Gebruiker uitnodigen</button>
+          <button type="button" class="btn btn-primary" @click="draft = !draft" v-if="!route.tab">
+              {{draft ? "Toon active diensten" : "+ Activeer diensten"}}
+          </button>
+    </span>
+        <span v-else>
+          <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
+        </span>
+        <form class="pull-right">
+            <div class="form-group">
+                <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : 'diensten')" style="max-width:300px" type="search">
+            </div>
+        </form>
+
       <!-- <button type="button" class="btn btn-link btn-disabled" :class="{active: route.tab=='admin'}" @click="route.tab='admin'" disabled>Toon administrators</button> -->
 
-      <div class="btn-group" v-if="!route.tab">
-        <button type="button" class="btn btn-default" :class="{ 'btn-success': !draft }" @click="draft = false">Toon actieve diensten</button>
-        <button type="button" class="btn btn-default" :class="{ 'btn-warning': draft }" @click="draft = true">Activeer diensten</button>
+      <!--<div class="btn-group" v-if="!route.tab">-->
+        <!--<button type="button" class="btn btn-default" :class="{ 'btn-success': !draft }" @click="draft = false">Toon actieve diensten</button>-->
+        <!--<button type="button" class="btn btn-default" :class="{ 'btn-warning': draft }" @click="draft = true">Activeer diensten</button>-->
+      <!--</div>-->
+
       </div>
-
-      <button type="button" class="btn btn-success" @click="newUser" v-if="route.tab == 'users'">Gebruiker uitnodigen</button>
-
-    </div>
-    <div v-else>
-      <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
-    </div>
-
-    <form class="pull-right">
-      <div class="form-group">
-        <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : 'diensten')" style="max-width:300px" type="search">
-      </div>
-    </form>
 
     <!-- Users -->
     <div v-if="isAdmin&&route.tab==='users'" class="row">
@@ -53,7 +57,9 @@
             <th class="text-right">Verwijder</th>
           </tr>
         </thead>
-        <tbody is="row-user" v-for="u in pagedUsers" :u="u"></tbody>
+        <tbody>
+        <tr is="row-user" v-for="u in pagedUsers" :u="u"></tr>
+        </tbody>
       </table>
       <pagination :total="filteredUsers.length"></pagination>
     </div>
@@ -61,7 +67,8 @@
     <!-- Services -->
     <div v-else class="row">
       <div v-if="!allowedServices.length" class="table-message">
-        <h3 class="text-muted" v-if="isAdmin">Er zijn geen inactieve diensten.</h3>
+        <h3 class="text-muted" v-if="isAdmin && !draft">Er zijn geen actieve diensten.</h3>
+        <h3 class="text-muted" v-else-if="isAdmin && draft">Er zijn geen inactieve diensten.</h3>
         <h3 class="text-muted" v-else>Je hebt nog geen toegang tot diensten</h3>
       </div>
       <div v-else-if="!filteredServices.length" class="table-message">
@@ -72,7 +79,6 @@
           <tr>
             <th>Activeer</th>
             <th-sort by="label">Dienst naam</th-sort>
-
           </tr>
         </thead>
         <tbody >
@@ -85,9 +91,12 @@
             <th-sort by="label">Actieve dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
+            <th class="text-right">Deactiveer</th>
           </tr>
         </thead>
-        <tbody is="row-service-admin" v-for="s in pagedServices" :s="s"></tbody>
+        <tbody>
+        <tr is="row-service-admin" v-for="s in pagedServices" :s="s"></tr>
+        </tbody>
       </table>
       <table v-else class="table table-hover table-service">
         <thead>
@@ -97,7 +106,9 @@
             <th-sort by="updated_at">Aangepast</th-sort>
           </tr>
         </thead>
-        <tbody is="row-service" v-for="s in pagedServices" :s="s"></tbody>
+        <tbody>
+        <tr is="row-service" v-for="s in pagedServices" :s="s"></tr>
+        </tbody>
       </table>
       <pagination :total="filteredServices.length"></pagination>
     </div>
