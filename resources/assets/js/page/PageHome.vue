@@ -71,7 +71,7 @@
         <h3 class="text-muted" v-else-if="isAdmin && draft">Er zijn geen inactieve diensten.</h3>
         <h3 class="text-muted" v-else>Je hebt nog geen toegang tot diensten</h3>
 
-          <button type="button" class="btn btn-primary" @click="draft = !draft" v-if="isAdmin">
+          <button type="button" class="btn btn-primary btn-lg" @click="draft = !draft" v-if="isAdmin">
               {{draft ? "Terug naar active diensten" : "Toon de inactieve diensten"}}
           </button>
       </div>
