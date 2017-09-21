@@ -32,7 +32,7 @@ class Openinghours extends Formatter
     public function render($format, $data)
     {
         if (!isset(self::OUTPUT_MAPPER[$format])) {
-            throw new \Exception("The given format " . $forma . " is not available in formatter " . self::class, 1);
+            throw new \Exception("The given format " . $format . " is not available in formatter " . self::class, 1);
         }
 
         if (!$data) {

@@ -16,8 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call('xxxTableSeeder');
-
         // Seed the roles and give the admin the admin role
         $roles = [
             [

@@ -221,7 +221,6 @@ class QueryControllerTest extends \TestCase
         }
 
         $url = '/api/query?' . $params;
-        //dd($url);
         if ($this->format === 'html') {
 
             return $this->call($type, $url);
