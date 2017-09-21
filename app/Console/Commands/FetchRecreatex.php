@@ -349,8 +349,6 @@ class FetchRecreatex extends Command
             if ($channel->label == $channelName) {
                 $channelObject = app('ChannelRepository')->getFullObjectById($channel->id);
 
-                event(new ChannelDeleted($channelObject));
-
                 app('ChannelRepository')->delete($channel->id);
             }
         }
