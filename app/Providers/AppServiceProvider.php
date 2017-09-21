@@ -64,5 +64,13 @@ class AppServiceProvider extends ServiceProvider
                 new \App\Models\User()
             );
         });
+
+        $this->app->singleton('OpeninghoursService', function ($app) {
+            return new \App\Services\OpeninghoursService();
+        });
+
+        $this->app->singleton('ICalService', function ($app) {
+            return new \App\Services\ICalService();
+        });
     }
 }
