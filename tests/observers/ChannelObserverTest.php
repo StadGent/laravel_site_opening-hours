@@ -14,7 +14,7 @@ class ChannelObserverTest extends \TestCase
      */
     public function testItTriggersMakeSyncJobsForExternalServicesWhenChannelIsDeleted()
     {
-        $this->app->singleton('ChannelService', function ($app) {
+        $this->app->singleton('ChannelService', function () {
             $mock = $this->createMock(\App\Services\ChannelService::class, ['makeSyncJobsForExternalServices']);
             $mock->expects($this->once())
                 ->method('makeSyncJobsForExternalServices');

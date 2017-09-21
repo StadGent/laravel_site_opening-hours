@@ -6,7 +6,7 @@ use App\Models\Openinghours;
 
 /**
  * Observer on Openinghours Object
- * 
+ *
  * These methods will be fired by Eloquent base events.
  * - When saved we want to sync the new data to the external services
  * - Before deleting we want to remove the data from the external services

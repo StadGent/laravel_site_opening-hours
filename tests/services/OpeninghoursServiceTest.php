@@ -96,7 +96,7 @@ class OpeninghoursServiceTest extends \TestCase
         $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenNow();
         // check or all channels have a 'open' or 'gesloten' value
-        foreach ($this->OHService->getData() as $channelKey => $data) {
+        foreach ($this->OHService->getData() as $data) {
             $this->assertContains($data, [trans('openinghourApi.CLOSED'), trans('openinghourApi.OPEN'), null]);
         }
     }
@@ -110,7 +110,7 @@ class OpeninghoursServiceTest extends \TestCase
     {
         $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenOnDay($startDate);
-        foreach ($this->OHService->getData() as $channelKey => $data) {
+        foreach ($this->OHService->getData() as $data) {
             $this->assertTrue($this->checkOpeningHoursContentString($data));
         }
     }
@@ -122,12 +122,12 @@ class OpeninghoursServiceTest extends \TestCase
     {
         $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenForNextSevenDays();
-        foreach ($this->OHService->getData() as $channelKey => $datedata) {
+        foreach ($this->OHService->getData() as $datedata) {
             if (!$datedata) {
                 // no data is good data... or something
                 continue;
             }
-            foreach ($datedata as $date => $dataString) {
+            foreach ($datedata as $dataString) {
                 /**
                  * @todo check date is correct
                  */
@@ -145,12 +145,12 @@ class OpeninghoursServiceTest extends \TestCase
     {
         $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenForFullWeek($startDate);
-        foreach ($this->OHService->getData() as $channelKey => $datedata) {
+        foreach ($this->OHService->getData() as $datedata) {
             if (!$datedata) {
                 // no data is good data... so funny
                 continue;
             }
-            foreach ($datedata as $date => $dataString) {
+            foreach ($datedata as $dataString) {
                 /**
                  * @todo check date is correct
                  */

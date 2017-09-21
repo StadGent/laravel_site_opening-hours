@@ -104,9 +104,9 @@ class Openinghours extends Formatter
                     foreach ($schedule as $entry) {
                         $formattedSchedule .= "<div>$entry</div>";
                     }
-                } else {
-                    $formattedSchedule .= "<div>$schedule</div>";
-                }
+                    continue;
+                } 
+                $formattedSchedule .= "<div>$schedule</div>";
             }
         }
 
@@ -142,16 +142,16 @@ class Openinghours extends Formatter
      */
     protected function makeTextForDayInfo($dayInfo)
     {
-        $text = '';
+
         if (is_array($dayInfo)) {
+            $text = '';
             foreach ($dayInfo as $date => $oh) {
                 $text .= date('d-m-Y', strtotime($date)) . ' ' . $oh . PHP_EOL;
             }
-        } else {
-            $text .= $dayInfo . PHP_EOL;
-        }
-
-        return $text;
+            return  $text;
+        }  
+          
+        return $dayInfo . PHP_EOL;
     }
 
 }

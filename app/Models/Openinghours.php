@@ -38,5 +38,4 @@ class Openinghours extends Model
 
         return $this->start_date <= $today && (empty($this->end_date) || $this->end_date >= $today);
     }
-
 }

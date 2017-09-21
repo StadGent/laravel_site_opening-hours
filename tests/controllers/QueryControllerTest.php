@@ -63,7 +63,6 @@ class QueryControllerTest extends \TestCase
         $call->seeJson([
             "serviceUri" => ["The service uri field is required."],
         ]);
-
     }
 
     /**
@@ -75,7 +74,10 @@ class QueryControllerTest extends \TestCase
         // undo service setter
         // will be restored for next test by setup
         $this->service = null;
-        $call          = $this->doRequest('GET', ['q' => 'now', 'serviceUri' => 'thisIsNotAServiceUri', 'date' => date('d-m-Y')]);
+        $call          = $this->doRequest(
+            'GET',
+            ['q' => 'now', 'serviceUri' => 'thisIsNotAServiceUri', 'date' => date('d-m-Y')]
+        );
         $call->seeStatusCode(400);
 
         $call->seeJson([
@@ -96,7 +98,6 @@ class QueryControllerTest extends \TestCase
         $call->seeJson([
             "serviceUri" => ["The selected service uri is not available yet."],
         ]);
-
     }
 
     /**
@@ -149,8 +150,8 @@ class QueryControllerTest extends \TestCase
     public function testItReturnsGoodResultsOnTypeNow()
     {
         // {host}/api/query?q=now&serviceUri={serviceUri}&format={format}
-        $call    = $this->doRequest('GET', ['q' => 'now']);
-        $content = $this->getContentStructureTested($call);
+        $call = $this->doRequest('GET', ['q' => 'now']);
+        $this->getContentStructureTested($call);
     }
 
     /**
@@ -160,8 +161,8 @@ class QueryControllerTest extends \TestCase
     public function testItReturnsGoodResultsOnTypeDayWithDateParam()
     {
         // {host}/api/query?q=day&date={mm-dd-yyyy}&serviceUri={serviceUri}&format={format}
-        $call    = $this->doRequest('GET', ['q' => 'day', 'date' => date('d-m-Y')]);
-        $content = $this->getContentStructureTested($call);
+        $call = $this->doRequest('GET', ['q' => 'day', 'date' => date('d-m-Y')]);
+        $this->getContentStructureTested($call);
     }
 
     /**
@@ -222,12 +223,10 @@ class QueryControllerTest extends \TestCase
 
         $url = '/api/query?' . $params;
         if ($this->format === 'html') {
-
             return $this->call($type, $url);
         }
 
         return $this->$type($url);
-
     }
 
     /**
@@ -260,15 +259,13 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(200);
 
         // check or the correct nr of channels are in the result
+        $structure = $this->channelKeys;
         if ($this->oneChannel()) {
-            $call->seeJsonStructure([
+            $structure = [
                 $this->channelKeys,
-            ]);
-        } else {
-            $call->seeJsonStructure(
-                $this->channelKeys
-            );
+            ];
         }
+        $call->seeJsonStructure($structure);
 
         return $call->decodeResponseJson();
     }
