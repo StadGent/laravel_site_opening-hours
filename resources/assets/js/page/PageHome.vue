@@ -4,22 +4,22 @@
       <div>
         <span v-if="isAdmin">
 
-        <span class="btn-group">
+        <span v-if="!draft" class="btn-group">
           <button type="button" class="btn btn-primary" :class="{ 'active': !route.tab }" @click="route.tab=0">Beheer diensten</button>
           <button type="button" class="btn btn-primary" :class="{ 'active': route.tab=='users' }" @click="route.tab='users'">Beheer gebruikers</button>
         </span>
 
           <button type="button" class="btn btn-primary" @click="newUser" v-if="route.tab == 'users'">+ Gebruiker uitnodigen</button>
           <button type="button" class="btn btn-primary" @click="draft = !draft" v-if="!route.tab">
-              {{draft ? "Toon active diensten" : "+ Activeer diensten"}}
+              {{draft ? "Terug naar active diensten" : "+ Activeer diensten"}}
           </button>
-    </span>
-        <span v-else>
+        </span>
+          <span v-else>
           <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
         </span>
-        <form class="pull-right">
+          <form class="pull-right">
             <div class="form-group">
-                <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : 'diensten')" style="max-width:300px" type="search">
+                <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')" style="max-width:300px" type="search">
             </div>
         </form>
 
@@ -70,6 +70,10 @@
         <h3 class="text-muted" v-if="isAdmin && !draft">Er zijn geen actieve diensten.</h3>
         <h3 class="text-muted" v-else-if="isAdmin && draft">Er zijn geen inactieve diensten.</h3>
         <h3 class="text-muted" v-else>Je hebt nog geen toegang tot diensten</h3>
+
+          <button type="button" class="btn btn-primary" @click="draft = !draft" v-if="isAdmin">
+              {{draft ? "Terug naar active diensten" : "Toon de inactieve diensten"}}
+          </button>
       </div>
       <div v-else-if="!filteredServices.length" class="table-message">
         <h1>Deze zoekopdracht leverde geen resultaten op</h1>
