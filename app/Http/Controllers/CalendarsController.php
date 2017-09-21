@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\CalendarUpdated;
 use App\Http\Requests\DeleteCalendarRequest;
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
@@ -50,11 +49,11 @@ class CalendarsController extends Controller
         $id = $this->calendars->store($input);
 
         // If events are passed, bulk upsert them
-        if (! empty($input['events']) && ! empty($id)) {
+        if (!empty($input['events']) && !empty($id)) {
             $this->bulkInsert($id, $input['events']);
         }
 
-        if (! empty($id)) {
+        if (!empty($id)) {
             $calendar = $this->calendars->getById($id);
 
             return response()->json($calendar);
@@ -88,7 +87,7 @@ class CalendarsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateCalendarRequest     $request
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
@@ -96,16 +95,16 @@ class CalendarsController extends Controller
     {
         $input = $request->input();
 
-        $success = $this->calendars->update($id, $input);
-
         // If events are passed, bulk upsert them
-        if (! empty($input['events'])) {
+        if (!empty($input['events'])) {
             $this->bulkInsert($id, $input['events']);
         }
-
+        /*
+         * update object AFTER bulk insert
+         * to get all data correct for event on observer
+         */
+        $success = $this->calendars->update($id, $input);
         if ($success) {
-            event(new CalendarUpdated($id));
-
             return response()->json($this->calendars->getById($id));
         }
 

@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Calendar;
 use App\Models\Openinghours;
+use App\Observers\CalendarObserver;
 use App\Observers\OpeninghoursObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Calendar::observe(CalendarObserver::class);
         Openinghours::observe(OpeninghoursObserver::class);
     }
 
