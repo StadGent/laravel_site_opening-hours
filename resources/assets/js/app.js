@@ -11,4 +11,4 @@ const app = new Vue({
   el: '#app',
   render: h => h(App),
   mixins: [rootAuthMixin, rootRouterMixin, printmeMixin, servicesMixin, usersMixin]
-})
+});
