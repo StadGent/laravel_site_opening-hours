@@ -82,7 +82,7 @@
         <thead>
           <tr>
             <th>Activeer</th>
-            <th-sort by="label">Dienst naam</th-sort>
+            <th-sort by="label">Naam dienst</th-sort>
           </tr>
         </thead>
         <tbody >
@@ -92,7 +92,7 @@
       <table v-else-if="isAdmin" class="table table-hover table-service-admin">
         <thead>
           <tr>
-            <th-sort by="label">Actieve dienst</th-sort>
+            <th-sort by="label">Naam dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
             <th class="text-right">Deactiveer</th>
@@ -105,7 +105,7 @@
       <table v-else class="table table-hover table-service">
         <thead>
           <tr>
-            <th-sort by="label">Dienst</th-sort>
+            <th-sort by="label">Naam dienst</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
           </tr>
