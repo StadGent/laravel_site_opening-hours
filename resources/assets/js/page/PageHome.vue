@@ -1,11 +1,6 @@
 <template>
   <div class="container">
     <h1>{{ isAdmin ? 'Admin' : 'Mijn diensten' }}</h1>
-    <form class="pull-right">
-      <div class="form-group">
-        <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : 'diensten')" style="max-width:300px" type="search">
-      </div>
-    </form>
     <div v-if="isAdmin">
       <p>
         <span class="btn-group">
@@ -17,7 +12,7 @@
 
       <div class="btn-group" v-if="!route.tab">
         <button type="button" class="btn btn-default" :class="{ 'btn-success': !draft }" @click="draft = false">Toon actieve diensten</button>
-        <button type="button" class="btn btn-default" :class="{ 'btn-warning': draft }" @click="draft = true">Toon inactieve diensten</button>
+        <button type="button" class="btn btn-default" :class="{ 'btn-warning': draft }" @click="draft = true">Activeer diensten</button>
       </div>
 
       <button type="button" class="btn btn-success" @click="newUser" v-if="route.tab == 'users'">Gebruiker uitnodigen</button>
@@ -26,6 +21,12 @@
     <div v-else>
       <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
     </div>
+
+    <form class="pull-right">
+      <div class="form-group">
+        <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : 'diensten')" style="max-width:300px" type="search">
+      </div>
+    </form>
 
     <!-- Users -->
     <div v-if="isAdmin&&route.tab==='users'" class="row">
@@ -69,11 +70,14 @@
       <table v-else-if="draft" class="table table-service-admin">
         <thead>
           <tr>
-            <th width="50">Activeer</th>
-            <th-sort by="label">Inactieve dienst</th-sort>
+            <th>Activeer</th>
+            <th-sort by="label">Dienst naam</th-sort>
+
           </tr>
         </thead>
-        <tbody is="row-service-draft" v-for="s in pagedServices" :s="s"></tbody>
+        <tbody >
+          <tr is="row-service-draft" v-for="s in pagedServices" :s="s"></tr>
+        </tbody>
       </table>
       <table v-else-if="isAdmin" class="table table-hover table-service-admin">
         <thead>
