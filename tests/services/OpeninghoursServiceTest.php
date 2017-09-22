@@ -2,6 +2,9 @@
 
 namespace Tests\Services;
 
+use App\Jobs\DeleteLodOpeninghours;
+use App\Jobs\UpdateLodOpeninghours;
+use App\Jobs\UpdateVestaOpeninghours;
 use App\Services\OpeninghoursService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -16,7 +19,6 @@ class OpeninghoursServiceTest extends \TestCase
     {
         parent::setUp();
         $this->OHService = new OpeninghoursService();
-        $this->OHService->setServiceModel(\App\Models\Service::first());
     }
 
     /**
@@ -49,9 +51,8 @@ class OpeninghoursServiceTest extends \TestCase
      * @test
      * @group validation
      **/
-    public function isOpenNow_without_service_fails()
+    public function testIsOpenNowWithoutServiceFails()
     {
-        $this->OHService = new OpeninghoursService();
         $this->setExpectedException('Exception');
         $this->OHService->isOpenNow();
     }
@@ -60,44 +61,42 @@ class OpeninghoursServiceTest extends \TestCase
      * @test
      * @group validation
      **/
-    public function isOpenOnDay_without_service_fails()
+    public function testIsOpenOnDayWithoutServiceFails()
     {
-        $OHService = new OpeninghoursService();
         $this->setExpectedException('Exception');
-        $OHService->isOpenOnDay();
+        $this->OHService->isOpenOnDay();
     }
 
     /**
      * @test
      * @group validation
      **/
-    public function isOpenForNextSevenDays_without_service_fails()
+    public function testIsOpenForNextSevenDaysWithoutServiceFails()
     {
-        $OHService = new OpeninghoursService();
         $this->setExpectedException('Exception');
-        $OHService->isOpenForNextSevenDays();
+        $this->OHService->isOpenForNextSevenDays();
     }
 
     /**
      * @test
      * @group validation
      **/
-    public function isOpenForFullWeek_without_service_fails()
+    public function testIsOpenForFullWeekWithoutServiceFails()
     {
-        $OHService = new OpeninghoursService();
         $this->setExpectedException('Exception');
-        $OHService->isOpenForFullWeek();
+        $this->OHService->isOpenForFullWeek();
     }
 
     /**
      * @test
      * @group content
      */
-    public function isOpenNow_gives_open_gesloten_or_null_per_channel()
+    public function testIsOpenNowGivesOpenGeslotenOrNullPerChannel()
     {
+        $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenNow();
         // check or all channels have a 'open' or 'gesloten' value
-        foreach ($this->OHService->getData() as $channelKey => $data) {
+        foreach ($this->OHService->getData() as $data) {
             $this->assertContains($data, [trans('openinghourApi.CLOSED'), trans('openinghourApi.OPEN'), null]);
         }
     }
@@ -107,10 +106,11 @@ class OpeninghoursServiceTest extends \TestCase
      * @group content
      * @dataProvider dateProvider
      */
-    public function isOpenOnDay_gives_openinghours_gesloten_or_null_per_channel($startDate)
+    public function testIsOpenOnDayGivesOpeninghoursGeslotenOrNullPerChannel($startDate)
     {
+        $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenOnDay($startDate);
-        foreach ($this->OHService->getData() as $channelKey => $data) {
+        foreach ($this->OHService->getData() as $data) {
             $this->assertTrue($this->checkOpeningHoursContentString($data));
         }
     }
@@ -118,15 +118,16 @@ class OpeninghoursServiceTest extends \TestCase
      * @test
      * @group content
      */
-    public function isOpenForNextSevenDays_gives()
+    public function testIsOpenForNextSevenDaysGives()
     {
+        $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenForNextSevenDays();
-        foreach ($this->OHService->getData() as $channelKey => $datedata) {
+        foreach ($this->OHService->getData() as $datedata) {
             if (!$datedata) {
                 // no data is good data... or something
                 continue;
             }
-            foreach ($datedata as $date => $dataString) {
+            foreach ($datedata as $dataString) {
                 /**
                  * @todo check date is correct
                  */
@@ -140,22 +141,22 @@ class OpeninghoursServiceTest extends \TestCase
      * @group content
      * @dataProvider dateProvider
      */
-    public function isOpenForFullWeek_gives($startDate)
+    public function testIsOpenForFullWeekGives($startDate)
     {
+        $this->OHService->setServiceModel(\App\Models\Service::first());
         $this->OHService->isOpenForFullWeek($startDate);
-        foreach ($this->OHService->getData() as $channelKey => $datedata) {
+        foreach ($this->OHService->getData() as $datedata) {
             if (!$datedata) {
                 // no data is good data... so funny
                 continue;
             }
-            foreach ($datedata as $date => $dataString) {
+            foreach ($datedata as $dataString) {
                 /**
                  * @todo check date is correct
                  */
                 $this->assertTrue($this->checkOpeningHoursContentString($dataString));
             }
         }
-
     }
 
     /**
@@ -163,7 +164,7 @@ class OpeninghoursServiceTest extends \TestCase
      * - 'hh:mm - hh:mm' (from - till) format
      * - 'gesloten' (in nl lang)
      * - null (not set)
-     * 
+     *
      * @param  string $dataString  Openinghours string
      * @return boolean             passed or failed
      */
@@ -174,12 +175,52 @@ class OpeninghoursServiceTest extends \TestCase
             case $dataString === null:
             // is closed that day
             case strpos($dataString, trans('openinghourApi.CLOSED')) !== false:
-            // is open that day and shows at least one event of 'from - to' hours
+            // is open that day and shows at least one event of 'fro m - to' hours
             case preg_match('/([01]?[0-9]|2[0-3]):([0-5][0-9])\s-\s([01]?[0-9]|2[0-3]):([0-5][0-9])/', $dataString):
                 return true;
                 break;
             default:
                 return false;
         }
+    }
+
+    /**
+     * @test
+     * @group functionality
+     */
+    public function testMakeSyncJobsForExternalServicesWithWrongTypeFails()
+    {
+        $this->setExpectedException('Exception');
+        $openinghours        = \App\Models\Openinghours::first();
+        $this->OHService->makeSyncJobsForExternalServices($openinghours, 'thisIsNotAType');
+    }
+
+    /**
+     * @test
+     * @group jobs
+     */
+    public function testItTriggersSyncUpdateJobsWhenOpeninghoursAreSaved()
+    {
+        $this->expectsJobs(UpdateVestaOpeninghours::class);
+        $this->expectsJobs(UpdateLodOpeninghours::class);
+
+        $openinghours        = \App\Models\Openinghours::first();
+        $openinghours->channel->service->source = 'vesta';
+        $openinghours->label = 'testLabel';
+        $this->OHService->makeSyncJobsForExternalServices($openinghours, 'update');
+    }
+
+    /**
+     * @test
+     * @group jobs
+     */
+    public function testItTriggersSyncDeleteJobsWhenOpeninghoursAreDeleted()
+    {
+        $this->expectsJobs(UpdateVestaOpeninghours::class);
+        $this->expectsJobs(DeleteLodOpeninghours::class);
+
+        $openinghours = \App\Models\Openinghours::first();
+        $openinghours->channel->service->source = 'vesta';
+        $this->OHService->makeSyncJobsForExternalServices($openinghours, 'delete');
     }
 }

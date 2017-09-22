@@ -30,7 +30,7 @@ class QueryController extends Controller
             \App::setLocale($request->input('lang'));
         }
         // set service uri as service unique key
-        $serviceModel        = Service::where(['uri' => $request->input('serviceUri')])->first();
+        $serviceModel = Service::where(['uri' => $request->input('serviceUri')])->first();
         $openinghoursService = app('OpeninghoursService');
         $openinghoursService->setServiceModel($serviceModel);
 
@@ -64,6 +64,7 @@ class QueryController extends Controller
         } catch (\Exception $ex) {
             \Log::error($ex->getMessage());
             \Log::error($ex->getTraceAsString());
+
             return response()->json(['message' => $ex->getMessage()], 400);
         }
 
@@ -74,6 +75,7 @@ class QueryController extends Controller
         $formatter->serviceUri = $request->input('serviceUri');
         // return rendered data
         $output = $formatter->render($format, $openinghoursService->getData());
+
         return response()->make($output);
     }
 }

@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Jobs\DeleteLodOpeninghours;
+use App\Jobs\UpdateLodOpeninghours;
+use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Channel;
+use App\Models\Openinghours;
 use App\Models\Service;
 use Carbon\Carbon;
 
 /**
- * Internal Business logic Service for ICal
+ * Internal Business logic Service for Openinghours
  */
 class OpeninghoursService
 {
@@ -49,7 +53,7 @@ class OpeninghoursService
         /**
          * @todo this logic needs to move to the formatter
          */
-        foreach ($this->data as $channelName => &$channelData) {
+        foreach ($this->data as &$channelData) {
             if (!$channelData ||
                 !isset(array_values($channelData)[0]) ||
                 !isset(array_values($channelData)[0]['OH'])) {
@@ -57,7 +61,8 @@ class OpeninghoursService
                 continue;
             }
             $tmpDateData = array_values($channelData)[0];
-            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ? trans('openinghourApi.CLOSED') : trans('openinghourApi.OPEN');
+            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ? 
+            trans('openinghourApi.CLOSED') : trans('openinghourApi.OPEN');
         }
 
         return $this;
@@ -84,7 +89,7 @@ class OpeninghoursService
         /**
          * @todo this logic needs to move to the formatter
          */
-        foreach ($this->data as $channelName => &$channelData) {
+        foreach ($this->data as &$channelData) {
             if (!$channelData ||
                 !isset(array_values($channelData)[0]) ||
                 !isset(array_values($channelData)[0]['OH'])) {
@@ -92,7 +97,8 @@ class OpeninghoursService
                 continue;
             }
             $tmpDateData = array_values($channelData)[0];
-            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ? trans('openinghourApi.CLOSED') : implode($tmpDateData['OH'], ', ');
+            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ? 
+            trans('openinghourApi.CLOSED') : implode($tmpDateData['OH'], ', ');
         }
 
         return $this;
@@ -116,7 +122,7 @@ class OpeninghoursService
         /**
          * @todo this logic needs to move to the formatter
          */
-        foreach ($this->data as $channelName => &$channelData) {
+        foreach ($this->data as &$channelData) {
             if (!$channelData ||
                 !isset(array_values($channelData)[0]) ||
                 !isset(array_values($channelData)[0]['OH'])) {
@@ -125,7 +131,8 @@ class OpeninghoursService
             }
 
             foreach ($channelData as $date => &$openhours) {
-                $tmpData   = strpos('Gesloten', $openhours['OH'][0]) !== false ? trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
+                $tmpData = strpos('Gesloten', $openhours['OH'][0]) !== false ?
+                trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
                 $openhours = $openhours['date']['dayOfWeek'] . ' ' . $tmpData;
             }
         }
@@ -156,7 +163,7 @@ class OpeninghoursService
         /**
          * @todo this logic needs to move to the formatter
          */
-        foreach ($this->data as $channelName => &$channelData) {
+        foreach ($this->data as &$channelData) {
             if (!$channelData ||
                 !isset(array_values($channelData)[0]) ||
                 !isset(array_values($channelData)[0]['OH'])) {
@@ -169,7 +176,8 @@ class OpeninghoursService
                 $tmpDateData = array_values($channelData)[0];
                 //unset($channelData);
 
-                $tmpData   = strpos('Gesloten', $openhours['OH'][0]) !== false ? trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
+                $tmpData = strpos('Gesloten', $openhours['OH'][0]) !== false ?
+                trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
                 $openhours = $openhours['date']['dayOfWeek'] . ' ' . $tmpData;
             }
         }
@@ -194,16 +202,24 @@ class OpeninghoursService
             }
 
             $value = [];
-            // mutliple openinghour models possible if start + end extend over limits of model (openhours of months, endings on new year ...)
+            // mutliple openinghour models possible
+            // if start + end extend over limits of model
+            // (openhours of months, endings on new year ...)
             $openinghoursCol = $channel->openinghours()
                 ->where('start_date', '<=', $end->toDateString())
                 ->where('end_date', '>=', $start->toDateString())
                 ->get();
             foreach ($openinghoursCol as $openinghours) {
                 // addapt begin and end to dates of openinghours
-                $calendarBegin = ($start > $openinghours->start_date) ? clone $start : new Carbon($openinghours->start_date);
-                $calendarEnd   = ($end < $openinghours->end_date) ? clone $end : new Carbon($openinghours->end_date);
-                $calendars     = $openinghours->calendars()
+                $calendarBegin = new Carbon($openinghours->start_date);
+                if ($start > $openinghours->start_date) {
+                    $calendarBegin = clone $start;
+                }
+                $calendarEnd = new Carbon($openinghours->end_date);
+                if ($end < $openinghours->end_date) {
+                    $calendarEnd = clone $end;
+                }
+                $calendars = $openinghours->calendars()
                     ->orderBy('priority', 'asc')
                     ->get();
 
@@ -235,6 +251,42 @@ class OpeninghoursService
         }
 
         return $this;
+    }
+
+    /**
+     * Creat Jobs to sync data to external services
+     *
+     * Make job for VESTA update when given openinghours is active
+     * and hase vesta source.
+     * Make job update LOD or delete LOD
+     *
+     * @param  Openinghours $openinghours
+     * @param  string       $type
+     * @return void
+     */
+    public function makeSyncJobsForExternalServices(Openinghours $openinghours, $type)
+    {
+        if (!in_array($type, ['update', 'delete'])) {
+            throw new \Exception('Define correct type of sync to external services', 1);
+        }
+
+        $channel = $openinghours->channel;
+        $service = $channel->service;
+
+        if ($openinghours->active) {
+            if (!empty($service) && $service->source == 'vesta') {
+                dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
+            }
+        }
+
+        switch ($type) {
+            case 'update':
+                dispatch(new UpdateLodOpeninghours($service->id, $openinghours->id, $channel->id));
+                break;
+            case 'delete':
+                dispatch(new DeleteLodOpeninghours($service->id, $openinghours->id));
+                break;
+        }
     }
 
     /**
@@ -279,5 +331,4 @@ class OpeninghoursService
 
         return $this;
     }
-
 }

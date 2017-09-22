@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Openinghours extends Model
 {
@@ -19,7 +19,7 @@ class Openinghours extends Model
      * @var array
      */
     protected $fillable = [
-        'active', 'start_date', 'end_date', 'label', 'channel_id'
+        'active', 'start_date', 'end_date', 'label', 'channel_id',
     ];
 
     public function calendars()

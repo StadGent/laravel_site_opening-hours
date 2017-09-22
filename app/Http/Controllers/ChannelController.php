@@ -125,8 +125,6 @@ class ChannelController extends Controller
             return response()->json(['message' => 'Het kanaal werd niet gevonden.'], 400);
         }
 
-        event(new ChannelDeleted($channel));
-
         $this->channels->delete($id);
 
         return response()->json(['Het kanaal werd verwijderd.']);

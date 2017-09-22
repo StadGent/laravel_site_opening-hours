@@ -9,10 +9,13 @@
 | you a convenient way to create models for testing and seeding your
 | database. Just tell the factory how a default model should look.
 |
-*/
+ */
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\SUser::class, function (Faker\Generator $faker) {
+    /**
+     * @var string
+     */
     static $password;
 
     return [
@@ -25,7 +28,7 @@ $factory->define(App\Models\SUser::class, function (Faker\Generator $faker) {
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Service::class, function (Faker\Generator $faker) {
-   	return [
+    return [
         'label' => $faker->text,
         'uri' => $faker->url,
         'description' => $faker->text,
@@ -35,7 +38,7 @@ $factory->define(App\Models\Service::class, function (Faker\Generator $faker) {
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Channel::class, function (Faker\Generator $faker) {
-   	return [
+    return [
         'label' => $faker->text($maxNbChars = 30),
         'service_id' => 1,
     ];

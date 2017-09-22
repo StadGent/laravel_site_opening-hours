@@ -58,7 +58,7 @@ class GetQueryRequest extends FormRequest
      * - check for q day and fullweek a date is given
      * - check if format is conform with OpeninghoursFormatter::OUTPUT_MAPPER
      * - check if given serivce has children
-     * - check if (when) given channel is child of given service 
+     * - check if (when) given channel is child of given service
      *
      * @param  Validator  $validator
      * @return void
@@ -83,7 +83,8 @@ class GetQueryRequest extends FormRequest
             /**
              * If format is set, it must be found in the keys of OpeninghoursFormatter::OUTPUT_MAPPER.
              */
-            if ($this->input('format') && !in_array($this->input('format'), array_keys(OpeninghoursFormatter::OUTPUT_MAPPER))) {
+            if ($this->input('format') &&
+                !in_array($this->input('format'), array_keys(OpeninghoursFormatter::OUTPUT_MAPPER))) {
                 $validator->errors()->add('format', 'The selected parameter format is invalid.');
             }
 
@@ -99,13 +100,12 @@ class GetQueryRequest extends FormRequest
                     $validator->errors()->add('channel', 'The selected service does not contain the selected channel.');
                 }
             }
-
         });
     }
 
     /**
      * Get the failed validation json response for the request.
-     * 
+     *
      * overwrite response so only json output will be given and not the http redirect
      * for expectsJson() the headers should correctly be set
      * this function catches all the times this is not correctly done

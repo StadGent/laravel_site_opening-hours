@@ -19,7 +19,6 @@ class EloquentRepository
     public function store(array $properties)
     {
         $model = $this->model->create($properties);
-        $model->save();
 
         return $model->id;
     }
