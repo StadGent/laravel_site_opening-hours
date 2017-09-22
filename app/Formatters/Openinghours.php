@@ -11,15 +11,19 @@ use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 class Openinghours extends Formatter
 {
 
+    /**
+     * contains the uri of the active record service
+     * @var string 
+     */
     public $serviceUri;
 
     const OUTPUT_MAPPER = [
-        'json'    => 'toJSON',
+        'json' => 'toJSON',
         'json-ld' => 'toJSONLD',
-        'html'    => 'toHTML',
-        'text'    => 'toTEXT',
-        'csv'     => 'toCSV',
-        'xml'     => 'toXML',
+        'html' => 'toHTML',
+        'text' => 'toTEXT',
+        'csv' => 'toCSV',
+        'xml' => 'toXML',
     ];
 
     /**
@@ -39,7 +43,7 @@ class Openinghours extends Formatter
             throw new \Exception("No data given for formatter" . self::class, 1);
         }
 
-        $this->data    = $data;
+        $this->data = $data;
         $renderMethode = self::OUTPUT_MAPPER[$format];
 
         return $this->$renderMethode();
@@ -66,7 +70,7 @@ class Openinghours extends Formatter
     {
         \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
 
-        $graph   = new \EasyRdf_Graph();
+        $graph = new \EasyRdf_Graph();
         $service = $graph->resource($this->serviceUri, 'schema:Organization');
 
         // get a raw render for the week:
@@ -105,7 +109,7 @@ class Openinghours extends Formatter
                         $formattedSchedule .= "<div>$entry</div>";
                     }
                     continue;
-                } 
+                }
                 $formattedSchedule .= "<div>$schedule</div>";
             }
         }
@@ -148,9 +152,10 @@ class Openinghours extends Formatter
             foreach ($dayInfo as $date => $oh) {
                 $text .= date('d-m-Y', strtotime($date)) . ' ' . $oh . PHP_EOL;
             }
-            return  $text;
-        }  
-          
+
+            return $text;
+        }
+
         return $dayInfo . PHP_EOL;
     }
 

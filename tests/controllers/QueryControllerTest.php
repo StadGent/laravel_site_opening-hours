@@ -13,6 +13,7 @@ class QueryControllerTest extends \TestCase
      * @var \App\Models\Service
      */
     protected $service;
+
     /**
      * store the optional channel labels
      * @var array
@@ -40,6 +41,7 @@ class QueryControllerTest extends \TestCase
     public function requestTypeProvider()
     {
         $dateParam = date('d-m-Y', strtotime('tomorrow'));
+
         return [
             [['q' => 'now']],
             [['q' => 'day', 'date' => $dateParam]],
@@ -58,7 +60,7 @@ class QueryControllerTest extends \TestCase
         // undo service setter
         // will be restored for next test by setup
         $this->service = null;
-        $call          = $this->doRequest('GET', $typeParams);
+        $call = $this->doRequest('GET', $typeParams);
         $call->seeStatusCode(400);
         $call->seeJson([
             "serviceUri" => ["The service uri field is required."],
@@ -74,7 +76,7 @@ class QueryControllerTest extends \TestCase
         // undo service setter
         // will be restored for next test by setup
         $this->service = null;
-        $call          = $this->doRequest(
+        $call = $this->doRequest(
             'GET',
             ['q' => 'now', 'serviceUri' => 'thisIsNotAServiceUri', 'date' => date('d-m-Y')]
         );
@@ -92,7 +94,7 @@ class QueryControllerTest extends \TestCase
     public function testValidateServiceWithoutChannelsReturnsNotFoundError()
     {
         $this->service = factory(\App\Models\Service::class)->create();
-        $call          = $this->doRequest('GET', ['q' => 'now', 'date' => date('d-m-Y')]);
+        $call = $this->doRequest('GET', ['q' => 'now', 'date' => date('d-m-Y')]);
         $call->seeStatusCode(400);
 
         $call->seeJson([
@@ -138,8 +140,8 @@ class QueryControllerTest extends \TestCase
     {
         // {host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}&format={format}
         $this->channelKeys = array_shift($this->channelKeys);
-        $call              = $this->doRequest('GET', $typeParams);
-        $content           = $this->getContentStructureTested($call);
+        $call = $this->doRequest('GET', $typeParams);
+        $content = $this->getContentStructureTested($call);
         $this->assertCount(1, $content);
     }
 
@@ -172,7 +174,7 @@ class QueryControllerTest extends \TestCase
     public function testItGivesSevenDaysOrNullPerChannelOnTypeWeek()
     {
         // {host}/api/query?q=week&serviceUri={serviceUri}&format={format}
-        $call    = $this->doRequest('GET', ['q' => 'week']);
+        $call = $this->doRequest('GET', ['q' => 'week']);
         $content = $this->getContentStructureTested($call);
         $this->checkSevenDaysOrNullPerChannel($content);
     }
@@ -186,8 +188,8 @@ class QueryControllerTest extends \TestCase
         // {host}/api/query?q=fullWeek&serviceUri={serviceUri}&format={format}
 
         $dateParam = date('d-m-Y', strtotime('tomorrow'));
-        $call      = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => $dateParam]);
-        $content   = $this->getContentStructureTested($call);
+        $call = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => $dateParam]);
+        $content = $this->getContentStructureTested($call);
         $this->checkSevenDaysOrNullPerChannel($content);
     }
 
@@ -198,7 +200,7 @@ class QueryControllerTest extends \TestCase
     public function testItGivesSevenDaysOrNullPerChannelOnTypeFullWeekWithDateParam()
     {
         // {host}/api/query?q=fullWeek&serviceUri={serviceUri}&date=dd-mm-yyyy&format={format}
-        $call    = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => date('d-m-Y')]);
+        $call = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => date('d-m-Y')]);
         $content = $this->getContentStructureTested($call);
         $this->checkSevenDaysOrNullPerChannel($content);
     }
@@ -270,6 +272,12 @@ class QueryControllerTest extends \TestCase
         return $call->decodeResponseJson();
     }
 
+    /**
+     * loop over channel labels in content
+     * and assert that there are 7 of no children
+     *
+     * @param $content
+     */
     protected function checkSevenDaysOrNullPerChannel($content)
     {
         // check if we 7 (days) results in all channels or is null

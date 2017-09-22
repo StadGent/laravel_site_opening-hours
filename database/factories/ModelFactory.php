@@ -13,12 +13,15 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\SUser::class, function (Faker\Generator $faker) {
+    /**
+     * @var string
+     */
     static $password;
 
     return [
-        'name'           => $faker->name,
-        'email'          => $faker->unique()->safeEmail,
-        'password'       => $password ?: $password = bcrypt('secret'),
+        'name' => $faker->name,
+        'email' => $faker->unique()->safeEmail,
+        'password' => $password ?: $password = bcrypt('secret'),
         'remember_token' => str_random(10),
     ];
 });
@@ -26,17 +29,17 @@ $factory->define(App\Models\SUser::class, function (Faker\Generator $faker) {
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Service::class, function (Faker\Generator $faker) {
     return [
-        'label'       => $faker->text,
-        'uri'         => $faker->url,
+        'label' => $faker->text,
+        'uri' => $faker->url,
         'description' => $faker->text,
-        'draft'       => 0,
+        'draft' => 0,
     ];
 });
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Channel::class, function (Faker\Generator $faker) {
     return [
-        'label'      => $faker->text($maxNbChars = 30),
+        'label' => $faker->text($maxNbChars = 30),
         'service_id' => 1,
     ];
 });

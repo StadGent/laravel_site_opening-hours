@@ -9,11 +9,16 @@ use App\Repositories\CalendarRepository;
 
 class CalendarsController extends Controller
 {
+    /**
+     * @param CalendarRepository $calendars
+     * @return  $this
+     */
     public function __construct(CalendarRepository $calendars)
     {
         $this->middleware('auth');
-
         $this->calendars = $calendars;
+
+        return $this;
     }
 
     /**
@@ -48,7 +53,7 @@ class CalendarsController extends Controller
 
         $id = $this->calendars->store($input);
 
-        // If events are passed, bulk upsert them
+        // If events are passed, bulk insert them
         if (!empty($input['events']) && !empty($id)) {
             $this->bulkInsert($id, $input['events']);
         }
@@ -95,7 +100,7 @@ class CalendarsController extends Controller
     {
         $input = $request->input();
 
-        // If events are passed, bulk upsert them
+        // If events are passed, bulk insert them
         if (!empty($input['events'])) {
             $this->bulkInsert($id, $input['events']);
         }
@@ -112,10 +117,10 @@ class CalendarsController extends Controller
     }
 
     /**
-     * Bulk upsert events
+     * Bulk insert events
      *
      * @param  integer $id     The id of the calendar
-     * @param  array   $events The events that need to be upserted
+     * @param  array   $events The events that need to be inserted
      * @return void
      */
     private function bulkInsert($calendarId, $events)
