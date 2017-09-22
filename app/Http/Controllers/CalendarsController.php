@@ -14,8 +14,7 @@ class CalendarsController extends Controller
      * @return  $this
      */
     public function __construct(CalendarRepository $calendars)
-    {
-        $this->middleware('auth');
+    {    
         $this->calendars = $calendars;
 
         return $this;
