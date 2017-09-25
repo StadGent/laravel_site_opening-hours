@@ -749,16 +749,16 @@
         },
         {
             "name": "digipolisgent/robo-digipolis-laravel",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digipolisgent/robo-digipolis-laravel.git",
-                "reference": "6b9c79d0861fe16144f25a12c1b6148436a4426b"
+                "reference": "6613a42ce5bb42e719ecc7aa7188723ce60372ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/6b9c79d0861fe16144f25a12c1b6148436a4426b",
-                "reference": "6b9c79d0861fe16144f25a12c1b6148436a4426b",
+                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/6613a42ce5bb42e719ecc7aa7188723ce60372ef",
+                "reference": "6613a42ce5bb42e719ecc7aa7188723ce60372ef",
                 "shasum": ""
             },
             "require": {
@@ -794,7 +794,7 @@
                 }
             ],
             "description": "Basic deploy flow for a Laravel site.",
-            "time": "2017-09-25T12:57:45+00:00"
+            "time": "2017-09-25T13:40:28+00:00"
         },
         {
             "name": "digipolisgent/robo-digipolis-package",
