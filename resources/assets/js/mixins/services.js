@@ -74,17 +74,27 @@ export default {
         }
     },
     mounted() {
-        this.fetchServices()
+        this.fetchServices();
         Hub.$on('activateService', service => {
             if (!service.id) {
                 return console.error('activateService: id is missing')
             }
-            service.draft = false
+            service.draft = false;
 
             this.$http.put('/api/services/' + service.id, {draft: false}).then(({data}) => {
                 service.draft = data.draft
             }).catch(fetchError)
-        })
+        });
+        Hub.$on('deactivateService', service => {
+            if (!service.id) {
+                return console.error('deactivateService: id is missing')
+            }
+            service.draft = true;
+
+            this.$http.put('/api/services/' + service.id, {draft: true}).then(({data}) => {
+                service.draft = data.draft
+            }).catch(fetchError)
+        });
         Hub.$on('createChannel', channel => {
             if (!channel.srv) {
                 return console.error('createChannel: service is missing')
