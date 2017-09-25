@@ -22,14 +22,6 @@
                 <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')" style="max-width:300px" type="search">
             </div>
         </form>
-
-      <!-- <button type="button" class="btn btn-link btn-disabled" :class="{active: route.tab=='admin'}" @click="route.tab='admin'" disabled>Toon administrators</button> -->
-
-      <!--<div class="btn-group" v-if="!route.tab">-->
-        <!--<button type="button" class="btn btn-default" :class="{ 'btn-success': !draft }" @click="draft = false">Toon actieve diensten</button>-->
-        <!--<button type="button" class="btn btn-default" :class="{ 'btn-warning': draft }" @click="draft = true">Activeer diensten</button>-->
-      <!--</div>-->
-
       </div>
 
     <!-- Users -->
