@@ -9,12 +9,11 @@
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 
-Route::group(['middleware'=>'auth:api'],
+Route::group(['middleware' => 'auth:api'],
     function () {
         Route::resource('/users', 'UsersController');
-        Route::resource('/services', 'ServicesController');
         Route::resource('/openinghours', 'OpeninghoursController');
         Route::resource('/calendars', 'CalendarsController');
         Route::resource('/channels', 'ChannelController');
@@ -24,4 +23,5 @@ Route::group(['middleware'=>'auth:api'],
     }
 );
 
+Route::resource('/services', 'ServicesController');
 Route::get('/query', 'QueryController@query');

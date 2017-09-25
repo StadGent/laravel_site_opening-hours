@@ -2,76 +2,87 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Service;
 use App\Repositories\ServicesRepository;
+use Illuminate\Http\Request;
 
 class ServicesController extends Controller
 {
+    /**
+     * @param ServicesRepository $services
+     */
     public function __construct(ServicesRepository $services)
     {
         $this->services = $services;
+        $this->middleware('auth:api')->except(['index', 'show']);
     }
 
     /**
+     * Get all entities
+     *
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        // An admin has access to all of the roles
-        if ($request->user()->hasRole('Admin')) {
-            return response()->json($this->services->get());
+        if ($request->user('api') && !$request->user('api')->hasRole('Admin')) {
+            return response()->json($this->services->getForUser($request->user('api')->id));
         }
 
-        return response()->json($this->services->getForUser($request->user()->id));
+        return response()->json($this->services->get());
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get the create form
      *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Base not implemnted reply
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response 501
      */
-    public function store(Request $request)
+    public function create(Service $request)
     {
-        throw new Exception('Not yet implemented');
+        return response()->json('Not Implemented', 501);
     }
 
     /**
-     * Display the specified resource.
+     * Post new entity to store
      *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Base not implemnted reply
      *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response 501
      */
-    public function edit($id)
+    public function store(Service $request)
     {
-        throw new Exception('Not yet implemented');
+        return response()->json('Not Implemented', 501);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Get with id
+     *
+     * Base get and return the service
+     *
+     * @return Service
+     */
+    public function show(Service $service)
+    {
+        return $service;
+    }
+
+    /**
+     * Get edit form
+     *
+     * Base not implemnted reply
+     *
+     * @return \Illuminate\Http\Response 501
+     */
+    public function edit(Service $request)
+    {
+        return response()->json('Not Implemented', 501);
+    }
+
+    /**
+     * Update/Patch the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int                       $id
@@ -79,10 +90,19 @@ class ServicesController extends Controller
      */
     public function update(Request $request, $id)
     {
+        /** should be handled by routes... but just to be sure **/
+        if (!$request->user('api')) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        /** only allowed for admin user **/
+        if (!$request->user('api')->hasRole('Admin')) {
+            return response()->json(['message' => 'Method not allowed'], 405);
+        }
+
         // The only field we allow to be updated is the draft flag
         $draft = $request->input('draft', null);
 
-        if (! is_null($draft)) {
+        if (!is_null($draft)) {
             $this->services->update($id, ['draft' => $draft]);
         }
 
@@ -90,13 +110,15 @@ class ServicesController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove entity
      *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * Base not implemnted reply
+     *
+     * @return \Illuminate\Http\Response 501
      */
-    public function destroy($id)
+    public function destroy(Service $request)
     {
-        throw new Exception('Not yet implemented');
+        return response()->json('Not Implemented', 501);
     }
+
 }
