@@ -31,6 +31,17 @@ class SparqlService
      */
     private $defaultGraph;
 
+    /**
+     * @var mixed
+     */
+    private $lastResponseCode;
+
+    /**
+     * @param $endpoint
+     * @param $username
+     * @param $password
+     * @param $defaultGraph
+     */
     public function __construct($endpoint, $username = '', $password = '', $defaultGraph = '')
     {
         if (empty($endpoint)) {
@@ -51,21 +62,23 @@ class SparqlService
      * If the method was not a GET method, return a boolean indicating
      * if the query was performed succesful or not
      *
+     * @deprecated
      * @param  string $query
      * @param  string $method
      * @param  string $format
      * @return mixed
      */
-    public function performSparqlQuery($query, $method = 'GET', $format = 'turtle')
+    public function performSparqlQuery($query, $method = 'GET', $format = null)
     {
         try {
-            $data = $this->executeQuery($query, $method, $format);
-
-            if ($method == 'GET') {
-                return $data;
+            switch ($method) {
+                case 'POST':
+                    return $this->post($query);
+                case 'GET':
+                    return $this->get($query, $format);
+                default:
+                    throw new \Exception('Given method: ' . $method . ' is not supported by this SparqlService');
             }
-
-            return true;
         } catch (\Exception $ex) {
             \Log::error('Something went wrong while writing to the LOD repository: ' . $ex->getMessage());
         }
@@ -74,107 +87,94 @@ class SparqlService
     }
 
     /**
-     * Prepare the query statement to be passed in a cURL requests
-     * meaning we need to apply proper url encoding and take into
-     * account specific characters
+     * Prepare and perform a POST to the SparQL
      *
-     * @param  string $query
-     * @return string
+     * @param $query
+     * @return mixed
      */
-    private function prepareQuery($query)
+    public function post($query)
     {
+        $curl = $this->initRequest();
+
+        // The crud endpoint works with digest authentication
+        if (!empty($this->username)) {
+            curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+        }
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/sparql-query',
+        ]);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
+
+        // format uri
+        $uri = env('SPARQL_WRITE_INSERT_ENDPOINT') . '?graph-uri=' . $this->defaultGraph;
+
+        $this->executeQuery($query, $uri);
+
+        return $this->lastResponseCode == 200;
+    }
+
+    /**
+     * Prepare and perform a GET to the SparQL
+     *
+     * @param $query
+     * @param $format
+     * @return mixed
+     */
+    public function get($query, $format = 'turtle')
+    {
+        $curl = $this->initRequest();
+        // If credentials are set, put the HTTP auth header in the cURL request
+        if (!empty($this->username)) {
+            curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+        }
+        // format uri
         $query = str_replace('%23', '#', $query);
         $query = urlencode($query);
+        $query = str_replace('+', '%20', $query);
+        $uri = $this->endpoint . '?query=' . $query . '&format=' . $format;
 
-        return str_replace('+', '%20', $query);
+        return $this->executeQuery($curl, $uri);
+    }
+
+    /**
+     * Setup cURL handle
+     * @return cURL hanlde
+     */
+    private function initRequest()
+    {
+        $curl = curl_init();
+        $this->lastResponseCode = null;
+
+        if (!empty($this->username)) {
+            curl_setopt($curl, CURLOPT_USERPWD, $this->username . ':' . $this->password);
+        }
+
+        // Request for a string result instead of having the result being outputted
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+        return $curl;
+
     }
 
     /**
      * Perform the query to the SPARQL endpoint which is
      * based on the configured properties (endpoint, username, pw) and the
-     * pass query and request method, then return the result.
-     *
-     * TODO: abstract the sparql service more to allow for specific endpoints
-     * to be configured upon constructing the class for specific methods
+     * pass query, then return the result.
      *
      * @param  string $query
      * @param  string $method
      * @param  string $format Default format is turtle
      * @return string
      */
-    private function executeQuery($query, $method = 'GET', $format = 'turtle')
+    private function executeQuery($curl, $uri)
     {
-        $curl = curl_init();
-
-        if ($method == 'GET' && empty($format)) {
-            $format = 'turtle';
-        } elseif ($method != 'GET') {
-            $format = '';
-        }
-
-        // POST queries are sent to the graph-crud-auth API endpoint
-        if ($method == 'POST') {
-            // The crud endpoint works with digest authentication
-            if (! empty($this->username)) {
-                curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-                curl_setopt($curl, CURLOPT_USERPWD, $this->username . ':' . $this->password);
-            }
-
-            $uri = env('SPARQL_WRITE_INSERT_ENDPOINT') . '?graph-uri=' . $this->defaultGraph;
-
-            curl_setopt($curl, CURLOPT_URL, $uri);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                                            'Content-Type: application/sparql-query'
-                                            ));
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
-
-            // Request for a string result instead of having the result being outputted
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        } else {
-            // If credentials are set, put the HTTP auth header in the cURL request
-            if (! empty($this->username)) {
-                curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-                curl_setopt($curl, CURLOPT_USERPWD, $this->username . ':' . $this->password);
-            }
-
-            $uri = $this->makeGetRequestUri($this->prepareQuery($query), $format);
-
-            // Make and set the request URI
-            curl_setopt($curl, CURLOPT_URL, $uri);
-
-            // Request for a string result instead of having the result being outputted
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        }
-
+        // Make and set the request URI
+        curl_setopt($curl, CURLOPT_URL, $uri);
         // Execute the request
         $response = curl_exec($curl);
-        $responseCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        // Virtuoso documentation states it only returns 200, 400, 500 status codes
-        // but apparently they mean 2xx, 4xx and 5xx
-        if (! $response && $responseCode > 299) {
-            $curl_err = curl_error($curl);
-
-            $uri = urldecode($uri);
-
-            $message = "Something went wrong while executing query. The request we put together was: $uri. The response code was: $responseCode. The response was: $response";
-
-            throw new \Exception($message);
-        }
-
-        if ($responseCode >= '400' && $responseCode <= '500') {
-            $uri = urldecode($uri);
-
-            $message = "The SPARQL endpoint returned an error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The error was: $response. The URI was: $uri";
-
-            throw new \Exception($message);
-        } elseif ($responseCode == '500') {
-            $uri = urldecode($uri);
-
-            $message = "The SPARQL endpoint returned a 500 error. If the SPARQL query contained a parameter, don't forget to pass them as a query string parameter. The URI was: $uri";
-
-            throw new \Exception($message);
-        }
+        $this->lastResponseCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $this->handleResponseCode(!!$response);
 
         curl_close($curl);
 
@@ -182,40 +182,36 @@ class SparqlService
     }
 
     /**
-     * Make and return the request URI based on
-     * the passed query and the configured endpoint
-     *
-     * @param  string $query
-     * @param  string $format
-     * @return string
+     * Getter lastResponseCode
+     * @return int
      */
-    private function makeGetRequestUri($query, $format = null)
+    public function getLastResponceCode()
     {
-        $requestUri = $this->endpoint . '?query=' . $query;
-
-        if (! empty($format)) {
-            $requestUri .= '&format=' . $format;
-        }
-
-        return $requestUri;
+        return $this->lastResponseCode;
     }
 
     /**
-     * Make and return the request URI based on
-     * the passed query and the configured endpoint
-     *
-     * @param  string $query
-     * @param  string $format
-     * @return string
+     * [handleResponseCode description]
+     * @param  bool   $notEmptyResponse 
+     * @return void
      */
-    private function makePostRequestUri($query, $format = null)
+    private function handleResponseCode(bool $succesExec)
     {
-        $requestUri = $this->endpoint . '?query=' . $query;
-
-        if (! empty($format)) {
-            $requestUri .= '&format=' . $format;
+        // Virtuoso documentation states it only returns 200, 400, 500 status codes
+        // but apparently they mean 2xx, 4xx and 5xx
+        if ($succesExec && $this->lastResponseCode > 299) {
+            $message = "Something went wrong while executing query.";
+            throw new \Exception($message);
         }
 
-        return $requestUri;
+        if ($this->lastResponseCode >= '400' && $this->lastResponseCode <= '500') {
+            $message = "The SPARQL endpoint returned an error.";
+            throw new \Exception($message);
+        }
+
+        if ($this->lastResponseCode == '500') {
+            $message = "The SPARQL endpoint returned a 500 error.";
+            throw new \Exception($message);
+        }
     }
 }
