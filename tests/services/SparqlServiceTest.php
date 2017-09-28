@@ -52,7 +52,7 @@ class SparqlServiceTest extends \TestCase
     /**
      * @test
      */
-    public function testAuthenticationThrowsErrorWithWrongCredentials($value='')
+    public function testAuthenticationThrowsErrorWithWrongCredentials()
     {
         $this->setExpectedException(\GuzzleHttp\Exception\ClientException::class);
         new \App\Services\SparqlService(
@@ -105,7 +105,7 @@ class SparqlServiceTest extends \TestCase
         $this->assertEquals($succesString, $resultString);
         $this->assertEquals(200, $this->sparqlService->getLastResponceCode());
 
-        //READ (already done once, but lets check if we have an "a" in there)        
+        //READ (already done once, but lets check if we have an "a" in there)
         $this->checkReadResults('a');
 
         //UPDATE (delete/insert)
@@ -138,10 +138,10 @@ class SparqlServiceTest extends \TestCase
     }
 
     /**
-     * Perfoms a read query 
-     * 
+     * Perfoms a read query
+     *
      * Checks when $endresult given, or it exists in the data
-     * 
+     *
      * @param $endValue
      */
     private function checkReadResults($endValue = false)
@@ -159,7 +159,7 @@ class SparqlServiceTest extends \TestCase
             $resultString = array_get($data, 'results.bindings.0.value.value');
             $this->assertEquals($endValue, $resultString);
         }
-        
+
     }
 
 }
