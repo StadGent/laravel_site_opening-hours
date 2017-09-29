@@ -14,6 +14,7 @@ class SparqlService
 {
 
     /**
+     * HttpClient to be fixed with endpoint to send requests
      * @var Client
      */
     private $guzzleClient;
@@ -37,9 +38,11 @@ class SparqlService
     private $defaultGraph;
 
     /**
+     * Default null
+     * After correct request: is set with statuscode
      * @var mixed
      */
-    private $lastResponseCode;
+    private $lastResponseCode = null;
 
     /**
      * @param $endpoint
@@ -62,7 +65,7 @@ class SparqlService
      * Is public as perhaps onther endpoints can be needed in logic
      * As currently digest authenitcation is currently only supported when using the cURL handler
      * http://docs.guzzlephp.org/en/stable/request-options.html#auth
-     * 
+     *
      * The base baseConnectionTest is triggered here to check or Client is correctly set
      * When not correct, the thrown error will prevent any further logic being send to the objedt
      *
@@ -73,7 +76,6 @@ class SparqlService
         $handler = new CurlHandler();
         $options['handler'] = HandlerStack::create($handler); // Wrap w/ middleware
         $options['base_uri'] = $endpoint;
-
         $this->guzzleClient = new Client($options);
 
         $this->baseConnectionTest();
