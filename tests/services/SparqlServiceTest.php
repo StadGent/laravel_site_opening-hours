@@ -24,6 +24,7 @@ class SparqlServiceTest extends \TestCase
 
     /**
      * @test
+     * @group validation
      */
     public function testBaseConnectionTestWorksWithoutExceptionThrown()
     {
@@ -31,8 +32,8 @@ class SparqlServiceTest extends \TestCase
     }
 
     /**
-     * @todo  error expected on no SARQL endpoint
      * @test
+     * @group validation
      */
     public function testBaseConnectionGivesExceptionOnNotSparqlEndPoint()
     {
@@ -42,6 +43,7 @@ class SparqlServiceTest extends \TestCase
 
     /**
      * @test
+     * @group validation
      */
     public function testBaseConnectionGivesExceptionOnNonexistingEndPoint()
     {
@@ -51,6 +53,7 @@ class SparqlServiceTest extends \TestCase
 
     /**
      * @test
+     * @group validation
      */
     public function testAuthenticationThrowsErrorWithWrongCredentials()
     {
@@ -63,6 +66,7 @@ class SparqlServiceTest extends \TestCase
 
     /**
      * @test
+     * @group functionality
      */
     public function testDeprecatedPerformSparqlQueryStillWorks()
     {
@@ -76,6 +80,7 @@ class SparqlServiceTest extends \TestCase
 
     /**
      * @test
+     * @group functionality
      */
     public function testRefactoredGet()
     {
@@ -89,6 +94,7 @@ class SparqlServiceTest extends \TestCase
 
     /**
      * @test
+     * @group scenario
      */
     public function testCRUDQueriesInFlow()
     {
@@ -138,9 +144,13 @@ class SparqlServiceTest extends \TestCase
     }
 
     /**
-     * Perfoms a read query
+     * Perfoms a read query for testCRUDQueriesInFlow
+     * 
+     * Is used for checking the situation in the database,
+     * before/between/after the alternations of create update and delete
      *
-     * Checks when $endresult given, or it exists in the data
+     * When $endresult given: it exists existence in the data
+     * When none given: checks or data is ectual empty
      *
      * @param $endValue
      */

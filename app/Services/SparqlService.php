@@ -57,15 +57,19 @@ class SparqlService
     }
 
     /**
+     * Create new Guzzle client with fixed base_uri endpoint
+     *
+     * Is public as perhaps onther endpoints can be needed in logic
+     * As currently digest authenitcation is currently only supported when using the cURL handler
+     * http://docs.guzzlephp.org/en/stable/request-options.html#auth
+     * 
+     * The base baseConnectionTest is triggered here to check or Client is correctly set
+     * When not correct, the thrown error will prevent any further logic being send to the objedt
+     *
      * @param $endpoint
-     * @param $username
-     * @param $password
      */
     public function setClient($endpoint = '')
     {
-        // CurlHandler
-        // As currently digest authenitcation is currently only supported when using the cURL handler
-        // http://docs.guzzlephp.org/en/stable/request-options.html#auth
         $handler = new CurlHandler();
         $options['handler'] = HandlerStack::create($handler); // Wrap w/ middleware
         $options['base_uri'] = $endpoint;
@@ -77,7 +81,17 @@ class SparqlService
     }
 
     /**
-     * @todo  check or reply is of SPARQL
+     * Test or the current Guzzle client contains the Sparql protocol
+     *
+     * A base ASK query request is fired to the current client.
+     * Throws error when
+     * - no connection to given endpoint is possible
+     * - endpoint returns a statuscode that is not 200
+     * - endpoint returns a value that is not parsable as json
+     * - endpoint returns not the expected boolean as answer on the ASK query
+     *
+     * @param  array  $options      Add other Guzzle Request options
+     * @return void
      */
     public function baseConnectionTest($options = [])
     {
@@ -94,21 +108,23 @@ class SparqlService
             throw new \Exception("No correct reply came back in connection test", 1);
         }
 
-        if ($data !== true) {
+        if ($data !== true && $data !== false) {
             throw new \Exception("No correct data came back in connection test", 1);
         }
 
     }
 
     /**
+     * Execute the query
+     *
      * Return the response coming from the result of a SPARQL query
      * If the method was not a GET method, return a boolean indicating
      * if the query was performed succesful or not
      *
      * @deprecated
      * @param  string $query
-     * @param  string $method
-     * @param  string $format
+     * @param  string $method   HTTP verb GET / POST
+     * @param  mixed $format    Default null will be handled later on as json
      * @return mixed
      */
     public function performSparqlQuery($query, $method = 'GET', $format = null)
@@ -134,12 +150,17 @@ class SparqlService
     /**
      * Prepare and perform a POST to the SparQL
      *
+     * Reset of $this->lastResponseCode
+     * Assemble the query for POST syntax
+     * As graph-uri value, the efaultGraph is set
+     * Set the format default to json for any conformation reply
+     * Query is send as ['form_params']['query'] = $query (no uri transform is needed here)
+     *
      * @param $query
      * @return mixed
      */
     public function post($query, $format = null)
     {
-        -
         $this->lastResponseCode = null;
         $uri = '?graph-uri=' . static::transformQuery($this->defaultGraph) . '&format=' . ($format ?: 'json');
         $options = ['form_params' => ['query' => $query]];
@@ -150,13 +171,16 @@ class SparqlService
     /**
      * Prepare and perform a GET to the SparQL
      *
+     * Reset of $this->lastResponseCode
+     * Assemble the uri transformed query for GET syntax
+     * Set the format default to json for any conformation reply
+     *
      * @param $query
      * @param $format
      * @return mixed
      */
     public function get($query, $format = null)
     {
-        //  \Log::info('SPARQL query GET: ' . $query);
         $this->lastResponseCode = null;
         $uri = '?query=' . static::transformQuery($query) . '&format=' . ($format ?: 'json');
 
@@ -166,6 +190,7 @@ class SparqlService
     /**
      * transform qQuery string to SparQL fit for uri
      *
+     * @todo perhaps look for a nicer syntax sugar (but it works as is)
      * @param  string $query
      * @return string
      */
@@ -179,8 +204,12 @@ class SparqlService
     }
 
     /**
-     *
      * Perform the query to the SPARQL endpoint
+     *
+     * Standard use auht. This is not needed for the GET SELECT,
+     * but to make extra logic for a "less safe exception" is ... not logic
+     *
+     * 'application/sparql-query' is set es Content-type
      *
      * @param  string $verb    HTTP verb GET / POST
      * @param  string $query
@@ -193,14 +222,13 @@ class SparqlService
         $options['Content-Type'] = 'application/sparql-query';
         // try {
         $response = $this->guzzleClient->request($verb, $query, $options);
-        $this->lastResponseCode = $response->getStatusCode();
 
         return $this->handleResponse($response);
     }
 
     /**
      * Getter lastResponseCode
-     * @return int
+     * @return int/null
      */
     public function getLastResponceCode()
     {
@@ -210,6 +238,7 @@ class SparqlService
     /**
      * Handle response of request
      *
+     * Set status code into property
      * Check errors based on response status code
      * Return the body of the request
      *
@@ -218,6 +247,7 @@ class SparqlService
      */
     private function handleResponse(Response $response)
     {
+        $this->lastResponseCode = $response->getStatusCode();
         // Virtuoso documentation states it only returns 200, 400, 500 status codes
         // but apparently they mean 2xx, 4xx and 5xx
         if ($response->getReasonPhrase() != 'OK' && $this->lastResponseCode > 299) {
