@@ -3,10 +3,7 @@
       <td class="td-sortable">
         <a :href="'#!service/'+s.id">{{ s.label }}</a>
       </td>
-      <td
-        :class="statusClass"
-        :rowspan="rowspan"
-      >
+      <td :class="statusClass">
         <span
           data-toggle="tooltip"
           :title="statusTooltip"
@@ -15,7 +12,7 @@
           <i class="glyphicon glyphicon-info-sign" v-if="statusTooltip"></i>
         </span>
       </td>
-      <td :rowspan="rowspan" class="text-muted td-sortable" :title="s.updated_at">
+      <td class="text-muted td-sortable" :title="s.updated_at">
         <div>{{ s.updated_at | date }}</div>
         <div>{{ s.updated_by }}</div>
       </td>
