@@ -82,25 +82,37 @@ class ServicesRepository extends EloquentRepository
             }
         }
 
-        $result['channels'] = [];
-        // Get all of the channels for the service
-        foreach ($service->channels as $channel) {
-            $tmpChannel = $channel->toArray();
-            $tmpChannel['openinghours'] = [];
-
-            foreach ($channel->openinghours as $openinghours) {
-                $instance = $openinghours->toArray();
-
-                $tmpChannel['openinghours'][] = $instance;
-            }
-
-            $result['channels'][] = $tmpChannel;
-        }
-
+        //todo do the same for users
         $users = app('UserRepository');
 
         // Get all of the users for the service
         $result['users'] = $users->getAllInService($result['id']);
+
+        return $result;
+    }
+
+    /**
+     * Get the channels for the service
+     *
+     * @return array
+     */
+    public function getChannels(){
+
+        $result = [];
+        // Get all of the channels for the service
+        foreach ($this->model->channels as $channel) {
+
+            $tmpChannel = $channel->toArray();
+            $tmpChannel['openinghours'] = [];
+
+            foreach ($channel->openinghours as $openinghours) {
+
+                $instance = $openinghours->toArray();
+                $tmpChannel['openinghours'][] = $instance;
+            }
+
+            $result[] = $tmpChannel;
+        }
 
         return $result;
     }

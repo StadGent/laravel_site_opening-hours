@@ -25,7 +25,7 @@ export default {
         routeVersion() {
             this.$nextTick(() => {
                 this.fetchVersion()
-            })
+            });
             return this.routeChannel.openinghours && this.routeChannel.openinghours.find(o => o.id === this.route.version) || {}
         },
         routeCalendar() {
@@ -36,11 +36,38 @@ export default {
         fetchServices() {
             return this.$http.get('/api/services')
                 .then(({data}) => {
-                console.log(data);
+                    console.log(data);
                     this.services = data || [];
                     this.versionDataQueue.forEach(this.applyVersionData);
-                    this.versionDataQueue = []
+                    this.versionDataQueue = [];
+
+                    //check for active routeService and populate channels?
+
+                    if(this.route.service){
+                        this.fetchChannels();
+                    }
+
                 }).catch(fetchError)
+        },
+        fetchChannels() {
+
+            //check if global services array is populated
+            if(Object.keys(this.routeService).length > 0){
+
+                console.log('fetching channels for ' + this.route.service);
+
+                this.$http.get('/api/channels/getChannelsByService/' + this.route.service).then(({data}) => {
+
+                    this.routeService.channels = data;
+
+                    this.services = this.services.map(s => {
+                        if(s.id == this.route.service){
+                            s.channels = data;
+                        }
+                        return s;
+                    });
+                })
+            }
         },
         fetchVersion(invalidate) {
             if (!this.route.version || this.route.version < 1) {
@@ -79,6 +106,7 @@ export default {
     },
     mounted() {
 
+        Hub.$on('fetchChannels', this.fetchChannels);
         Hub.$on('activateService', service => {
             if (!service.id) {
                 return console.error('activateService: id is missing')
@@ -156,7 +184,7 @@ export default {
             }
 
             this.$http.put('/api/openinghours/' + version.id, version).then(({data}) => {
-                this.fetchServices()
+                this.fetchServices();
                 this.modalClose()
             }).catch(fetchError)
         });

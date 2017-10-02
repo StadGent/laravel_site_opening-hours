@@ -99,6 +99,11 @@ export default {
       service: null
     }
   },
+    created() {
+      if(!this.srv.channels) {
+          Hub.$emit('fetchChannels');
+      }
+    },
   computed: {
     srv () {
       return this.$root.routeService
