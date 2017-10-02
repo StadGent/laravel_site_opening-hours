@@ -62,12 +62,12 @@ class SparqlService
     /**
      * Create new Guzzle client with fixed base_uri endpoint
      *
-     * Is public as perhaps onther endpoints can be needed in logic
-     * As currently digest authenitcation is currently only supported when using the cURL handler
+     * Is public as perhaps other endpoints can be needed in logic
+     * As currently digest authenitcation is only supported when using the cURL handler
      * http://docs.guzzlephp.org/en/stable/request-options.html#auth
      *
      * The base baseConnectionTest is triggered here to check or Client is correctly set
-     * When not correct, the thrown error will prevent any further logic being send to the objedt
+     * When not correct, the thrown error will prevent any further logic being send to the object
      *
      * @param $endpoint
      */
@@ -83,7 +83,7 @@ class SparqlService
     }
 
     /**
-     * Test or the current Guzzle client contains the Sparql protocol
+     * Test if the current Guzzle client contains the Sparql protocol
      *
      * A base ASK query request is fired to the current client.
      * Throws error when
@@ -154,7 +154,7 @@ class SparqlService
      *
      * Reset of $this->lastResponseCode
      * Assemble the query for POST syntax
-     * As graph-uri value, the efaultGraph is set
+     * As graph-uri value, the defaultGraph is set
      * Set the format default to json for any conformation reply
      * Query is send as ['form_params']['query'] = $query (no uri transform is needed here)
      *
@@ -190,7 +190,7 @@ class SparqlService
     }
 
     /**
-     * transform qQuery string to SparQL fit for uri
+     * Transform query string to SparQL fit for uri
      *
      * @todo perhaps look for a nicer syntax sugar (but it works as is)
      * @param  string $query
@@ -208,10 +208,10 @@ class SparqlService
     /**
      * Perform the query to the SPARQL endpoint
      *
-     * Standard use auht. This is not needed for the GET SELECT,
+     * Standard use auth. This is not needed for the GET SELECT,
      * but to make extra logic for a "less safe exception" is ... not logic
      *
-     * 'application/sparql-query' is set es Content-type
+     * 'application/sparql-query' is set as Content-type
      *
      * @param  string $verb    HTTP verb GET / POST
      * @param  string $query
@@ -222,7 +222,6 @@ class SparqlService
     {
         $options['auth'] = [$this->username, $this->password, 'digest'];
         $options['Content-Type'] = 'application/sparql-query';
-        // try {
         $response = $this->guzzleClient->request($verb, $query, $options);
 
         return $this->handleResponse($response);
