@@ -39,6 +39,7 @@ export default {
   },
   mixins: [RowServiceMixin],
   computed: {
+      //todo figure out what this does...
 //    activeUsers () {
 //      return this.s.activeUsers.map(u => u.email) || []
 //    },

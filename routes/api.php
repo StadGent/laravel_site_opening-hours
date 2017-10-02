@@ -17,6 +17,7 @@ Route::group(['middleware' => 'auth:api'],
         Route::resource('/openinghours', 'OpeninghoursController');
         Route::resource('/calendars', 'CalendarsController');
         Route::resource('/channels', 'ChannelController');
+        Route::resource('/channels/getChannelsByService', 'ChannelController@getChannelsByService');
         Route::post('/roles', 'RolesController@update');
         Route::delete('/roles', 'RolesController@destroy');
         Route::get('api/presets', 'PresetsController@index');

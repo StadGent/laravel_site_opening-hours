@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Events\ChannelDeleted;
 use App\Http\Requests\StoreChannelRequest;
+use App\Models\Service;
 use App\Repositories\ChannelRepository;
+use App\Repositories\ServicesRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -78,6 +80,14 @@ class ChannelController extends Controller
                 ]
             ]
         ];
+    }
+
+    public function getChannelsByService($id){
+
+        $serviceRepo = new ServicesRepository(Service::find($id));
+        $channels = $serviceRepo->getChannels();
+
+        return response()->json($channels);
     }
 
     /**
