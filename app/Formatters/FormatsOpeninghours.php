@@ -8,6 +8,10 @@ use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 date_default_timezone_set('Europe/Brussels');
 
 /**
+ * @deprecated 
+ * 
+ * this logic is refactored 
+ * 
  * Provides functionality to parse Calendar objects into ICAL objects
  * and provides a means to format the outcome of the ICAL events into text, json-ld, html and json
  *

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Formatters\Openinghours;
 use App\Http\Requests\GetQueryRequest;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -20,11 +19,10 @@ class QueryController extends Controller
      * Send data to formatter by given param format
      * Return formated data as output
      *
-     * @param  GetQueryRequest $request
-     * @param  Openinghours    $formatter
-     * @return mixed
+     * @param  App\Http\Requests\GetQueryRequest $request
+     * @return \Illuminate\Http\Response
      */
-    public function query(GetQueryRequest $request, Openinghours $formatter)
+    public function query(GetQueryRequest $request)
     {
         if ($request->input('lang')) {
             \App::setLocale($request->input('lang'));
@@ -72,6 +70,7 @@ class QueryController extends Controller
         // output format with json as default
         $format = $request->input('format') ?: 'json';
         // special for parent obj in json-ld
+        $formatter = app('OpeninghoursFormatter');
         $formatter->serviceUri = $request->input('serviceUri');
         // return rendered data
         $output = $formatter->render($format, $openinghoursService->getData());
