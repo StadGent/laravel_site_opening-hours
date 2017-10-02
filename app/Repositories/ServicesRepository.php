@@ -61,8 +61,28 @@ class ServicesRepository extends EloquentRepository
     public function expandService($service)
     {
         $result = $service->toArray();
-        $result['channels'] = [];
 
+        if($service->channels->count() > 0){
+            $result['c'] = [];
+            $result['c']['channel_count'] = $service->channels->count();
+
+            foreach ($service->channels as $channel) {
+
+                if($channel->openinghours->count() == 0){
+                    $result['c']['has_missing_oh'] = true;
+                }
+
+                foreach ($channel->openinghours as $openinghours) {
+
+                    if(!$openinghours->active){
+                        $result['c']['has_inactive_oh'] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $result['channels'] = [];
         // Get all of the channels for the service
         foreach ($service->channels as $channel) {
             $tmpChannel = $channel->toArray();

@@ -32,10 +32,10 @@ var exampleChannel = {
 export default {
   props: ['s'],
   computed: {
-    rowspan() {
-      var s = this.s
-      return 1 + (this.countChannels || 1)
-    },
+    // rowspan() {
+    //   var s = this.s
+    //   return 1 + (this.countChannels || 1)
+    // },
     hasChannels() {
       return hasChannels(this.s)
     },
@@ -57,19 +57,32 @@ export default {
     },
     statusMessage() {
       // Service without channels
-      if (!this.countChannels) {
-        return 'Geen kanalen'
-      }
+      // if (!this.countChannels) {
+      //   return 'Geen kanalen'
+      // }
 
-      // Not every channel of the service has at least 1 version
-      if (this.hasChannels.filter(ch => !hasOh(ch).length).length) {
-        return 'Ontbrekende kalender(s)'
-      }
 
-      // Not every channel of the service has at least 1 active version
-      if (this.hasChannels.filter(ch => !hasActiveOh(ch).length).length) {
-        return 'Ontbrekende actieve kalender(s)'
-      }
+        if(!this.s.c){
+          return 'Geen kanalen'
+        }
+
+      // // Not every channel of the service has at least 1 version
+      // if (this.hasChannels.filter(ch => !hasOh(ch).length).length) {
+      //   return 'Ontbrekende kalender(s)'
+      // }
+
+        if (this.s.c.has_missing_oh) {
+            return 'Ontbrekende kalender(s)'
+        }
+
+      // // Not every channel of the service has at least 1 active version
+      // if (this.hasChannels.filter(ch => !hasActiveOh(ch).length).length) {
+      //   return 'Ontbrekende actieve kalender(s)'
+      // }
+
+        if(this.s.c.has_inactive_oh){
+            return 'Ontbrekende actieve kalender(s)'
+        }
 
       return '✓ Volledig'
     },

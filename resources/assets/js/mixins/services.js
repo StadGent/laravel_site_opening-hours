@@ -9,6 +9,9 @@ export default {
             versionDataQueue: []
         }
     },
+    created() {
+        this.fetchServices();
+    },
     computed: {
         isRecreatex() {
             return this.routeService.source === 'recreatex'
@@ -33,8 +36,9 @@ export default {
         fetchServices() {
             return this.$http.get('/api/services')
                 .then(({data}) => {
-                    this.services = data || []
-                    this.versionDataQueue.forEach(this.applyVersionData)
+                console.log(data);
+                    this.services = data || [];
+                    this.versionDataQueue.forEach(this.applyVersionData);
                     this.versionDataQueue = []
                 }).catch(fetchError)
         },
@@ -74,7 +78,7 @@ export default {
         }
     },
     mounted() {
-        this.fetchServices();
+
         Hub.$on('activateService', service => {
             if (!service.id) {
                 return console.error('activateService: id is missing')
@@ -100,13 +104,13 @@ export default {
                 return console.error('createChannel: service is missing')
             }
 
-            channel.service_id = channel.srv && channel.srv.id
+            channel.service_id = channel.srv && channel.srv.id;
             this.$http.post('/api/channels', channel).then(({data}) => {
-                this.fetchServices()
-                this.modalClose()
+                this.fetchServices();
+                this.modalClose();
                 this.toChannel(data.id)
             }).catch(fetchError)
-        })
+        });
         Hub.$on('deleteChannel', channel => {
             if (!channel.id) {
                 return console.error('deleteChannel: id is missing')
@@ -115,13 +119,13 @@ export default {
                 return
             }
             this.$http.delete('/api/channels/' + channel.id).then(() => {
-                this.fetchServices()
-                this.modalClose()
+                this.fetchServices();
+                this.modalClose();
             }).catch(fetchError)
-        })
+        });
 
         Hub.$on('createVersion', input => {
-            const version = Object.assign(createVersion(), input)
+            const version = Object.assign(createVersion(), input);
             if (!version.channel_id) {
                 version.channel_id = this.route.channel
             }
@@ -137,14 +141,14 @@ export default {
             // * get first calendar
             // The user can now edit the first calendar of the new version
             this.$http.post('/api/openinghours', version).then(({data}) => {
-                this.modalClose()
+                this.modalClose();
                 this.fetchServices().then(() => {
                     Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
                         openinghours_id: data.id
                     }), 'calendar')
                 })
             }).catch(fetchError)
-        })
+        });
 
         Hub.$on('updateVersion', version => {
             if (!version || !version.id) {
@@ -155,7 +159,7 @@ export default {
                 this.fetchServices()
                 this.modalClose()
             }).catch(fetchError)
-        })
+        });
 
         Hub.$on('deleteVersion', version => {
             if (!version || !version.id) {
@@ -170,7 +174,7 @@ export default {
                 this.toChannel(version.channel_id)
                 this.fetchServices()
             }).catch(fetchError)
-        })
+        });
 
         Hub.$on('createCalendar', (calendar, done) => {
             if (!calendar.openinghours_id) {
@@ -198,7 +202,7 @@ export default {
                     this.toCalendar(data.id)
                 }).catch(fetchError)
             }
-        })
+        });
         Hub.$on('deleteCalendar', calendar => {
             if (!calendar.id) {
                 return console.warn('deleteCalendar: id is missing')
@@ -208,7 +212,7 @@ export default {
             }
 
             this.$http.delete('/api/calendars/' + calendar.id).then(() => {
-                this.fetchVersion(true)
+                this.fetchVersion(true);
                 this.toVersion()
             }).catch(fetchError)
         })
