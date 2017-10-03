@@ -63,6 +63,9 @@
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate",
             "php artisan optimize"
+        ],
+	"post-autoload-dump": [
+            "sh vendor/bin/robo precommit:install"
         ]
     },
     "config": {
