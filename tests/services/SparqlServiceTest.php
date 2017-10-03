@@ -15,9 +15,16 @@ class SparqlServiceTest extends \TestCase
      */
     private $sparqlService;
 
+    /**
+     * @return null
+     */
     public function setup()
     {
         parent::setup();
+
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
 
         $this->sparqlService = app('SparqlService');
     }
@@ -28,6 +35,9 @@ class SparqlServiceTest extends \TestCase
      */
     public function testBaseConnectionTestWorksWithoutExceptionThrown()
     {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
         app('SparqlService');
     }
 
@@ -37,6 +47,9 @@ class SparqlServiceTest extends \TestCase
      */
     public function testBaseConnectionGivesExceptionOnNotSparqlEndPoint()
     {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
         $this->setExpectedException(\Exception::class);
         $this->sparqlService->setClient('http://stad.gent');
     }
@@ -47,6 +60,9 @@ class SparqlServiceTest extends \TestCase
      */
     public function testBaseConnectionGivesExceptionOnNonexistingEndPoint()
     {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
         $this->setExpectedException(\GuzzleHttp\Exception\ConnectException::class);
         $this->sparqlService->setClient('http://thisIsNotAnEndpoint');
     }
@@ -57,6 +73,9 @@ class SparqlServiceTest extends \TestCase
      */
     public function testAuthenticationThrowsErrorWithWrongCredentials()
     {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
         $this->setExpectedException(\GuzzleHttp\Exception\ClientException::class);
         new \App\Services\SparqlService(
             env('SPARQL_WRITE_ENDPOINT'),
@@ -70,6 +89,9 @@ class SparqlServiceTest extends \TestCase
      */
     public function testDeprecatedPerformSparqlQueryStillWorks()
     {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
         $getServicesQuery = LodServicesRepository::getVestaServicesQuery();
         $services = $this->sparqlService->performSparqlQuery($getServicesQuery, 'GET');
         $this->assertTrue($this->sparqlService->getLastResponceCode() == 200);
@@ -84,6 +106,9 @@ class SparqlServiceTest extends \TestCase
      */
     public function testRefactoredGet()
     {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
         $getServicesQuery = LodServicesRepository::getRecreatexServicesQuery();
         $services = $this->sparqlService->get($getServicesQuery);
         $this->assertTrue($this->sparqlService->getLastResponceCode() == 200);
@@ -98,6 +123,9 @@ class SparqlServiceTest extends \TestCase
      */
     public function testCRUDQueriesInFlow()
     {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
         // see of no data to start with
         $this->checkReadResults();
 
@@ -145,7 +173,7 @@ class SparqlServiceTest extends \TestCase
 
     /**
      * Perfoms a read query for testCRUDQueriesInFlow
-     * 
+     *
      * Is used for checking the situation in the database,
      * before/between/after the alternations of create update and delete
      *
