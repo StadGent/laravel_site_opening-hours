@@ -6,7 +6,7 @@
 RETVAL=0
 echo -e "Running unit tests"
 # Run unit tests.
-OUTPUT="$(php vendor/bin/robo test)"
+OUTPUT="$(sh vendor/bin/robo test)"
 
 if [ $? -ne 0 ]; then
    echo
