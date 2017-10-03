@@ -4,14 +4,14 @@
 
 # Default return code.
 RETVAL=0
-
+echo -e "Running unit tests"
 # Run unit tests.
 OUTPUT="$(php vendor/bin/robo test)"
 
 if [ $? -ne 0 ]; then
    echo
    echo -e "\033[00;41;37m                                                                      \033[0m"
-   echo -e "\033[00;41;37m  ✘ Error(s) during coder checks!                                     \033[0m"
+   echo -e "\033[00;41;37m  ✘ Error(s) during unit tests!                                       \033[0m"
    echo -e "\033[00;41;37m                                                                      \033[0m"
    echo
    RETVAL=1
