@@ -65,7 +65,7 @@
             "php artisan optimize"
         ],
 	"post-autoload-dump": [
-            "sh vendor/bin/robo precommit:install"
+            "vendor/bin/robo precommit:install"
         ]
     },
     "config": {
