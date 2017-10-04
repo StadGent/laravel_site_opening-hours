@@ -80,12 +80,16 @@ class AppServiceProvider extends ServiceProvider
             return new \App\Services\ChannelService();
         });
 
+        $this->app->singleton('ICalService', function ($app) {
+            return new \App\Services\ICalService();
+        });
+
         $this->app->singleton('OpeninghoursService', function ($app) {
             return new \App\Services\OpeninghoursService();
         });
 
-        $this->app->singleton('ICalService', function ($app) {
-            return new \App\Services\ICalService();
+        $this->app->singleton('SparqlService', function ($app) {
+            return new \App\Services\SparqlService();
         });
 
 
