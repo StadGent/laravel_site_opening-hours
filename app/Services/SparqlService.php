@@ -251,7 +251,7 @@ class SparqlService
         $this->lastResponseCode = $response->getStatusCode();
         // Virtuoso documentation states it only returns 200, 400, 500 status codes
         // but apparently they mean 2xx, 4xx and 5xx
-        if ($response->getReasonPhrase() != 'OK' && $this->lastResponseCode > 299) {
+        if ($response->getReasonPhrase() !== 'OK' && $this->lastResponseCode > 299) {
             $message = "Something went wrong while executing query.";
             throw new \Exception($message);
         }
