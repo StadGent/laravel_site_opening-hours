@@ -2,16 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Formatters\FormatsOpeninghours;
-use App\Services\VestaService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateVestaOpeninghours implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels, FormatsOpeninghours;
+    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * The UID of the service in VESTA
@@ -47,11 +45,13 @@ class UpdateVestaOpeninghours implements ShouldQueue
         $output = '';
 
         try {
-            $output = $this->formatWeek($this->serviceId, 'html', '', \Carbon\Carbon::today()->startOfWeek());
+            $openinghoursService = app('OpeninghoursService');
+            $openinghoursService->isOpenForFullWeek();
+            $output = $formatter->render('html', $openinghoursService->getData());
         } catch (\Exception $ex) {
             \Log::warning('No output was created for VESTA for service with UID ' . $this->vestaUid);
         }
 
-        (new VestaService())->updateOpeninghours($this->vestaUid, $output);
+        app('VestaService')->updateOpeninghours($this->vestaUid, $output);
     }
 }
