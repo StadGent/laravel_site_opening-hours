@@ -26,7 +26,7 @@ class LodServicesRepository
 
         $fetchFunction = 'get' . ucfirst($type) . 'ServicesQuery';
 
-        $semanticResults = $this->makeSparqlService()->performSparqlQuery($this->$fetchFunction($limit, 0), 'GET', 'json');
+        $semanticResults = $this->makeSparqlService()->performSparqlQuery(static::$fetchFunction(), 'GET', 'json');
 
         // Transform the data in a compatible format
         $transformedData = $this->transform($semanticResults);
@@ -35,7 +35,7 @@ class LodServicesRepository
 
         while (! empty($transformedData)) {
             $page++;
-            $semanticResults = $this->makeSparqlService()->performSparqlQuery($this->$fetchFunction($limit, ($limit * $page)), 'GET', 'json');
+            $semanticResults = $this->makeSparqlService()->performSparqlQuery(static::$fetchFunction($limit, ($limit * $page)), 'GET', 'json');
 
             // Transform the data in a compatible format
             $transformedData = $this->transform($semanticResults);
@@ -102,9 +102,9 @@ class LodServicesRepository
      * @param  int    $offset
      * @return string
      */
-    private function getVestaServicesQuery($limit, $offset)
+    public static function getVestaServicesQuery($limit = 100, $offset = 0)
     {
-        return 'SELECT ?agent ?identifier ?name
+        return 'SELECT DISTINCT ?agent ?identifier ?name
                 WHERE {
                 {
                     ?agent a foaf:Agent;
@@ -131,7 +131,7 @@ class LodServicesRepository
                     <http://purl.org/dc/terms/identifier> ?identifier;
                     foaf:name ?name.
                 }
-                } ' . " LIMIT $limit OFFSET $offset";
+                }  ORDER BY ?name ' . " LIMIT $limit OFFSET $offset";
     }
 
     /**
@@ -142,7 +142,7 @@ class LodServicesRepository
      * @param  int    $offset
      * @return string
      */
-    private function getRecreatexServicesQuery($limit, $offset)
+    public static function getRecreatexServicesQuery($limit = 100, $offset = 0)
     {
         return 'SELECT ?agent ?identifier ?name
                 WHERE
