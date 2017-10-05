@@ -133,7 +133,8 @@ class OpeninghoursService
             foreach ($channelData as $date => &$openhours) {
                 $tmpData = strpos('Gesloten', $openhours['OH'][0]) !== false ?
                 trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
-                $openhours = $openhours['date']['dayOfWeek'] . ' ' . $tmpData;
+                $day = new Carbon($date);
+                $openhours = trans('openinghourApi.day_' . $day->dayOfWeek) . ' ' . $tmpData;
             }
         }
 
@@ -178,7 +179,8 @@ class OpeninghoursService
 
                 $tmpData = strpos('Gesloten', $openhours['OH'][0]) !== false ?
                 trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
-                $openhours = $openhours['date']['dayOfWeek'] . ' ' . $tmpData;
+                $day = new Carbon($date);
+                $openhours = trans('openinghourApi.day_' . $day->dayOfWeek) . ' ' . $tmpData;
             }
         }
 
@@ -209,6 +211,7 @@ class OpeninghoursService
                 ->where('start_date', '<=', $end->toDateString())
                 ->where('end_date', '>=', $start->toDateString())
                 ->get();
+            $dateInterval = \DateInterval::createFromDateString('1 day');
             foreach ($openinghoursCol as $openinghours) {
                 // addapt begin and end to dates of openinghours
                 $calendarBegin = new Carbon($openinghours->start_date);
@@ -223,29 +226,36 @@ class OpeninghoursService
                     ->orderBy('priority', 'asc')
                     ->get();
 
+                $datePeriod = new \DatePeriod($calendarBegin, $dateInterval, $calendarEnd);
+
                 foreach ($calendars as $calendar) {
-                    $ical         = app('ICalService')->createIcalFromCalendar($calendar, $calendarBegin, $calendarEnd);
-                    $dateInterval = \DateInterval::createFromDateString('1 day');
-                    $datePeriod   = new \DatePeriod($calendarBegin, $dateInterval, $calendarEnd);
-
+                    $ical = null;
                     foreach ($datePeriod as $day) {
-                        $date = [
-                            'day'       => $day->day,
-                            'month'     => $day->month,
-                            'year'      => $day->year,
-                            'dayInWeek' => $day->dayOfWeek,
-                            'dayOfWeek' => trans('openinghourApi.day_' . $day->dayOfWeek),
-                        ];
-
-                        $key                 = $day->toDateString();
-                        $value[$key]['date'] = $date;
-                        $dayInfo             = app('ICalService')->extractDayInfo($ical, $day, $day);
-
-                        $value[$key]['OH'] = ['Gesloten'];
+                        $key = $day->toDateString();
+                        // if value isset => it is done by a prev exception calendar
+                        if (isset($value[$key]['OH']) && $value[$key]['OH'] !== []) {
+                            continue;
+                        }
+                        $value[$key]['OH'] = [];
+                        // very slow => so only get the ical when required
+                        // is done inside the loop of days, as not sure it is needed and could be called for nothing
+                        if (!$ical) {
+                            $ical = app('ICalService')->createIcalFromCalendar($calendar, $calendarBegin, $calendarEnd);
+                        }
+                        // extract dayinfo
+                        $dayInfo = app('ICalService')->extractDayInfo($ical, $day, $day);
                         if (!empty($dayInfo)) {
                             $value[$key]['OH'] = $calendar->closinghours ? ['Gesloten'] : $dayInfo;
                         }
                     }
+                }
+            }
+            // fill up the requested dates not covered by the calendars
+            $datePeriod = new \DatePeriod($start, $dateInterval, $end);
+            foreach ($datePeriod as $day) {
+                $key = $day->toDateString();
+                if (isset($value[$key]['OH']) && $value[$key]['OH'] === []) {
+                    $value[$key]['OH'] = ['Gesloten'];
                 }
             }
         }
