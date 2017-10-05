@@ -206,6 +206,20 @@ class QueryControllerTest extends \TestCase
     }
 
     /**
+     * @test
+     * Seeder data for events is set to set closinghours calendar on each first monday of the month
+     */
+    public function testItGivesClosedForEachFirstMondayOfTheMonth()
+    {
+        $firstMondayOfSept2017 = '04-09-2017';
+        $fullWeekCall = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => $firstMondayOfSept2017]);
+        $fullWeekContent = $this->getContentStructureTested($fullWeekCall);
+        foreach ($fullWeekContent as $channel) {
+            $this->assertEquals('maandag gesloten', $channel['2017-09-04']);
+        }
+    }
+
+    /**
      * returns true if we have a value in the channel parameter
      * @return boolean
      */

@@ -45,9 +45,8 @@ $factory->define(App\Models\Channel::class, function (Faker\Generator $faker) {
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Openinghours::class, function (Faker\Generator $faker) {
-    $dt = Carbon::now();
-    $start = $dt->copy()->modify('01 January');
-    $end = $dt->copy()->modify('31 December');
+    $start = new Carbon('2017-01-01'); 
+    $end = $start->copy()->modify('31 December');
 
     return [
         'active' => 1,
@@ -70,7 +69,7 @@ $factory->define(App\Models\Calendar::class, function (Faker\Generator $faker) {
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Event::class, function (Faker\Generator $faker) {
-    $dt = Carbon::now()->modify('01 January');
+    $dt = new Carbon('2017-01-01');
     $dt->minute = 00;
     $dt->second = 00;
 
@@ -84,6 +83,6 @@ $factory->define(App\Models\Event::class, function (Faker\Generator $faker) {
         'start_date' => $start,
         'end_date' => $end,
         'label' => 1,
-        'until' => $end = Carbon::now()->modify('31 December')->addYear(),
+        'until' => $dt->modify('31 December')->addYear(),
     ];
 });
