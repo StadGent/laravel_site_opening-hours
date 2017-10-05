@@ -2,8 +2,8 @@
 
 namespace Database\Seeds;
 
-use App\Models\Calendar;
 use App\Models\Event;
+use App\Models\Openinghours;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -16,20 +16,21 @@ class EventsTableSeeder extends Seeder
      */
     public function run()
     {
-
-        $dt = Carbon::now()->modify('01 January');
+        $dt = new Carbon('2017-01-01');
         $dt->minute = 00;
         $dt->second = 00;
 
         $start = $dt->copy();
         $end = $dt->copy();
 
-        $calendars = Calendar::all();
-        foreach ($calendars as $calendar) {
+        $openinghours = Openinghours::all();
+        foreach ($openinghours as $openinghour) {
+            $calendars = $openinghour->calendars;
+            $baseCalendar = $calendars->shift();
             // morning hours
             $start->hour = 9;
             $end->hour = 12;
-            $calendar->events()->save(factory(Event::class)
+            $baseCalendar->events()->save(factory(Event::class)
                     ->make([
                         'start_date' => $start,
                         'end_date' => $end,
@@ -37,8 +38,20 @@ class EventsTableSeeder extends Seeder
             // afternoon hours
             $start->hour = 13;
             $end->hour = 18;
-            $calendar->events()->save(factory(Event::class)
+
+            $baseCalendar->events()->save(factory(Event::class)
                     ->make([
+                        'start_date' => $start,
+                        'end_date' => $end,
+                    ]));
+
+            $exceptionCalendar = $calendars->shift();
+
+            $start->hour = 9;
+            $end->hour = 18;
+            $exceptionCalendar->events()->save(factory(Event::class)
+                    ->make([
+                        'rrule' => 'BYSETPOS=1;BYDAY=MO;FREQ=MONTHLY',
                         'start_date' => $start,
                         'end_date' => $end,
                     ]));
