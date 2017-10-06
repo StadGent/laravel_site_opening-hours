@@ -20,6 +20,20 @@ class Service extends Model
         'uri',
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'countChannels',
+    ];
+
+    /**
+     * Returns the Child Channels of the
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function channels()
     {
         return $this->hasMany('App\Models\Channel');
@@ -34,4 +48,15 @@ class Service extends Model
     {
         return $this->belongsToMany('App\Models\User', 'user_service_role', 'service_id', 'user_id');
     }
+
+    /**
+     * Get number of channels on the Service
+     *
+     * @return integer
+     */
+    public function getCountChannelsAttribute()
+    {
+        return $this->channels()->count();
+    }
+
 }

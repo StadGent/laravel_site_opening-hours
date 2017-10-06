@@ -53,8 +53,8 @@ class ServicesRepository extends EloquentRepository
     }
 
     /**
-     * Get the complete service detail
-     *
+     * Get the complete service detail 
+     * @todo check or these properties should be dynamic or static on the MODEL      
      * @param  integer $userId
      * @return array
      */
@@ -64,7 +64,6 @@ class ServicesRepository extends EloquentRepository
 
         if($service->channels->count() > 0){
             $result['c'] = [];
-            $result['c']['channel_count'] = $service->channels->count();
 
             foreach ($service->channels as $channel) {
 
