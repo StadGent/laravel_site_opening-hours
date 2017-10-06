@@ -91,6 +91,17 @@ class ChannelController extends Controller
     }
 
     /**
+     * Get channels from parent Service
+     * 
+     * @param  Service $service 
+     * @return  Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function getFromService(Service $service)
+    {
+        return $service->channels;
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int                       $id
