@@ -7,19 +7,83 @@ use App\Models\User;
 
 class ServicesRepository extends EloquentRepository
 {
+    /**
+     * @param Service $service
+     */
     public function __construct(Service $service)
     {
         parent::__construct($service);
     }
 
     /**
+     * @param $serviceId
+     * @return mixed
+     */
+    public function getExpandedServices($serviceId = null)
+    {
+        return $this->getExpandedServicesQuery($serviceId)->get();
+    }
+
+    /**
+     * @param $userId
+     * @return mixed
+     */
+    public function getExpandedServiceForUser($userId)
+    {
+        if (empty($userId)) {
+            return;
+        }
+
+        return $this->getExpandedServiceForUserQuery($userId)->get();
+    }
+
+    /**
      * Return all services with their channels and openinghours (without the attached calendars)
      *
+     * @param  int   $serviceId
      * @return Collection
      */
-    public function get()
+    private function getExpandedServicesQuery($serviceId = null)
     {
-        return $this->model->get()->map(array($this, 'expandService'));
+        $rawSelect = \DB::raw("services.*,
+            count(channelId) countChannels,
+            if(group_concat(missingOH) like '%1%', 1, 0) has_missing_oh,
+            if(group_concat(inactiveOH) like '%1%', 1, 0) has_inactive_oh");
+
+        $rawSubQuery = \DB::raw("(select distinct c.service_id, c.id channelId , if(oh.id is null, true, false) missingOH, if(oh.active = 0, true, false) inactiveOH
+            from channels c left join openinghours oh on c.id = oh.channel_id) as tmp");
+
+        $query = \DB::table('services')
+            ->select($rawSelect)
+            ->leftJoin($rawSubQuery, 'services.id', '=', 'tmp.service_id')
+            ->groupBy('services.id');
+
+        if ($serviceId) {
+            $query->where('id', $serviceId);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Return a specific service with linked channels
+     *
+     * @param  int   $serviceId
+     * @return array
+     */
+    private function getExpandedServiceForUserQuery($userId)
+    {
+        if (empty($userId)) {
+            return;
+        }
+
+        $query = $this->getExpandedServicesQuery();
+
+        $query->join('user_service_role', 'services.id', '=', 'user_service_role.service_id')
+            ->where('user_service_role.user_id', $userId);
+
+        return $query;
+
     }
 
     /**
@@ -49,12 +113,12 @@ class ServicesRepository extends EloquentRepository
     {
         return $this->model->whereHas('users', function ($query) use ($userId) {
             $query->where('id', '=', $userId);
-        })->get()->map(array($this, 'expandService'));
+        })->get()->map([$this, 'expandService']);
     }
 
     /**
-     * Get the complete service detail 
-     * @todo check or these properties should be dynamic or static on the MODEL      
+     * Get the complete service detail
+     * @todo check or these properties should be dynamic or static on the MODEL
      * @param  integer $userId
      * @return array
      */
@@ -62,18 +126,18 @@ class ServicesRepository extends EloquentRepository
     {
         $result = $service->toArray();
 
-        if($service->channels->count() > 0){
+        if ($service->channels->count() > 0) {
             $result['c'] = [];
 
             foreach ($service->channels as $channel) {
 
-                if($channel->openinghours->count() == 0){
+                if ($channel->openinghours->count() == 0) {
                     $result['c']['has_missing_oh'] = true;
                 }
 
                 foreach ($channel->openinghours as $openinghours) {
 
-                    if(!$openinghours->active){
+                    if (!$openinghours->active) {
                         $result['c']['has_inactive_oh'] = true;
                         break;
                     }
@@ -95,7 +159,8 @@ class ServicesRepository extends EloquentRepository
      *
      * @return array
      */
-    public function getChannels(){
+    public function getChannels()
+    {
 
         $result = [];
         // Get all of the channels for the service

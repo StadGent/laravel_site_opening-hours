@@ -14,16 +14,14 @@ export default {
         if(this.s.countChannels === 0){
           return 'Geen kanalen'
         }
-
-      /**
-       * @todo check or these properties should be dynamic or static in the backend       
-        if (this.s.c.has_missing_oh) {
+ 
+        if (this.s.has_missing_oh === 1) {
             return 'Ontbrekende kalender(s)'
         }
 
-        if(this.s.c.has_inactive_oh){
+        if(this.s.has_inactive_oh === 1){
             return 'Ontbrekende actieve kalender(s)'
-        }*/
+        }
 
       return '✓ Volledig'
     },

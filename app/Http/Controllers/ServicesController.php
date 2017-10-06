@@ -15,7 +15,6 @@ class ServicesController extends Controller
     public function __construct(ServicesRepository $services)
     {
         $this->services = $services;
-        $this->middleware('auth:api')->except(['index', 'show']);
     }
 
     /**
@@ -23,14 +22,10 @@ class ServicesController extends Controller
      *
      * Display a listing of the resource.
      *
-     * @return App\Models\Service
+     * @return Illuminate\Database\Eloquent\Collection
      */
-    public function index(Request $request)
+    public function index()
     {
-        if ($request->user('api') && !$request->user('api')->hasRole('Admin')) {
-            return $request->user('api')->services()->get();
-        }
-
         return Service::all();
     }
 
@@ -41,7 +36,7 @@ class ServicesController extends Controller
      *
      * @return \Illuminate\Http\Response 501
      */
-    public function create(Service $request)
+    public function create()
     {
         return response()->json('Not Implemented', 501);
     }
@@ -53,7 +48,7 @@ class ServicesController extends Controller
      *
      * @return \Illuminate\Http\Response 501
      */
-    public function store(Service $request)
+    public function store()
     {
         return response()->json('Not Implemented', 501);
     }
@@ -63,7 +58,7 @@ class ServicesController extends Controller
      *
      * Base get and return the service
      *
-     * @return Service
+     * @return \App\Models\Service
      */
     public function show(Service $service)
     {
@@ -77,7 +72,7 @@ class ServicesController extends Controller
      *
      * @return \Illuminate\Http\Response 501
      */
-    public function edit(Service $request)
+    public function edit()
     {
         return response()->json('Not Implemented', 501);
     }
@@ -85,29 +80,11 @@ class ServicesController extends Controller
     /**
      * Update/Patch the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response 501
      */
-    public function update(Request $request, $id)
+    public function update()
     {
-        /** should be handled by routes... but just to be sure **/
-        if (!$request->user('api')) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
-        }
-        /** only allowed for admin user **/
-        if (!$request->user('api')->hasRole('Admin')) {
-            return response()->json(['message' => 'Method not allowed'], 405);
-        }
-
-        // The only field we allow to be updated is the draft flag
-        $draft = $request->input('draft', null);
-
-        if (!is_null($draft)) {
-            $this->services->update($id, ['draft' => $draft]);
-        }
-
-        return response()->json($this->services->getById($id));
+        return response()->json('Not Implemented', 501);
     }
 
     /**
@@ -117,7 +94,7 @@ class ServicesController extends Controller
      *
      * @return \Illuminate\Http\Response 501
      */
-    public function destroy(Service $request)
+    public function destroy()
     {
         return response()->json('Not Implemented', 501);
     }
