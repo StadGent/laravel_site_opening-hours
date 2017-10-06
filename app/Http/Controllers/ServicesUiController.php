@@ -111,7 +111,7 @@ class ServicesUiController extends Controller
             $service->save();
         }
 
-        return app('ServicesRepository')->getExpandedServices($service->id);
+        return response()->json(app('ServicesRepository')->getExpandedServices($service->id));
     }
 
     /**

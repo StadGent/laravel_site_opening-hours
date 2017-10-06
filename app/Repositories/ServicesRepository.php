@@ -21,7 +21,10 @@ class ServicesRepository extends EloquentRepository
      */
     public function getExpandedServices($serviceId = null)
     {
-        return $this->getExpandedServicesQuery($serviceId)->get();
+        if($serviceId) {
+            return $this->getExpandedServicesQuery($serviceId)->first();
+        }
+        return $this->getExpandedServicesQuery()->get();
     }
 
     /**
