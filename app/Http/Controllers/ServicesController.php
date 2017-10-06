@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\User;
 use App\Repositories\ServicesRepository;
 use Illuminate\Http\Request;
 
@@ -22,15 +23,15 @@ class ServicesController extends Controller
      *
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return App\Models\Service
      */
     public function index(Request $request)
     {
         if ($request->user('api') && !$request->user('api')->hasRole('Admin')) {
-            return response()->json($this->services->getForUser($request->user('api')->id));
+            return $request->user('api')->services()->get();
         }
 
-        return response()->json($this->services->get());
+        return Service::all();
     }
 
     /**

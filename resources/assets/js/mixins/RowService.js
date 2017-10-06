@@ -11,18 +11,19 @@ export default {
       }
     },
     statusMessage() {
-
-        if(!this.s.c){
+        if(this.s.countChannels === 0){
           return 'Geen kanalen'
         }
 
+      /**
+       * @todo check or these properties should be dynamic or static in the backend       
         if (this.s.c.has_missing_oh) {
             return 'Ontbrekende kalender(s)'
         }
 
         if(this.s.c.has_inactive_oh){
             return 'Ontbrekende actieve kalender(s)'
-        }
+        }*/
 
       return '✓ Volledig'
     },
