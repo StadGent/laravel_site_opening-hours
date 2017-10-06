@@ -227,6 +227,9 @@
             }
         },
         created() {
+
+            console.log("calendar editor was created");
+
             this.RRule = RRule || {};
 
             //fetch presets from services.js

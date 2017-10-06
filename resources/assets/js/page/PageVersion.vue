@@ -92,16 +92,16 @@ export default {
       return this.$root.routeChannel || {}
     },
     version () {
-      return this.$root.routeVersion || {}
+      return this.$root.routeVersion || {};
     },
     layeredVersion () {
       return Object.assign({}, this.version, { calendar: this.calendars })
     },
     calendars () {
-      const calendars = (this.version.calendars || [])
-      calendars.sort(orderBy('-priority'))
+      const calendars = (this.version.calendars || []);
+      calendars.sort(orderBy('-priority'));
       return calendars.map(c => {
-        c.layer = -c.priority
+        c.layer = -c.priority;
         return c
       })
     },
@@ -141,6 +141,9 @@ export default {
   components: {
     CalendarEditor,
     YearCalendar
-  }
+  },
+    created () {
+
+    }
 }
 </script>
