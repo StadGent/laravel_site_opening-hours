@@ -34,7 +34,7 @@ export default {
     },
     methods: {
         fetchServices() {
-            return this.$http.get('/api/services')
+            return this.$http.get('/api/ui/services')
                 .then(({data}) => {
                     console.log(data);
                     this.services = data || [];
@@ -56,7 +56,7 @@ export default {
 
                 console.log('fetching channels for ' + this.route.service);
 
-                this.$http.get('/api/channels/getChannelsByService/' + this.route.service).then(({data}) => {
+                this.$http.get('/api/ui/channels/getChannelsByService/' + this.route.service).then(({data}) => {
 
                     this.routeService.channels = data;
 
@@ -80,7 +80,7 @@ export default {
                 return // console.warn('version is being fetched')
             }
             this.fetchingVersion = this.route.version
-            return this.$http.get('/api/openinghours/' + this.route.version)
+            return this.$http.get('/api/ui/openinghours/' + this.route.version)
                 .then(this.applyVersionData)
                 .catch(fetchError)
         },
@@ -98,7 +98,7 @@ export default {
             return this.services.find(s => s.id === id) || {}
         },
         fetchPresets(next) {
-            Vue.http.get('/api/presets')
+            Vue.http.get('/api/ui/presets')
                 .then(({data}) => {
                     next(data);
                 }).catch(fetchError)
@@ -113,7 +113,7 @@ export default {
             }
             service.draft = false;
 
-            this.$http.put('/api/services/' + service.id, {draft: false}).then(({data}) => {
+            this.$http.put('/api/ui/services/' + service.id, {draft: false}).then(({data}) => {
                 service.draft = data.draft
             }).catch(fetchError)
         });
@@ -123,7 +123,7 @@ export default {
             }
             service.draft = true;
 
-            this.$http.put('/api/services/' + service.id, {draft: true}).then(({data}) => {
+            this.$http.put('/api/ui/services/' + service.id, {draft: true}).then(({data}) => {
                 service.draft = data.draft
             }).catch(fetchError)
         });
@@ -133,7 +133,7 @@ export default {
             }
 
             channel.service_id = channel.srv && channel.srv.id;
-            this.$http.post('/api/channels', channel).then(({data}) => {
+            this.$http.post('/api/ui/channels', channel).then(({data}) => {
                 this.fetchServices();
                 this.modalClose();
                 this.toChannel(data.id)
@@ -146,7 +146,7 @@ export default {
             if (!confirm('Zeker dat je dit kanaal wil verwijderen?')) {
                 return
             }
-            this.$http.delete('/api/channels/' + channel.id).then(() => {
+            this.$http.delete('/api/ui/channels/' + channel.id).then(() => {
                 this.fetchServices();
                 this.modalClose();
             }).catch(fetchError)
@@ -168,7 +168,7 @@ export default {
             // * create first calendar in newly created version
             // * get first calendar
             // The user can now edit the first calendar of the new version
-            this.$http.post('/api/openinghours', version).then(({data}) => {
+            this.$http.post('/api/ui/openinghours', version).then(({data}) => {
                 this.modalClose();
                 this.fetchServices().then(() => {
                     Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
@@ -183,7 +183,7 @@ export default {
                 return console.warn('id is missing', version)
             }
 
-            this.$http.put('/api/openinghours/' + version.id, version).then(({data}) => {
+            this.$http.put('/api/ui/openinghours/' + version.id, version).then(({data}) => {
                 this.fetchServices();
                 this.modalClose()
             }).catch(fetchError)
@@ -197,7 +197,7 @@ export default {
                 return
             }
 
-            this.$http.delete('/api/openinghours/' + version.id).then(() => {
+            this.$http.delete('/api/ui/openinghours/' + version.id).then(() => {
                 this.modalClose()
                 this.toChannel(version.channel_id)
                 this.fetchServices()
@@ -211,7 +211,7 @@ export default {
             console.log('Create calendar', inert(calendar))
 
             if (calendar.id) {
-                this.$http.put('/api/calendars/' + calendar.id, calendar).then(({data}) => {
+                this.$http.put('/api/ui/calendars/' + calendar.id, calendar).then(({data}) => {
                     const index = this.routeVersion.calendars.findIndex(c => c.id === data.id)
                     if (index === -1) {
                         console.log(inert(this.routeVersion.calendars))
@@ -221,7 +221,7 @@ export default {
                     done && this.toVersion(data.openinghours_id)
                 }).catch(fetchError)
             } else {
-                this.$http.post('/api/calendars', calendar).then(({data}) => {
+                this.$http.post('/api/ui/calendars', calendar).then(({data}) => {
                     if (!this.routeVersion.calendars) {
                         this.$set(this.routeVersion, 'calendars', [])
                     }
@@ -239,7 +239,7 @@ export default {
                 return
             }
 
-            this.$http.delete('/api/calendars/' + calendar.id).then(() => {
+            this.$http.delete('/api/ui/calendars/' + calendar.id).then(() => {
                 this.fetchVersion(true);
                 this.toVersion()
             }).catch(fetchError)

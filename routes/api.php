@@ -11,13 +11,14 @@
 |
  */
 
-Route::group(['middleware' => 'auth:api'],
+Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'],
     function () {
         Route::resource('/users', 'UsersController');
         Route::resource('/openinghours', 'OpeninghoursController');
         Route::resource('/calendars', 'CalendarsController');
         Route::resource('/channels', 'ChannelController');
         Route::resource('/channels/getChannelsByService', 'ChannelController@getChannelsByService');
+        Route::resource('/services', 'ServicesController');
         Route::post('/roles', 'RolesController@update');
         Route::delete('/roles', 'RolesController@destroy');
         Route::get('api/presets', 'PresetsController@index');
@@ -25,4 +26,5 @@ Route::group(['middleware' => 'auth:api'],
 );
 
 Route::resource('/services', 'ServicesController');
+Route::get('/services/{service}/channels', 'ChannelController@getFromService');
 Route::get('/query', 'QueryController@query');

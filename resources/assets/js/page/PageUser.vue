@@ -110,7 +110,7 @@ export default {
   },
   methods: {
     fetchUser (id) {
-      this.$http.get('/api/users/' + id)
+      this.$http.get('/api/ui/users/' + id)
         .then(({ data }) => {
           this.fetchedUser = expandUser(data)
         })
