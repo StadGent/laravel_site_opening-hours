@@ -2,15 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Formatters\FormatsOpeninghours;
-use App\Services\VestaService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class UpdateSchedulesInVesta extends Command
 {
-    use FormatsOpeninghours;
-
     /**
      * The name and signature of the console command.
      *
@@ -48,11 +44,10 @@ class UpdateSchedulesInVesta extends Command
 
         foreach ($vestaServices as $vestaService) {
             try {
-                // Don't work through events, we want to capture the output in the CLI
-                $output = $this->formatWeek($vestaService->id, 'html', '', \Carbon\Carbon::today()->startOfWeek());
-
-                (new VestaService())->updateOpeninghours($vestaService->identifier, $output);
-
+                $openinghoursService = app('OpeninghoursService');
+                $openinghoursService->isOpenForFullWeek();
+                $output = $formatter->render('html', $openinghoursService->getData());
+                app('VestaService')->updateOpeninghours($vestaService->identifier, $output);
                 $this->info('Openingsuren voor dienst ' . $vestaService->label . ' met UID ' . $vestaService->identifier . ' werden geupdatet.');
             } catch (\Exception $ex) {
                 $this->error('Er ging iets mis met dienst ' . $vestaService->label . ' met UID ' . $vestaService->identifier . '. Foutbericht: ' . $ex->getMessage());
