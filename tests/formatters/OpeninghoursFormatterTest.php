@@ -70,7 +70,7 @@ class OpeninghoursFormatterTest extends \TestCase
     {
         $output = $this->formatter->render('json', $this->data);
 
-        $this->assertEquals($this->data, $output);
+        $this->assertEquals(array_values($this->data), $output);
     }
 
     /**

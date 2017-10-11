@@ -106,7 +106,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('OHHtmlFormatter', function () {
-
             return new \App\Formatters\Openinghours\HtmlFormatter();
         });
         $this->app->bind('OHTextFormatter', function () {
