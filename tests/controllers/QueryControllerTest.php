@@ -2,6 +2,7 @@
 
 namespace Tests\Controllers;
 
+use App\Services\ICalService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class QueryControllerTest extends \TestCase
@@ -12,7 +13,7 @@ class QueryControllerTest extends \TestCase
      * [$service description]
      * @var \App\Models\Service
      */
-    protected $service;
+    protected $serviceId;
 
     /**
      * store the optional channel labels
@@ -33,20 +34,57 @@ class QueryControllerTest extends \TestCase
     public function setup()
     {
         parent::setUp();
-        $this->service = \App\Models\Service::first();
+        $service = \App\Models\Service::first();
+        $this->serviceId = $service->id;
+        $this->channelKeys = $service->channels->pluck('id');
+    }
 
-        $this->channelKeys = $this->service->channels()->pluck('label')->all();
+    /**
+     * @return mixed
+     */
+    private function setupICalServiceServiceMock()
+    {
+
+        $ICalServiceMock = $this->createMock(ICalService::class, ['createIcalFromCalendar', 'extractDayInfo']);
+        $ICalServiceMock->expects($this->any())
+            ->method('createIcalFromCalendar')
+            ->willReturn(false);
+
+        $ICalServiceMock->expects($this->any())
+            ->method('extractDayInfo')
+            ->with($this->anything())
+            ->will($this->returnCallback(function () {
+                $shuffle = [
+                    [
+                        ['from' => '08:00', 'until' => '12:00'], // morning shift
+                        ['from' => '12:30', 'until' => '17:00'], // afternoon shift
+                    ],
+                    [
+                        ['from' => '08:00', 'until' => '16:00'], // fulltime
+                    ],
+                    [
+                        ['from' => '20:00', 'until' => '23:59'], // night shift
+                    ],
+                    false, // holiday :-D
+                ];
+
+                return $shuffle[rand(0, 3)];
+            }));
+
+        $this->app->instance('ICalService', $ICalServiceMock);
     }
 
     public function requestTypeProvider()
     {
-        $dateParam = date('d-m-Y', strtotime('tomorrow'));
+        $dateParam = date('Y-m-d');
 
         return [
-            [['q' => 'now']],
-            [['q' => 'day', 'date' => $dateParam]],
-            [['q' => 'week']],
-            [['q' => 'fullWeek', 'date' => $dateParam]],
+            [['type' => 'open-now']],
+            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days'))]],
+            [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam]],
+            [['type' => 'openinghours', 'period' => 'week', 'date' => $dateParam]],
+            [['type' => 'openinghours', 'period' => 'month', 'date' => $dateParam]],
+            [['type' => 'openinghours', 'period' => 'year', 'date' => $dateParam]],
         ];
     }
 
@@ -55,35 +93,40 @@ class QueryControllerTest extends \TestCase
      * @group validation
      * @dataProvider requestTypeProvider
      **/
-    public function testValidateNoServiceUriParameterIsAFail($typeParams)
+    public function testValidateNoServiceArgumentIsAPathNotFoundError($typeParams)
     {
+        $this->setupICalServiceServiceMock();
         // undo service setter
         // will be restored for next test by setup
-        $this->service = null;
+        $this->serviceId = null;
         $call = $this->doRequest('GET', $typeParams);
-        $call->seeStatusCode(400);
-        $call->seeJson([
-            "serviceUri" => ["The service uri field is required."],
+        $call->seeStatusCode(404);
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "PathNotFound",
+                "message" => "The requested path could not match a route in the API",
+                "target" => "query",
+            ],
         ]);
     }
 
     /**
      * @test
      * @group validation
+     * @dataProvider requestTypeProvider
      */
-    public function testValidateWrongServiceUriParameterIsAFail()
+    public function testValidateInvallidServiceIdentifierIsAModelNotFoundError($typeParams)
     {
-        // undo service setter
-        // will be restored for next test by setup
-        $this->service = null;
-        $call = $this->doRequest(
-            'GET',
-            ['q' => 'now', 'serviceUri' => 'thisIsNotAServiceUri', 'date' => date('d-m-Y')]
-        );
-        $call->seeStatusCode(400);
-
-        $call->seeJson([
-            "serviceUri" => ["The selected service uri is invalid."],
+        $this->setupICalServiceServiceMock();
+        $this->serviceId = 'notAServiceId';
+        $call = $this->doRequest('GET', $typeParams);
+        $call->seeStatusCode(422);
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "ModelNotFound",
+                "message" => "Service model is not found with given identifier",
+                "target" => "Service",
+            ],
         ]);
     }
 
@@ -93,12 +136,23 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateServiceWithoutChannelsReturnsNotFoundError()
     {
-        $this->service = factory(\App\Models\Service::class)->create();
-        $call = $this->doRequest('GET', ['q' => 'now', 'date' => date('d-m-Y')]);
+        $this->setupICalServiceServiceMock();
+        $this->serviceId = factory(\App\Models\Service::class)->create(['label' => 'testChildlessService'])->id;
+        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('Y-m-d')]);
         $call->seeStatusCode(400);
-
-        $call->seeJson([
-            "serviceUri" => ["The selected service uri is not available yet."],
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "NotValidParameter",
+                "message" => "Paramters did not pass validation",
+                "target" => "parameters",
+                "details" => [
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The selected service 'testChildlessService' is not available yet.",
+                        "target" => "Service",
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -106,13 +160,29 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateNoQParameterIsAFail()
+    public function testValidateOpeninhoursRequiresFromUntilParameters()
     {
-        // {host}/api/query?serviceUri={serviceUri}&format={format}
-        $call = $this->doRequest('GET', []);
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'openinghours']);
         $call->seeStatusCode(400);
-        $call->seeJson([
-            "q" => ["The q field is required."],
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "NotValidParameter",
+                "message" => "Paramters did not pass validation",
+                "target" => "parameters",
+                "details" => [
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The 'from' argument is required.",
+                        "target" => "from",
+                    ],
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The 'until' argument is required.",
+                        "target" => "until",
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -120,15 +190,149 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateWrongQParameterIsAFail()
+    public function testValidateOpeninhoursFromUntilParametersMustBeVallidDateFormat()
     {
-        // {host}/api/query?q=norealq&serviceUri={serviceUri}&format={format}
-        $call = $this->doRequest('GET', ['q' => 'noreal_q']);
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => 'notADate', 'until' => 'notADate']);
         $call->seeStatusCode(400);
-
-        $call->seeJson([
-            'q' => ['The selected parameter q is invalid.'],
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "NotValidParameter",
+                "message" => "Paramters did not pass validation",
+                "target" => "parameters",
+                "details" => [
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The from is not a valid date.",
+                        "target" => "from",
+                    ],
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The until is not a valid date.",
+                        "target" => "until",
+                    ],
+                ],
+            ],
         ]);
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function testValidateOpeninhoursFromMustComeBeforUntil()
+    {
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2016-01-01']);
+        $call->seeStatusCode(400);
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "NotValidParameter",
+                "message" => "Paramters did not pass validation",
+                "target" => "parameters",
+                "details" => [
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The until must be a date after from.",
+                        "target" => "until",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function testValidateOpeninhoursFromUntilParametersMustBeWithinOneYear()
+    {
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2018-01-05']);
+        $call->seeStatusCode(400);
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "NotValidParameter",
+                "message" => "Paramters did not pass validation",
+                "target" => "parameters",
+                "details" => [
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The difference between from and till may only be max 366 days.",
+                        "target" => "until",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function testValidateOpeninhoursWithPeriodRequiresDateParameter()
+    {
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day']);
+        $call->seeStatusCode(400);
+        $call->seeJsonEquals([
+            "error" => [
+                "code" => "NotValidParameter",
+                "message" => "Paramters did not pass validation",
+                "target" => "parameters",
+                "details" => [
+                    [
+                        "code" => "NotValidParameter",
+                        "message" => "The 'date' argument is required.",
+                        "target" => "date",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function requestDateTypes()
+    {
+        $dateParam = date('Y-m-d');
+
+        return [
+            [[
+                'from' => '2017-01-01',
+                'until' => '09-01-2017',
+            ]],
+            [[
+                'from' => 'last day of August 2017',
+                'until' => 'first day of September 2017',
+            ]],
+            [[
+                'from' => date(DATE_RFC2822, strtotime('2017-09-15')), // 'Fri, 15 Sep 2017 00:00:00 +0000'
+                'until' => date(DATE_RFC1036, strtotime('2017-09-16')), //'Sat, 16 Sep 17 00:00:00 +0000'
+            ]],
+            [[
+                'from' => date(DATE_RFC850, strtotime('2017-09-01')), //  'Friday, 01-Sep-17 00:00:00 UTC'
+                'until' => date(DATE_W3C, strtotime('2017-09-02')), //    '2017-09-02T00:00:00+00:00'
+            ]],
+            [[
+                'period' => 'day',
+                'date' => '2017-01-01',
+            ]],
+            [[
+                'period' => 'month',
+                'date' => 'sept-2017',
+            ]],
+        ];
+    }
+
+    /**
+     * @test
+     * @group validation
+     * @dataProvider requestDateTypes
+     */
+    public function testValidateOpeninhoursDatesCanHandlePHPDateFormats($dateTypes)
+    {
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'openinghours'] + $dateTypes);
+        $call->seeStatusCode(200);
     }
 
     /**
@@ -139,20 +343,22 @@ class QueryControllerTest extends \TestCase
     public function testItHasOnlyOneChannelkeyWhenChannelParamIsGiven($typeParams)
     {
         // {host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}&format={format}
-        $this->channelKeys = array_shift($this->channelKeys);
+        $this->setupICalServiceServiceMock();
+        $this->channelKeys = $this->channelKeys->first();
         $call = $this->doRequest('GET', $typeParams);
         $content = $this->getContentStructureTested($call);
-        $this->assertCount(1, $content);
+
     }
 
     /**
      * @test
      * @group content
      */
-    public function testItReturnsGoodResultsOnTypeNow()
+    public function testItReturnsGoodResultsOnTypeOpenNow()
     {
         // {host}/api/query?q=now&serviceUri={serviceUri}&format={format}
-        $call = $this->doRequest('GET', ['q' => 'now']);
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'open-now']);
         $this->getContentStructureTested($call);
     }
 
@@ -163,7 +369,9 @@ class QueryControllerTest extends \TestCase
     public function testItReturnsGoodResultsOnTypeDayWithDateParam()
     {
         // {host}/api/query?q=day&date={mm-dd-yyyy}&serviceUri={serviceUri}&format={format}
-        $call = $this->doRequest('GET', ['q' => 'day', 'date' => date('d-m-Y')]);
+        $this->setupICalServiceServiceMock();
+        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('d-m-Y')]);
+        $this->setupICalServiceServiceMock();
         $this->getContentStructureTested($call);
     }
 
@@ -171,51 +379,33 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group content
      */
-    public function testItGivesSevenDaysOrNullPerChannelOnTypeWeek()
+    public function testItGivesSevenDaysPerChannelOnTypeWeek()
     {
         // {host}/api/query?q=week&serviceUri={serviceUri}&format={format}
-        $call = $this->doRequest('GET', ['q' => 'week']);
-        $content = $this->getContentStructureTested($call);
-        $this->checkSevenDaysOrNullPerChannel($content);
-    }
-
-    /**
-     * @test
-     * @group content
-     */
-    public function testItGivesSevenDaysOrNullPerChannelOnTypeFullWeek()
-    {
-        // {host}/api/query?q=fullWeek&serviceUri={serviceUri}&format={format}
-
+        $this->setupICalServiceServiceMock();
         $dateParam = date('d-m-Y', strtotime('tomorrow'));
-        $call = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => $dateParam]);
+        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => date('d-m-Y')]);
         $content = $this->getContentStructureTested($call);
-        $this->checkSevenDaysOrNullPerChannel($content);
+
+        foreach ($content as $channelBlock) {
+            $this->assertCount(7, $channelBlock['openinghours']);
+        }
     }
 
     /**
      * @test
      * @group content
-     */
-    public function testItGivesSevenDaysOrNullPerChannelOnTypeFullWeekWithDateParam()
-    {
-        // {host}/api/query?q=fullWeek&serviceUri={serviceUri}&date=dd-mm-yyyy&format={format}
-        $call = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => date('d-m-Y')]);
-        $content = $this->getContentStructureTested($call);
-        $this->checkSevenDaysOrNullPerChannel($content);
-    }
-
-    /**
-     * @test
-     * Seeder data for events is set to set closinghours calendar on each first monday of the month
+     * Setup data closing day on each first monday of the month
      */
     public function testItGivesClosedForEachFirstMondayOfTheMonth()
     {
         $firstMondayOfSept2017 = '04-09-2017';
-        $fullWeekCall = $this->doRequest('GET', ['q' => 'fullWeek', 'date' => $firstMondayOfSept2017]);
-        $fullWeekContent = $this->getContentStructureTested($fullWeekCall);
-        foreach ($fullWeekContent as $channel) {
-            $this->assertEquals('maandag gesloten', $channel['2017-09-04']);
+        $fullWeekCall = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => $firstMondayOfSept2017]);
+        $content = $this->getContentStructureTested($fullWeekCall);
+
+        foreach ($content as $channelBlock) {
+            // first 0 key is monday
+            $this->assertFalse($channelBlock['openinghours'][0]['open']);
         }
     }
 
@@ -223,7 +413,7 @@ class QueryControllerTest extends \TestCase
      * returns true if we have a value in the channel parameter
      * @return boolean
      */
-    private function oneChannel()
+    public function oneChannel()
     {
         return count($this->channelKeys) === 1;
     }
@@ -231,79 +421,56 @@ class QueryControllerTest extends \TestCase
     /**
      * do request according to the given format
      */
-    protected function doRequest($type, $params = null)
+    public function doRequest($type, $params = null)
     {
-        if (is_array($params)) {
-            $params = $this->assembleParameters($params);
-        }
 
-        $url = '/api/query?' . $params;
-        if ($this->format === 'html') {
-            return $this->call($type, $url);
-        }
-
-        return $this->$type($url);
-    }
-
-    /**
-     * assemble parameters into url string
-     */
-    protected function assembleParameters($params = [])
-    {
-        if (!isset($params['serviceUri']) && $this->service) {
-            $params['serviceUri'] = $this->service->uri;
-        }
+        $path = '/api/services/' . $this->serviceId;
 
         if ($this->oneChannel()) {
-            $params['channel'] = $this->channelKeys;
+            $path .= '/channels/' . $this->channelKeys;
         }
 
-        if ($this->format) {
-            $params['format'] = $this->format;
+        if (is_array($params)) {
+            $path .= '/' . $params['type'];
+            unset($params['type']);
+
+            if (isset($params['period'])) {
+                $path .= '/' . $params['period'];
+                unset($params['period']);
+            }
+
+            if (count($params)) {
+                $path .= '?' . http_build_query($params, null, '&');
+            }
         }
 
-        return http_build_query($params, null, '&');
+        if ($this->format === 'html') {
+            return $this->call($type, $path);
+        }
+
+        return $this->json(
+            'GET',
+            $path,
+            [],
+            [
+                'Accept-Encoding' => 'gzip, deflate',
+                'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
+                'X-Requested-With' => 'XMLHttpRequest',
+            ]);
     }
 
     /**
      * get contect from call
      * and do base tests
      */
-    protected function getContentStructureTested($call)
+    public function getContentStructureTested($call)
     {
         // check status code
         $call->seeStatusCode(200);
+        $content = $call->decodeResponseJson();
+        $this->assertCount(count($this->channelKeys), $content);
 
-        // check or the correct nr of channels are in the result
-        $structure = $this->channelKeys;
-        if ($this->oneChannel()) {
-            $structure = [
-                $this->channelKeys,
-            ];
-        }
-        $call->seeJsonStructure($structure);
-
-        return $call->decodeResponseJson();
+        return $content;
     }
 
-    /**
-     * loop over channel labels in content
-     * and assert that there are 7 of no children
-     *
-     * @param $content
-     */
-    protected function checkSevenDaysOrNullPerChannel($content)
-    {
-        // check if we 7 (days) results in all channels or is null
-        foreach ($this->channelKeys as $channelKey) {
-            switch (true) {
-                case $content[$channelKey] === null:
-                case count($content[$channelKey]) == 7:
-                    $this->assertTrue(true);
-                    break;
-                default:
-                    $this->assertTrue(false);
-            }
-        }
-    }
 }
