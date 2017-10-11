@@ -148,17 +148,17 @@ export default {
 
       // Align events with start_date and end_date
       if (this.modal.id && this.modal.calendars) {
-        const version = this.modal
+        const version = this.modal;
 
         // Look for events that pose problems
-        let invalid = false
+        let invalid = false;
         this.modal.calendars.forEach(cal => {
           cal.events.forEach(event => {
             if (cal.layer && (event.start_date < version.start_date || event.until > version.end_date)) {
               invalid = true
             }
           })
-        })
+        });
 
         if (invalid) {
           return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.')
@@ -166,15 +166,15 @@ export default {
 
         // Update the event until date
         this.modal.calendars.forEach(cal => {
-          let changed = false
+          let changed = false;
           cal.events.forEach(event => {
             if (!cal.layer) {
-              event.start_date = version.start_date + event.start_date.slice(10)
-              event.end_date = version.start_date + event.end_date.slice(10)
-              event.until = version.end_date
+              event.start_date = version.start_date + event.start_date.slice(10);
+              event.end_date = version.start_date + event.end_date.slice(10);
+              event.until = version.end_date;
               changed = true
             }
-          })
+          });
           if (changed) {
             Hub.$emit('createCalendar', cal)
           }
@@ -183,7 +183,7 @@ export default {
       Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },
     createRole () {
-      this.modal.strict = true
+      this.modal.strict = true;
       if (this.modal.usr) {
         this.modal.user_id = this.modal.usr.id
       }
