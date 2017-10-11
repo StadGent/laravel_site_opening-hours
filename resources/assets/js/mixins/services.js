@@ -135,8 +135,7 @@ export default {
 
                 })
 
-        }
-        ,
+        },
         fetchVersion() {
 
             if (!this.route.version || this.route.version < 1) {
@@ -163,6 +162,7 @@ export default {
         ,
         applyVersionData(data) {
 
+            console.log('applyversiondata');
 
             const index = this.routeChannel.openinghours ? this.routeChannel.openinghours.findIndex(o => o.id === data.id) : -1;
 
@@ -174,6 +174,9 @@ export default {
 
             Object.assign(data, {fetched: true});
             this.$set(this.routeChannel.openinghours, index, data);
+
+            //todo this index is wrong!
+            this.$set(this.services, index, this.routeService);
         }
         ,
         serviceById(id) {
@@ -316,6 +319,11 @@ export default {
                         return console.warn('did not find this calendar', data);
                     }
                     this.$set(this.routeVersion.calendars, index, data);
+
+                    //todo don't change entire service...
+                    //todo why is the index always 0?
+                    this.$set(this.services, this.services.findIndex(s => s.id === this.route.service), this.routeService);
+
                     done && this.toVersion(data.openinghours_id);
                 }).catch(fetchError)
             } else {
@@ -329,6 +337,7 @@ export default {
                         this.$set(this.routeVersion, 'calendars', [])
                     }
                     this.routeVersion.calendars.push(data);
+
                     this.toVersion(data.openinghours_id);
                     console.log("going to calendar");
                     this.toCalendar(data.id);
@@ -344,6 +353,7 @@ export default {
             }
 
             this.$http.delete('/api/ui/calendars/' + calendar.id).then(() => {
+
                 this.fetchVersion(true);
                 this.toVersion()
             }).catch(fetchError)
