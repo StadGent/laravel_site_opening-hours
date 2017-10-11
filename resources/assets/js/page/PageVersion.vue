@@ -142,8 +142,5 @@ export default {
     CalendarEditor,
     YearCalendar
   },
-    created () {
-
-    }
 }
 </script>

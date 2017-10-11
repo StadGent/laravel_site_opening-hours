@@ -5,8 +5,8 @@
 
             <!-- First calendar is always weekly -->
             <div v-if="!cal.layer">
-                <h3>Stel de openingsuren in voor {{ $root.routeService.label
-                    }}. Op welke dagen is deze dienst normaal open?</h3>
+                <h3>Stel de openingsuren in voor {{ $root.routeService.label}}.</h3>
+                <p>Op welke dagen is deze dienst normaal open?</p>
                 <p class="text-muted">Uitzonderingen kan je later instellen.</p>
 
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
@@ -119,7 +119,7 @@
 
     export default {
         name: 'calendar-editor',
-        props: ['cal', 'layer'],
+        props: ['cal'],
         data() {
             return {
                 // options: {}
@@ -182,7 +182,7 @@
                 this.cal.events.push(createFirstEvent(this.$parent.version))
             },
             addEvent(index, event) {
-                event = Object.assign({}, event, {id: null})
+                event = Object.assign({}, event, {id: null});
                 this.cal.events.splice(index, 0, event)
             },
             rmEvent(index) {
@@ -192,7 +192,7 @@
                 if (this.cal.label === 'Uitzondering') {
                     return this.rmCalendar()
                 }
-                this.toVersion()
+                this.toVersion();
                 this.$root.fetchVersion(true)
             },
             save() {
@@ -247,6 +247,8 @@
 
                 this.presets = data;
             })
+
+            console.log(this.$root.routeVersion)
         },
         mounted() {
             this.$set(this.cal, 'closinghours', !!this.cal.closinghours)
