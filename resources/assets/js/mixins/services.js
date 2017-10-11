@@ -11,7 +11,6 @@ export default {
         }
     },
     created() {
-        console.info('service.js was created');
         this.fetchServices();
     },
     computed: {
@@ -171,7 +170,7 @@ export default {
 
                     this.applyVersionData(data);
                     this.versionDataQueue = this.versionDataQueue.filter(version => version !== this.route.version);
-                    console.info('services: got openinghours for ' + this.versionDataQueue.toString());
+                    console.info('services: got openinghours for ' + this.route.version);
                 })
                 .catch(fetchError)
         }
@@ -232,7 +231,8 @@ export default {
 
             channel.service_id = channel.srv && channel.srv.id;
             this.$http.post('/api/ui/channels', channel).then(({data}) => {
-                this.fetchServices();
+                // this.fetchServices();
+                this.fetchChannels();
                 this.modalClose();
                 this.toChannel(data.id)
             }).catch(fetchError)

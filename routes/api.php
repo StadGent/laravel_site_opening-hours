@@ -20,7 +20,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::resource('/services', 'ServicesUiController');
     Route::post('/roles', 'RolesController@update');
     Route::delete('/roles', 'RolesController@destroy');
-    Route::get('api/presets', 'PresetsController@index');
+    Route::get('/presets', 'PresetsController@index');
 });
  
 Route::resource('/services', 'ServicesController');
