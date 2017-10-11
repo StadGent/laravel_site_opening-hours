@@ -27,7 +27,6 @@ export default {
             //an empty array does not always mean they haven't been fetched yet.
 
             if (this.services.length === 0 && !this.serviceLock) {
-                console.info('services: routservice fetches services');
                 this.fetchServices();
             }
 
@@ -53,7 +52,6 @@ export default {
             if (this.routeChannel.openinghours
                 && this.routeChannel.openinghours.find(o => o.id === this.route.version)
                 && !this.routeChannel.openinghours.find(o => o.id === this.route.version).fetched) {
-                console.warn('openinghours not fetched');
                 this.fetchVersion();
                 return {};
             }
@@ -70,7 +68,6 @@ export default {
             if (this.services.length === 0) return {};
 
             if (this.route.calendar < 0) return {};
-            console.info('services: getting routeCalendar ' + this.route.calendar);
 
             return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.id === this.route.calendar) || {}
         }
@@ -79,14 +76,12 @@ export default {
         fetchServices() {
 
             this.serviceLock = true;
-            console.info('services: fetching services ' + this.serviceLock);
 
             return this.$http.get('/api/ui/services')
                 .then(({data}) => {
 
                     this.services = data || [];
                     this.serviceLock = false;
-                    console.info('services: got services ' + this.serviceLock);
 
 
                     // legacy? used to fetch versions for channels...
@@ -125,10 +120,6 @@ export default {
             //now we can fetch the channels
             this.channelDataQueue.push(this.route.service);
 
-            console.info('services: fetching channels for service ' + this.channelDataQueue.toString());
-
-            //todo maybe loop over the queue?
-
             return this.$http.get('/api/ui/channels/getChannelsByService/' + this.route.service)
                 .then(({data}) => {
 
@@ -137,10 +128,8 @@ export default {
 
                     //remove the service from the channelDataQueue;
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
-                    console.info('services: got channels for service ' + this.channelDataQueue.toString());
 
                     if (this.route.version !== -1) {
-                        console.log('route version not empty, channels are fetching version');
                         this.fetchVersion();
                     }
 
@@ -157,12 +146,10 @@ export default {
 
             //return if versions are already being fetched for the routeVersion.
             if (this.versionDataQueue.indexOf(this.route.version) !== -1) {
-                console.warn('Version already in versionqueue');
                 return;
             }
 
             this.versionDataQueue.push(this.route.version);
-            console.info('services: fetching openinghours for ' + this.versionDataQueue.toString());
 
 
             return this.$http.get('/api/ui/openinghours/' + this.route.version)
@@ -170,7 +157,6 @@ export default {
 
                     this.applyVersionData(data);
                     this.versionDataQueue = this.versionDataQueue.filter(version => version !== this.route.version);
-                    console.info('services: got openinghours for ' + this.route.version);
                 })
                 .catch(fetchError)
         }
@@ -323,6 +309,7 @@ export default {
 
             if (calendar.id) {
                 this.$http.put('/api/ui/calendars/' + calendar.id, calendar).then(({data}) => {
+
                     const index = this.routeVersion.calendars.findIndex(c => c.id === data.id);
                     if (index === -1) {
                         console.log(inert(this.routeVersion.calendars));
@@ -333,11 +320,17 @@ export default {
                 }).catch(fetchError)
             } else {
                 this.$http.post('/api/ui/calendars', calendar).then(({data}) => {
+
+                    //todo why??
+                    //calendarEditor filters on cal.layer... but this is not a field in the calendar model
+                    data.layer = -data.priority;
+
                     if (!this.routeVersion.calendars) {
                         this.$set(this.routeVersion, 'calendars', [])
                     }
                     this.routeVersion.calendars.push(data);
                     this.toVersion(data.openinghours_id);
+                    console.log("going to calendar");
                     this.toCalendar(data.id);
                 }).catch(fetchError)
             }
