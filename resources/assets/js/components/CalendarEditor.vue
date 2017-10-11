@@ -87,7 +87,7 @@
                 </button>
                 <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
                 <button type="submit" class="btn btn-primary" @click="saveLabel"
-                        v-else-if="cal.label == 'Uitzondering'">Bewaar
+                        v-else-if="cal.label == 'Uitzondering'">Bewaar uitzondering
                 </button>
                 <button type="button" class="btn btn-primary" @click="save" v-else>Bewaar</button>
             </div>
@@ -207,7 +207,7 @@
                             e.end_date = date.toJSON().slice(0, 10) + e.end_date.slice(10)
                         }
                     }
-                })
+                });
 
                 if (this.disabled) {
                     return console.warn('Expected valid calendar')
@@ -219,7 +219,7 @@
                 if (!this.calLabel || this.calLabel === 'Uitzondering') {
                     return console.warn('Expected calendar name')
                 }
-                this.cal.label = this.calLabel
+                this.cal.label = this.calLabel;
                 Hub.$emit('createCalendar', this.cal)
             },
             rmCalendar() {

@@ -98,7 +98,7 @@ export default {
       return Object.assign({}, this.version, { calendar: this.calendars })
     },
     calendars () {
-      const calendars = (this.version.calendars || []);
+      let calendars = (this.version.calendars || []);
       calendars.sort(orderBy('-priority'));
       return calendars.map(c => {
         c.layer = -c.priority;
