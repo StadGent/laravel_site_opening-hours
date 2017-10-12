@@ -295,9 +295,7 @@ export default {
                         this.$set(this.routeVersion, 'calendars', [])
                     }
                     this.routeVersion.calendars.push(data);
-
                     this.toVersion(data.openinghours_id);
-                    console.log("going to calendar");
                     this.toCalendar(data.id);
                 }).catch(fetchError)
             }
