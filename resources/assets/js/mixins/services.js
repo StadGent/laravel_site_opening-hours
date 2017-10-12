@@ -45,9 +45,8 @@ export default {
             if (this.services.length === 0) return {};
 
             //check if global routeChannel has values
-            if (Object.keys(this.routeChannel).length === 0) {
-                return {}
-            }
+            if (Object.keys(this.routeChannel).length === 0) return {};
+
 
             if (this.routeChannel.openinghours
                 && this.routeChannel.openinghours.find(o => o.id === this.route.version)
@@ -66,13 +65,25 @@ export default {
         routeCalendar() {
 
             if (this.services.length === 0) return {};
-
             if (this.route.calendar < 0) return {};
 
             return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.id === this.route.calendar) || {}
+        },
+        serviceIndex() {
+            return this.services.findIndex(s => {
+                return s.id === this.route.service
+            })
         }
     },
     methods: {
+        updateService() {
+            let index = this.serviceIndex;
+            if (index === -1) return;
+
+            console.info('updateService, index = ' + index);
+
+            this.$set(this.services, index, this.routeService);
+        },
         fetchServices() {
 
             this.serviceLock = true;
@@ -83,38 +94,30 @@ export default {
                     this.services = data || [];
                     this.serviceLock = false;
 
-
                     // legacy? used to fetch versions for channels...
                     // this.versionDataQueue.forEach(this.applyVersionData);
                     // this.versionDataQueue = [];
-
-                    //check for active routeService and populate channels?
-
+                })
+                .then(() => {
+                    //check for active routeService and populate channels
                     if (this.route.service !== -1) {
                         this.fetchChannels();
                     }
-
                 }).catch(fetchError)
         },
         fetchChannels() {
 
             //return if channels are already being fetched for the routeService.
-            if (this.channelDataQueue.indexOf(this.route.service) !== -1) {
-                return;
-            }
+            if (this.channelDataQueue.indexOf(this.route.service) !== -1) return;
 
             //check if global services array is already populated
-            if (Object.keys(this.routeService).length === 0) {
-                return
-            }
+            if (Object.keys(this.routeService).length === 0) return;
+
 
             //check if routeservice is part of services array
-            let index = this.services.findIndex(s => {
-                return s.id === this.route.service;
-            });
-            if (index === -1) {
+            if (this.serviceIndex === -1) {
                 console.warn('services: trying to fetch channels for unknown service...');
-                return
+                return;
             }
 
             //now we can fetch the channels
@@ -124,65 +127,55 @@ export default {
                 .then(({data}) => {
 
                     this.routeService.channels = data;
-                    this.$set(this.services, index, this.routeService);
+                    // this.updateService();
+                    // this.$set(this.services, index, this.routeService);
 
                     //remove the service from the channelDataQueue;
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
 
+                    this.updateService();
+                })
+                .then(() => {
+                    //check for active routeVersion and populate openinghours.
                     if (this.route.version !== -1) {
                         this.fetchVersion();
                     }
-
                 })
-
+                .catch(fetchError);
         },
         fetchVersion() {
 
-            if (!this.route.version || this.route.version < 1) {
-                console.warn('no route version');
-                return;
-            }
+            if (!this.route.version || this.route.version < 1) return;
 
             //return if versions are already being fetched for the routeVersion.
-            if (this.versionDataQueue.indexOf(this.route.version) !== -1) {
-                return;
-            }
+            if (this.versionDataQueue.indexOf(this.route.version) !== -1) return;
 
             this.versionDataQueue.push(this.route.version);
 
-
             return this.$http.get('/api/ui/openinghours/' + this.route.version)
                 .then(({data}) => {
-
                     this.applyVersionData(data);
                     this.versionDataQueue = this.versionDataQueue.filter(version => version !== this.route.version);
                 })
                 .catch(fetchError)
-        }
-        ,
+        },
         applyVersionData(data) {
 
-            console.log('applyversiondata');
-
-            const index = this.routeChannel.openinghours ? this.routeChannel.openinghours.findIndex(o => o.id === data.id) : -1;
+            let index = this.routeChannel.openinghours ? this.routeChannel.openinghours.findIndex(o => o.id === data.id) : -1;
 
             if (index === -1) {
                 this.versionDataQueue.push({data});
                 console.warn('version placed in queue', inert(data));
-                return
+                return;
             }
 
             Object.assign(data, {fetched: true});
             this.$set(this.routeChannel.openinghours, index, data);
-
-            //todo this index is wrong!
-            this.$set(this.services, index, this.routeService);
-        }
-        ,
+            this.updateService();
+        },
         serviceById(id) {
             return this.services.find(s => s.id === id) || {}
-        }
-        ,
+        },
         fetchPresets(next) {
             Vue.http.get('/api/ui/presets')
                 .then(({data}) => {
@@ -238,7 +231,6 @@ export default {
                 this.modalClose();
             }).catch(fetchError)
         });
-
         Hub.$on('createVersion', input => {
             const version = Object.assign(createVersion(), input);
             if (!version.channel_id) {
@@ -271,7 +263,6 @@ export default {
                     Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
                         openinghours_id: data.id
                     }), 'calendar')
-
                 });
 
 
@@ -319,10 +310,7 @@ export default {
                         return console.warn('did not find this calendar', data);
                     }
                     this.$set(this.routeVersion.calendars, index, data);
-
-                    //todo don't change entire service...
-                    //todo why is the index always 0?
-                    this.$set(this.services, this.services.findIndex(s => s.id === this.route.service), this.routeService);
+                    this.updateService();
 
                     done && this.toVersion(data.openinghours_id);
                 }).catch(fetchError)

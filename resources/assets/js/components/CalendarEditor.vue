@@ -169,10 +169,10 @@
         },
         methods: {
             toggleClosing() {
-                this.$set(this.cal, 'closinghours', !this.cal.closinghours)
+                this.$set(this.cal, 'closinghours', !this.cal.closinghours);
             },
             pushEvent() {
-                const start_date = toDatetime(this.$parent.version.start_date)
+                const start_date = toDatetime(this.$parent.version.start_date);
                 this.cal.events.push(createEvent({
                     start_date,
                     label: this.cal.events.length + 1
