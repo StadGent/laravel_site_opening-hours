@@ -170,6 +170,10 @@
         methods: {
             toggleClosing() {
                 this.$set(this.cal, 'closinghours', !this.cal.closinghours);
+
+                this.$set(this.cal, 'label', 'haha, een label');
+                this.cal.label = "test";
+                this.$emit('input', this.cal);
             },
             pushEvent() {
                 const start_date = toDatetime(this.$parent.version.start_date);

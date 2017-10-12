@@ -18,7 +18,10 @@
     <div class="version-split">
       <div class="version-cals col-sm-6 col-md-5 col-lg-4">
         <!-- Editing a calendar -->
-        <calendar-editor v-if="$root.routeCalendar.events" :cal="$root.routeCalendar"></calendar-editor>
+        <calendar-editor v-if="$root.routeCalendar.events"
+                         :cal="$root.routeCalendar"
+                         v-on:input="handleInput(arguments)">
+        </calendar-editor>
 
         <!-- Showing list of calendars -->
         <div v-else>
@@ -110,6 +113,12 @@ export default {
     }
   },
   methods: {
+      handleInput(data){
+          console.info(data[0]);
+          let index = this.calendars.findIndex(c => {return c.id === data[0].id});
+          console.log(index);
+
+      },
     swapLayers (a, b) {
       a = this.calendars.find(c => c.layer === a)
       b = this.calendars.find(c => c.layer === b)
