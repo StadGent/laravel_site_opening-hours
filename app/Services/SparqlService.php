@@ -45,36 +45,18 @@ class SparqlService
     private $lastResponseCode = null;
 
     /**
-     * Singleton class instance.
-     *
-     * @var SparqlService
+     * @param $endpoint
+     * @param $username
+     * @param $password
+     * @param $defaultGraph
      */
-    private static $instance;
-
-    /**
-     * 
-     * Private contructor for Singleton pattern
-     * force set client with default values from .env file
-     * 
-     * @return SparqlService
-     */
-    private function __construct()
+    public function __construct($endpoint = null, $username = null, $password = null, $defaultGraph = null)
     {
-        $this->setClient();
-    }
+        $this->username = $username ?: env('SPARQL_WRITE_ENDPOINT_USERNAME');
+        $this->password = $password ?: env('SPARQL_WRITE_ENDPOINT_PASSWORD');
+        $this->defaultGraph = $defaultGraph ?: env('SPARQL_WRITE_GRAPH');
 
-    /**
-     * GetInstance for Singleton pattern
-     * 
-     * @return SparqlService
-     */
-    public static function getInstance()
-    {
-        if (!self::$instance) {
-            self::$instance = new SparqlService();
-        }
-
-        return self::$instance;
+        $this->setClient($endpoint ?: env('SPARQL_WRITE_ENDPOINT'));
     }
 
     /**
@@ -89,19 +71,15 @@ class SparqlService
      *
      * @param $endpoint
      */
-    public function setClient($endpoint = null, $username = null, $password = null, $defaultGraph = null)
+    public function setClient($endpoint = '')
     {
-
-        $this->username = $username ?: env('SPARQL_WRITE_ENDPOINT_USERNAME');
-        $this->password = $password ?: env('SPARQL_WRITE_ENDPOINT_PASSWORD');
-        $this->defaultGraph = $defaultGraph ?: env('SPARQL_WRITE_GRAPH');
-
         $handler = new CurlHandler();
         $options['handler'] = HandlerStack::create($handler); // Wrap w/ middleware
-        $options['base_uri'] = $endpoint ?: env('SPARQL_WRITE_ENDPOINT');
+        $options['base_uri'] = $endpoint;
         $this->guzzleClient = new Client($options);
 
         $this->baseConnectionTest();
+
     }
 
     /**

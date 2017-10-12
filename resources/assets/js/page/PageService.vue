@@ -104,6 +104,9 @@ export default {
       return this.$root.routeService
     },
     channels () {
+        if(!this.srv.channels) {
+            Hub.$emit('fetchChannels');
+        }
       return this.srv.channels || []
     },
     filteredChannels () {

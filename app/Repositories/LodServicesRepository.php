@@ -33,14 +33,14 @@ class LodServicesRepository
 
         $data = array_merge($data, array_values($transformedData));
 
-        while (!empty($transformedData)) {
+        while (! empty($transformedData)) {
             $page++;
             $semanticResults = $this->makeSparqlService()->performSparqlQuery(static::$fetchFunction($limit, ($limit * $page)), 'GET', 'json');
 
             // Transform the data in a compatible format
             $transformedData = $this->transform($semanticResults);
 
-            if (!empty($transformedData)) {
+            if (! empty($transformedData)) {
                 $data = array_merge($data, array_values($transformedData));
             }
         }
@@ -82,11 +82,11 @@ class LodServicesRepository
         collect($data)->each(function ($agent) use (&$services) {
             $identifier = array_get($agent, 'identifier.value', '');
 
-            if (!empty($identifier)) {
+            if (! empty($identifier)) {
                 $services[] = [
                     'label' => array_get($agent, 'name.value', ''),
                     'uri' => array_get($agent, 'agent.value', ''),
-                    'identifier' => $identifier,
+                    'identifier' => $identifier
                 ];
             }
         });
@@ -104,8 +104,7 @@ class LodServicesRepository
      */
     public static function getVestaServicesQuery($limit = 100, $offset = 0)
     {
-        $query = 'SELECT DISTINCT ?agent ?identifier ?name
-                FROM <http://stad.gent/agents/>
+        return 'SELECT DISTINCT ?agent ?identifier ?name
                 WHERE {
                 {
                     ?agent a foaf:Agent;
@@ -132,13 +131,7 @@ class LodServicesRepository
                     <http://purl.org/dc/terms/identifier> ?identifier;
                     foaf:name ?name.
                 }
-                }  ORDER BY ?name ';
-
-        if ($limit) {
-            $query .= " LIMIT $limit OFFSET $offset";
-        }
-
-        return $query;
+                }  ORDER BY ?name ' . " LIMIT $limit OFFSET $offset";
     }
 
     /**
@@ -151,20 +144,13 @@ class LodServicesRepository
      */
     public static function getRecreatexServicesQuery($limit = 100, $offset = 0)
     {
-        $query = 'SELECT ?agent ?identifier ?name
-                FROM <http://stad.gent/agents/>
+        return 'SELECT ?agent ?identifier ?name
                 WHERE
                 {
                     ?agent a foaf:Agent;
                     <http://purl.org/dc/terms/source> "RECREATEX"^^xsd:string ;
                     <http://purl.org/dc/terms/identifier> ?identifier.
                     ?agent foaf:name ?name.
-                } ';
-
-        if ($limit) {
-            $query .= " LIMIT $limit OFFSET $offset";
-        }
-
-        return $query;
+                } ' . " LIMIT $limit OFFSET $offset";
     }
 }

@@ -15,33 +15,6 @@ use Carbon\Carbon;
  */
 class ICalService
 {
-
-    /**
-     * Singleton class instance.
-     *
-     * @var ICalService
-     */
-    private static $instance;
-
-    /**
-     * Private contructor for Singleton pattern
-     */
-    private function __construct() {}
-
-    /**
-     * GetInstance for Singleton pattern
-     * 
-     * @return ICalService
-     */
-    public static function getInstance()
-    {
-        if (!self::$instance) {
-            self::$instance = new ICalService();
-        }
-
-        return self::$instance;
-    }
-
     /**
      * Create an Ical object based on the service URI, channel and time range
      * by fetching the relevant openinghours objects and parsing the related calendars
@@ -134,11 +107,11 @@ class ICalService
             if ($until >= $minTimestamp->toDateString() || empty($minTimestamp)) {
                 // Performance tweak
                 $startDate = new Carbon($event->start_date);
-                $endDate = new Carbon($event->end_date);
+                $endDate   = new Carbon($event->end_date);
                 $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
 
                 if ($endDate->toDateString() > $until && $endDate->toDateString() > $startDate->toDateString()) {
-                    $untilDate = Carbon::createFromFormat('Y-m-d', $event->until);
+                    $untilDate      = Carbon::createFromFormat('Y-m-d', $event->until);
                     $endDate->month = $untilDate->month;
                 } elseif ($endDate->toDateString() < $startDate->toDateString()) {
                     $endDate->month = $startDate->month;
@@ -147,7 +120,7 @@ class ICalService
                 $until = Carbon::createFromFormat('Y-m-d', $until)->endOfDay();
 
                 $startDate = $this->convertCarbonToIcal($startDate);
-                $endDate = $this->convertCarbonToIcal($endDate);
+                $endDate   = $this->convertCarbonToIcal($endDate);
 
                 $icalString .= "BEGIN:VEVENT\n";
                 $icalString .= 'DTSTART;TZID=Europe/Brussels:' . $startDate . "\n";
@@ -186,7 +159,6 @@ class ICalService
     protected function convertIsoToIcal($date)
     {
         $date = new Carbon($date);
-
         return $date->format('Ymd\THis');
     }
 
@@ -240,10 +212,10 @@ class ICalService
                 return 'Gesloten';
             } else {
                 $start = $event->dtstart;
-                $end = $event->dtend;
+                $end   = $event->dtend;
 
                 $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
-                $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
+                $dtEnd   = Carbon::createFromFormat('Ymd\THis', $end);
 
                 // Check for the one-off chance that there are overlapping hours (=events)
                 // within one layer (=calendar)
@@ -268,7 +240,6 @@ class ICalService
         $hours = array_unique($hours);
 
         // return rtrim(implode($hours, ', '), ',');
-
         return $hours;
     }
 }

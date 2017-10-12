@@ -147,12 +147,15 @@ export default {
       var services = this.sortedServices.slice(this.route.offset || 0, this.route.offset + pageSize)
       if (this.isAdmin) {
         // TODO: do this enriching onload, like is done with users
-        services.forEach(s => {
-          Object.assign(s, {
-            activeUsers: s.users.filter(u => u.verified),
-            ghostUsers: s.users.filter(u => !u.verified)
-          })
-        })
+          // Bart: no idea what original developer is hinting at
+
+          //Todo: Bart: users are no longer part of the services array... should they be?
+//        services.forEach(s => {
+//          Object.assign(s, {
+//            activeUsers: s.users.filter(u => u.verified),
+//            ghostUsers: s.users.filter(u => !u.verified)
+//          })
+//        })
       }
       return services
     },
