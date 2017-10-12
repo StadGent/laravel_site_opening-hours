@@ -5,8 +5,8 @@
 
             <!-- First calendar is always weekly -->
             <div v-if="!cal.layer">
-                <h3>Stel de openingsuren in voor {{ $root.routeService.label}}.</h3>
-                <p>Op welke dagen is deze dienst normaal open?</p>
+                <h3>Stel de openingsuren in voor {{ $root.routeService.label
+                    }}. Op welke dagen is deze dienst normaal open?</h3>
                 <p class="text-muted">Uitzonderingen kan je later instellen.</p>
 
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
@@ -87,7 +87,7 @@
                 </button>
                 <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
                 <button type="submit" class="btn btn-primary" @click="saveLabel"
-                        v-else-if="cal.label == 'Uitzondering'">Bewaar uitzondering
+                        v-else-if="cal.label == 'Uitzondering'">Bewaar
                 </button>
                 <button type="button" class="btn btn-primary" @click="save" v-else>Bewaar</button>
             </div>
@@ -119,7 +119,7 @@
 
     export default {
         name: 'calendar-editor',
-        props: ['cal'],
+        props: ['cal', 'layer'],
         data() {
             return {
                 // options: {}
@@ -169,14 +169,10 @@
         },
         methods: {
             toggleClosing() {
-                this.$set(this.cal, 'closinghours', !this.cal.closinghours);
-
-                this.$set(this.cal, 'label', 'haha, een label');
-                this.cal.label = "test";
-                this.$emit('input', this.cal);
+                this.$set(this.cal, 'closinghours', !this.cal.closinghours)
             },
             pushEvent() {
-                const start_date = toDatetime(this.$parent.version.start_date);
+                const start_date = toDatetime(this.$parent.version.start_date)
                 this.cal.events.push(createEvent({
                     start_date,
                     label: this.cal.events.length + 1
@@ -186,7 +182,7 @@
                 this.cal.events.push(createFirstEvent(this.$parent.version))
             },
             addEvent(index, event) {
-                event = Object.assign({}, event, {id: null});
+                event = Object.assign({}, event, {id: null})
                 this.cal.events.splice(index, 0, event)
             },
             rmEvent(index) {
@@ -196,7 +192,7 @@
                 if (this.cal.label === 'Uitzondering') {
                     return this.rmCalendar()
                 }
-                this.toVersion();
+                this.toVersion()
                 this.$root.fetchVersion(true)
             },
             save() {
@@ -211,7 +207,7 @@
                             e.end_date = date.toJSON().slice(0, 10) + e.end_date.slice(10)
                         }
                     }
-                });
+                })
 
                 if (this.disabled) {
                     return console.warn('Expected valid calendar')
@@ -223,7 +219,7 @@
                 if (!this.calLabel || this.calLabel === 'Uitzondering') {
                     return console.warn('Expected calendar name')
                 }
-                this.cal.label = this.calLabel;
+                this.cal.label = this.calLabel
                 Hub.$emit('createCalendar', this.cal)
             },
             rmCalendar() {
@@ -231,9 +227,6 @@
             }
         },
         created() {
-
-            console.log("calendar editor was created");
-
             this.RRule = RRule || {};
 
             //fetch presets from services.js
@@ -251,8 +244,6 @@
 
                 this.presets = data;
             })
-
-            console.log(this.$root.routeVersion)
         },
         mounted() {
             this.$set(this.cal, 'closinghours', !!this.cal.closinghours)
