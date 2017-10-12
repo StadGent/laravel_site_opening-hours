@@ -18,27 +18,10 @@ export default {
             return this.routeService.source === 'recreatex'
         },
         routeService() {
-
-            //todo: why is this always called even if there is no routeService?
-            if (this.route.service === -1) return {};
-
-            //if the services array is empty: fetch services
-            //todo: can we put a flag on it?
-            //an empty array does not always mean they haven't been fetched yet.
-
-            if (this.services.length === 0 && !this.serviceLock) {
-                this.fetchServices();
-            }
-
-            //return the requested service
-            return this.services.find(s => s.id === this.route.service) || {};
+            return this.services.find(s => s.id === this.route.service) || {}
         },
         routeChannel() {
-
-            if (this.services.length === 0) return {};
-            if (!this.routeService.channels) return {};
-
-            return this.routeService.channels.find(c => c.id === this.route.channel) || {};
+            return this.routeService.channels && this.routeService.channels.find(c => c.id === this.route.channel) || {}
         },
         routeVersion() {
 
@@ -47,7 +30,6 @@ export default {
             //check if global routeChannel has values
             if (Object.keys(this.routeChannel).length === 0) return {};
 
-
             if (this.routeChannel.openinghours
                 && this.routeChannel.openinghours.find(o => o.id === this.route.version)
                 && !this.routeChannel.openinghours.find(o => o.id === this.route.version).fetched) {
@@ -55,18 +37,9 @@ export default {
                 return {};
             }
 
-            // todo: can this go??
-            // this.$nextTick(() => {
-            //     this.fetchVersion()
-            // });
-
             return this.routeChannel.openinghours.find(o => o.id === this.route.version) || {}
         },
         routeCalendar() {
-
-            if (this.services.length === 0) return {};
-            if (this.route.calendar < 0) return {};
-
             return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.id === this.route.calendar) || {}
         },
         serviceIndex() {
@@ -268,7 +241,6 @@ export default {
 
             }).catch(fetchError)
         });
-
         Hub.$on('updateVersion', version => {
             if (!version || !version.id) {
                 return console.warn('id is missing', version)
@@ -279,7 +251,6 @@ export default {
                 this.modalClose()
             }).catch(fetchError)
         });
-
         Hub.$on('deleteVersion', version => {
             if (!version || !version.id) {
                 return console.warn('id is missing', version)
@@ -294,7 +265,6 @@ export default {
                 this.fetchServices();
             }).catch(fetchError)
         });
-
         Hub.$on('createCalendar', (calendar, done) => {
             if (!calendar.openinghours_id) {
                 calendar.openinghours_id = this.route.version;
