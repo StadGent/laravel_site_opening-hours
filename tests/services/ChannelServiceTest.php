@@ -16,14 +16,14 @@ class ChannelServiceTest extends \TestCase
     public function setup()
     {
         parent::setUp();
-        $this->channelService = app('ChannelService');
+        $this->channelService = new ChannelService();
     }
 
     /**
      * @test
      * @group jobs
      */
-    public function testConnection()
+    public function testItTriggersSyncDeleteJobsWhenChannelsAreDeleted()
     {
         $this->expectsJobs(UpdateVestaOpeninghours::class);
         $this->expectsJobs(DeleteLodChannel::class);

@@ -18,7 +18,7 @@ class OpeninghoursServiceTest extends \TestCase
     public function setup()
     {
         parent::setUp();
-        $this->OHService = app('OpeninghoursService'); 
+        $this->OHService = new OpeninghoursService();
     }
 
     /**

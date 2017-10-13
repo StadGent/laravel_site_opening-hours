@@ -5,8 +5,8 @@
     <!-- Version actions -->
     <div class="pull-right">
       <div class="btn-group">
-<!--         <button type="button" class="btn btn-default" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
-        <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'" disabled>Toon open en gesloten</button> -->
+        <!--         <button type="button" class="btn btn-default" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
+                <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'" disabled>Toon open en gesloten</button> -->
       </div>
     </div>
 
@@ -69,78 +69,78 @@
 </template>
 
 <script>
-import YearCalendar from '../components/YearCalendar.vue'
-import CalendarEditor from '../components/CalendarEditor.vue'
+    import YearCalendar from '../components/YearCalendar.vue'
+    import CalendarEditor from '../components/CalendarEditor.vue'
 
-import { createCalendar, createFirstCalendar } from '../defaults.js'
-import { orderBy, Hub, toDatetime } from '../lib.js'
+    import { createCalendar, createFirstCalendar } from '../defaults.js'
+    import { orderBy, Hub, toDatetime } from '../lib.js'
 
-export default {
-  name: 'page-version',
-  data () {
-    return {
-      tab: null,
-      editing: 0,
-      msg: 'Hello Vue!'
+    export default {
+        name: 'page-version',
+        data () {
+            return {
+                tab: null,
+                editing: 0,
+                msg: 'Hello Vue!'
+            }
+        },
+        computed: {
+            service () {
+                return this.$root.routeService || {}
+            },
+            channel () {
+                return this.$root.routeChannel || {}
+            },
+            version () {
+                return this.$root.routeVersion || {}
+            },
+            layeredVersion () {
+                return Object.assign({}, this.version, { calendar: this.calendars })
+            },
+            calendars () {
+                const calendars = (this.version.calendars || [])
+                calendars.sort(orderBy('-priority'))
+                return calendars.map(c => {
+                    c.layer = -c.priority
+                    return c
+                })
+            },
+            reversedCalendars () {
+                return inert(this.calendars).reverse()
+            }
+        },
+        methods: {
+            swapLayers (a, b) {
+                a = this.calendars.find(c => c.layer === a)
+                b = this.calendars.find(c => c.layer === b)
+                if (a && b) {
+                    const p = a.priority
+                    a.priority = b.priority
+                    b.priority = p
+
+                    Hub.$emit('createCalendar', a)
+                    Hub.$emit('createCalendar', b)
+                } else {
+                    console.warn('one of the layers was not found', a, b)
+                }
+            },
+            addCalendar () {
+                if (this.calendars.length > 10) {
+                    return alert('Er kan geen uitzondering toegevoegd worden.\n(Max. 1 normale uren + 10 uitzonderingen)')
+                }
+
+                const maxLayer = Math.max.apply(0, this.calendars.map(c => parseInt(c.layer)))
+
+                const newCal = this.calendars.length ? createCalendar(maxLayer + 1, {
+                    start_date: toDatetime(this.version.start_date)
+                }) : createFirstCalendar(this.version)
+
+                Hub.$emit('createCalendar', newCal)
+            }
+        },
+        components: {
+            CalendarEditor,
+            YearCalendar
+        }
     }
-  },
-  computed: {
-    service () {
-      return this.$root.routeService || {}
-    },
-    channel () {
-      return this.$root.routeChannel || {}
-    },
-    version () {
-      return this.$root.routeVersion || {}
-    },
-    layeredVersion () {
-      return Object.assign({}, this.version, { calendar: this.calendars })
-    },
-    calendars () {
-      const calendars = (this.version.calendars || [])
-      calendars.sort(orderBy('-priority'))
-      return calendars.map(c => {
-        c.layer = -c.priority
-        return c
-      })
-    },
-    reversedCalendars () {
-      return inert(this.calendars).reverse()
-    }
-  },
-  methods: {
-    swapLayers (a, b) {
-      a = this.calendars.find(c => c.layer === a)
-      b = this.calendars.find(c => c.layer === b)
-      if (a && b) {
-        const p = a.priority
-        a.priority = b.priority
-        b.priority = p
-
-        Hub.$emit('createCalendar', a)
-        Hub.$emit('createCalendar', b)
-      } else {
-        console.warn('one of the layers was not found', a, b)
-      }
-    },
-    addCalendar () {
-      if (this.calendars.length > 10) {
-        return alert('Er kan geen uitzondering toegevoegd worden.\n(Max. 1 normale uren + 10 uitzonderingen)')
-      }
-
-      const maxLayer = Math.max.apply(0, this.calendars.map(c => parseInt(c.layer)))
-
-      const newCal = this.calendars.length ? createCalendar(maxLayer + 1, {
-        start_date: toDatetime(this.version.start_date)
-      }) : createFirstCalendar(this.version)
-
-      Hub.$emit('createCalendar', newCal)
-    }
-  },
-  components: {
-    CalendarEditor,
-    YearCalendar
-  }
-}
 </script>

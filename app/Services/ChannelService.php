@@ -12,33 +12,6 @@ use App\Models\Channel;
 class ChannelService
 {
     /**
-     * Singleton class instance.
-     *
-     * @var ChannelService
-     */
-    private static $instance;
-
-    /**
-     * Private contructor for Singleton pattern
-     */
-    private function __construct() {}
-
-    /**
-     * GetInstance for Singleton pattern
-     *
-     * @return ChannelService
-     */
-    public static function getInstance()
-    {
-        if (!self::$instance) {
-            self::$instance = new ChannelService();
-        }
-        self::$instance->serviceModel = null;
-
-        return self::$instance;
-    }
-
-    /**
      * Creat Jobs to sync data to external services
      *
      * Make job for VESTA update when service hase vesta source.

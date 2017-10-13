@@ -37,32 +37,6 @@ class OpeninghoursService
     private $data;
 
     /**
-     * Singleton class instance.
-     *
-     * @var OpeninghoursService
-     */
-    private static $instance;
-
-    /**
-     * Private contructor for Singleton pattern
-     */
-    private function __construct() {}
-
-    /**
-     * GetInstance for Singleton pattern
-     * 
-     * @return OpeninghoursService
-     */
-    public static function getInstance()
-    {
-        if (!self::$instance) {
-            self::$instance = new OpeninghoursService();
-        }
-        self::$instance->serviceModel = null;
-        return self::$instance;
-    }
-
-    /**
      * Compute or the channel(s) are open or closed on this moment.
      *
      * @return OpeninghoursService  $this
@@ -73,7 +47,7 @@ class OpeninghoursService
             throw new \Exception('Set Service Model to calculate if a service', 1);
         }
         $start = new Carbon(); //('2017-09-14 22:00:00');
-        $end = $start->copy()->addMinute();
+        $end   = $start->copy()->addMinute();
         $this->collectData($start, $end);
 
         /**
@@ -87,7 +61,7 @@ class OpeninghoursService
                 continue;
             }
             $tmpDateData = array_values($channelData)[0];
-            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ?
+            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ? 
             trans('openinghourApi.CLOSED') : trans('openinghourApi.OPEN');
         }
 
@@ -123,7 +97,7 @@ class OpeninghoursService
                 continue;
             }
             $tmpDateData = array_values($channelData)[0];
-            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ?
+            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ? 
             trans('openinghourApi.CLOSED') : implode($tmpDateData['OH'], ', ');
         }
 
@@ -142,7 +116,7 @@ class OpeninghoursService
         }
 
         $start = Carbon::now()->startOfDay();
-        $end = $start->copy()->addWeek()->subDay()->endOfDay();
+        $end   = $start->copy()->addWeek()->subDay()->endOfDay();
         $this->collectData($start, $end);
 
         /**
@@ -184,7 +158,7 @@ class OpeninghoursService
         }
 
         $start = $date->startOfWeek();
-        $end = $start->copy()->addWeek()->subDay()->endOfDay();
+        $end   = $start->copy()->addWeek()->subDay()->endOfDay();
         $this->collectData($start, $end);
 
         /**
@@ -223,7 +197,7 @@ class OpeninghoursService
     protected function collectData(Carbon $start, Carbon $end)
     {
         foreach ($this->data as $channelLabel => &$value) {
-            $value = null;
+            $value   = null;
             $channel = Channel::where(['label' => $channelLabel])->first();
             if (!$channel->openinghours()->count()) {
                 continue;
@@ -347,7 +321,7 @@ class OpeninghoursService
     {
         $this->serviceModel = $serviceModel;
         $this->channelModel = null;
-        $this->data = array_fill_keys($this->serviceModel->channels()->pluck('label')->all(), null);
+        $this->data         = array_fill_keys($this->serviceModel->channels()->pluck('label')->all(), null);
 
         return $this;
     }
@@ -363,7 +337,7 @@ class OpeninghoursService
     {
 
         $this->channelModel = $channelModel;
-        $this->data = [$this->channelModel->label => null];
+        $this->data         = [$this->channelModel->label => null];
 
         return $this;
     }
