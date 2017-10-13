@@ -19,13 +19,7 @@
         </span>
           <form class="pull-right">
             <div class="form-group">
-                <input aria-label="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
-                       v-model="query"
-                       @input="route.offset=0"
-                       class="form-control"
-                       :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
-                       style="max-width:300px"
-                       type="search">
+                <input v-model="query" @input="route.offset=0" class="form-control" :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')" style="max-width:300px" type="search">
             </div>
         </form>
       </div>
@@ -153,6 +147,9 @@ export default {
       var services = this.sortedServices.slice(this.route.offset || 0, this.route.offset + pageSize)
       if (this.isAdmin) {
         // TODO: do this enriching onload, like is done with users
+          // Bart: no idea what original developer is hinting at
+
+          //Todo: Bart: users are no longer part of the services array... should they be?
 //        services.forEach(s => {
 //          Object.assign(s, {
 //            activeUsers: s.users.filter(u => u.verified),

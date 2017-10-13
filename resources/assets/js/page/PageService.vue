@@ -99,20 +99,14 @@ export default {
       service: null
     }
   },
-    created() {
-//      if(!this.srv.channels) {
-//          console.info('no channels found, fetching now...');
-//          Hub.$emit('fetchChannels');
-//      }
-    },
   computed: {
     srv () {
       return this.$root.routeService
     },
     channels () {
-      if(!this.srv.channels) {
-          Hub.$emit('fetchChannels');
-      }
+        if(!this.srv.channels) {
+            Hub.$emit('fetchChannels');
+        }
       return this.srv.channels || []
     },
     filteredChannels () {
