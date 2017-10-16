@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Formatters\Openinghours as OpeninghoursFormatter;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Validator;
 
 /**
@@ -117,19 +116,4 @@ class GetQueryRequest extends FormRequest
             }
         });
     }
-
-    /**
-     * Get the failed validation json response for the request.
-     *
-     * overwrite response so only json output will be given and not the http redirect
-     * for expectsJson() the headers should correctly be set
-     * this function catches all the times this is not correctly done
-     *
-     * @param  array  $errors
-     * @return \Symfony\Component\HttpFoundation\Response
-
-    public function response(array $errors)
-    {
-    return new JsonResponse($errors, 400);
-    }*/
 }
