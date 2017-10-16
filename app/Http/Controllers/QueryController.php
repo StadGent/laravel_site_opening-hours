@@ -39,7 +39,7 @@ class QueryController extends Controller
      */
     public function nowOpenAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
-        $this->OpeninghoursService->isOpenNow($service, $channel);
+        $this->OpeninghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
         // output format with json as default
         $output = $this->OpeninghoursFormatter->render('json', $this->OpeninghoursService->getData());
 
