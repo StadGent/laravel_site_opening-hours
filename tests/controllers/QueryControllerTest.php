@@ -39,41 +39,6 @@ class QueryControllerTest extends \TestCase
         $this->channelKeys = $service->channels->pluck('id');
     }
 
-    /**
-     * @return mixed
-     */
-    private function setupICalServiceServiceMock()
-    {
-
-        $ICalServiceMock = $this->createMock(ICalService::class, ['createIcalFromCalendar', 'extractDayInfo']);
-        $ICalServiceMock->expects($this->any())
-            ->method('createIcalFromCalendar')
-            ->willReturn(false);
-
-        $ICalServiceMock->expects($this->any())
-            ->method('extractDayInfo')
-            ->with($this->anything())
-            ->will($this->returnCallback(function () {
-                $shuffle = [
-                    [
-                        ['from' => '08:00', 'until' => '12:00'], // morning shift
-                        ['from' => '12:30', 'until' => '17:00'], // afternoon shift
-                    ],
-                    [
-                        ['from' => '08:00', 'until' => '16:00'], // fulltime
-                    ],
-                    [
-                        ['from' => '20:00', 'until' => '23:59'], // night shift
-                    ],
-                    false, // holiday :-D
-                ];
-
-                return $shuffle[rand(0, 3)];
-            }));
-
-        $this->app->instance('ICalService', $ICalServiceMock);
-    }
-
     public function requestTypeProvider()
     {
         $dateParam = date('Y-m-d');
@@ -94,10 +59,7 @@ class QueryControllerTest extends \TestCase
      * @dataProvider requestTypeProvider
      **/
     public function testValidateNoServiceArgumentIsAPathNotFoundError($typeParams)
-    {
-        $this->setupICalServiceServiceMock();
-        // undo service setter
-        // will be restored for next test by setup
+    {  
         $this->serviceId = null;
         $call = $this->doRequest('GET', $typeParams);
         $call->seeStatusCode(404);
@@ -117,7 +79,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateInvallidServiceIdentifierIsAModelNotFoundError($typeParams)
     {
-        $this->setupICalServiceServiceMock();
         $this->serviceId = 'notAServiceId';
         $call = $this->doRequest('GET', $typeParams);
         $call->seeStatusCode(422);
@@ -136,7 +97,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateServiceWithoutChannelsReturnsNotFoundError()
     {
-        $this->setupICalServiceServiceMock();
         $this->serviceId = factory(\App\Models\Service::class)->create(['label' => 'testChildlessService'])->id;
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('Y-m-d')]);
         $call->seeStatusCode(400);
@@ -162,7 +122,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursRequiresFromUntilParameters()
     {
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'openinghours']);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
@@ -192,7 +151,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursFromUntilParametersMustBeVallidDateFormat()
     {
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => 'notADate', 'until' => 'notADate']);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
@@ -222,7 +180,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursFromMustComeBeforUntil()
     {
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2016-01-01']);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
@@ -247,7 +204,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursFromUntilParametersMustBeWithinOneYear()
     {
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2018-01-05']);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
@@ -272,7 +228,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursWithPeriodRequiresDateParameter()
     {
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day']);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
@@ -330,7 +285,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursDatesCanHandlePHPDateFormats($dateTypes)
     {
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'openinghours'] + $dateTypes);
         $call->seeStatusCode(200);
     }
@@ -342,8 +296,6 @@ class QueryControllerTest extends \TestCase
      **/
     public function testItHasOnlyOneChannelkeyWhenChannelParamIsGiven($typeParams)
     {
-        // {host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}&format={format}
-        $this->setupICalServiceServiceMock();
         $this->channelKeys = $this->channelKeys->first();
         $call = $this->doRequest('GET', $typeParams);
         $content = $this->getContentStructureTested($call);
@@ -356,8 +308,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testItReturnsGoodResultsOnTypeOpenNow()
     {
-        // {host}/api/query?q=now&serviceUri={serviceUri}&format={format}
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'open-now']);
         $this->getContentStructureTested($call);
     }
@@ -368,10 +318,7 @@ class QueryControllerTest extends \TestCase
      */
     public function testItReturnsGoodResultsOnTypeDayWithDateParam()
     {
-        // {host}/api/query?q=day&date={mm-dd-yyyy}&serviceUri={serviceUri}&format={format}
-        $this->setupICalServiceServiceMock();
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('d-m-Y')]);
-        $this->setupICalServiceServiceMock();
         $this->getContentStructureTested($call);
     }
 
@@ -381,8 +328,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testItGivesSevenDaysPerChannelOnTypeWeek()
     {
-        // {host}/api/query?q=week&serviceUri={serviceUri}&format={format}
-        $this->setupICalServiceServiceMock();
         $dateParam = date('d-m-Y', strtotime('tomorrow'));
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => date('d-m-Y')]);
         $content = $this->getContentStructureTested($call);
@@ -405,7 +350,7 @@ class QueryControllerTest extends \TestCase
 
         foreach ($content as $channelBlock) {
             // first 0 key is monday
-            $this->assertFalse($channelBlock['openinghours'][0]['open']);
+            $this->assertFalse($channelBlock['openinghours']['2017-09-04']['open']);
         }
     }
 
