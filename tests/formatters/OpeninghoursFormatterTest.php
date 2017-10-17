@@ -98,18 +98,19 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatJsonLdEhNotSureYet()
     {
         $this->formatter->setService($this->service);
-        $output = $this->formatter->render('json-ld', $this->data); 
+        $output = $this->formatter->render('json-ld', $this->data);
 
         $result = '[';
         $result .= '{"@id":"http://data.europa.eu/m8g/Channel"},';
         $result .= '{"@id":"http://dev.foo/cultuurdienst","@type":["http://schema.org/Organization"]},';
         $result .= '{"@id":"http://schema.org/Organization"},';
-        $result .= '{"@id":"https://qa.stad.gent/id/openinghours/channel/1","@type":["http://data.europa.eu/m8g/Channel"],"http://schema.org/label":[{"@value":"Balie"}],';
-        $result .= '"http://schema.org/openingHours":[{"@value":"15-09-2017:    09:00 - 12:00   13:00 - 17:00\n\n"}],"http://data.europa.eu/m8g/isOwnedBy":[{"@id":"http://dev.foo/cultuurdienst"}]},';
-        $result .= '{"@id":"https://qa.stad.gent/id/openinghours/channel/2","@type":["http://data.europa.eu/m8g/Channel"],"http://schema.org/label":[{"@value":"Non-public contact"}],';
-        $result .= '"http://schema.org/openingHours":[{"@value":"15-09-2017:    09:00 - 12:00   13:00 - 17:00\n\n"}],"http://data.europa.eu/m8g/isOwnedBy":[{"@id":"http://dev.foo/cultuurdienst"}]},';
-        $result .= '{"@id":"https://qa.stad.gent/id/openinghours/channel/3","@type":["http://data.europa.eu/m8g/Channel"],"http://schema.org/label":[{"@value":"Technical staff"}],';
-        $result .= '"http://schema.org/openingHours":[{"@value":"15-09-2017:    09:00 - 12:00   13:00 - 17:00\n\n"}],"http://data.europa.eu/m8g/isOwnedBy":[{"@id":"http://dev.foo/cultuurdienst"}]}';
+        $channelsResult = [];
+        foreach ($this->service->channels as $channel) {
+            $resultSub = '{"@id":"https://qa.stad.gent/id/openinghours/channel/'.$channel->id.'","@type":["http://data.europa.eu/m8g/Channel"],"http://schema.org/label":[{"@value":"'.$channel->label.'"}],';
+            $resultSub .= '"http://schema.org/openingHours":[{"@value":"15-09-2017:    09:00 - 12:00   13:00 - 17:00\n\n"}],"http://data.europa.eu/m8g/isOwnedBy":[{"@id":"http://dev.foo/cultuurdienst"}]}';
+            $channelsResult[] = $resultSub;
+        }
+        $result .= implode(',', $channelsResult);
         $result .= ']';
         $this->assertEquals($result, $output);
     }
@@ -122,11 +123,11 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatHtmlGivesHtml()
     {
         $output = $this->formatter->render('html', $this->data);
-        $result = "<div>" .
-            "<h4>Balie</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li><li>13:00 - 17:00</li></ul>" .
-            "<h4>Non-public contact</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li><li>13:00 - 17:00</li></ul>" .
-            "<h4>Technical staff</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li><li>13:00 - 17:00</li></ul>" .
-            "</div>";
+        $result = "<div>";
+        foreach ($this->service->channels as $channel) {
+            $result .= "<h4>" . $channel->label . "</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li><li>13:00 - 17:00</li></ul>";
+        }
+        $result .= "</div>";
         $this->assertEquals($result, $output);
     }
 
@@ -138,19 +139,17 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatTextGivesAString()
     {
         $output = $this->formatter->render('text', $this->data);
-        $result = PHP_EOL . "Balie:" . PHP_EOL;
-        $result .= "======" . PHP_EOL;
-        $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00" . PHP_EOL;
-        $result .= PHP_EOL;
-        $result .= PHP_EOL . "Non-public contact:" . PHP_EOL;
-        $result .= "===================" . PHP_EOL;
-        $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00" . PHP_EOL;
-        $result .= PHP_EOL;
-        $result .= PHP_EOL . "Technical staff:" . PHP_EOL;
-        $result .= "================" . PHP_EOL;
-        $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00";
+        $result = '';
+        foreach ($this->service->channels as $channel) {
+            $result .= $channel->label . ":" ;            
+            $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00" ;
+        } 
+        // remove all EOL's 
+        $removedEOL = str_replace(PHP_EOL, '', $output); 
+        // remove fancy double lines under channel names
+        $cleanedoutput = str_replace('=', '', $removedEOL); 
 
-        $this->assertEquals($result, $output);
+        $this->assertEquals($result, $cleanedoutput);
     }
 
 }
