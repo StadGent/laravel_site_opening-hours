@@ -80,10 +80,6 @@ class AppServiceProvider extends ServiceProvider
             return \App\Services\ChannelService::getInstance();
         });
 
-        $this->app->singleton('ICalService', function ($app) {
-            return \App\Services\ICalService::getInstance();
-        });
-
         $this->app->singleton('OpeninghoursService', function ($app) {
             return \App\Services\OpeninghoursService::getInstance();
         });

@@ -23,17 +23,28 @@ class HtmlFormatter extends BaseFormatter
     {
         $formattedSchedule = '<div>';
 
-        foreach ($data as $channel => $schedule) {
-            $formattedSchedule .= "<h4>$channel</h4>";
-            if (!empty($schedule)) {
-                if (is_array($schedule)) {
-                    foreach ($schedule as $entry) {
-                        $formattedSchedule .= "<div>$entry</div>";
+        foreach ($data as $channelObj) {
+            $formattedSchedule .= "<h4>$channelObj->channel</h4>";
+            if (isset($channelObj->openNow)) {
+                $formattedSchedule .= "<div>" . $channelObj->openNow->label . "</div>";
+            } else {
+
+                foreach ($channelObj->openinghours as $ohObj) {
+                    $formattedSchedule .= "<div>" . date('d-m-Y', strtotime($ohObj->date)) . "</div>";
+                    $formattedSchedule .= "<ul>";
+
+                    if ($ohObj->open) {
+                        foreach ($ohObj->hours as $hoursObj) {
+                            $formattedSchedule .= "<li>" . $hoursObj['from'] . " - " . $hoursObj['until'] . "</li>";
+                        }
+                    } else {
+                        $formattedSchedule .= trans('openinghourApi.CLOSED');
                     }
-                    continue;
+
+                    $formattedSchedule .= "</ul>";
                 }
-                $formattedSchedule .= "<div>$schedule</div>";
             }
+
         }
         $formattedSchedule .= '</div>';
         $this->output = $formattedSchedule;

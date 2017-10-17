@@ -39,9 +39,10 @@ class QueryController extends Controller
      */
     public function nowOpenAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
-        $this->OpeninghoursService->isOpenNow($service, $channel);
+        $this->OpeninghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
         // output format with json as default
-        $output = $this->OpeninghoursFormatter->render('json', $this->OpeninghoursService->getData());
+        $this->OpeninghoursFormatter->setService($service);
+        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
 
         return response()->make($output);
     }
@@ -61,6 +62,7 @@ class QueryController extends Controller
         $end = new Carbon($request['until']);
 
         $this->OpeninghoursService->collectData($start->startOfDay(), $end->endOfDay(), $service, $channel);
+        $this->OpeninghoursFormatter->setService($service);
         $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
 
         return response()->make($output);
@@ -83,6 +85,7 @@ class QueryController extends Controller
         $this->OpeninghoursService->collectData($start, $end, $service, $channel);
 
         $this->OpeninghoursService->getData();
+        $this->OpeninghoursFormatter->setService($service);
         $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
 
         return response()->make($output);
@@ -104,6 +107,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
         $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+        $this->OpeninghoursFormatter->setService($service);
         $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
 
         return response()->make($output);
@@ -125,6 +129,7 @@ class QueryController extends Controller
         $end = $date->copy()->endOfMonth();
 
         $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+        $this->OpeninghoursFormatter->setService($service);
         $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
 
         return response()->make($output);
@@ -146,6 +151,7 @@ class QueryController extends Controller
         $end = $date->copy()->endOfYear();
 
         $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+        $this->OpeninghoursFormatter->setService($service);
         $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
 
         return response()->make($output);
