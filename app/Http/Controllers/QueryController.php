@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GetQueryRequest;
+use App\Models\Channel;
 use App\Models\Service;
 use Carbon\Carbon;
 
@@ -12,69 +13,142 @@ use Carbon\Carbon;
 class QueryController extends Controller
 {
     /**
-     * Action for query
+     * @var App\Services\OpeninghoursService
+     */
+    private $OpeninghoursService;
+
+    /**
+     * @var App\Formatters\OpeninghoursFormatter
+     */
+    private $OpeninghoursFormatter;
+
+    public function __construct()
+    {
+        $this->OpeninghoursService = app('OpeninghoursService');
+        $this->OpeninghoursFormatter = app('OpeninghoursFormatter');
+    }
+
+    /**
+     * Collection of Channels with values or is now open or not
      *
-     * Check the parameters and load models.
-     * Compute data by OpeninghoursService according to param q
-     * Send data to formatter by given param format
-     * Return formated data as output
-     *
-     * @param  App\Http\Requests\GetQueryRequest $request
+     * @todo  check the correct output by Accept header
+     * @param  GetQueryRequest $request [description]
+     * @param  Service         $service [description]
+     * @param  Channel         $channel [description]
      * @return \Illuminate\Http\Response
      */
-    public function query(GetQueryRequest $request)
+    public function nowOpenAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
-        if ($request->input('lang')) {
-            \App::setLocale($request->input('lang'));
-        }
-        // set service uri as service unique key
-        $serviceModel = Service::where(['uri' => $request->input('serviceUri')])->first();
-        $openinghoursService = app('OpeninghoursService');
-        $openinghoursService->setServiceModel($serviceModel);
-
-        // set channel if available
-        $channelModel = null;
-        if ($request->input('channel')) {
-            $channelModel = $serviceModel->channels()->where('label', '=', $request->input('channel'))->first();
-            $openinghoursService->setChannelModel($channelModel);
-        }
-
-        $date = null;
-        if ($request->input('date')) {
-            $date = Carbon::createFromFormat('d-m-Y', $request->input('date'));
-        }
-        /** @todo make these sepperate actions on controller */
-        try {
-            switch ($request->input('q')) {
-                case 'now':
-                    $openinghoursService->isOpenNow();
-                    break;
-                case 'day':
-                    $openinghoursService->isOpenOnDay($date);
-                    break;
-                case 'week':
-                    $openinghoursService->isOpenForNextSevenDays();
-                    break;
-                case 'fullWeek':
-                    $openinghoursService->isOpenForFullWeek($date);
-                    break;
-            }
-        } catch (\Exception $ex) {
-            \Log::error($ex->getMessage());
-            \Log::error($ex->getTraceAsString());
-
-            return response()->json(['message' => $ex->getMessage()], 400);
-        }
-
-        /** return rendered output **/
+        $this->OpeninghoursService->isOpenNow($service, $channel);
         // output format with json as default
-        $format = $request->input('format') ?: 'json';
-        // special for parent obj in json-ld
-        $formatter = app('OpeninghoursFormatter');
-        $formatter->serviceUri = $request->input('serviceUri');
-        // return rendered data
-        $output = $formatter->render($format, $openinghoursService->getData());
+        $output = $this->OpeninghoursFormatter->render('json', $this->OpeninghoursService->getData());
 
         return response()->make($output);
     }
+
+    /**
+     * Collection of openinghours with custom from - till
+     *
+     * @todo  check the correct output by Accept header
+     * @param Request $request
+     * @param Service $service
+     * @param Channel $channel
+     * @return \Illuminate\Http\Response
+     */
+    public function fromTillAction(GetQueryRequest $request, Service $service, Channel $channel)
+    {
+        $start = new Carbon($request['from']);
+        $end = new Carbon($request['until']);
+
+        $this->OpeninghoursService->collectData($start->startOfDay(), $end->endOfDay(), $service, $channel);
+        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+
+        return response()->make($output);
+    }
+
+    /**
+     * Collection of openinghours for one day
+     *
+     * @todo  check the correct output by Accept header
+     * @param Request $request
+     * @param Service $service
+     * @param Channel $channel
+     * @return \Illuminate\Http\Response
+     */
+    public function dayAction(GetQueryRequest $request, Service $service, Channel $channel)
+    {
+        $start = new Carbon($request['date']);
+        $end = $start->copy()->endOfDay();
+
+        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+
+        $this->OpeninghoursService->getData();
+        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+
+        return response()->make($output);
+    }
+
+    /**
+     * Collection of openinghours for one week
+     *
+     * @todo  check the correct output by Accept header
+     * @todo  find week based on given locale
+     * @param Request $request
+     * @param Service $service
+     * @param Channel $channel
+     * @return \Illuminate\Http\Response
+     */
+    public function weekAction(GetQueryRequest $request, Service $service, Channel $channel)
+    {
+        $date = new Carbon($request['date']);
+        $start = $date->copy()->startOfWeek();
+        $end = $date->copy()->endOfWeek();
+        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+
+        return response()->make($output);
+    }
+
+    /**
+     * Collection of openinghours for one month
+     *
+     * @todo  check the correct output by Accept header
+     * @param Request $request
+     * @param Service $service
+     * @param Channel $channel
+     * @return \Illuminate\Http\Response
+     */
+    public function monthAction(GetQueryRequest $request, Service $service, Channel $channel)
+    {
+        $date = new Carbon($request['date']);
+        $start = $date->copy()->startOfMonth();
+        $end = $date->copy()->endOfMonth();
+
+        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+
+        return response()->make($output);
+    }
+
+    /**
+     * Collection of openinghours for one year
+     *
+     * @todo  check the correct output by Accept header
+     * @param Request $request
+     * @param Service $service
+     * @param Channel $channel
+     * @return \Illuminate\Http\Response
+     */
+    public function yearAction(GetQueryRequest $request, Service $service, Channel $channel)
+    {
+        $date = new Carbon($request['date']);
+        $start = $date->copy()->startOfYear();
+        $end = $date->copy()->endOfYear();
+
+        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+
+        return response()->make($output);
+    }
+
 }
