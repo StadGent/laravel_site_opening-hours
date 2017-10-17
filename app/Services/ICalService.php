@@ -30,7 +30,7 @@ class ICalService
 
     /**
      * GetInstance for Singleton pattern
-     * 
+     *
      * @return ICalService
      */
     public static function getInstance()
@@ -250,13 +250,11 @@ class ICalService
                 if (!empty($hours)) {
                     $lastHourRange = end($hours);
 
-                    $lastHourRangeEnd = explode('-', $lastHourRange);
-
-                    if (trim(array_get($lastHourRangeEnd, 1, '')) < $dtStart->format('H:i')) {
-                        $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                    if (trim(array_get($lastHourRange['until'], 1, '')) < $dtStart->format('H:i')) {
+                        $hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
                     }
                 } else {
-                    $hours[] = $dtStart->format('H:i') . ' - ' . $dtEnd->format('H:i');
+                    $hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
                 }
             }
 
@@ -264,10 +262,6 @@ class ICalService
                 $uid = $event->uid;
             }
         }
-
-        $hours = array_unique($hours);
-
-        // return rtrim(implode($hours, ', '), ',');
 
         return $hours;
     }

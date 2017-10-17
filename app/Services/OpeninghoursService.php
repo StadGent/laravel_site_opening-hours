@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
+use App\Models\Calendar;
 use App\Models\Channel;
 use App\Models\Openinghours;
 use App\Models\Service;
@@ -16,25 +17,16 @@ use Carbon\Carbon;
 class OpeninghoursService
 {
     /**
-     * ServiceModel in scope
-     *
-     * @var App\Models\Service
-     */
-    private $serviceModel;
-
-    /**
-     * ChannelModel in scope
-     *
-     * @var \App\Models\Channel
-     */
-    private $channelModel;
-
-    /**
      * Computed data
      *
      * @var array
      */
     private $data;
+
+    /**
+     * @var DateInterval
+     */
+    private $dayInterval;
 
     /**
      * Singleton class instance.
@@ -46,11 +38,14 @@ class OpeninghoursService
     /**
      * Private contructor for Singleton pattern
      */
-    private function __construct() {}
+    private function __construct()
+    {
+        $this->dayInterval = \DateInterval::createFromDateString('1 day');
+    }
 
     /**
      * GetInstance for Singleton pattern
-     * 
+     *
      * @return OpeninghoursService
      */
     public static function getInstance()
@@ -59,6 +54,7 @@ class OpeninghoursService
             self::$instance = new OpeninghoursService();
         }
         self::$instance->serviceModel = null;
+
         return self::$instance;
     }
 
@@ -67,147 +63,25 @@ class OpeninghoursService
      *
      * @return OpeninghoursService  $this
      */
-    public function isOpenNow()
+    public function isOpenNow(Service $service, Channel $channel = null)
     {
-        if (!isset($this->serviceModel)) {
-            throw new \Exception('Set Service Model to calculate if a service', 1);
-        }
-        $start = new Carbon(); //('2017-09-14 22:00:00');
+        $start = Carbon::now();
         $end = $start->copy()->addMinute();
-        $this->collectData($start, $end);
+        $this->collectData($start, $end, $service, $channel);
 
-        /**
-         * @todo this logic needs to move to the formatter
-         */
         foreach ($this->data as &$channelData) {
-            if (!$channelData ||
-                !isset(array_values($channelData)[0]) ||
-                !isset(array_values($channelData)[0]['OH'])) {
-                $channelData = null;
-                continue;
-            }
-            $tmpDateData = array_values($channelData)[0];
-            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ?
-            trans('openinghourApi.CLOSED') : trans('openinghourApi.OPEN');
-        }
+            $openNow = new \stdClass();
+            $channelData->openNow = new \stdClass();
+            $openNow->status = false;
+            $openNow->label = trans('openinghourApi.CLOSED');
 
-        return $this;
-    }
-
-    /**
-     * Compute or the channel(s) have openinghours or are closed for a given day.
-     *
-     * @param  Carbon|null $date    date to see the data from
-     * @return OpeninghoursService  $this
-     */
-    public function isOpenOnDay(Carbon $start = null)
-    {
-        if (!isset($this->serviceModel)) {
-            throw new \Exception('Set Service Model to calculate if a service is open', 1);
-        }
-
-        if (!$start) {
-            $start = Carbon::today();
-        }
-        $end = $start->copy()->endOfDay();
-        $this->collectData($start, $end);
-
-        /**
-         * @todo this logic needs to move to the formatter
-         */
-        foreach ($this->data as &$channelData) {
-            if (!$channelData ||
-                !isset(array_values($channelData)[0]) ||
-                !isset(array_values($channelData)[0]['OH'])) {
-                $channelData = null;
-                continue;
-            }
-            $tmpDateData = array_values($channelData)[0];
-            $channelData = strpos('Gesloten', $tmpDateData['OH'][0]) !== false ?
-            trans('openinghourApi.CLOSED') : implode($tmpDateData['OH'], ', ');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Compute for the next seven days or the channel(s) have openinghours or are closed
-     *
-     * @return OpeninghoursService  $this
-     */
-    public function isOpenForNextSevenDays()
-    {
-        if (!isset($this->serviceModel)) {
-            throw new \Exception('Set Service Model to calculate if a service is open', 1);
-        }
-
-        $start = Carbon::now()->startOfDay();
-        $end = $start->copy()->addWeek()->subDay()->endOfDay();
-        $this->collectData($start, $end);
-
-        /**
-         * @todo this logic needs to move to the formatter
-         */
-        foreach ($this->data as &$channelData) {
-            if (!$channelData ||
-                !isset(array_values($channelData)[0]) ||
-                !isset(array_values($channelData)[0]['OH'])) {
-                $channelData = null;
-                continue;
+            if ($channelData->openinghours[0]->open) {
+                $openNow->status = true;
+                $openNow->label = trans('openinghourApi.OPEN');
             }
 
-            foreach ($channelData as $date => &$openhours) {
-                $tmpData = strpos('Gesloten', $openhours['OH'][0]) !== false ?
-                trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
-                $day = new Carbon($date);
-                $openhours = trans('openinghourApi.day_' . $day->dayOfWeek) . ' ' . $tmpData;
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Compute for a full week or the channel(s) have openinghours or are closed based on a given date
-     *
-     * @param  Carbon|null $date    date that falls into the requested week
-     * @return OpeninghoursService  $this
-     */
-    public function isOpenForFullWeek(Carbon $date = null)
-    {
-        if (!isset($this->serviceModel)) {
-            throw new \Exception('Set Service Model to calculate if a service is open', 1);
-        }
-
-        if (!$date) {
-            $date = Carbon::today();
-        }
-
-        $start = $date->startOfWeek();
-        $end = $start->copy()->addWeek()->subDay()->endOfDay();
-        $this->collectData($start, $end);
-
-        /**
-         * @todo this logic needs to move to the formatter
-         */
-        foreach ($this->data as &$channelData) {
-            if (!$channelData ||
-                !isset(array_values($channelData)[0]) ||
-                !isset(array_values($channelData)[0]['OH'])) {
-                $channelData = null;
-                continue;
-            }
-
-            foreach ($channelData as $date => &$openhours) {
-
-                $tmpDateData = array_values($channelData)[0];
-                //unset($channelData);
-
-                $tmpData = strpos('Gesloten', $openhours['OH'][0]) !== false ?
-                trans('openinghourApi.CLOSED') : implode($openhours['OH'], ', ');
-                $day = new Carbon($date);
-                $openhours = trans('openinghourApi.day_' . $day->dayOfWeek) . ' ' . $tmpData;
-            }
+            unset($channelData->openinghours);
+            $channelData->openNow = $openNow;
         }
 
         return $this;
@@ -216,72 +90,142 @@ class OpeninghoursService
     /**
      * Collect for the channel(s) the openingshours per day between a start and end date
      *
-     * @param  Carbon $start        start date for calculations
-     * @param  Carbon $end          end date for calculations
+     * @param  Carbon       $start
+     * @param  Carbon       $end
+     * @param  Service      $service
+     * @param  Channel|null $channel
      * @return OpeninghoursService  $this
      */
-    protected function collectData(Carbon $start, Carbon $end)
+    public function collectData(Carbon $start, Carbon $end, Service $service, Channel $channel = null)
     {
-        foreach ($this->data as $channelLabel => &$value) {
-            $value = null;
-            $channel = Channel::where(['label' => $channelLabel])->first();
-            if (!$channel->openinghours()->count()) {
+
+        if (!isset($service->id)) {
+            throw new \Exception("Cannot get data without service model", 1);
+        }
+
+        $activeChannels = isset($channel->id) ? [$channel] : $service->channels;
+
+        $this->data = [];
+
+        foreach ($activeChannels as $currentChannel) {
+
+            $channelData = new \stdClass();
+            $this->data[$currentChannel->id] = $channelData;
+
+            $channelData->channel = $currentChannel->label;
+            $channelData->channelId = $currentChannel->id;
+            $channelData->openinghours = [];
+
+            if (!$currentChannel->openinghours()->count()) {
                 continue;
             }
 
-            $value = [];
-            // mutliple openinghour models possible
-            // if start + end extend over limits of model
-            // (openhours of months, endings on new year ...)
-            $openinghoursCol = $channel->openinghours()
-                ->where('start_date', '<=', $end->toDateString())
-                ->where('end_date', '>=', $start->toDateString())
-                ->get();
-            $dateInterval = \DateInterval::createFromDateString('1 day');
-            foreach ($openinghoursCol as $openinghours) {
-                // addapt begin and end to dates of openinghours
-                $calendarBegin = new Carbon($openinghours->start_date);
-                if ($start > $openinghours->start_date) {
-                    $calendarBegin = clone $start;
-                }
-                $calendarEnd = new Carbon($openinghours->end_date);
-                if ($end < $openinghours->end_date) {
-                    $calendarEnd = clone $end;
-                }
-                $calendars = $openinghours->calendars()
-                    ->orderBy('priority', 'asc')
-                    ->get();
-
-                $datePeriod = new \DatePeriod($calendarBegin, $dateInterval, $calendarEnd);
-
-                foreach ($calendars as $calendar) {
-                    $ical = null;
-                    foreach ($datePeriod as $day) {
-                        $key = $day->toDateString();
-                        // if value isset => it is done by a prev exception calendar
-                        if (isset($value[$key]['OH']) && $value[$key]['OH'] !== []) {
-                            continue;
-                        }
-                        $value[$key]['OH'] = [];
-                        // very slow => so only get the ical when required
-                        // is done inside the loop of days, as not sure it is needed and could be called for nothing
-                        if (!$ical) {
-                            $ical = app('ICalService')->createIcalFromCalendar($calendar, $calendarBegin, $calendarEnd);
-                        }
-                        // extract dayinfo
-                        $dayInfo = app('ICalService')->extractDayInfo($ical, $day, $day);
-                        if (!empty($dayInfo)) {
-                            $value[$key]['OH'] = $calendar->closinghours ? ['Gesloten'] : $dayInfo;
-                        }
-                    }
-                }
-            }
             // fill up the requested dates not covered by the calendars
-            $datePeriod = new \DatePeriod($start, $dateInterval, $end);
+            $datePeriod = new \DatePeriod($start, $this->dayInterval, $end);
             foreach ($datePeriod as $day) {
                 $key = $day->toDateString();
-                if (isset($value[$key]['OH']) && $value[$key]['OH'] === []) {
-                    $value[$key]['OH'] = ['Gesloten'];
+                $hoursObj = new \stdClass();
+                $hoursObj->date = $key;
+                $hoursObj->open = null;
+                $channelData->openinghours[$key] = $hoursObj;
+            }
+
+            $this->collectDataForChannel($currentChannel, $start, $end);
+        }
+
+        return $this;
+    }
+
+    /**
+     *  collect data for a channel
+     *
+     * @param  Channel $channel
+     * @param  Carbon  $start
+     * @param  Carbon  $end
+     * @return OpeninghoursService  $this
+     */
+    private function collectDataForChannel(Channel $channel, Carbon $start, Carbon $end)
+    {
+        $channelData = $this->data[$channel->id];
+        $hoursObj = $channelData->openinghours;
+
+        // mutliple openinghour models possible
+        // if start + end extend over limits of model
+        // (openhours of months, endings on new year ...)
+        $openinghoursCollection = $channel->openinghours()
+            ->where('start_date', '<=', $end->toDateString())
+            ->where('end_date', '>=', $start->toDateString())
+            ->get();
+
+        foreach ($openinghoursCollection as $openinghours) {
+            // addapt begin and end to dates of openinghours
+            $calendarBegin = new Carbon($openinghours->start_date);
+            if ($start > $openinghours->start_date) {
+                $calendarBegin = clone $start;
+            }
+            $calendarEnd = new Carbon($openinghours->end_date);
+            if ($end < $openinghours->end_date) {
+                $calendarEnd = clone $end;
+            }
+            $calendars = $openinghours->calendars()
+                ->orderBy('priority', 'asc')
+                ->get();
+
+            $datePeriod = new \DatePeriod($calendarBegin, $this->dayInterval, $calendarEnd);
+
+            foreach ($calendars as $calendar) {
+                $this->collectDataFromCalendar($hoursObj, $calendar, $calendarBegin, $calendarEnd, $datePeriod);
+            }
+            // set all days withing calendar range without value to open = false (for example weekends)
+            foreach ($datePeriod as $day) {
+                $key = $day->toDateString();
+                if ($hoursObj[$key]->open === null) {
+                    $hoursObj[$key]->open = false;
+                    $hoursObj[$key]->hours = [];
+                }
+            }
+        }
+        // remove date keys that where needed for quick navigation
+        $channelData->openinghours = array_values($hoursObj);
+
+        return $this;
+    }
+
+    /**
+     * Loop over dates of calender to collect the data
+     *
+     * When a more dominant calendar already filled in the date, no data will be collected
+     * The current collecting of the ICal is very expensive so will be avoided if possible
+     * It is done inside the loop of days, so it will only be called when sertain that it is needed
+     *
+     * @param $hoursObj
+     * @param Calendar $calendar
+     * @param Carbon $calendarBegin
+     * @param Carbon $calendarEnd
+     * @param \DatePeriod $datePeriod
+     * @return OpeninghoursService  $this
+     */
+    private function collectDataFromCalendar($hoursObj, Calendar $calendar, Carbon $calendarBegin, Carbon $calendarEnd, \DatePeriod $datePeriod)
+    {
+        $ical = null;
+        foreach ($datePeriod as $day) {
+            $key = $day->toDateString();
+            // if value isset => it is done by a prev exception calendar
+            if ($hoursObj[$key]->open !== null) {
+                continue;
+            }
+            // very slow => so only get the ical when required
+            if (!$ical) {
+                $ical = app('ICalService')->createIcalFromCalendar($calendar, $calendarBegin, $calendarEnd);
+            }
+            // extract dayinfo
+            $dayInfo = app('ICalService')->extractDayInfo($ical, $day, $day);
+            if (!empty($dayInfo)) {
+                $hoursObj[$key]->open = false;
+                $hoursObj[$key]->hours = [];
+                if (!$calendar->closinghours) {
+                    $hoursObj[$key]->open = true;
+                    $hoursObj[$key]->hours = $dayInfo;
                 }
             }
         }
@@ -298,7 +242,7 @@ class OpeninghoursService
      *
      * @param  Openinghours $openinghours
      * @param  string       $type
-     * @return void
+     * @return OpeninghoursService  $this
      */
     public function makeSyncJobsForExternalServices(Openinghours $openinghours, $type)
     {
@@ -323,6 +267,8 @@ class OpeninghoursService
                 dispatch(new DeleteLodOpeninghours($service->id, $openinghours->id));
                 break;
         }
+
+        return $this;
     }
 
     /**
@@ -335,36 +281,4 @@ class OpeninghoursService
         return $this->data;
     }
 
-    /**
-     * Setter App\Models\Service
-     *
-     * + reset $this->channelModel
-     * + reset $this->data with channels of the Service as default;
-     *
-     * @param Service $serviceModel [description]
-     */
-    public function setServiceModel(Service $serviceModel)
-    {
-        $this->serviceModel = $serviceModel;
-        $this->channelModel = null;
-        $this->data = array_fill_keys($this->serviceModel->channels()->pluck('label')->all(), null);
-
-        return $this;
-    }
-
-    /**
-     * Setter  App\Models\Channel
-     *
-     * + reset $this->data with this channel;
-     *
-     * @param Channel $channelModel [description]
-     */
-    public function setChannelModel(Channel $channelModel)
-    {
-
-        $this->channelModel = $channelModel;
-        $this->data = [$this->channelModel->label => null];
-
-        return $this;
-    }
 }
