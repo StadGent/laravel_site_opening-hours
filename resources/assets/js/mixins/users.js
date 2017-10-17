@@ -10,7 +10,7 @@ export default {
   computed: {
     routeUser () {
       return this.users.find(u => u.id === this.route.user) || {}
-    }
+    },
   },
   methods: {
     fetchUsers(id) {
@@ -18,7 +18,21 @@ export default {
         .then(({ data }) => {
           this.users = (data || []).map(expandUser)
         }).catch(fetchError)
-    }
+    },
+    translateRole (role) {
+
+          let translation;
+
+          switch(role) {
+              case 'admin': translation = 'Admin'; break;
+              case 'AppUser': translation = 'Gebruiker'; break;
+              case 'Member': translation = 'Lid'; break;
+              case 'Owner': translation = 'Eigenaar'; break;
+              default: translation = role;
+          }
+
+          return translation;
+      }
   },
   mounted() {
     this.fetchUsers()
