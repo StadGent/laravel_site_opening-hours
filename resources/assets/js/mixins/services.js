@@ -53,7 +53,7 @@ export default {
                     this.serviceLock = false
                 })
                 .then(() => {
-                    console.info('services fetched')
+                    console.info('services fetched');
                 })
                 .then(() => {
                     //fetch channel in case of direct url access.
@@ -79,10 +79,16 @@ export default {
                     this.$set(this.routeService, 'channels', data);
                 })
                 .then(() => {
+                    return this.$http.get('/api/ui/users/getUsersByService/' + this.route.service)
+                })
+                .then(({data}) => {
+                    this.$set(this.routeService, 'users', data);
+                })
+                .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
                 })
                 .then(() => {
-                    console.info('channels fetched');
+                    console.info('channels & users fetched for service');
                 })
                 .then(() => {
                     //in case the version was fetched before the channel,

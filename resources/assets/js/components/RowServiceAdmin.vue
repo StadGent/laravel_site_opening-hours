@@ -38,14 +38,5 @@ export default {
       }
   },
   mixins: [RowServiceMixin],
-  computed: {
-      //todo figure out what this does...
-//    activeUsers () {
-//      return this.s.activeUsers.map(u => u.email) || []
-//    },
-//    ghostUsers () {
-//      return this.s.ghostUsers.map(u => u.email) || []
-//    }
-  }
 }
 </script>
