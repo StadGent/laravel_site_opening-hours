@@ -47,19 +47,24 @@ abstract class BaseFormatter implements FormatterInterface
      * @param  string|array $dayInfo
      * @return string
      */
-    protected function makeTextForDayInfo($dayInfo)
+    protected function makeTextForDayInfo($openinghours)
     {
-
-        if (is_array($dayInfo)) {
-            $text = '';
-            foreach ($dayInfo as $date => $oh) {
-                $text .= date('d-m-Y', strtotime($date)) . ' ' . $oh . PHP_EOL;
+        $text = '';
+        foreach ($openinghours as $ohObj) {
+            $text .= date('d-m-Y', strtotime($ohObj->date)) . ': ';
+            if ($ohObj->open) {
+                foreach ($ohObj->hours as $hoursObj) {
+                    $text .= '   ' . $hoursObj['from'] . " - " . $hoursObj['until'];
+                }
+            } else {
+                $text .= '   ' . trans('openinghourApi.CLOSED');
             }
 
-            return $text;
+            $text .= PHP_EOL;
         }
+        $text .= PHP_EOL;
 
-        return $dayInfo . PHP_EOL;
+        return $text;
     }
 
     /**

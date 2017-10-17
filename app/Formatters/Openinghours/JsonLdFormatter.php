@@ -18,7 +18,7 @@ class JsonLdFormatter extends BaseFormatter
      * contains the uri of the active record service
      * @var string
      */
-    public $serviceUri;
+    public $service;
     /**
      * Return a JSON-LD formatted openinghours schedule
      * TODO: rework how a schedule is returned, some formats
@@ -30,21 +30,26 @@ class JsonLdFormatter extends BaseFormatter
      */
     public function render($data)
     {
+        if (!$this->service) {
+            throw new \Exception("JSON-LD formatter needs a service to be set", 1);
+        }
         \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
 
         $graph = new \EasyRdf_Graph();
-        $service = $graph->resource($this->serviceUri, 'schema:Organization');
-        $serviceModel = \App\Models\Service::where('uri', '=', $this->serviceUri)->first();
-        $channels = $serviceModel->channels;
+        $service = $graph->resource($this->service->uri, 'schema:Organization');
+        $channels = $this->service->channels;
         // get a raw render for the week:
         // $channel id + days index in english
         // for each channel create an openinghours specification
         // where the channel URI is also set as some sort of context
-        foreach ($data as $channelName => $schedule) {
-            $channel = $channels->where('label', '=', $channelName)->first();
-            $channelSpecification = $graph->resource(createChannelUri($channel->id), 'cv:Channel');
-            $channelSpecification->addLiteral('schema:label', $channelName);
-            $channelSpecification->addLiteral('schema:openingHours', $this->makeTextForDayInfo($schedule));
+        foreach ($data as $channelObj) {
+            $channelSpecification = $graph->resource(createChannelUri($channelObj->channelId), 'cv:Channel');
+            $channelSpecification->addLiteral('schema:label', $channelObj->channel);
+            if (isset($channelObj->openNow)) {
+                $channelSpecification->addLiteral('schema:isOpenNow', ($channelObj->openNow) ? 'true' : 'false');
+            } else {
+                $channelSpecification->addLiteral('schema:openingHours', $this->makeTextForDayInfo($channelObj->openinghours));
+            }
             $channelSpecification->addResource('cv:isOwnedBy', $service);
         }
         $serialiser = new JsonLdSerialiser();
