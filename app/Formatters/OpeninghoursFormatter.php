@@ -3,6 +3,7 @@
 namespace App\Formatters;
 
 use App\Formatters\Openinghours\BaseFormatter;
+use App\Models\Service;
 
 /**
  * Formatter class for Openinghours
@@ -14,7 +15,7 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
      * contains the uri of the active record service
      * @var string
      */
-    public $serviceUri;
+    private $service;
 
     /**
      * @var array
@@ -40,6 +41,24 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
     }
 
     /**
+     * Return all supported formats of this endpoint
+     *
+     * @return array
+     */
+    public function getFormatters()
+    {
+        return $this->formatters;
+    }
+
+    /**
+     * @param Service $service
+     */
+    public function setService(Service $service)
+    {
+        $this->service = $service;
+    }
+
+    /**
      * Render data according to the given format
      *
      * @param  string $format to match with available formats
@@ -56,7 +75,7 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
         foreach ($this->formatters as $formatter) {
             if ($formatter->getSupportFormat() === $format) {
                 $activeFormatter = $formatter;
-                $activeFormatter->serviceUri = $this->serviceUri;
+                $activeFormatter->service = $this->service;
                 break;
             }
         }

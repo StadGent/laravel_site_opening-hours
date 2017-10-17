@@ -2,7 +2,6 @@
 
 namespace Tests\Controllers;
 
-use App\Services\ICalService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class QueryControllerTest extends \TestCase
@@ -45,8 +44,17 @@ class QueryControllerTest extends \TestCase
 
         return [
             [['type' => 'open-now']],
+            [['type' => 'open-now', 'format' => 'json-ld']],
+            [['type' => 'open-now', 'format' => 'html']],
+            [['type' => 'open-now', 'format' => 'text']],
             [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days'))]],
+            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'json-ld']],
+            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'html']],
+            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'text']],
             [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam]],
+            [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam, 'format' => 'json-ld']],
+            [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam, 'format' => 'html']],
+            [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam, 'format' => 'text']],
             [['type' => 'openinghours', 'period' => 'week', 'date' => $dateParam]],
             [['type' => 'openinghours', 'period' => 'month', 'date' => $dateParam]],
             [['type' => 'openinghours', 'period' => 'year', 'date' => $dateParam]],
@@ -59,8 +67,9 @@ class QueryControllerTest extends \TestCase
      * @dataProvider requestTypeProvider
      **/
     public function testValidateNoServiceArgumentIsAPathNotFoundError($typeParams)
-    {  
+    {
         $this->serviceId = null;
+        $typeParams['format'] = 'json';
         $call = $this->doRequest('GET', $typeParams);
         $call->seeStatusCode(404);
         $call->seeJsonEquals([
@@ -80,6 +89,7 @@ class QueryControllerTest extends \TestCase
     public function testValidateInvallidServiceIdentifierIsAModelNotFoundError($typeParams)
     {
         $this->serviceId = 'notAServiceId';
+        $typeParams['format'] = 'json';
         $call = $this->doRequest('GET', $typeParams);
         $call->seeStatusCode(422);
         $call->seeJsonEquals([
@@ -298,7 +308,9 @@ class QueryControllerTest extends \TestCase
     {
         $this->channelKeys = $this->channelKeys->first();
         $call = $this->doRequest('GET', $typeParams);
-        $content = $this->getContentStructureTested($call);
+        if (!isset($typeParams['format']) || $typeParams['format'] === 'json') {
+            $this->getContentStructureTested($call);
+        }
 
     }
 
@@ -389,7 +401,7 @@ class QueryControllerTest extends \TestCase
             }
         }
 
-        if ($this->format === 'html') {
+        if (isset($params['format']) && $params['format'] !== 'json') {
             return $this->call($type, $path);
         }
 
