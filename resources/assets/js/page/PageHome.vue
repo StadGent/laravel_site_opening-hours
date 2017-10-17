@@ -150,12 +150,15 @@ export default {
           // Bart: no idea what original developer is hinting at
 
           //Todo: Bart: users are no longer part of the services array... should they be?
-//        services.forEach(s => {
-//          Object.assign(s, {
-//            activeUsers: s.users.filter(u => u.verified),
-//            ghostUsers: s.users.filter(u => !u.verified)
-//          })
-//        })
+          // Also Bart: yes, yes they should
+
+        services.forEach(s => {
+          Object.assign(s, {
+            activeUsers: s.users.filter(u => u.verified),
+            ghostUsers: s.users.filter(u => !u.verified)
+          })
+        });
+
       }
       return services
     },
