@@ -5,7 +5,7 @@
         <a :href="'#!service/'+s.service_id">{{ s.label }}</a>
       </td>
       <td>
-        <div>{{ s.role === 'Owner' ? 'Eigenaar' : 'Lid' }}</div>
+        <div>{{$root.translateRole(s.role)}}</div>
       </td>
     </tr>
   </tbody>
