@@ -12,18 +12,18 @@ export default {
     },
     statusMessage() {
         if(this.s.countChannels === 0){
-          return 'Geen kanalen'
+          return 'Geen kanalen';
         }
  
         if (this.s.has_missing_oh === 1) {
-            return 'Ontbrekende kalender(s)'
+            return 'Ontbrekende kalender(s)';
         }
 
         if(this.s.has_inactive_oh === 1){
-            return 'Ontbrekende actieve kalender(s)'
+            return 'Ontbrekende actieve kalender(s)';
         }
 
-      return '✓ Volledig'
+      return '✓ Volledig';
     },
 
     // TODO: refactor into structured set of messages
@@ -44,6 +44,6 @@ export default {
     }
   },
   mounted () {
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-toggle="tooltip"]').tooltip();
   }
 }
