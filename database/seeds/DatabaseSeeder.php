@@ -67,5 +67,4 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info("Database cleared \r\n");
     }
-
 }

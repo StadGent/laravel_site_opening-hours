@@ -18,7 +18,6 @@ class UsersTableSeeder extends Seeder
         $roles = Role::all();
 
         foreach ($roles as $roleConfig) {
-
             $name = strtolower($roleConfig['name']);
             $password = 'opening' . $name;
 
