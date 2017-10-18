@@ -66,7 +66,6 @@ export default {
     channel () {
       return this.$root.routeChannel || {}
     },
-
     versions () {
       return this.$root.routeChannel.openinghours || []
     },

@@ -10,7 +10,7 @@
         <div v-if="! u.roles.length">-</div>
         <div>
           <div v-for="r in u.roles">
-            {{ r.role === 'Owner' ? 'Eigenaar' : 'Lid' }}
+            {{$root.translateRole(r.role)}}
             &nbsp;
             <a :href="'#!service/' + r.service_id">{{ $root.serviceById(r.service_id).label }}</a>
           </div>
