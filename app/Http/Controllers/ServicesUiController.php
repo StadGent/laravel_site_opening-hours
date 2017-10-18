@@ -30,11 +30,21 @@ class ServicesUiController extends Controller
      */
     public function index(Request $request)
     {
+
         if ($request->user('api')->hasRole('Admin')) {
-            return app('ServicesRepository')->getExpandedServices();
+            $services = app('ServicesRepository')->getExpandedServices();
+
+            $userRepository = app('UserRepository');
+
+            foreach ($services as $service) {
+                $service->users = $userRepository->getAllInService($service->id);
+            }
+
+            return $services;
         }
 
         return app('ServicesRepository')->getExpandedServiceForUser($request->user('api')->id);
+
     }
 
     /**
