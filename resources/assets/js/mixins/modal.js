@@ -9,7 +9,7 @@ export const modal = {
   start_date: null,
   end_date: null,
   text: null
-}
+};
 
 export default {
   data() {
@@ -33,34 +33,34 @@ export default {
       }
     },
     requestService() {
-      console.log('req')
+      console.log('req');
       this.modal.text = 'requestService'
     },
 
     newChannel(srv) {
-      this.modal.text = 'newChannel'
-      this.modal.label = ''
+      this.modal.text = 'newChannel';
+      this.modal.label = '';
       this.modal.srv = srv
     },
     newVersion(srv) {
-      this.modal = Object.assign(this.modal, createVersion())
-      this.modal.text = 'newVersion'
-      this.modal.srv = srv
+      this.modal = Object.assign(this.modal, createVersion());
+      this.modal.text = 'newVersion';
+      this.modal.srv = srv;
 
-      const expires = expiresOn(hasActiveOh(this.$root.routeChannel))
+      const expires = expiresOn(hasActiveOh(this.$root.routeChannel));
       if (expires) {
-        this.modal.start_date = expires.slice(0, 4) + '-01-01'
-        this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + VERSION_YEARS - 1) + '-12-31'
+        this.modal.start_date = expires.slice(0, 4) + '-01-01';
+        this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + VERSION_YEARS - 1) + '-12-31';
         this.modal.label = ''
       }
     },
     newCalendar(srv) {
-      this.modal.text = 'newCalendar'
+      this.modal.text = 'newCalendar';
       this.modal.srv = srv
     },
 
     editVersion(v) {
-      this.modal.text = 'newVersion'
+      this.modal.text = 'newVersion';
       Object.assign(this.modal, v)
     },
 

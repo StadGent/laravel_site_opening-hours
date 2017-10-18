@@ -10,15 +10,29 @@ export default {
   computed: {
     routeUser () {
       return this.users.find(u => u.id === this.route.user) || {}
-    }
+    },
   },
   methods: {
     fetchUsers(id) {
-      return this.$http.get('/api/users')
+      return this.$http.get('/api/ui/users')
         .then(({ data }) => {
           this.users = (data || []).map(expandUser)
         }).catch(fetchError)
-    }
+    },
+    translateRole (role) {
+
+          let translation;
+
+          switch(role) {
+              case 'admin': translation = 'Admin'; break;
+              case 'AppUser': translation = 'Gebruiker'; break;
+              case 'Member': translation = 'Lid'; break;
+              case 'Owner': translation = 'Eigenaar'; break;
+              default: translation = role;
+          }
+
+          return translation;
+      }
   },
   mounted() {
     this.fetchUsers()
@@ -41,7 +55,7 @@ export default {
         return
       }
 
-      this.$http.post('/api/roles', newRole).then(() => {
+      this.$http.post('/api/ui/roles', newRole).then(() => {
         this.fetchUsers()
         this.fetchServices()
         this.modalClose()
@@ -55,7 +69,7 @@ export default {
         return console.log('Delete role canceled')
       }
 
-      this.$http.delete('/api/roles?service_id=' + role.service_id + '&user_id=' + role.user_id).then(() => {
+      this.$http.delete('/api/ui/roles?service_id=' + role.service_id + '&user_id=' + role.user_id).then(() => {
         this.fetchServices()
         this.modalClose()
       }).catch(fetchError)
@@ -77,7 +91,7 @@ export default {
         return
       }
 
-      this.$http.post('/api/roles', newRole).then(() => {
+      this.$http.post('/api/ui/roles', newRole).then(() => {
         this.fetchUsers()
         this.fetchServices()
         this.modalClose()
@@ -93,7 +107,7 @@ export default {
       }
       newUser.name = newUser.name || newUser.email
 
-      this.$http.post('/api/users', newUser).then(({ data }) => {
+      this.$http.post('/api/ui/users', newUser).then(({ data }) => {
         Object.assign(newUser, data)
         if (newUser.role) {
           Hub.$emit('createRole', newUser)
@@ -113,7 +127,7 @@ export default {
       if (!user.id) {
         return console.error('deleteRole: id is required')
       }
-      this.$http.delete('/api/users/' + user.id).then(() => {
+      this.$http.delete('/api/ui/users/' + user.id).then(() => {
         this.fetchUsers()
         this.fetchServices()
         this.modalClose()
@@ -123,11 +137,12 @@ export default {
 }
 
 export function expandUser (u) {
-  u.roles = u.roles || []
-  u.services = u.roles.map(r => r.service)
 
-  u.role = {}
-  for (var i = 0; i < u.roles.length - 1; i++) {
+  u.roles = u.roles || [];
+  u.services = u.roles.map(r => r.service_id);
+
+  u.role = {};
+  for (let i = 0; i < u.roles.length - 1; i++) {
     u.role[u.roles[i].service] = u.roles[i].role
   }
 

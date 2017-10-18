@@ -4,7 +4,7 @@ const DAY_IN_MS = 24 * 60 * 60 * 1000
 /** Service functions **/
 
 export function hasChannels(s) {
-  return s && s.channels || []
+  return s && s.countChannels || []
 }
 // Calendars in the first OH of the channels of a service
 function countCals(s) {

@@ -11,20 +11,23 @@
 |
  */
 
+
 /*************************/
 /** Authenticated UI API */
 /*************************/
-Route::group(['middleware' => 'auth:api'],
-    function () {
-        Route::resource('/users', 'UsersController');
-        Route::resource('/openinghours', 'OpeninghoursController');
-        Route::resource('/calendars', 'CalendarsController');
-        Route::resource('/channels', 'ChannelController');
-        Route::post('/roles', 'RolesController@update');
-        Route::delete('/roles', 'RolesController@destroy');
-        Route::get('/presets', 'PresetsController@index');
-    }
-);
+
+Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
+    Route::resource('/users', 'UsersController');
+    Route::resource('/openinghours', 'OpeninghoursController');
+    Route::resource('/calendars', 'CalendarsController');
+    Route::resource('/channels', 'ChannelController');
+    Route::resource('/channels/getChannelsByService', 'ChannelController@getChannelsByService');
+    Route::resource('/users/getUsersByService', 'UsersController@getUsersByService');
+    Route::resource('/services', 'ServicesUiController');
+    Route::post('/roles', 'RolesController@update');
+    Route::delete('/roles', 'RolesController@destroy');
+    Route::get('/presets', 'PresetsController@index');
+});
 
 /****************/
 /** Public API **/
@@ -57,3 +60,4 @@ Route::get('/services/{service}/channels/{channel}/openinghours/month', 'QueryCo
 Route::get('/services/{service}/channels/{channel}/openinghours/year', 'QueryController@yearAction');
 /** Get the current status of a specific channel for a service **/
 Route::get('/services/{service}/channels/{channel}/open-now', 'QueryController@nowOpenAction');
+
