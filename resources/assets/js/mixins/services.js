@@ -8,20 +8,20 @@ export default {
             versionDataQueue: [],
             serviceLock: false,
             channelDataQueue: [],
-        }
+        };
     },
     created() {
         this.fetchServices();
     },
     computed: {
         isRecreatex() {
-            return this.routeService.source === 'recreatex'
+            return this.routeService.source === 'recreatex';
         },
         routeService() {
-            return this.services.find(s => s.id === this.route.service) || {}
+            return this.services.find(s => s.id === this.route.service) || {};
         },
         routeChannel() {
-            return this.routeService.channels && this.routeService.channels.find(c => c.id === this.route.channel) || {}
+            return this.routeService.channels && this.routeService.channels.find(c => c.id === this.route.channel) || {};
         },
         routeVersion() {
 
@@ -37,14 +37,14 @@ export default {
                 return {};
             }
 
-            return this.routeChannel.openinghours.find(o => o.id === this.route.version) || {}
+            return this.routeChannel.openinghours.find(o => o.id === this.route.version) || {};
         },
         routeCalendar() {
-            return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.id === this.route.calendar) || {}
+            return this.routeVersion.calendars && this.routeVersion.calendars.find(c => c.id === this.route.calendar) || {};
         },
         serviceIndex() {
             return this.services.findIndex(s => {
-                return s.id === this.route.service
+                return s.id === this.route.service;
             })
         }
     },
@@ -72,7 +72,7 @@ export default {
                     // this.versionDataQueue = [];
                 })
                 .then(() => {
-                    this.serviceLock = false
+                    this.serviceLock = false;
                 })
                 .then(() => {
                     console.info('services fetched');
@@ -82,7 +82,7 @@ export default {
                     if (this.route.channel > -1) {
                         this.fetchChannels();
                     }
-                }).catch(fetchError)
+                }).catch(fetchError);
         },
         fetchChannels() {
 
@@ -107,7 +107,7 @@ export default {
                     this.$set(this.routeService, 'channels', data);
                 })
                 .then(() => {
-                    return this.$http.get('/api/ui/users/getUsersByService/' + this.route.service)
+                    return this.$http.get('/api/ui/users/getUsersByService/' + this.route.service);
                 })
                 .then(({data}) => {
                     this.$set(this.routeService, 'users', data);
@@ -136,7 +136,7 @@ export default {
                     this.applyVersionData(data);
                     this.versionDataQueue = this.versionDataQueue.filter(version => version !== this.route.version);
                 })
-                .catch(fetchError)
+                .catch(fetchError);
         },
         applyVersionData(data) {
 
@@ -153,13 +153,13 @@ export default {
             this.updateService();
         },
         serviceById(id) {
-            return this.services.find(s => s.id === id) || {}
+            return this.services.find(s => s.id === id) || {};
         },
         fetchPresets(next) {
             Vue.http.get('/api/ui/presets')
                 .then(({data}) => {
                     next(data);
-                }).catch(fetchError)
+                }).catch(fetchError);
         }
     },
     mounted() {
@@ -167,27 +167,27 @@ export default {
         Hub.$on('fetchChannels', this.fetchChannels);
         Hub.$on('activateService', service => {
             if (!service.id) {
-                return console.error('activateService: id is missing')
+                return console.error('activateService: id is missing');
             }
             service.draft = false;
 
             this.$http.put('/api/ui/services/' + service.id, {draft: false}).then(({data}) => {
-                service.draft = data.draft
-            }).catch(fetchError)
+                service.draft = data.draft;
+            }).catch(fetchError);
         });
         Hub.$on('deactivateService', service => {
             if (!service.id) {
-                return console.error('deactivateService: id is missing')
+                return console.error('deactivateService: id is missing');
             }
             service.draft = true;
 
             this.$http.put('/api/ui/services/' + service.id, {draft: true}).then(({data}) => {
-                service.draft = data.draft
-            }).catch(fetchError)
+                service.draft = data.draft;
+            }).catch(fetchError);
         });
         Hub.$on('createChannel', channel => {
             if (!channel.srv) {
-                return console.error('createChannel: service is missing')
+                return console.error('createChannel: service is missing');
             }
 
             channel.service_id = channel.srv && channel.srv.id;
@@ -195,28 +195,28 @@ export default {
                 // this.fetchServices();
                 this.fetchChannels();
                 this.modalClose();
-                this.toChannel(data.id)
+                this.toChannel(data.id);
             }).catch(fetchError)
         });
         Hub.$on('deleteChannel', channel => {
             if (!channel.id) {
-                return console.error('deleteChannel: id is missing')
+                return console.error('deleteChannel: id is missing');
             }
             if (!confirm('Zeker dat je dit kanaal wil verwijderen?')) {
-                return
+                return;
             }
             this.$http.delete('/api/ui/channels/' + channel.id).then(() => {
                 this.fetchServices();
                 this.modalClose();
-            }).catch(fetchError)
+            }).catch(fetchError);
         });
         Hub.$on('createVersion', input => {
             const version = Object.assign(createVersion(), input);
             if (!version.channel_id) {
-                version.channel_id = this.route.channel
+                version.channel_id = this.route.channel;
             }
             if (!version.service_id) {
-                version.service_id = this.route.service
+                version.service_id = this.route.service;
             }
             console.log('Create version', inert(version));
 
@@ -228,20 +228,10 @@ export default {
             // The user can now edit the first calendar of the new version
             this.$http.post('/api/ui/openinghours', version).then(({data}) => {
                 this.modalClose();
-
-                //why fetch services???
-                // this.fetchServices().then(() => {
-                //
-                //     Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
-                //         openinghours_id: data.id
-                //     }), 'calendar')
-                // })
-
                 this.fetchChannels().then(() => {
-
                     Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
                         openinghours_id: data.id
-                    }), 'calendar')
+                    }), 'calendar');
                 });
 
 
@@ -249,27 +239,27 @@ export default {
         });
         Hub.$on('updateVersion', version => {
             if (!version || !version.id) {
-                return console.warn('id is missing', version)
+                return console.warn('id is missing', version);
             }
 
             this.$http.put('/api/ui/openinghours/' + version.id, version).then(({data}) => {
                 this.fetchServices();
-                this.modalClose()
-            }).catch(fetchError)
+                this.modalClose();
+            }).catch(fetchError);
         });
         Hub.$on('deleteVersion', version => {
             if (!version || !version.id) {
-                return console.warn('id is missing', version)
+                return console.warn('id is missing', version);
             }
             if (!confirm('Zeker dat je deze versie wil verwijderen?')) {
-                return
+                return;
             }
 
             this.$http.delete('/api/ui/openinghours/' + version.id).then(() => {
                 this.modalClose();
                 this.toChannel(version.channel_id);
                 this.fetchServices();
-            }).catch(fetchError)
+            }).catch(fetchError);
         });
         Hub.$on('createCalendar', (calendar, done) => {
             if (!calendar.openinghours_id) {
@@ -303,21 +293,21 @@ export default {
                     this.routeVersion.calendars.push(data);
                     this.toVersion(data.openinghours_id);
                     this.toCalendar(data.id);
-                }).catch(fetchError)
+                }).catch(fetchError);
             }
         });
         Hub.$on('deleteCalendar', calendar => {
             if (!calendar.id) {
-                return console.warn('deleteCalendar: id is missing')
+                return console.warn('deleteCalendar: id is missing');
             }
             if (calendar.label !== 'Uitzondering' && !confirm('Zeker dat je deze kalender wil verwijderen?')) {
-                return
+                return;
             }
 
             this.$http.delete('/api/ui/calendars/' + calendar.id).then(() => {
 
                 this.fetchVersion(true);
-                this.toVersion()
+                this.toVersion();
             }).catch(fetchError)
         })
     }
