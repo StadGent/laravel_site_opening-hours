@@ -2,99 +2,66 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ChannelDeleted;
-use App\Http\Requests\StoreChannelRequest;
+use App\Models\Channel;
 use App\Models\Service;
-use App\Repositories\ChannelRepository;
-use App\Repositories\ServicesRepository;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class ChannelController extends Controller
 {
-    public function __construct(ChannelRepository $channels)
-    {
-        $this->channels = $channels;
-    }
-
     /**
-     * Display a listing of the resource.
+     * Get all entities
      *
-     * @return \Illuminate\Http\Response
+     * Will not be allowed as this is WAY TOO MUCH data
+     * the channels need to be required by the getFromService method
+     * Base not implemnted reply
+     *
+     * @return \Illuminate\Http\Response 501
      */
     public function index()
     {
-        throw new Exception('Not yet implemented');
+        return response()->json('Not Implemented', 501);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get the create form
      *
-     * @return \Illuminate\Http\Response
+     * Base not implemnted reply
+     *
+     * @return \Illuminate\Http\Response 501
      */
     public function create()
     {
-        throw new Exception('Not yet implemented');
+        return response()->json('Not Implemented', 501);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Post new entity to store
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreChannelRequest $request)
-    {
-        $input = $request->input();
-
-        $id = $this->channels->store($input);
-
-        $channel = $this->channels->getById($id);
-
-        if (! empty($channel)) {
-            return response()->json($channel);
-        }
-
-        return response()->json(['message' => 'Something went wrong while storing the new channel, check the logs.'], 400);
-    }
-
-    /**
-     * Display the specified resource.
+     * Base not implemnted reply
      *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response 501
      */
-    public function show($id)
+    public function store()
     {
-        $start = Carbon::today();
-        $end = Carbon::today();
-
-        return [
-            'label' => 'telefonisch',
-            'openinghours' => [
-                [
-                    'active' => true,
-                    'start_date' => $start->subMonth()->toDateString(),
-                    'end_date' => $end->subMonth()->addYear()->toDateString(),
-                    'id' => 5
-                ]
-            ]
-        ];
-    }
-
-    public function getChannelsByService($id){
-
-        $serviceRepo = new ServicesRepository(Service::find($id));
-        $channels = $serviceRepo->getChannels();
-
-        return response()->json($channels);
+        return response()->json('Not Implemented', 501);
     }
 
     /**
-     * Get channels from parent Service
-     * 
-     * @param  Service $service 
-     * @return  Illuminate\Database\Eloquent\Relations\HasMany
+     * Get with id
+     *
+     * Base get and return the Channel
+     *
+     * @return \App\Models\Channel
+     */
+    public function show(Channel $channel)
+    {
+        return $channel;
+    }
+
+    /**
+     * Get Subset of channels from Service
+     *
+     * @param Service $service
+     * @return Illuminate\Database\Eloquent\Collection
      */
     public function getFromService(Service $service)
     {
@@ -102,52 +69,38 @@ class ChannelController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Get edit form
      *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * Base not implemnted reply
+     *
+     * @return \Illuminate\Http\Response 501
      */
-    public function edit($id)
+    public function edit()
     {
-        throw new Exception('Not yet implemented');
+        return response()->json('Not Implemented', 501);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update/Patch the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * Base not implemnted reply
+     *
+     * @return \Illuminate\Http\Response 501
      */
-    public function update(Request $request, $id)
+    public function update()
     {
-        $input = $request->input();
-
-        $success = $this->channels->update($id, $input);
-
-        if ($success) {
-            return response()->json($this->channels->getById($id));
-        }
-
-        return response()->json(['message' => 'Something went wrong while updating the channel, check the logs.'], 400);
+        return response()->json('Not Implemented', 501);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove entity
      *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * Base not implemnted reply
+     *
+     * @return \Illuminate\Http\Response 501
      */
-    public function destroy($id)
+    public function destroy()
     {
-        $channel = $this->channels->getFullObjectById($id);
-
-        if (empty($channel)) {
-            return response()->json(['message' => 'Het kanaal werd niet gevonden.'], 400);
-        }
-
-        $this->channels->delete($id);
-
-        return response()->json(['Het kanaal werd verwijderd.']);
+        return response()->json('Not Implemented', 501);
     }
 }
