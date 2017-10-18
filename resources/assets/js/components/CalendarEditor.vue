@@ -294,7 +294,7 @@
                 if (start.getMonth() === until.getMonth()) {
                     if (start.getDate() === until.getDate()) {
                         return start.getDate() + ' ' + MONTHS[start.getMonth()]
-                    }
+                     }
                     return start.getDate() + ' - ' + until.getDate() + ' ' + MONTHS[start.getMonth()]
                 }
                 return start.getDate() + ' ' + MONTHS[start.getMonth()] + ' - ' + until.getDate() + ' ' + MONTHS[until.getMonth()]
@@ -303,27 +303,5 @@
         components: {
             EventEditor
         }
-        // watch: {
-        //   cal (v) {
-        //     console.log('load cal', v)
-        //     var options = RRule.parseString(this.rr)
-        //     options.dtstart = new Date(2000, 1, 1)
-        //     var r = new RRule(options)
-        //     this.options = r.options
-        //   },
-        //   options: {
-        //     deep: true,
-        //     handler (v, o) {
-        //       if (!v || !v.dtstart) {
-        //         return
-        //       }
-        //       var str = new RRule(v).toString()
-        //       if (this.cal.events && this.rr != str) {
-        //         console.log('saves change to cal', str)
-        //         this.cal.events[0].rrule = new RRule(v).toString()
-        //       }
-        //     }
-        //   }
-        // }
     }
 </script>

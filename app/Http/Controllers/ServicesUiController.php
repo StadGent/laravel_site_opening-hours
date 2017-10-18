@@ -13,11 +13,16 @@ use Illuminate\Http\Request;
 class ServicesUiController extends Controller
 {
     /**
+     * @var ServicesRepository
+     */
+    protected $servicesRepository;
+
+    /**
      * @param ServicesRepository $services
      */
-    public function __construct(ServicesRepository $services)
+    public function __construct(ServicesRepository $servicesRepository)
     {
-        $this->services = $services;
+        $this->servicesRepository = $servicesRepository;
         $this->middleware('auth:api');
     }
 
@@ -30,13 +35,11 @@ class ServicesUiController extends Controller
      */
     public function index(Request $request)
     {
-
         if ($request->user('api')->hasRole('Admin')) {
-            return app('ServicesRepository')->getExpandedServices();
+            return $this->servicesRepository->getExpandedServices();
         }
 
-        return app('ServicesRepository')->getExpandedServiceForUser($request->user('api')->id);
-
+        return $this->servicesRepository->getExpandedServiceForUser($request->user('api')->id);
     }
 
     /**
@@ -96,11 +99,11 @@ class ServicesUiController extends Controller
      */
     public function update(Request $request, Service $service)
     {
-        /** should be handled by routes... but just to be sure **/
+        // should be handled by routes... but just to be sure
         if (!$request->user('api')) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
-        /** only allowed for admin user **/
+        // only allowed for admin user
         if (!$request->user('api')->hasRole('Admin')) {
             return response()->json(['message' => 'Method not allowed'], 405);
         }
@@ -112,8 +115,9 @@ class ServicesUiController extends Controller
             $service->draft = $draft;
             $service->save();
         }
+        $expandedServices = $this->servicesRepository->getExpandedServices($service->id);
 
-        return response()->json(app('ServicesRepository')->getExpandedServices($service->id));
+        return response()->json($expandedServices);
     }
 
     /**
@@ -127,5 +131,4 @@ class ServicesUiController extends Controller
     {
         return response()->json('Not Implemented', 501);
     }
-
 }

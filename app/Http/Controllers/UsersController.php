@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteUserRequest;
 use App\Models\Role;
 use App\Repositories\UserRepository;
-use App\Http\Requests\DeleteUserRequest;
-use Auth;
 use Illuminate\Http\Request;
-
 
 class UsersController extends Controller
 {
-    public function __construct(UserRepository $users)
+    /**
+     * @var UserRepository
+     */
+    protected $userRepository;
+
+    /**
+     * @param UserRepository $users
+     */
+    public function __construct(UserRepository $userRepository)
     {
-        $this->users = $users;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -23,7 +29,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $users = $this->users->getAll();
+        $users = $this->userRepository->getAll();
 
         return response()->json($users);
     }
@@ -48,16 +54,16 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         // Check if the user already exists
-        $user = $this->users->where('email', $request->input('email'))->first();
+        $user = $this->userRepository->where('email', $request->input('email'))->first();
 
         if (empty($user)) {
             $input = $request->input();
             $input['password'] = '';
             $input['token'] = str_random(32);
 
-            $userId = $this->users->store($input);
+            $userId = $this->usersuserRepository->store($input);
 
-            $user = $this->users->getById($userId);
+            $user = $this->userRepository->getById($userId);
 
             // Attach the role of application user to the new user
             $appUserRole = Role::where('name', 'AppUser')->first();
@@ -84,7 +90,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        return response()->json($this->users->getById($id));
+        return response()->json($this->userRepository->getById($id));
     }
 
     /**
@@ -122,7 +128,7 @@ class UsersController extends Controller
         $success = app(UserRepository::class)->delete($id);
 
         if ($success !== false) {
-            $users = $this->users->getAll();
+            $users = $this->userRepository->getAll();
 
             return response()->json($users);
         }
@@ -130,6 +136,9 @@ class UsersController extends Controller
         return response()->json('Something went wrong while deleting the user, check the logs for more info.', 400);
     }
 
+    /**
+     * @param $id
+     */
     public function getUsersByService($id)
     {
         return app('UserRepository')->getAllInService($id);
