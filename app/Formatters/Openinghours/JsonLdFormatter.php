@@ -26,7 +26,7 @@ class JsonLdFormatter extends BaseFormatter
      * formatted hours per day, such as this one.
      *
      * @param Illuminate\Database\Eloquent\Model $data
-     * @return json-ld
+     * @return $this
      */
     public function render($data)
     {

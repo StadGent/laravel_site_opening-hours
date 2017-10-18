@@ -35,7 +35,6 @@ abstract class BaseFormatter implements FormatterInterface
     {
         if (!$this->supportFormat) {
             throw new \Exception("Error supportFormat not declared in " . get_class($this), 1);
-
         }
 
         return $this->supportFormat;

@@ -21,5 +21,4 @@ interface EndPointFormatterInterface
      * @param $formatter
      */
     public function addFormat($formatter);
-
 }
