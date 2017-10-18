@@ -19,8 +19,8 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::resource('/users', 'UsersController');
     Route::resource('/openinghours', 'OpeninghoursController');
     Route::resource('/calendars', 'CalendarsController');
-    Route::resource('/channels', 'ChannelController');
-    Route::resource('/channels/getChannelsByService', 'ChannelController@getChannelsByService');
+    Route::resource('/channels', 'ChannelUIController');
+    Route::resource('/channels/getChannelsByService', 'ChannelUIController@getFromService');
     Route::resource('/users/getUsersByService', 'UsersController@getUsersByService');
     Route::resource('/services', 'ServicesUiController');
     Route::post('/roles', 'RolesController@update');
