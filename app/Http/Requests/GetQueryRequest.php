@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Formatters\Openinghours as OpeninghoursFormatter;
+use App\Formatters\OpeninghoursFormatter;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Validator;
 
 /**
@@ -12,13 +12,6 @@ use Illuminate\Validation\Validator;
  */
 class GetQueryRequest extends FormRequest
 {
-
-    const TYPE_MAPPER = [
-        'now',
-        'day',
-        'week',
-        'fullWeek',
-    ];
 
     /**
      * Is current user authorized to make this request.
@@ -44,9 +37,11 @@ class GetQueryRequest extends FormRequest
     public function rules()
     {
         return [
-            'serviceUri' => 'required|exists:services,uri',
-            'q'          => 'required',
-            'date'       => ['regex:/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/'],
+            'service' => 'exists:services|id',
+            'channel' => 'exists:channels|id',
+            'date' => 'date',
+            'from' => 'date',
+            'until' => 'date|after:from',
         ];
     }
 
@@ -54,11 +49,10 @@ class GetQueryRequest extends FormRequest
      * Configure the validator instance.
      *
      * Validate and sanitize all inputs and combinations.
-     * - check q of correct format
-     * - check for q day and fullweek a date is given
+     * - chech if required parameters are given for the correct types
      * - check if format is conform with OpeninghoursFormatter::OUTPUT_MAPPER
-     * - check if given serivce has children
-     * - check if (when) given channel is child of given service
+     * - check if requested serivce has children
+     * - check if (when) requested channel is child of requested service
      *
      * @param  Validator  $validator
      * @return void
@@ -66,55 +60,66 @@ class GetQueryRequest extends FormRequest
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
-            /**
-             * If q is set (so it won't interact with the required rule),
-             * it must be found in the self::TYPE_MAPPER.
-             */
-            if ($this->input('q') && !in_array($this->input('q'), self::TYPE_MAPPER)) {
-                $validator->errors()->add('q', 'The selected parameter q is invalid.');
+            // Pop last argument of path to validate given parameters
+            $arguments = explode('/', self::path());
+            $lastArgument = array_pop($arguments);
+
+            switch ($lastArgument) {
+                case 'open-now':
+                    // no parameters are relevant
+                    break;
+                case 'openinghours':
+                    if (!$this->input('from')) {
+                        $validator->errors()->add('from', "The 'from' argument is required.");
+                    }
+                    if (!$this->input('until')) {
+                        $validator->errors()->add('until', "The 'until' argument is required.");
+                    }
+                    if (strtotime($this->input('from')) && strtotime($this->input('until'))) {
+                        $from = new Carbon($this->input('from'));
+                        $diff = $from->diffInDays(new Carbon($this->input('until')));
+                        if ($diff > 366) {
+                            $validator->errors()->add('until', "The difference between from and till may only be max 366 days.");
+                        }
+                    }
+                    break;
+                default: // everything else are periods
+                    if (!$this->input('date')) {
+                        $validator->errors()->add('date', "The 'date' argument is required.");
+                    }
             }
-            /**
-             * Date parameter is required when using type day and type fullWeek.
-             */
-            if ($this->input('q') === self::TYPE_MAPPER[1] && !$this->input('date') ||
-                $this->input('q') === self::TYPE_MAPPER[3] && !$this->input('date')) {
-                $validator->errors()->add('date', 'The selected parameter date is invalid.');
-            }
+
             /**
              * If format is set, it must be found in the keys of OpeninghoursFormatter::OUTPUT_MAPPER.
              */
-            if ($this->input('format') &&
-                !in_array($this->input('format'), array_keys(OpeninghoursFormatter::OUTPUT_MAPPER))) {
-                $validator->errors()->add('format', 'The selected parameter format is invalid.');
+            if ($this->input('format')) {
+                $openinghoursFormatter = app('OpeninghoursFormatter');
+                foreach ($openinghoursFormatter->getFormatters() as $formatter) {
+                    $formatters[] = $formatter->getSupportFormat();
+                }
+
+                if (!in_array($this->input('format'), $formatters)) {
+                    $validator->errors()->add('format', 'The selected parameter format is invalid.' .$this->input('format'));
+                }
             }
 
-            // no fear for injection as the rules() vallidated this input as existing value in db
-            $service = \App\Models\Service::where(['uri' => $this->input('serviceUri')])->first();
+            // model binding gives correct App\Models\Service
+            $service = $this->route('service');
+
             if ($service && !$service->channels()->count()) {
-                $validator->errors()->add('serviceUri', "The selected service uri is not available yet.");
+                $validator->errors()->add('Service', "The selected service '" . $service->label . "' is not available yet.");
             }
-            if ($service && $this->input('channel')) {
-                // no fear for injection as the rules() vallidated this input as existing value in db
-                $channel = $service->channels()->where('label', '=', $this->input('channel'))->get();
-                if (!$channel) {
-                    $validator->errors()->add('channel', 'The selected service does not contain the selected channel.');
+
+            if ($service && $this->route('channel')) {
+                // model binding gives correct App\Models\Channel
+                $channelCollection = $service->channels->filter(function ($item) {
+                    return $item->id == $this->route('channel')->id;
+                });
+
+                if ($channelCollection->isEmpty()) {
+                    $validator->errors()->add('Channel', "The selected service '" . $service->label . "' does not contain a channel with the identifier " . $this->route('channel')->id);
                 }
             }
         });
-    }
-
-    /**
-     * Get the failed validation json response for the request.
-     *
-     * overwrite response so only json output will be given and not the http redirect
-     * for expectsJson() the headers should correctly be set
-     * this function catches all the times this is not correctly done
-     *
-     * @param  array  $errors
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function response(array $errors)
-    {
-        return new JsonResponse($errors, 400);
     }
 }
