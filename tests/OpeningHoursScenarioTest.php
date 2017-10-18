@@ -4,7 +4,6 @@ namespace Tests;
 
 class OpeningHoursScenarioTest extends \TestCase
 {
-
     /**
      * setup for each test
      */
@@ -26,8 +25,8 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
-            $expected[] =
-                ['channel' => $channel->label, 'channelId' => $channel->id, 'openNow' => ['status' => true, 'label' => 'open'],
+            $expected[] = ['channel' => $channel->label, 'channelId' => $channel->id,
+                'openNow' => ['status' => true, 'label' => 'open'],
             ];
         }
         $this->assertEquals($expected, $content);
@@ -43,8 +42,8 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
-            $expected[] =
-                ['channel' => $channel->label, 'channelId' => $channel->id, 'openNow' => ['status' => false, 'label' => 'gesloten'],
+            $expected[] = ['channel' => $channel->label, 'channelId' => $channel->id,
+                'openNow' => ['status' => false, 'label' => 'gesloten'],
             ];
         }
         $this->assertEquals($expected, $content);
@@ -60,13 +59,17 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
-            $expected[] =
-                ['channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
-                '2017-09-03' => ['date' => '2017-09-03', 'open' => false, 'hours' => []],
-                '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []],
-                '2017-09-05' => ['date' => '2017-09-05', 'open' => true, 'hours' => [0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']]],
-                '2017-09-06' => ['date' => '2017-09-06', 'open' => true, 'hours' => [0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']]],
-            ]];
+            $expected[] = [
+                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
+                    '2017-09-03' => ['date' => '2017-09-03', 'open' => false, 'hours' => []],
+                    '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []],
+                    '2017-09-05' => ['date' => '2017-09-05', 'open' => true, 'hours' => [
+                        0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']],
+                    ],
+                    '2017-09-06' => ['date' => '2017-09-06', 'open' => true, 'hours' => [
+                        0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']],
+                    ],
+                ]];
         }
         $this->assertEquals($expected, $content);
     }
@@ -81,10 +84,15 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
-            $expected[] =
-                ['channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
-                '2017-09-05' => ['date' => '2017-09-05', 'open' => true, 'hours' => [0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']]],
-            ]];
+            $expected[] = [
+                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
+                    '2017-09-05' => ['date' => '2017-09-05', 'open' => true,
+                        'hours' => [
+                            0 => ['from' => '09:00', 'until' => '12:00'],
+                            1 => ['from' => '13:00', 'until' => '17:00']],
+                    ],
+                ],
+            ];
         }
         $this->assertEquals($expected, $content);
     }
@@ -99,10 +107,10 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
-            $expected[] =
-                ['channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
-                '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []],
-            ]];
+            $expected[] = [
+                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
+                    '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []]],
+            ];
         }
         $this->assertEquals($expected, $content);
     }
@@ -116,15 +124,29 @@ class OpeningHoursScenarioTest extends \TestCase
         $call = $this->doRequest('/api/services/1/openinghours/week?date=2017-09-05');
         $content = $this->getContentStructureTested($call);
         foreach ($this->channels as $channel) {
-            $expected[] =
-                ['channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => ['2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []],
-                '2017-09-05' => ['date' => '2017-09-05', 'open' => true, 'hours' => [0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']]],
-                '2017-09-06' => ['date' => '2017-09-06', 'open' => true, 'hours' => [0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']]],
-                '2017-09-07' => ['date' => '2017-09-07', 'open' => true, 'hours' => [0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']]],
-                '2017-09-08' => ['date' => '2017-09-08', 'open' => true, 'hours' => [0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']]],
-                '2017-09-09' => ['date' => '2017-09-09', 'open' => false, 'hours' => []],
-                '2017-09-10' => ['date' => '2017-09-10', 'open' => false, 'hours' => []],
-            ]];
+            $expected[] = [
+                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
+                    '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []],
+                    '2017-09-05' => ['date' => '2017-09-05', 'open' => true, 'hours' => [
+                        0 => ['from' => '09:00', 'until' => '12:00'],
+                        1 => ['from' => '13:00', 'until' => '17:00']],
+                    ],
+                    '2017-09-06' => ['date' => '2017-09-06', 'open' => true, 'hours' => [
+                        0 => ['from' => '09:00', 'until' => '12:00'],
+                        1 => ['from' => '13:00', 'until' => '17:00']],
+                    ],
+                    '2017-09-07' => ['date' => '2017-09-07', 'open' => true, 'hours' => [
+                        0 => ['from' => '09:00', 'until' => '12:00'],
+                        1 => ['from' => '13:00', 'until' => '17:00']],
+                    ],
+                    '2017-09-08' => ['date' => '2017-09-08', 'open' => true, 'hours' => [
+                        0 => ['from' => '09:00', 'until' => '12:00'],
+                        1 => ['from' => '13:00', 'until' => '17:00']],
+                    ],
+                    '2017-09-09' => ['date' => '2017-09-09', 'open' => false, 'hours' => []],
+                    '2017-09-10' => ['date' => '2017-09-10', 'open' => false, 'hours' => []],
+                ],
+            ];
         }
         $this->assertEquals($expected, $content);
     }
@@ -137,7 +159,6 @@ class OpeningHoursScenarioTest extends \TestCase
     {
         $call = $this->doRequest('/api/services/1/openinghours/month?date=2017-09-05');
         $content = $this->getContentStructureTested($call);
-
     }
 
     /**
@@ -153,7 +174,8 @@ class OpeningHoursScenarioTest extends \TestCase
                 'Accept-Encoding' => 'gzip, deflate',
                 'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
                 'X-Requested-With' => 'XMLHttpRequest',
-            ]);
+            ]
+        );
     }
 
     /**
@@ -169,5 +191,4 @@ class OpeningHoursScenarioTest extends \TestCase
 
         return $content;
     }
-
 }

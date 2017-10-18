@@ -4,7 +4,6 @@ namespace Tests\Services;
 
 class VestaServiceTest extends \TestCase
 {
-
     /**
      * @var string
      */
@@ -97,5 +96,4 @@ class VestaServiceTest extends \TestCase
         $resultRead = $this->vestaService->getOpeningshoursByGuid($this->testGuid);
         $this->assertEquals($testData, $resultRead);
     }
-
 }

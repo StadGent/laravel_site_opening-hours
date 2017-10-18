@@ -47,10 +47,14 @@ class QueryControllerTest extends \TestCase
             [['type' => 'open-now', 'format' => 'json-ld']],
             [['type' => 'open-now', 'format' => 'html']],
             [['type' => 'open-now', 'format' => 'text']],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days'))]],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'json-ld']],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'html']],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'text']],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days'))]],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'json-ld']],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'html']],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'text']],
             [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam]],
             [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam, 'format' => 'json-ld']],
             [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam, 'format' => 'html']],
@@ -311,7 +315,6 @@ class QueryControllerTest extends \TestCase
         if (!isset($typeParams['format']) || $typeParams['format'] === 'json') {
             $this->getContentStructureTested($call);
         }
-
     }
 
     /**
@@ -357,7 +360,8 @@ class QueryControllerTest extends \TestCase
     public function testItGivesClosedForEachFirstMondayOfTheMonth()
     {
         $firstMondayOfSept2017 = '04-09-2017';
-        $fullWeekCall = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => $firstMondayOfSept2017]);
+        $fullWeekCall = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week',
+            'date' => $firstMondayOfSept2017]);
         $content = $this->getContentStructureTested($fullWeekCall);
 
         foreach ($content as $channelBlock) {
@@ -380,7 +384,6 @@ class QueryControllerTest extends \TestCase
      */
     public function doRequest($type, $params = null)
     {
-
         $path = '/api/services/' . $this->serviceId;
 
         if ($this->oneChannel()) {
@@ -413,7 +416,8 @@ class QueryControllerTest extends \TestCase
                 'Accept-Encoding' => 'gzip, deflate',
                 'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
                 'X-Requested-With' => 'XMLHttpRequest',
-            ]);
+            ]
+        );
     }
 
     /**
@@ -429,5 +433,4 @@ class QueryControllerTest extends \TestCase
 
         return $content;
     }
-
 }

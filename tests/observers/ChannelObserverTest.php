@@ -18,6 +18,7 @@ class ChannelObserverTest extends \TestCase
             $mock = $this->createMock(\App\Services\ChannelService::class, ['makeSyncJobsForExternalServices']);
             $mock->expects($this->once())
                 ->method('makeSyncJobsForExternalServices');
+
             return $mock;
         });
 
