@@ -85,5 +85,4 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
 
         return $activeFormatter->render($data)->getOutput();
     }
-
 }

@@ -17,7 +17,7 @@ class HtmlFormatter extends BaseFormatter
      * @todo use (blade) template ???
      *
      * @param Illuminate\Database\Eloquent\Model $data
-     * @return html
+     * @return $this
      */
     public function render($data)
     {
@@ -28,7 +28,6 @@ class HtmlFormatter extends BaseFormatter
             if (isset($channelObj->openNow)) {
                 $formattedSchedule .= "<div>" . $channelObj->openNow->label . "</div>";
             } else {
-
                 foreach ($channelObj->openinghours as $ohObj) {
                     $formattedSchedule .= "<div>" . date('d-m-Y', strtotime($ohObj->date)) . "</div>";
                     $formattedSchedule .= "<ul>";
@@ -44,12 +43,10 @@ class HtmlFormatter extends BaseFormatter
                     $formattedSchedule .= "</ul>";
                 }
             }
-
         }
         $formattedSchedule .= '</div>';
         $this->output = $formattedSchedule;
 
         return $this;
     }
-
 }
