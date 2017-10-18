@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Formatters\Openinghours as OpeninghoursFormatter;
+use App\Formatters\OpeninghoursFormatter;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -92,9 +92,15 @@ class GetQueryRequest extends FormRequest
             /**
              * If format is set, it must be found in the keys of OpeninghoursFormatter::OUTPUT_MAPPER.
              */
-            if ($this->input('format') &&
-                !in_array($this->input('format'), array_keys(OpeninghoursFormatter::OUTPUT_MAPPER))) {
-                $validator->errors()->add('format', 'The selected parameter format is invalid.');
+            if ($this->input('format')) {
+                $openinghoursFormatter = app('OpeninghoursFormatter');
+                foreach ($openinghoursFormatter->getFormatters() as $formatter) {
+                    $formatters[] = $formatter->getSupportFormat();
+                }
+
+                if (!in_array($this->input('format'), $formatters)) {
+                    $validator->errors()->add('format', 'The selected parameter format is invalid.' .$this->input('format'));
+                }
             }
 
             // model binding gives correct App\Models\Service

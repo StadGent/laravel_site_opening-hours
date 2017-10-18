@@ -2,6 +2,8 @@
 
 namespace Tests\Formatters;
 
+use App\Models\DayInfo;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class OpeninghoursFormatterTest extends \TestCase
@@ -24,11 +26,27 @@ class OpeninghoursFormatterTest extends \TestCase
 
         $this->formatter = app('OpeninghoursFormatter');
 
-        $service = \App\Models\Service::first();
-        $this->serviceuri = $service->uri;
-        $this->channelKeys = $service->channels()->pluck('label')->all();
-        foreach ($this->channelKeys as $key) {
-            $this->data[$key] = ['08:00', '17:00'];
+        $this->service = \App\Models\Service::first();
+        foreach ($this->service->channels as $channel) {
+            $channelObj = new \stdClass();
+            $this->data[] = $channelObj;
+
+            $channelObj->channel = $channel->label;
+            $channelObj->channelId = $channel->id;
+            $dayInfo = new DayInfo(new Carbon("2017-09-15"));
+            $channelObj->openinghours["2017-09-15"] = $dayInfo;
+
+            $dayInfo->open = true;
+            $dayInfo->hours = [
+                [
+                    "from" => "09:00",
+                    "until" => "12:00",
+                ],
+                [
+                    "from" => "13:00",
+                    "until" => "17:00",
+                ],
+            ];
         }
     }
 
@@ -69,7 +87,6 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatJsonJustReturnsOriginalData()
     {
         $output = $this->formatter->render('json', $this->data);
-
         $this->assertEquals(array_values($this->data), $output);
     }
 
@@ -80,9 +97,9 @@ class OpeninghoursFormatterTest extends \TestCase
      */
     public function testFormatJsonLdEhNotSureYet()
     {
-        $this->formatter->serviceUri = $this->serviceuri;
+        $this->formatter->setService($this->service);
         $output = $this->formatter->render('json-ld', $this->data);
-        // if no errors => all is good... I hope
+        // No errors ... no problems
     }
 
     /**
@@ -93,11 +110,11 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatHtmlGivesHtml()
     {
         $output = $this->formatter->render('html', $this->data);
-        $result = '<div>';
-        foreach ($this->channelKeys as $key) {
-            $result .= '<h4>' . $key . '</h4><div>08:00</div><div>17:00</div>';
+        $result = "<div>";
+        foreach ($this->service->channels as $channel) {
+            $result .= "<h4>" . $channel->label . "</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li><li>13:00 - 17:00</li></ul>";
         }
-        $result .= '</div>';
+        $result .= "</div>";
         $this->assertEquals($result, $output);
     }
 
@@ -109,13 +126,17 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatTextGivesAString()
     {
         $output = $this->formatter->render('text', $this->data);
+        $result = '';
+        foreach ($this->service->channels as $channel) {
+            $result .= $channel->label . ":" ;            
+            $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00" ;
+        } 
+        // remove all EOL's 
+        $removedEOL = str_replace(PHP_EOL, '', $output); 
+        // remove fancy double lines under channel names
+        $cleanedoutput = str_replace('=', '', $removedEOL); 
 
-        $result = [];
-        foreach ($this->channelKeys as $key) {
-            $result[] = $key . ': ' . PHP_EOL . '01-01-1970 08:00' . PHP_EOL . '01-01-1970 17:00';
-        }
-
-        $this->assertEquals(implode(PHP_EOL . PHP_EOL . PHP_EOL, $result), $output);
+        $this->assertEquals($result, $cleanedoutput);
     }
 
 }
