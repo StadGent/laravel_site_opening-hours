@@ -18,10 +18,11 @@ class CalendarObserverTest extends \TestCase
             $mock = $this->createMock(\App\Services\OpeninghoursService::class, ['makeSyncJobsForExternalServices']);
             $mock->expects($this->once())
                 ->method('makeSyncJobsForExternalServices');
+
             return $mock;
         });
 
-        $calendar        = \App\Models\Calendar::first();
+        $calendar = \App\Models\Calendar::first();
         $calendar->save();
     }
 }

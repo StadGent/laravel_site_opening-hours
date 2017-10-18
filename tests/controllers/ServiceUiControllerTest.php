@@ -105,8 +105,8 @@ class ServicesUiControllerTest extends \TestCase
                 'Accept-Encoding' => 'gzip, deflate',
                 'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
                 'X-Requested-With' => 'XMLHttpRequest',
-            ]);
+            ]
+        );
         $call->seeStatusCode($statusCode);
     }
-
 }
