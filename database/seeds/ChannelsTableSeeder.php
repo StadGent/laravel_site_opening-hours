@@ -28,7 +28,8 @@ class ChannelsTableSeeder extends Seeder
             shuffle($sampleChannels);
             $tmpChannels = array_slice($sampleChannels, 0, rand(2, 4));
             foreach ($tmpChannels as $newChannel) {
-                $service->channels()->save(factory(Channel::class)
+                $service->channels()->save(
+                    factory(Channel::class)
                         ->make([
                             'service_id' => $service,
                             'label' => $newChannel,
