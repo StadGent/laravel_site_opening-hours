@@ -27,6 +27,7 @@ class SparqlServiceTest extends \TestCase
         }
 
         $this->sparqlService = app('SparqlService');
+        $this->sparqlService->setClient();
     }
 
     /**
@@ -77,7 +78,7 @@ class SparqlServiceTest extends \TestCase
             return;
         }
         $this->setExpectedException(\GuzzleHttp\Exception\ClientException::class);
-        new \App\Services\SparqlService(
+        $this->sparqlService->setClient(
             env('SPARQL_WRITE_ENDPOINT'),
             'WrongUserName',
             'wrongPasw');
@@ -92,7 +93,7 @@ class SparqlServiceTest extends \TestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $getServicesQuery = LodServicesRepository::getVestaServicesQuery();
+        $getServicesQuery = LodServicesRepository::getVestaServicesQuery(5);
         $services = $this->sparqlService->performSparqlQuery($getServicesQuery, 'GET');
         $this->assertTrue($this->sparqlService->getLastResponceCode() == 200);
 
@@ -109,7 +110,7 @@ class SparqlServiceTest extends \TestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $getServicesQuery = LodServicesRepository::getRecreatexServicesQuery();
+        $getServicesQuery = LodServicesRepository::getRecreatexServicesQuery(5);
         $services = $this->sparqlService->get($getServicesQuery);
         $this->assertTrue($this->sparqlService->getLastResponceCode() == 200);
 

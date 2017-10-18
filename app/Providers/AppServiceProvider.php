@@ -77,21 +77,20 @@ class AppServiceProvider extends ServiceProvider
 
         /** SERVICES **/
         $this->app->singleton('ChannelService', function ($app) {
-            return new \App\Services\ChannelService();
-        });
-
-        $this->app->singleton('ICalService', function ($app) {
-            return new \App\Services\ICalService();
+            return \App\Services\ChannelService::getInstance();
         });
 
         $this->app->singleton('OpeninghoursService', function ($app) {
-            return new \App\Services\OpeninghoursService();
+            return \App\Services\OpeninghoursService::getInstance();
         });
 
         $this->app->singleton('SparqlService', function ($app) {
-            return new \App\Services\SparqlService();
+            return \App\Services\SparqlService::getInstance();
         });
 
+        $this->app->singleton('VestaService', function ($app) {
+            return \App\Services\VestaService::getInstance();
+        });
 
         /** FORMATTERS **/
         $this->app->bind('OHJsonFormatter', function () {
@@ -103,7 +102,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('OHHtmlFormatter', function () {
-
             return new \App\Formatters\Openinghours\HtmlFormatter();
         });
         $this->app->bind('OHTextFormatter', function () {
