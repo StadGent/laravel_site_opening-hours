@@ -36,13 +36,13 @@ class UsersController extends Controller
     public function create()
     {
         //
-        return response()->json([ 'id' => 1 ]);
+        return response()->json(['id' => 1]);
     }
 
     /**
      * Upsert a user
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -69,7 +69,7 @@ class UsersController extends Controller
             $mailer->sendEmailConfirmationTo($user['email'], $user['token']);
         }
 
-        if (! empty($user)) {
+        if (!empty($user)) {
             return response()->json($user);
         }
 
@@ -79,7 +79,7 @@ class UsersController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int                       $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -90,7 +90,7 @@ class UsersController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int                       $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -101,8 +101,8 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -113,8 +113,8 @@ class UsersController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  DeleteUserRequest         $request
-     * @param  int                       $id
+     * @param  DeleteUserRequest $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteUserRequest $request, $id)
@@ -128,5 +128,10 @@ class UsersController extends Controller
         }
 
         return response()->json('Something went wrong while deleting the user, check the logs for more info.', 400);
+    }
+
+    public function getUsersByService($id)
+    {
+        return app('UserRepository')->getAllInService($id);
     }
 }

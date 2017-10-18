@@ -123,11 +123,12 @@ export default {
 }
 
 export function expandUser (u) {
-  u.roles = u.roles || []
-  u.services = u.roles.map(r => r.service)
 
-  u.role = {}
-  for (var i = 0; i < u.roles.length - 1; i++) {
+  u.roles = u.roles || [];
+  u.services = u.roles.map(r => r.service_id);
+
+  u.role = {};
+  for (let i = 0; i < u.roles.length - 1; i++) {
     u.role[u.roles[i].service] = u.roles[i].role
   }
 

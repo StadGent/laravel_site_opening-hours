@@ -124,7 +124,7 @@ export default {
 
     // Users
     filteredUsers () {
-      return this.srv.users
+      return this.srv.users || {};
     },
     sortedUsers () {
       return this.order ? this.filteredUsers.slice().sort(orderBy(this.order)) : this.filteredUsers

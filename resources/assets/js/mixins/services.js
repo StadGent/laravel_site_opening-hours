@@ -72,8 +72,14 @@ export default {
                     // this.versionDataQueue = [];
                 })
                 .then(() => {
-                    //check for active routeService and populate channels
-                    if (this.route.service !== -1) {
+                    this.serviceLock = false
+                })
+                .then(() => {
+                    console.info('services fetched');
+                })
+                .then(() => {
+                    //fetch channel in case of direct url access.
+                    if (this.route.channel > -1) {
                         this.fetchChannels();
                     }
                 }).catch(fetchError)
@@ -98,21 +104,21 @@ export default {
 
             return this.$http.get('/api/ui/channels/getChannelsByService/' + this.route.service)
                 .then(({data}) => {
-
-                    this.routeService.channels = data;
-                    // this.updateService();
-                    // this.$set(this.services, index, this.routeService);
-
-                    //remove the service from the channelDataQueue;
+                    this.$set(this.routeService, 'channels', data);
+                })
+                .then(() => {
+                    return this.$http.get('/api/ui/users/getUsersByService/' + this.route.service)
+                })
+                .then(({data}) => {
+                    this.$set(this.routeService, 'users', data);
+                })
+                .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
 
                     this.updateService();
                 })
                 .then(() => {
-                    //check for active routeVersion and populate openinghours.
-                    if (this.route.version !== -1) {
-                        this.fetchVersion();
-                    }
+                    console.info('channels & users fetched for service');
                 })
                 .catch(fetchError);
         },

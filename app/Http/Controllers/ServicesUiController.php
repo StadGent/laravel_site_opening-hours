@@ -32,15 +32,7 @@ class ServicesUiController extends Controller
     {
 
         if ($request->user('api')->hasRole('Admin')) {
-            $services = app('ServicesRepository')->getExpandedServices();
-
-            $userRepository = app('UserRepository');
-
-            foreach ($services as $service) {
-                $service->users = $userRepository->getAllInService($service->id);
-            }
-
-            return $services;
+            return app('ServicesRepository')->getExpandedServices();
         }
 
         return app('ServicesRepository')->getExpandedServiceForUser($request->user('api')->id);
