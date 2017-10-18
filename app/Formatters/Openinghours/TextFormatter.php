@@ -21,12 +21,23 @@ class TextFormatter extends BaseFormatter
     public function render($data)
     {
         $text = '';
-
-        foreach ($data as $channel => $info) {
-            $text .= $channel . ': ' . PHP_EOL;
-            $text .= $this->makeTextForDayInfo($info);
-            $text .= PHP_EOL . PHP_EOL;
+        foreach ($data as $channelObj) {
+            $text .= PHP_EOL . $channelObj->channel . ':' . PHP_EOL;
+            for ($i = 0; $i < strlen($channelObj->channel) + 1; $i++) {
+                $text .= '=';
+            }
+            $text .= PHP_EOL;
+            if (isset($channelObj->openNow)) {
+                $text .= $channelObj->openNow->label . PHP_EOL;
+                continue;
+            }
+            if (isset($channelObj->openNow)) {
+                $text .= $channelObj->openNow . PHP_EOL;
+            } else {
+                $text .= $this->makeTextForDayInfo($channelObj->openinghours);
+            }
         }
+        $this->output = $text;
         $this->output = rtrim($text, PHP_EOL);
 
         return $this;
