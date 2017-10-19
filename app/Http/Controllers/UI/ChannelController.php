@@ -23,25 +23,21 @@ class ChannelController extends Controller
     /**
      * Get all entities
      *
-     * Will not be allowed as this is WAY TOO MUCH data
-     * the channels need to be required by the getFromService method
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
+     * @throws UnexpectedValueException
      */
     public function index()
     {
-        return response()->json('Not Implemented', 501);
+        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @throws UnexpectedValueException
      */
     public function create()
     {
-        return response()->json('Not Implemented', 501);
+        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
@@ -62,13 +58,16 @@ class ChannelController extends Controller
             return response()->json($channel);
         }
 
-        return response()->json(['message' => 'Something went wrong while storing the new channel, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while storing the new channel, check the logs.'],
+            400
+        );
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int                       $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -90,6 +89,7 @@ class ChannelController extends Controller
     }
 
     /**
+     * Get subset of Channels from Serivce
      * @param $id
      */
     public function getFromService($id)
@@ -103,19 +103,18 @@ class ChannelController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * @throws UnexpectedValueException
      */
-    public function edit($id)
+    public function edit()
     {
-        return response()->json('Not Implemented', 501);
+        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -134,7 +133,7 @@ class ChannelController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int                       $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
