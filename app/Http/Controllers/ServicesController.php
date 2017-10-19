@@ -3,20 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
-use App\Models\User;
-use App\Repositories\ServicesRepository;
-use Illuminate\Http\Request;
 
 class ServicesController extends Controller
 {
-    /**
-     * @param ServicesRepository $services
-     */
-    public function __construct(ServicesRepository $services)
-    {
-        $this->services = $services;
-    }
-
     /**
      * Get all entities
      *
@@ -98,5 +87,4 @@ class ServicesController extends Controller
     {
         return response()->json('Not Implemented', 501);
     }
-
 }

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
-use App\Repositories\UserRepository;
-use App\Http\Requests\StoreRoleRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteRoleRequest;
+use App\Http\Requests\StoreRoleRequest;
+use App\Repositories\UserRepository;
 
 /**
  * RolesController takes care of CRUD'ing of roles
@@ -12,6 +13,9 @@ use App\Http\Requests\DeleteRoleRequest;
  */
 class RolesController extends Controller
 {
+    /**
+     * @param UserRepository $users
+     */
     public function __construct(UserRepository $users)
     {
         $this->users = $users;

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
+use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\User;
 use App\Repositories\ServicesRepository;
@@ -10,7 +11,7 @@ use Illuminate\Http\Request;
 /**
  * Controller for the UI with extended models
  */
-class ServicesUiController extends Controller
+class ServicesController extends Controller
 {
     /**
      * @var ServicesRepository

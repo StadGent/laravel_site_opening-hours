@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreChannelRequest;
 use App\Models\Service;
 use App\Repositories\ChannelRepository;
@@ -9,7 +10,7 @@ use App\Repositories\ServicesRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class ChannelUIController extends Controller
+class ChannelController extends Controller
 {
     /**
      * @param ChannelRepository $channels
@@ -98,7 +99,7 @@ class ChannelUIController extends Controller
 
         return response()->json($channels);
     }
- 
+
     /**
      * Show the form for editing the specified resource.
      *
