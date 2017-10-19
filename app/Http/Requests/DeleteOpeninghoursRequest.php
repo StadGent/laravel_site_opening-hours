@@ -12,6 +12,8 @@ class DeleteOpeninghoursRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param UserRepository $users
+     * @param Request $request
      * @return bool
      */
     public function authorize(UserRepository $users, Request $request)
@@ -36,8 +38,6 @@ class DeleteOpeninghoursRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        return [];
     }
 }

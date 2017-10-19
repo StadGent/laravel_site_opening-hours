@@ -15,7 +15,7 @@ class IsAdmin
      */
     public function handle($request, Closure $next)
     {
-        if(!$request->user('api')->hasRole('Admin')){
+        if (!$request->user('api')->hasRole('Admin')) {
             return response('Unauthorized.', 401);
         }
 

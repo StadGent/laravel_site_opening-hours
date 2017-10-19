@@ -2,16 +2,18 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Openinghours;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
-use App\Models\Openinghours;
 
 class StoreCalendarRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param UserRepository $users
+     * @param Request $request
      * @return bool
      */
     public function authorize(UserRepository $users, Request $request)
@@ -39,15 +41,20 @@ class StoreCalendarRequest extends FormRequest
         return [
             'priority' => 'required|numeric',
             'label' => 'required',
-            'openinghours_id' => 'required|numeric'
+            'openinghours_id' => 'required|numeric',
         ];
     }
 
+    /**
+     * Get the messages
+     *
+     * @return array
+     */
     public function messages()
     {
-        return $messages = [
+        return [
             'required' => 'Het veld is verplicht in te vullen.',
-            'numeric' => 'Het veld moet een numerieke waarde krijgen.'
+            'numeric' => 'Het veld moet een numerieke waarde krijgen.',
         ];
     }
 }

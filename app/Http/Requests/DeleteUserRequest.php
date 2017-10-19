@@ -10,6 +10,7 @@ class DeleteUserRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param Request $request
      * @return bool
      */
     public function authorize(Request $request)
@@ -24,8 +25,6 @@ class DeleteUserRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        return [];
     }
 }
