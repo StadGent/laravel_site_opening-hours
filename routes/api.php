@@ -33,7 +33,14 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 /****************/
 
 /* Work models **/
-Route::resource('/services', 'ServicesController');
+Route::get('/services', 'ServicesController@index');
+Route::get('/services/create', function () {
+    throw new UnexpectedValueException();
+});
+Route::get('/services/{service}/edit', function () {
+    throw new UnexpectedValueException();
+});
+Route::get('/services/{service}', 'ServicesController@show');
 Route::get('/services/{service}/channels', 'ChannelController@getFromService');
 
 /**************************/
