@@ -70,7 +70,7 @@ class QueryControllerTest extends \TestCase
      * @group validation
      * @dataProvider requestTypeProvider
      **/
-    public function testValidateNoServiceArgumentIsAPathNotFoundError($typeParams)
+    public function testValidateNoServiceArgumentIsANotFoundHttpException($typeParams)
     {
         $this->serviceId = null;
         $typeParams['format'] = 'json';
@@ -78,7 +78,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(404);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "PathNotFound",
+                "code" => "NotFoundHttpException",
                 "message" => "The requested path could not match a route in the API",
                 "target" => "query",
             ],
@@ -90,7 +90,7 @@ class QueryControllerTest extends \TestCase
      * @group validation
      * @dataProvider requestTypeProvider
      */
-    public function testValidateInvallidServiceIdentifierIsAModelNotFoundError($typeParams)
+    public function testValidateInvallidServiceIdentifierIsAModelNotFoundException($typeParams)
     {
         $this->serviceId = 'notAServiceId';
         $typeParams['format'] = 'json';
@@ -98,7 +98,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(422);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "ModelNotFound",
+                "code" => "ModelNotFoundException",
                 "message" => "Service model is not found with given identifier",
                 "target" => "Service",
             ],
@@ -109,14 +109,14 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateServiceWithoutChannelsReturnsNotFoundError()
+    public function testValidateServiceWithoutChannelsReturnsValidationException()
     {
         $this->serviceId = factory(\App\Models\Service::class)->create(['label' => 'testChildlessService'])->id;
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('Y-m-d')]);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -140,7 +140,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -169,7 +169,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -198,7 +198,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -222,7 +222,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -246,7 +246,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -413,9 +413,11 @@ class QueryControllerTest extends \TestCase
             $path,
             [],
             [
+                'Accept' => 'application/json',
                 'Accept-Encoding' => 'gzip, deflate',
                 'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
                 'X-Requested-With' => 'XMLHttpRequest',
+                'Accept-type' => 'application/json',
             ]
         );
     }
