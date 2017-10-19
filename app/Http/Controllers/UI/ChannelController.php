@@ -67,10 +67,10 @@ class ChannelController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @todo someone pls check or this has any functionality
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
         $start = Carbon::today();
         $end = Carbon::today();

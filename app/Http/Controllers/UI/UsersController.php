@@ -98,10 +98,9 @@ class UsersController extends Controller
      * Show the form for editing the specified resource.
      *
      * @todo someone pls check or this has any functionality
-     * @param  int $id
      * @return ???
      */
-    public function edit($id)
+    public function edit()
     {
         //
     }
@@ -110,11 +109,9 @@ class UsersController extends Controller
      * Update the specified resource in storage.
      *
      * @todo someone pls check or this has any functionality
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
      * @return ???
      */
-    public function update(Request $request, $id)
+    public function update()
     {
         //
     }
