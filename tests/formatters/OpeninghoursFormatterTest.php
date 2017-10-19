@@ -73,7 +73,7 @@ class OpeninghoursFormatterTest extends \TestCase
             'Exception',
             'No data given for formatterApp\Formatters\OpeninghoursFormatter'
         );
-        $output = $this->formatter->render('json', []);
+        $this->formatter->render('json', []);
     }
 
     /**
@@ -86,7 +86,7 @@ class OpeninghoursFormatterTest extends \TestCase
             'Exception',
             'The given format NotAFormatter is not available in App\Formatters\OpeninghoursFormatter'
         );
-        $output = $this->formatter->render('NotAFormatter', ['thisIsData' => true]);
+        $this->formatter->render('NotAFormatter', ['thisIsData' => true]);
     }
 
     /**
@@ -107,7 +107,7 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatJsonLdEhNotSureYet()
     {
         $this->formatter->setService($this->service);
-        $output = $this->formatter->render('json-ld', $this->data);
+        $this->formatter->render('json-ld', $this->data);
         // No errors ... no problems
     }
 

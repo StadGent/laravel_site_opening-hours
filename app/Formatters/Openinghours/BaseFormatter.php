@@ -51,14 +51,15 @@ abstract class BaseFormatter implements FormatterInterface
         $text = '';
         foreach ($openinghours as $ohObj) {
             $text .= date('d-m-Y', strtotime($ohObj->date)) . ': ';
-            if ($ohObj->open) {
-                foreach ($ohObj->hours as $hoursObj) {
-                    $text .= '   ' . $hoursObj['from'] . " - " . $hoursObj['until'];
-                }
-            } else {
+            if (!$ohObj->open) {
                 $text .= '   ' . trans('openinghourApi.CLOSED');
+                $text .= PHP_EOL;
+                continue;
             }
 
+            foreach ($ohObj->hours as $hoursObj) {
+                $text .= '   ' . $hoursObj['from'] . " - " . $hoursObj['until'];
+            }
             $text .= PHP_EOL;
         }
         $text .= PHP_EOL;

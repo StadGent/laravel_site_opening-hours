@@ -158,7 +158,7 @@ class OpeningHoursScenarioTest extends \TestCase
     public function testOpeninghoursMonth()
     {
         $call = $this->doRequest('/api/services/1/openinghours/month?date=2017-09-05');
-        $content = $this->getContentStructureTested($call);
+        $this->getContentStructureTested($call);
     }
 
     /**

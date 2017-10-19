@@ -38,6 +38,11 @@ class QueryControllerTest extends \TestCase
         $this->channelKeys = $service->channels->pluck('id');
     }
 
+    /**
+     * requestTypeProvider
+     *
+     * @return array
+     */
     public function requestTypeProvider()
     {
         $dateParam = date('Y-m-d');
@@ -260,10 +265,13 @@ class QueryControllerTest extends \TestCase
         ]);
     }
 
+    /**
+     * requestDateTypes
+     *
+     * @return array
+     */
     public function requestDateTypes()
     {
-        $dateParam = date('Y-m-d');
-
         return [
             [[
                 'from' => '2017-01-01',
@@ -343,7 +351,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testItGivesSevenDaysPerChannelOnTypeWeek()
     {
-        $dateParam = date('d-m-Y', strtotime('tomorrow'));
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => date('d-m-Y')]);
         $content = $this->getContentStructureTested($call);
 
@@ -423,8 +430,12 @@ class QueryControllerTest extends \TestCase
     }
 
     /**
+     *
      * get contect from call
      * and do base tests
+     *
+     * @param uri $call
+     * @return array
      */
     public function getContentStructureTested($call)
     {
