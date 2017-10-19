@@ -30,7 +30,7 @@ class Service extends Model
     ];
 
     /**
-     * Returns the Child Channels of the
+     * Child Objects Channel
      *
      * @return Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -58,5 +58,4 @@ class Service extends Model
     {
         return $this->channels()->count();
     }
-
 }

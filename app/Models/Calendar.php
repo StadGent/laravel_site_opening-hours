@@ -12,14 +12,24 @@ class Calendar extends Model
      * @var array
      */
     protected $fillable = [
-        'priority', 'summary', 'label', 'openinghours_id', 'closinghours'
+        'priority', 'summary', 'label', 'openinghours_id', 'closinghours',
     ];
 
+    /**
+     * Child Objects Event
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function events()
     {
         return $this->hasMany('App\Models\Event');
     }
 
+    /**
+     * Parent Object Openinghours
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function openinghours()
     {
         return $this->belongsTo('App\Models\Openinghours');

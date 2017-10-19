@@ -21,8 +21,9 @@ class ChannelService
     /**
      * Private contructor for Singleton pattern
      */
-    private function __construct() {}
-
+    private function __construct()
+    {
+    }
     /**
      * GetInstance for Singleton pattern
      *
@@ -31,7 +32,7 @@ class ChannelService
     public static function getInstance()
     {
         if (!self::$instance) {
-            self::$instance = new ChannelService();
+            self::$instance = new self();
         }
         self::$instance->serviceModel = null;
 
