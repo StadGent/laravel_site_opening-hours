@@ -134,8 +134,6 @@ class OpeninghoursController extends Controller
      */
     public function destroy(DeleteOpeninghoursRequest $request, $id)
     {
-        $openinghours = $this->openinghours->getFullObjectById($id);
-
         $success = $this->openinghours->delete($id);
 
         if ($success) {

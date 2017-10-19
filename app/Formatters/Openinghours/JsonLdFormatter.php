@@ -37,7 +37,6 @@ class JsonLdFormatter extends BaseFormatter
 
         $graph = new \EasyRdf_Graph();
         $service = $graph->resource($this->service->uri, 'schema:Organization');
-        $channels = $this->service->channels;
         // get a raw render for the week:
         // $channel id + days index in english
         // for each channel create an openinghours specification

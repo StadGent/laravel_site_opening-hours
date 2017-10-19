@@ -14,8 +14,6 @@ class ServicesTableSeeder extends Seeder
      */
     public function run()
     {
-        $services = app()->make('ServicesRepository');
-
         $sampleServiceNames = [
             'Cultuurdienst',
             'DeCentrale',

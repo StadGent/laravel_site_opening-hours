@@ -27,21 +27,23 @@ class HtmlFormatter extends BaseFormatter
             $formattedSchedule .= "<h4>$channelObj->channel</h4>";
             if (isset($channelObj->openNow)) {
                 $formattedSchedule .= "<div>" . $channelObj->openNow->label . "</div>";
-            } else {
-                foreach ($channelObj->openinghours as $ohObj) {
-                    $formattedSchedule .= "<div>" . date('d-m-Y', strtotime($ohObj->date)) . "</div>";
-                    $formattedSchedule .= "<ul>";
+                continue;
+            }
 
-                    if ($ohObj->open) {
-                        foreach ($ohObj->hours as $hoursObj) {
-                            $formattedSchedule .= "<li>" . $hoursObj['from'] . " - " . $hoursObj['until'] . "</li>";
-                        }
-                    } else {
-                        $formattedSchedule .= trans('openinghourApi.CLOSED');
-                    }
+            foreach ($channelObj->openinghours as $ohObj) {
+                $formattedSchedule .= "<div>" . date('d-m-Y', strtotime($ohObj->date)) . "</div>";
+                $formattedSchedule .= "<ul>";
 
+                if (!$ohObj->open) {
+                    $formattedSchedule .= trans('openinghourApi.CLOSED');
                     $formattedSchedule .= "</ul>";
+                    continue;
                 }
+
+                foreach ($ohObj->hours as $hoursObj) {
+                    $formattedSchedule .= "<li>" . $hoursObj['from'] . " - " . $hoursObj['until'] . "</li>";
+                }
+                $formattedSchedule .= "</ul>";
             }
         }
         $formattedSchedule .= '</div>';

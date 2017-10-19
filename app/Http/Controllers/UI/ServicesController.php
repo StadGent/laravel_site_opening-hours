@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\Repositories\ServicesRepository;
 use Illuminate\Http\Request;
+use UnexpectedValueException;
 
 /**
  * Controller for the UI with extended models
@@ -44,27 +45,23 @@ class ServicesController extends Controller
     }
 
     /**
-     * Get the create form
+     * Get the create form not allowed
      *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
+     * @throws UnexpectedValueException
      */
-    public function create(Service $request)
+    public function create()
     {
-        return response()->json('Not Implemented', 501);
+        throw new UnexpectedValueException();
     }
 
     /**
-     * Post new entity to store
+     * Post new entity to store not allowed
      *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
+     * @throws UnexpectedValueException
      */
-    public function store(Service $request)
+    public function store()
     {
-        return response()->json('Not Implemented', 501);
+        throw new UnexpectedValueException();
     }
 
     /**
@@ -80,15 +77,13 @@ class ServicesController extends Controller
     }
 
     /**
-     * Get edit form
+     * Get edit form not allowed
      *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
+     * @throws UnexpectedValueException
      */
-    public function edit(Service $request)
+    public function edit()
     {
-        return response()->json('Not Implemented', 501);
+        throw new UnexpectedValueException();
     }
 
     /**
@@ -122,14 +117,12 @@ class ServicesController extends Controller
     }
 
     /**
-     * Remove entity
+     * Destroy entity not allowed
      *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
+     * @throws UnexpectedValueException
      */
-    public function destroy(Service $request)
+    public function destroy()
     {
-        return response()->json('Not Implemented', 501);
+        throw new UnexpectedValueException();
     }
 }
