@@ -20,8 +20,9 @@ class OpeninghoursController extends Controller
 
     /**
      * Display a listing of the resource.
+     *
      * @todo someone pls check or this has any functionality
-     * @return \Illuminate\Http\Response
+     * @return ???
      */
     public function index()
     {
@@ -88,8 +89,7 @@ class OpeninghoursController extends Controller
      * Show the form for editing the specified resource.
      *
      * @todo someone pls check or this has any functionality
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
+     * @return ???
      */
     public function edit()
     {
