@@ -20,8 +20,7 @@ class OpeninghoursController extends Controller
 
     /**
      * Display a listing of the resource.
-     * @todo  is this used???
-     *
+     * @todo someone pls check or this has any functionality
      * @return \Illuminate\Http\Response
      */
     public function index()
@@ -32,7 +31,7 @@ class OpeninghoursController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @throws UnexpectedValueException
      */
     public function create()
     {
@@ -68,13 +67,16 @@ class OpeninghoursController extends Controller
             return response()->json($openinghours);
         }
 
-        return response()->json(['message' => 'Something went wrong while storing the new openingshours, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while storing the new openingshours, check the logs.'],
+            400
+        );
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int                       $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -85,10 +87,11 @@ class OpeninghoursController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @todo someone pls check or this has any functionality
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit()
     {
         //
     }
@@ -122,7 +125,10 @@ class OpeninghoursController extends Controller
             return response()->json($this->openinghours->getById($id));
         }
 
-        return response()->json(['message' => 'Something went wrong while updating the openinghours, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while updating the openinghours, check the logs.'],
+            400
+        );
     }
 
     /**

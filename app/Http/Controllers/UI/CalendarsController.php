@@ -21,21 +21,21 @@ class CalendarsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @throws UnexpectedValueException
      */
     public function index()
     {
-        throw new Exception('Not yet implemented');
+        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @throws UnexpectedValueException
      */
     public function create()
     {
-        throw new Exception('Not yet implemented');
+        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
@@ -61,7 +61,10 @@ class CalendarsController extends Controller
             return response()->json($calendar);
         }
 
-        return response()->json(['message' => 'Something went wrong while storing the new channel, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while storing the new channel, check the logs.'],
+            400
+        );
     }
 
     /**
@@ -78,12 +81,11 @@ class CalendarsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @throws UnexpectedValueException
      */
-    public function edit($id)
+    public function edit()
     {
-        throw new Exception('Not yet implemented');
+        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
@@ -110,7 +112,10 @@ class CalendarsController extends Controller
             return response()->json($this->calendars->getById($id));
         }
 
-        return response()->json(['message' => 'Something went wrong while updating the calendar, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while updating the calendar, check the logs.'],
+            400
+        );
     }
 
     /**
@@ -146,7 +151,10 @@ class CalendarsController extends Controller
         $calendar = $this->calendars->getById($calendarId);
 
         if (empty($calendar)) {
-            return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
+            return response()->json(
+                ['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'],
+                400
+            );
         }
 
         $success = $this->calendars->delete($calendarId);

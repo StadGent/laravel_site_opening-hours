@@ -68,7 +68,13 @@ class QueryController extends Controller
     {
         $start = new Carbon($request['from']);
         $end = new Carbon($request['until']);
-        $output = $this->generateOutput($start->startOfDay(), $end->endOfDay(), $service, $channel, $request->input('format'));
+        $output = $this->generateOutput(
+            $start->startOfDay(),
+            $end->endOfDay(),
+            $service,
+            $channel,
+            $request->input('format')
+        );
 
         return response()->make($output);
     }
