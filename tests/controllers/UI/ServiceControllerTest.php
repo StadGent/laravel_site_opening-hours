@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Controllers;
+namespace Tests\Controllers\UI;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ServicesUiControllerTest extends \TestCase
+class ServicesControllerTest extends \TestCase
 {
     use DatabaseTransactions;
 
@@ -105,6 +105,7 @@ class ServicesUiControllerTest extends \TestCase
                 'Accept-Encoding' => 'gzip, deflate',
                 'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
                 'X-Requested-With' => 'XMLHttpRequest',
+                'Accept-type' => 'application/json',
             ]
         );
         $call->seeStatusCode($statusCode);

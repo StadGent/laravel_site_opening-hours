@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteOpeninghoursRequest;
 use App\Http\Requests\StoreOpeninghoursRequest;
 use App\Repositories\ChannelRepository;
@@ -9,6 +10,9 @@ use App\Repositories\OpeninghoursRepository;
 
 class OpeninghoursController extends Controller
 {
+    /**
+     * @param OpeninghoursRepository $openinghours
+     */
     public function __construct(OpeninghoursRepository $openinghours)
     {
         $this->openinghours = $openinghours;
@@ -16,6 +20,7 @@ class OpeninghoursController extends Controller
 
     /**
      * Display a listing of the resource.
+     * @todo  is this used???
      *
      * @return \Illuminate\Http\Response
      */
@@ -37,7 +42,7 @@ class OpeninghoursController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param StoreOpeninghoursRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreOpeninghoursRequest $request)
@@ -59,7 +64,7 @@ class OpeninghoursController extends Controller
 
         $openinghours = $this->openinghours->getById($id);
 
-        if (! empty($openinghours)) {
+        if (!empty($openinghours)) {
             return response()->json($openinghours);
         }
 

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteCalendarRequest;
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
@@ -11,13 +12,10 @@ class CalendarsController extends Controller
 {
     /**
      * @param CalendarRepository $calendars
-     * @return  $this
      */
     public function __construct(CalendarRepository $calendars)
-    {    
+    {
         $this->calendars = $calendars;
-
-        return $this;
     }
 
     /**
@@ -43,7 +41,7 @@ class CalendarsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreCalendarRequest $request)
@@ -69,7 +67,7 @@ class CalendarsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int                       $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -80,7 +78,7 @@ class CalendarsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int                       $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -91,8 +89,8 @@ class CalendarsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateCalendarRequest     $request
-     * @param  int                       $id
+     * @param UpdateCalendarRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateCalendarRequest $request, $id)
@@ -118,8 +116,8 @@ class CalendarsController extends Controller
     /**
      * Bulk insert events
      *
-     * @param  integer $id     The id of the calendar
-     * @param  array   $events The events that need to be inserted
+     * @param integer $id
+     * @param array $events
      * @return void
      */
     private function bulkInsert($calendarId, $events)
@@ -139,8 +137,8 @@ class CalendarsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  DeleteCalendarRequest     $request
-     * @param  int                       $id
+     * @param DeleteCalendarRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteCalendarRequest $request, $calendarId)

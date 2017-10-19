@@ -16,16 +16,16 @@
 /*************************/
 
 Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
-    Route::resource('/users', 'UsersController');
-    Route::resource('/openinghours', 'OpeninghoursController');
-    Route::resource('/calendars', 'CalendarsController');
-    Route::resource('/channels', 'ChannelUIController');
-    Route::resource('/channels/getChannelsByService', 'ChannelUIController@getFromService');
-    Route::resource('/users/getUsersByService', 'UsersController@getUsersByService');
-    Route::resource('/services', 'ServicesUiController');
-    Route::post('/roles', 'RolesController@update');
-    Route::delete('/roles', 'RolesController@destroy');
-    Route::get('/presets', 'PresetsController@index');
+    Route::resource('/calendars', 'UI\CalendarsController');
+    Route::resource('/channels', 'UI\ChannelController');
+    Route::resource('/channels/getChannelsByService', 'UI\ChannelController@getFromService');
+    Route::resource('/openinghours', 'UI\OpeninghoursController');
+    Route::get('/presets', 'UI\PresetsController@index');
+    Route::post('/roles', 'UI\RolesController@update');
+    Route::delete('/roles', 'UI\RolesController@destroy');
+    Route::resource('/services', 'UI\ServicesController');
+    Route::resource('/users', 'UI\UsersController');
+    Route::resource('/users/getUsersByService', 'UI\UsersController@getUsersByService');
 });
 
 /****************/
