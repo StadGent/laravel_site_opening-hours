@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Repositories\UserRepository;
 use App\Models\Calendar;
+use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
@@ -12,6 +12,8 @@ class DeleteCalendarRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param UserRepository $users
+     * @param Request $request
      * @return bool
      */
     public function authorize(UserRepository $users, Request $request)
@@ -36,8 +38,6 @@ class DeleteCalendarRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        return [];
     }
 }
