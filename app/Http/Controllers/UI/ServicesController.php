@@ -7,7 +7,6 @@ use App\Models\Service;
 use App\Models\User;
 use App\Repositories\ServicesRepository;
 use Illuminate\Http\Request;
-use UnexpectedValueException;
 
 /**
  * Controller for the UI with extended models
@@ -25,7 +24,6 @@ class ServicesController extends Controller
     public function __construct(ServicesRepository $servicesRepository)
     {
         $this->servicesRepository = $servicesRepository;
-        $this->middleware('auth:api');
     }
 
     /**
@@ -45,26 +43,6 @@ class ServicesController extends Controller
     }
 
     /**
-     * Get the create form not allowed
-     *
-     * @throws UnexpectedValueException
-     */
-    public function create()
-    {
-        throw new UnexpectedValueException();
-    }
-
-    /**
-     * Post new entity to store not allowed
-     *
-     * @throws UnexpectedValueException
-     */
-    public function store()
-    {
-        throw new UnexpectedValueException();
-    }
-
-    /**
      * Get with id
      *
      * Base get and return the service
@@ -74,16 +52,6 @@ class ServicesController extends Controller
     public function show(Service $service)
     {
         return $service;
-    }
-
-    /**
-     * Get edit form not allowed
-     *
-     * @throws UnexpectedValueException
-     */
-    public function edit()
-    {
-        throw new UnexpectedValueException();
     }
 
     /**
@@ -114,15 +82,5 @@ class ServicesController extends Controller
         $expandedServices = $this->servicesRepository->getExpandedServices($service->id);
 
         return response()->json($expandedServices);
-    }
-
-    /**
-     * Destroy entity not allowed
-     *
-     * @throws UnexpectedValueException
-     */
-    public function destroy()
-    {
-        throw new UnexpectedValueException();
     }
 }

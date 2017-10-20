@@ -4,6 +4,9 @@ namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
 
+/**
+ * @todo refactor to preset holidays
+ */
 class PresetsController extends Controller
 {
     /**

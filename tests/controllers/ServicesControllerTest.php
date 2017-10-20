@@ -3,6 +3,8 @@
 namespace Tests\Controllers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use UnexpectedValueException;
 
 class ServicesControllerTest extends \TestCase
 {
@@ -60,31 +62,25 @@ class ServicesControllerTest extends \TestCase
         return [
             //  unauth user
             ['', 'get', '/api/services', [], '200'], // index
-            ['', 'get', '/api/services/create', [], '501'], // create
-            ['', 'post', '/api/services', [], '501'], // store
+            ['', 'post', '/api/services', [], '405'], // store
             ['', 'get', '/api/services/1', [], '200'], // show
-            ['', 'get', '/api/services/1/edit', [], '501'], // edit
-            ['', 'put', '/api/services/1', [], '501'], // update (full)
-            ['', 'patch', '/api/services/1', ['draft' => false], '501'], // update (partial)
-            ['', 'delete', '/api/services/1', [], '501'], // destroy
+            ['', 'put', '/api/services/1', [], '405'], // update (full)
+            ['', 'patch', '/api/services/1', ['draft' => false], '405'], // update (partial)
+            ['', 'delete', '/api/services/1', [], '405'], // destroy
             // admin user
             ['1', 'get', '/api/services', [], '200'], // index
-            ['1', 'get', '/api/services/create', [], '501'], // create
-            ['1', 'post', '/api/services', [], '501'], // store
+            ['1', 'post', '/api/services', [], '405'], // store
             ['1', 'get', '/api/services/1', [], '200'], // show
-            ['1', 'get', '/api/services/1/edit', [], '501'], // edit
-            ['1', 'put', '/api/services/1', [], '501'], // update (full)
-            ['1', 'patch', '/api/services/1', ['draft' => false], '501'], // update (partial)
-            ['1', 'delete', '/api/services/1', [], '501'], // destroy
+            ['1', 'put', '/api/services/1', [], '405'], // update (full)
+            ['1', 'patch', '/api/services/1', ['draft' => false], '405'], // update (partial)
+            ['1', 'delete', '/api/services/1', [], '405'], // destroy
             // regular user
             ['2', 'get', '/api/services', [], '200'], // index
-            ['2', 'get', '/api/services/create', [], '501'], // create
-            ['2', 'post', '/api/services', [], '501'], // store
+            ['2', 'post', '/api/services', [], '405'], // store
             ['2', 'get', '/api/services/1', [], '200'], // show
-            ['2', 'get', '/api/services/1/edit', [], '501'], // edit
-            ['2', 'put', '/api/services/1', [], '501'], // update (full)
-            ['2', 'patch', '/api/services/1', ['draft' => false], '501'], // update (partial)
-            ['2', 'delete', '/api/services/1', [], '501'], // destroy
+            ['2', 'put', '/api/services/1', [], '405'], // update (full)
+            ['2', 'patch', '/api/services/1', ['draft' => false], '405'], // update (partial)
+            ['2', 'delete', '/api/services/1', [], '405'], // destroy
         ];
     }
 
@@ -95,9 +91,10 @@ class ServicesControllerTest extends \TestCase
     public function testRequestsByUserWithRoleAndCheckStatusCode($userId, $verb, $path, $data, $statusCode)
     {
         if ($userId) {
-            $adminUser = \App\Models\User::find($userId);
-            $this->actingAs($adminUser, 'api');
+            $authUser = \App\Models\User::find($userId);
+            $this->actingAs($authUser, 'api');
         }
+
         $call = $this->json(
             $verb,
             $path,

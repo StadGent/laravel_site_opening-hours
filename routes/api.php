@@ -16,16 +16,47 @@
 /*************************/
 
 Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
-    Route::resource('/calendars', 'UI\CalendarsController');
-    Route::resource('/channels', 'UI\ChannelController');
-    Route::resource('/channels/getChannelsByService', 'UI\ChannelController@getFromService');
-    Route::resource('/openinghours', 'UI\OpeninghoursController');
+    // calendars
+    Route::put('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
+    Route::patch('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
+    Route::delete('/calendars/{calendar}', 'UI\CalendarsController@destory')->middleware('hasRoleInService');
+
+    // channels
+    Route::post('/channels/{channel}', 'UI\ChannelController@store')->middleware('hasRoleInService');
+    Route::put('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
+    Route::patch('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
+    Route::delete('/channels/{channel}', 'UI\ChannelController@destory')->middleware('hasRoleInService');
+    // subset
+    Route::get('/services/{service}/channels', 'UI\ChannelController@getFromService');
+
+    // openinghours
+    Route::get('/openinghours/{openinghours}', 'UI\OpeninghoursController@show');
+    Route::post('/openinghours/{openinghours}', 'UI\OpeninghoursController@store')->middleware('hasRoleInService');
+    Route::put('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
+    Route::patch('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
+    Route::delete('/openinghours/{openinghours}', 'UI\OpeninghoursController@destory')->middleware('hasRoleInService');
+
+    // Presets (refactor to holidays)
     Route::get('/presets', 'UI\PresetsController@index');
-    Route::post('/roles', 'UI\RolesController@update');
+
+    // roles
+    Route::put('/roles', 'UI\RolesController@update');
+    Route::patch('/roles', 'UI\RolesController@update');
     Route::delete('/roles', 'UI\RolesController@destroy');
-    Route::resource('/services', 'UI\ServicesController');
-    Route::resource('/users', 'UI\UsersController');
-    Route::resource('/users/getUsersByService', 'UI\UsersController@getUsersByService');
+
+    // services
+    Route::get('/services', 'UI\ServicesController@index');
+    Route::get('/services/{service}', 'UI\ServicesController@show');
+    Route::put('/services/{service}', 'UI\ServicesController@update')->middleware('hasRoleInService');
+    Route::patch('/services/{service}', 'UI\ServicesController@update')->middleware('hasRoleInService');
+
+    // users
+    Route::get('/users', 'UI\UsersController@index')->middleware('admin');
+    Route::post('/users', 'UI\UsersController@store')->middleware('admin');
+    Route::delete('/users/{user}', 'UI\UsersController@destory')->middleware('admin');
+    // subset
+    Route::get('/services/{service}/users', 'UI\UsersController@getFromService')
+        ->middleware('hasRoleInService');
 });
 
 /****************/
@@ -34,12 +65,6 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 
 /* Work models **/
 Route::get('/services', 'ServicesController@index');
-Route::get('/services/create', function () {
-    throw new UnexpectedValueException();
-});
-Route::get('/services/{service}/edit', function () {
-    throw new UnexpectedValueException();
-});
 Route::get('/services/{service}', 'ServicesController@show');
 Route::get('/services/{service}/channels', 'ChannelController@getFromService');
 

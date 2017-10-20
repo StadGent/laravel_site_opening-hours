@@ -5,7 +5,9 @@ namespace App\Http\Controllers\UI;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteUserRequest;
 use App\Models\Role;
+use App\Models\Service;
 use App\Repositories\UserRepository;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -28,22 +30,11 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $users = $this->userRepository->getAll();
 
         return response()->json($users);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     * @todo someone pls check or this has any functionality
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-        return response()->json(['id' => 1]);
     }
 
     /**
@@ -95,37 +86,19 @@ class UsersController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @todo someone pls check or this has any functionality
-     * @return ???
-     */
-    public function edit()
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @todo someone pls check or this has any functionality
-     * @return ???
-     */
-    public function update()
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  DeleteUserRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteUserRequest $request, $id)
+    public function destroy(User $user)
     {
-        $success = app(UserRepository::class)->delete($id);
+        if (\Auth::user()->id === $user->id) {
+            throw new AuthenticationException("You can't delete yourself!!!");
+        }
+
+        $success = $model->delete();
 
         if ($success !== false) {
             $users = $this->userRepository->getAll();
@@ -137,10 +110,12 @@ class UsersController extends Controller
     }
 
     /**
-     * @param $id
+     * @todo checkout $service->usersWithRole
+     * @param Service $service
      */
-    public function getUsersByService($id)
+    public function getFromService(Service $service)
     {
-        return app('UserRepository')->getAllInService($id);
+        //return $service->usersWithRole();
+        return app('UserRepository')->getAllInService($service->id);
     }
 }

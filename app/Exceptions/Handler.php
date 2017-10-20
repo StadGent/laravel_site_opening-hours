@@ -7,8 +7,8 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UnexpectedValueException;
 
 class Handler extends ExceptionHandler
@@ -101,7 +101,9 @@ class Handler extends ExceptionHandler
         if ($request->isJson() || $request->expectsJson()) {
             $this->errorObj = new \stdClass();
             $this->errorObj->code = "AuthenticationException";
-            $this->errorObj->message = "You are not autherised to make this request";
+            $this->errorObj->message = $exception->getMessage();
+            $this->errorObj->message .= " You are not autherised to make this request";
+
             $this->errorObj->target = "query";
 
             return response()->json(['error' => $this->errorObj], 401);
@@ -123,6 +125,21 @@ class Handler extends ExceptionHandler
         $this->errorObj->target = "query";
 
         return response()->json(['error' => $this->errorObj], 404);
+    }
+
+    /**
+     * MethodNotAllowedHttpException
+     * The used HTTP method is not allowed on this route in the API
+     *
+     * @param MethodNotAllowedHttpException $exception
+     * @return \Illuminate\Http\Response 501
+     */
+    protected function handleMethodNotAllowedHttpException(MethodNotAllowedHttpException $exception)
+    {
+        $this->errorObj->message = "The used HTTP method is not allowed on this route in the API";
+        $this->errorObj->target = "query";
+
+        return response()->json(['error' => $this->errorObj], 405);
     }
 
     /**
@@ -183,21 +200,6 @@ class Handler extends ExceptionHandler
     protected function handleUnexpectedValueException(UnexpectedValueException $exception)
     {
         $this->errorObj->message = "The requested functionality is not implemented on this route in the API";
-        $this->errorObj->target = "query";
-
-        return response()->json(['error' => $this->errorObj], 501);
-    }
-
-    /**
-     * MethodNotAllowedHttpException
-     * The used HTTP method is not allowed on this route in the API
-     *
-     * @param MethodNotAllowedHttpException $exception
-     * @return \Illuminate\Http\Response 501
-     */
-    protected function handleMethodNotAllowedHttpException(MethodNotAllowedHttpException $exception)
-    {
-        $this->errorObj->message = "The used HTTP method is not allowed on this route in the API";
         $this->errorObj->target = "query";
 
         return response()->json(['error' => $this->errorObj], 501);

@@ -46,7 +46,24 @@ class Service extends Model
      */
     public function users()
     {
-        return $this->belongsToMany('App\Models\User', 'user_service_role', 'service_id', 'user_id');
+        return $this->belongsToMany('App\Models\User', 'user_service_role', 'service_id', 'user_id')
+            ->withPivot('role_id');
+    }
+
+    /**
+     * @todo try to find a ORM solution for this
+     * relation = $service->user->role (1 role per user for this service)
+     * @return mixed
+     */
+    public function usersWithRole()
+    {
+        $roles = \App\Models\Role::all();
+        $users = $this->users;
+        foreach ($users as $user) {
+            $user->role = $roles->find($user->pivot->role_id);
+        }
+
+        return $users;
     }
 
     /**
