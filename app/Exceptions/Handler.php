@@ -9,7 +9,6 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use UnexpectedValueException;
 
 class Handler extends ExceptionHandler
 {
@@ -102,7 +101,7 @@ class Handler extends ExceptionHandler
             $this->errorObj = new \stdClass();
             $this->errorObj->code = "AuthenticationException";
             $this->errorObj->message = $exception->getMessage();
-            $this->errorObj->message .= " You are not autherised to make this request";
+            $this->errorObj->message .= "You are not autherised to make this request";
 
             $this->errorObj->target = "query";
 
@@ -188,20 +187,5 @@ class Handler extends ExceptionHandler
         }
 
         return response()->json(['error' => $this->errorObj], 400);
-    }
-
-    /**
-     * UnexpectedValueException
-     * The used HTTP method is not implemented on this route in the API
-     *
-     * @param UnexpectedValueException $exception
-     * @return \Illuminate\Http\Response 501
-     */
-    protected function handleUnexpectedValueException(UnexpectedValueException $exception)
-    {
-        $this->errorObj->message = "The requested functionality is not implemented on this route in the API";
-        $this->errorObj->target = "query";
-
-        return response()->json(['error' => $this->errorObj], 501);
     }
 }

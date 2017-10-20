@@ -3,8 +3,6 @@
 namespace Tests\Controllers\UI;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use UnexpectedValueException;
 
 class ServicesControllerTest extends \TestCase
 {
