@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
-use App\Http\Requests\DeleteCalendarRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
 use App\Repositories\CalendarRepository;
@@ -11,39 +11,16 @@ class CalendarsController extends Controller
 {
     /**
      * @param CalendarRepository $calendars
-     * @return  $this
      */
     public function __construct(CalendarRepository $calendars)
-    {    
+    {
         $this->calendars = $calendars;
-
-        return $this;
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        throw new Exception('Not yet implemented');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreCalendarRequest $request)
@@ -63,13 +40,16 @@ class CalendarsController extends Controller
             return response()->json($calendar);
         }
 
-        return response()->json(['message' => 'Something went wrong while storing the new channel, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while storing the new channel, check the logs.'],
+            400
+        );
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int                       $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -78,21 +58,10 @@ class CalendarsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateCalendarRequest     $request
-     * @param  int                       $id
+     * @param UpdateCalendarRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateCalendarRequest $request, $id)
@@ -112,14 +81,17 @@ class CalendarsController extends Controller
             return response()->json($this->calendars->getById($id));
         }
 
-        return response()->json(['message' => 'Something went wrong while updating the calendar, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while updating the calendar, check the logs.'],
+            400
+        );
     }
 
     /**
      * Bulk insert events
      *
-     * @param  integer $id     The id of the calendar
-     * @param  array   $events The events that need to be inserted
+     * @param integer $id
+     * @param array $events
      * @return void
      */
     private function bulkInsert($calendarId, $events)
@@ -139,16 +111,18 @@ class CalendarsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  DeleteCalendarRequest     $request
-     * @param  int                       $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteCalendarRequest $request, $calendarId)
+    public function destroy($calendarId)
     {
         $calendar = $this->calendars->getById($calendarId);
 
         if (empty($calendar)) {
-            return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
+            return response()->json(
+                ['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'],
+                400
+            );
         }
 
         $success = $this->calendars->delete($calendarId);

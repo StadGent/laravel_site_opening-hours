@@ -12,7 +12,6 @@ use Illuminate\Validation\Validator;
  */
 class GetQueryRequest extends FormRequest
 {
-
     /**
      * Is current user authorized to make this request.
      *
@@ -79,7 +78,10 @@ class GetQueryRequest extends FormRequest
                         $from = new Carbon($this->input('from'));
                         $diff = $from->diffInDays(new Carbon($this->input('until')));
                         if ($diff > 366) {
-                            $validator->errors()->add('until', "The difference between from and till may only be max 366 days.");
+                            $validator->errors()->add(
+                                'until',
+                                "The difference between from and till may only be max 366 days."
+                            );
                         }
                     }
                     break;
@@ -89,7 +91,7 @@ class GetQueryRequest extends FormRequest
                     }
             }
 
-            /**
+            /*
              * If format is set, it must be found in the keys of OpeninghoursFormatter::OUTPUT_MAPPER.
              */
             if ($this->input('format')) {
@@ -98,8 +100,9 @@ class GetQueryRequest extends FormRequest
                     $formatters[] = $formatter->getSupportFormat();
                 }
 
-                if (!in_array($this->input('format'), $formatters)) {
-                    $validator->errors()->add('format', 'The selected parameter format is invalid.' .$this->input('format'));
+                if (!in_array($this->input('format'), $formatters, true)) {
+                    $validator->errors()->add('format', 'The selected parameter format is invalid.' .
+                        $this->input('format'));
                 }
             }
 
@@ -107,7 +110,8 @@ class GetQueryRequest extends FormRequest
             $service = $this->route('service');
 
             if ($service && !$service->channels()->count()) {
-                $validator->errors()->add('Service', "The selected service '" . $service->label . "' is not available yet.");
+                $validator->errors()->add('Service', "The selected service '" . $service->label .
+                    "' is not available yet.");
             }
 
             if ($service && $this->route('channel')) {
@@ -117,7 +121,8 @@ class GetQueryRequest extends FormRequest
                 });
 
                 if ($channelCollection->isEmpty()) {
-                    $validator->errors()->add('Channel', "The selected service '" . $service->label . "' does not contain a channel with the identifier " . $this->route('channel')->id);
+                    $validator->errors()->add('Channel', "The selected service '" . $service->label .
+                        "' does not contain a channel with the identifier " . $this->route('channel')->id);
                 }
             }
         });

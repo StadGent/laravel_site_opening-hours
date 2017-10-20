@@ -56,7 +56,10 @@ class OpeninghoursFormatterTest extends \TestCase
      */
     public function testAddUnknownFormatThrowsError()
     {
-        $this->setExpectedException('Exception', 'NotAFormatter is not supported as format for App\Formatters\OpeninghoursFormatter');
+        $this->setExpectedException(
+            'Exception',
+            'NotAFormatter is not supported as format for App\Formatters\OpeninghoursFormatter'
+        );
         $this->formatter->addFormat('NotAFormatter');
     }
 
@@ -66,8 +69,11 @@ class OpeninghoursFormatterTest extends \TestCase
      */
     public function testNoDataThrowsError()
     {
-        $this->setExpectedException('Exception', 'No data given for formatterApp\Formatters\OpeninghoursFormatter');
-        $output = $this->formatter->render('json', []);
+        $this->setExpectedException(
+            'Exception',
+            'No data given for formatterApp\Formatters\OpeninghoursFormatter'
+        );
+        $this->formatter->render('json', []);
     }
 
     /**
@@ -76,8 +82,11 @@ class OpeninghoursFormatterTest extends \TestCase
      */
     public function testRequestUnknownFormatThrowsError()
     {
-        $this->setExpectedException('Exception', 'The given format NotAFormatter is not available in App\Formatters\OpeninghoursFormatter');
-        $output = $this->formatter->render('NotAFormatter', ['thisIsData' => true]);
+        $this->setExpectedException(
+            'Exception',
+            'The given format NotAFormatter is not available in App\Formatters\OpeninghoursFormatter'
+        );
+        $this->formatter->render('NotAFormatter', ['thisIsData' => true]);
     }
 
     /**
@@ -98,7 +107,7 @@ class OpeninghoursFormatterTest extends \TestCase
     public function testFormatJsonLdEhNotSureYet()
     {
         $this->formatter->setService($this->service);
-        $output = $this->formatter->render('json-ld', $this->data);
+        $this->formatter->render('json-ld', $this->data);
         // No errors ... no problems
     }
 
@@ -112,7 +121,8 @@ class OpeninghoursFormatterTest extends \TestCase
         $output = $this->formatter->render('html', $this->data);
         $result = "<div>";
         foreach ($this->service->channels as $channel) {
-            $result .= "<h4>" . $channel->label . "</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li><li>13:00 - 17:00</li></ul>";
+            $result .= "<h4>" . $channel->label . "</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li>" .
+                "<li>13:00 - 17:00</li></ul>";
         }
         $result .= "</div>";
         $this->assertEquals($result, $output);
@@ -128,15 +138,14 @@ class OpeninghoursFormatterTest extends \TestCase
         $output = $this->formatter->render('text', $this->data);
         $result = '';
         foreach ($this->service->channels as $channel) {
-            $result .= $channel->label . ":" ;            
-            $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00" ;
-        } 
-        // remove all EOL's 
-        $removedEOL = str_replace(PHP_EOL, '', $output); 
+            $result .= $channel->label . ":";
+            $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00";
+        }
+        // remove all EOL's
+        $removedEOL = str_replace(PHP_EOL, '', $output);
         // remove fancy double lines under channel names
-        $cleanedoutput = str_replace('=', '', $removedEOL); 
+        $cleanedoutput = str_replace('=', '', $removedEOL);
 
         $this->assertEquals($result, $cleanedoutput);
     }
-
 }

@@ -81,7 +81,8 @@ class SparqlServiceTest extends \TestCase
         $this->sparqlService->setClient(
             env('SPARQL_WRITE_ENDPOINT'),
             'WrongUserName',
-            'wrongPasw');
+            'wrongPasw'
+        );
     }
 
     /**
@@ -131,7 +132,8 @@ class SparqlServiceTest extends \TestCase
         $this->checkReadResults();
 
         //CREATE
-        $query = 'WITH <' . env('SPARQL_WRITE_GRAPH') . '> INSERT DATA { <http://example.org/> <http://example.org/foo> "a" }';
+        $query = 'WITH <' . env('SPARQL_WRITE_GRAPH') . '> INSERT DATA { <http://example.org/> ' .
+            '<http://example.org/foo> "a" }';
         $response = $this->sparqlService->post($query);
         // see if results are correct
         $data = json_decode($response, true);
@@ -152,14 +154,16 @@ class SparqlServiceTest extends \TestCase
         // see if results are correct
         $data = json_decode($response, true);
         $resultString = array_get($data, 'results.bindings.0.callret-0.value');
-        $succesString = 'Modify <' . env('SPARQL_WRITE_GRAPH') . '>, delete 1 (or less) and insert 1 (or less) triples -- done';
+        $succesString = 'Modify <' . env('SPARQL_WRITE_GRAPH') . '>, delete 1 (or less) ' .
+            'and insert 1 (or less) triples -- done';
         $this->assertEquals($succesString, $resultString);
 
         // check if "a" changed to "b"
         $this->checkReadResults('b');
 
         //DELETE
-        $query = 'WITH <' . env('SPARQL_WRITE_GRAPH') . '> DELETE DATA { <http://example.org/> <http://example.org/foo> "b" }';
+        $query = 'WITH <' . env('SPARQL_WRITE_GRAPH') . '> DELETE DATA { <http://example.org/> ' .
+            '<http://example.org/foo> "b" }';
         $response = $this->sparqlService->get($query);
         // see if results are correct
         $data = json_decode($response, true);
@@ -169,7 +173,6 @@ class SparqlServiceTest extends \TestCase
 
         // see of no data to end with
         $this->checkReadResults();
-
     }
 
     /**
@@ -186,7 +189,8 @@ class SparqlServiceTest extends \TestCase
     private function checkReadResults($endValue = false)
     {
         // check all data
-        $query = 'WITH <' . env('SPARQL_WRITE_GRAPH') . '> SELECT ?value { <http://example.org/> <http://example.org/foo> ?value }';
+        $query = 'WITH <' . env('SPARQL_WRITE_GRAPH') . '> SELECT ?value { <http://example.org/> ' .
+            '<http://example.org/foo> ?value }';
         $response = $this->sparqlService->get($query);
         $this->assertEquals(200, $this->sparqlService->getLastResponceCode());
         // see if results are correct
@@ -198,7 +202,5 @@ class SparqlServiceTest extends \TestCase
             $resultString = array_get($data, 'results.bindings.0.value.value');
             $this->assertEquals($endValue, $resultString);
         }
-
     }
-
 }

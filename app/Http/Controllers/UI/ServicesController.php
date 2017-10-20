@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
+use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\User;
 use App\Repositories\ServicesRepository;
@@ -10,7 +11,7 @@ use Illuminate\Http\Request;
 /**
  * Controller for the UI with extended models
  */
-class ServicesUiController extends Controller
+class ServicesController extends Controller
 {
     /**
      * @var ServicesRepository
@@ -23,7 +24,6 @@ class ServicesUiController extends Controller
     public function __construct(ServicesRepository $servicesRepository)
     {
         $this->servicesRepository = $servicesRepository;
-        $this->middleware('auth:api');
     }
 
     /**
@@ -43,30 +43,6 @@ class ServicesUiController extends Controller
     }
 
     /**
-     * Get the create form
-     *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
-     */
-    public function create(Service $request)
-    {
-        return response()->json('Not Implemented', 501);
-    }
-
-    /**
-     * Post new entity to store
-     *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
-     */
-    public function store(Service $request)
-    {
-        return response()->json('Not Implemented', 501);
-    }
-
-    /**
      * Get with id
      *
      * Base get and return the service
@@ -76,18 +52,6 @@ class ServicesUiController extends Controller
     public function show(Service $service)
     {
         return $service;
-    }
-
-    /**
-     * Get edit form
-     *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
-     */
-    public function edit(Service $request)
-    {
-        return response()->json('Not Implemented', 501);
     }
 
     /**
@@ -118,17 +82,5 @@ class ServicesUiController extends Controller
         $expandedServices = $this->servicesRepository->getExpandedServices($service->id);
 
         return response()->json($expandedServices);
-    }
-
-    /**
-     * Remove entity
-     *
-     * Base not implemnted reply
-     *
-     * @return \Illuminate\Http\Response 501
-     */
-    public function destroy(Service $request)
-    {
-        return response()->json('Not Implemented', 501);
     }
 }

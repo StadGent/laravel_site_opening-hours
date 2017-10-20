@@ -11,6 +11,9 @@ class ChannelServiceTest extends \TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * @var mixed
+     */
     private $channelService;
 
     public function setup()
@@ -28,7 +31,7 @@ class ChannelServiceTest extends \TestCase
         $this->expectsJobs(UpdateVestaOpeninghours::class);
         $this->expectsJobs(DeleteLodChannel::class);
 
-        $channel                  = \App\Models\Channel::first();
+        $channel = \App\Models\Channel::first();
         $channel->service->source = 'vesta';
         $this->channelService->makeSyncJobsForExternalServices($channel);
     }

@@ -44,7 +44,7 @@ class DayInfo
             $theString .= '[from => ' . $hours->from . ', until' . $hours->until . '], ';
         }
         if (isset($this->openNow)) {
-            $theString .= 'openNow => [status => ' . $$this->openNow->status . ', label' . $$this->openNow->label . '], ';
+            $theString .= 'openNow => [status => ' . $this->openNow->status . ', label' . $this->openNow->label . '], ';
         }
 
         $theString .= ']]';

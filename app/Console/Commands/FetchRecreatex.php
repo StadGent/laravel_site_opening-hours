@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Events\ChannelDeleted;
 use App\Models\Calendar;
 use App\Models\Channel;
 use App\Models\Event;
@@ -85,7 +84,7 @@ class FetchRecreatex extends Command
         $recreatexServices = app('ServicesRepository')->where('source', 'recreatex')->get();
 
         foreach ($recreatexServices as $recreatexService) {
-            if (! empty($recreatexService->identifier)) {
+            if (!empty($recreatexService->identifier)) {
                 $channelName = 'Infrastructuur';
 
                 // Remove the old auto-generated channel
@@ -102,11 +101,11 @@ class FetchRecreatex extends Command
 
                     $openinghoursList = $this->getOpeninghours($recreatexService->identifier, $year);
 
-                    if (! empty($openinghoursList)) {
+                    if (!empty($openinghoursList)) {
                         $openinghoursList = $this->transformOpeninghours($openinghoursList, $year);
                     }
 
-                    if (! empty($openinghoursList)) {
+                    if (!empty($openinghoursList)) {
                         $openinghours = new Openinghours();
                         $openinghours->active = true;
                         $openinghours->start_date = $year . '-01-01';
@@ -194,7 +193,7 @@ class FetchRecreatex extends Command
                 continue;
             }
 
-            if (! empty($openinghoursEvent['From1']) && ! empty($openinghoursEvent['To1'])) {
+            if (!empty($openinghoursEvent['From1']) && !empty($openinghoursEvent['To1'])) {
                 $fromTimestamp = $openinghoursEvent['From1'];
 
                 if (str_contains($fromTimestamp, '00:00:00')) {
@@ -225,7 +224,7 @@ class FetchRecreatex extends Command
                 $until = clone $from;
             }
 
-            if (! empty($openinghoursEvent['From2']) && ! empty($openinghoursEvent['To2']) && $nextEventPossible) {
+            if (!empty($openinghoursEvent['From2']) && !empty($openinghoursEvent['To2']) && $nextEventPossible) {
                 $from = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['From2']);
                 $to = Carbon::createFromFormat('Y-m-d\TH:i:s', $openinghoursEvent['To2']);
 
@@ -237,16 +236,16 @@ class FetchRecreatex extends Command
             }
 
             // Add the timespans to the week schedule
-            if (! empty($timespans)) {
+            if (!empty($timespans)) {
                 foreach ($timespans as $timespan => $day) {
                     // Week 1 and 52 can overlap, spanning a year
                     // keep them separate and add them as daily events
                     if ($parsedWeek == 52 || $parsedWeek == 1) {
                         $transformedList[] = [
-                        'days' => [$day],
-                        'start' => clone $from,
-                        'end' => clone $to,
-                        'until' => clone $eventDay
+                            'days' => [$day],
+                            'start' => clone $from,
+                            'end' => clone $to,
+                            'until' => clone $eventDay,
                         ];
                     } else {
                         if (empty($weekBuffer[$parsedWeek]['schedules'])) {
@@ -273,61 +272,60 @@ class FetchRecreatex extends Command
 
         // All year closed
         if (empty($weekBuffer)) {
-         return [];
-     }
+            return [];
+        }
 
-     $firstWeek = key($weekBuffer);
+        $firstWeek = key($weekBuffer);
 
         // Parse weekly RRULEs from the week schedules
-     $recurringBuffer = $weekBuffer[$firstWeek]['schedules'];
-     unset($weekBuffer[$firstWeek]);
+        $recurringBuffer = $weekBuffer[$firstWeek]['schedules'];
+        unset($weekBuffer[$firstWeek]);
 
-     foreach ($weekBuffer as $weekNumber => $weekConfig) {
-        $schedule = $weekConfig['schedules'];
-        $until = $weekConfig['until'];
+        foreach ($weekBuffer as $weekNumber => $weekConfig) {
+            $schedule = $weekConfig['schedules'];
+            $until = $weekConfig['until'];
 
-        $newBuffer = [];
+            $newBuffer = [];
 
-        foreach ($schedule as $timespan => $timespanConfig) {
-            if (array_key_exists($timespan, $recurringBuffer) && array_values($timespanConfig['days']) == array_values($recurringBuffer[$timespan]['days'])) {
-                $recurringBuffer[$timespan]['until'] = $until;
-            } else {
-                $newBuffer[$timespan] = $timespanConfig;
+            foreach ($schedule as $timespan => $timespanConfig) {
+                if (array_key_exists($timespan, $recurringBuffer) && array_values($timespanConfig['days']) == array_values($recurringBuffer[$timespan]['days'])) {
+                    $recurringBuffer[$timespan]['until'] = $until;
+                } else {
+                    $newBuffer[$timespan] = $timespanConfig;
+                }
             }
-        }
 
             // Filter out the events that did not receive an updated until date
-        $tmpBuffer = [];
+            $tmpBuffer = [];
 
-        foreach ($recurringBuffer as $timespan => $config) {
-            if ($config['until']->toDateString() != $until->toDateString()) {
-                $transformedList[] = $config;
-            } else {
-                $tmpBuffer[$timespan] = $config;
+            foreach ($recurringBuffer as $timespan => $config) {
+                if ($config['until']->toDateString() != $until->toDateString()) {
+                    $transformedList[] = $config;
+                } else {
+                    $tmpBuffer[$timespan] = $config;
+                }
             }
-        }
 
-        $recurringBuffer = $tmpBuffer;
+            $recurringBuffer = $tmpBuffer;
 
             // Merge the recurring rules with the new timespans
             // if timespans overlap, this means that the old rule should be put
             // into the final list of events as well
-        foreach ($newBuffer as $timespan => $config) {
-            if (array_key_exists($timespan, $recurringBuffer)) {
-                $transformedList[] = $config;
+            foreach ($newBuffer as $timespan => $config) {
+                if (array_key_exists($timespan, $recurringBuffer)) {
+                    $transformedList[] = $config;
+                }
 
+                $recurringBuffer[$timespan] = $config;
             }
-
-            $recurringBuffer[$timespan] = $config;
         }
-    }
 
-    foreach ($recurringBuffer as $timespan => $config) {
-        $transformedList[] = $config;
-    }
+        foreach ($recurringBuffer as $timespan => $config) {
+            $transformedList[] = $config;
+        }
 
-    return $transformedList;
-}
+        return $transformedList;
+    }
 
     /**
      * Determine if the service has a channel called "Infrastructuur"
@@ -347,8 +345,7 @@ class FetchRecreatex extends Command
 
         foreach ($channels as $channel) {
             if ($channel->label == $channelName) {
-                $channelObject = app('ChannelRepository')->getFullObjectById($channel->id);
-
+                app('ChannelRepository')->getFullObjectById($channel->id);
                 app('ChannelRepository')->delete($channel->id);
             }
         }
@@ -366,12 +363,12 @@ class FetchRecreatex extends Command
         $soapBody = $this->makeSoapBody($recreatexId, $year);
 
         $headers = [
-        'Content-type: text/xml;charset="utf-8"',
-        'Accept: text/xml',
-        'Cache-Control: no-cache',
-        'Pragma: no-cache',
-        'SOAPAction:  http://www.recreatex.be/webshop/IWebShop/FindInfrastructureOpenings',
-        'Content-length: ' . strlen($soapBody),
+            'Content-type: text/xml;charset="utf-8"',
+            'Accept: text/xml',
+            'Cache-Control: no-cache',
+            'Pragma: no-cache',
+            'SOAPAction:  http://www.recreatex.be/webshop/IWebShop/FindInfrastructureOpenings',
+            'Content-length: ' . strlen($soapBody),
         ];
 
         $ch = curl_init();
@@ -397,9 +394,14 @@ class FetchRecreatex extends Command
         $fullJson = json_decode($json, true);
 
         // Parse the InfrastructureOpeningHours from the body
+
         return array_get($fullJson, 'InfrastructureOpenings.InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour', []);
     }
 
+    /**
+     * @param $recreatexId
+     * @param $year
+     */
     private function makeSoapBody($recreatexId, $year)
     {
         return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v3="http://www.recreatex.be/webshop/">

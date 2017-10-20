@@ -31,16 +31,11 @@ class TextFormatter extends BaseFormatter
                 $text .= $channelObj->openNow->label . PHP_EOL;
                 continue;
             }
-            if (isset($channelObj->openNow)) {
-                $text .= $channelObj->openNow . PHP_EOL;
-            } else {
-                $text .= $this->makeTextForDayInfo($channelObj->openinghours);
-            }
+            $text .= $this->makeTextForDayInfo($channelObj->openinghours);
         }
         $this->output = $text;
         $this->output = rtrim($text, PHP_EOL);
 
         return $this;
     }
-
 }

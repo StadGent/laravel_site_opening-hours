@@ -13,9 +13,8 @@ use Carbon\Carbon;
 |
  */
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\SUser::class, function (Faker\Generator $faker) {
-
     return [
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
@@ -24,7 +23,7 @@ $factory->define(App\Models\SUser::class, function (Faker\Generator $faker) {
     ];
 });
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Service::class, function (Faker\Generator $faker) {
     return [
         'label' => $faker->text,
@@ -34,18 +33,17 @@ $factory->define(App\Models\Service::class, function (Faker\Generator $faker) {
     ];
 });
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Channel::class, function (Faker\Generator $faker) {
     return [
         'label' => $faker->text($maxNbChars = 30),
         'service_id' => 1,
     ];
-
 });
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Openinghours::class, function (Faker\Generator $faker) {
-    $start = new Carbon('2017-01-01'); 
+    $start = new Carbon('2017-01-01');
     $end = $start->copy()->modify('31 December');
 
     return [
@@ -56,9 +54,8 @@ $factory->define(App\Models\Openinghours::class, function (Faker\Generator $fake
     ];
 });
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Calendar::class, function (Faker\Generator $faker) {
-
     return [
         'priority' => 0,
         'summary' => '',
@@ -67,7 +64,7 @@ $factory->define(App\Models\Calendar::class, function (Faker\Generator $faker) {
     ];
 });
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Event::class, function (Faker\Generator $faker) {
     $dt = new Carbon('2017-01-01');
     $dt->minute = 00;

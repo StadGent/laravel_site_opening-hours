@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Formatters\OpeninghoursFormatter;
 use App\Http\Requests\GetQueryRequest;
 use App\Models\Channel;
 use App\Models\Service;
+use App\Services\OpeninghoursService;
 use Carbon\Carbon;
 
 /**
@@ -22,6 +24,10 @@ class QueryController extends Controller
      */
     private $OpeninghoursFormatter;
 
+    /**
+     * @param OpeninghoursService $ohService
+     * @param OpeninghoursFormatter $ohFormatter
+     */
     public function __construct()
     {
         $this->OpeninghoursService = app('OpeninghoursService');
@@ -31,10 +37,9 @@ class QueryController extends Controller
     /**
      * Collection of Channels with values or is now open or not
      *
-     * @todo  check the correct output by Accept header
-     * @param  GetQueryRequest $request [description]
-     * @param  Service         $service [description]
-     * @param  Channel         $channel [description]
+     * @param GetQueryRequest $request
+     * @param Service $service
+     * @param Channel $channel
      * @return \Illuminate\Http\Response
      */
     public function nowOpenAction(GetQueryRequest $request, Service $service, Channel $channel)
@@ -42,7 +47,10 @@ class QueryController extends Controller
         $this->OpeninghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
         // output format with json as default
         $this->OpeninghoursFormatter->setService($service);
-        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+        $output = $this->OpeninghoursFormatter->render(
+            $request->input('format') ?: 'json',
+            $this->OpeninghoursService->getData()
+        );
 
         return response()->make($output);
     }
@@ -60,10 +68,13 @@ class QueryController extends Controller
     {
         $start = new Carbon($request['from']);
         $end = new Carbon($request['until']);
-
-        $this->OpeninghoursService->collectData($start->startOfDay(), $end->endOfDay(), $service, $channel);
-        $this->OpeninghoursFormatter->setService($service);
-        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+        $output = $this->generateOutput(
+            $start->startOfDay(),
+            $end->endOfDay(),
+            $service,
+            $channel,
+            $request->input('format')
+        );
 
         return response()->make($output);
     }
@@ -81,12 +92,7 @@ class QueryController extends Controller
     {
         $start = new Carbon($request['date']);
         $end = $start->copy()->endOfDay();
-
-        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
-
-        $this->OpeninghoursService->getData();
-        $this->OpeninghoursFormatter->setService($service);
-        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
 
         return response()->make($output);
     }
@@ -106,9 +112,7 @@ class QueryController extends Controller
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
-        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
-        $this->OpeninghoursFormatter->setService($service);
-        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
 
         return response()->make($output);
     }
@@ -127,10 +131,7 @@ class QueryController extends Controller
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfMonth();
         $end = $date->copy()->endOfMonth();
-
-        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
-        $this->OpeninghoursFormatter->setService($service);
-        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
 
         return response()->make($output);
     }
@@ -149,12 +150,29 @@ class QueryController extends Controller
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
-
-        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
-        $this->OpeninghoursFormatter->setService($service);
-        $output = $this->OpeninghoursFormatter->render($request->input('format') ?: 'json', $this->OpeninghoursService->getData());
+        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
 
         return response()->make($output);
     }
 
+    /**
+     * Get the data from the service
+     *
+     * @param Carbon $start
+     * @param Carbon $end
+     * @param Service $service
+     * @param Channel $channel
+     * @param string $format
+     * @return mixed
+     */
+    private function generateOutput(Carbon $start, Carbon $end, Service $service, Channel $channel, $format)
+    {
+        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
+        $this->OpeninghoursFormatter->setService($service);
+
+        return $this->OpeninghoursFormatter->render(
+            $format ?: 'json',
+            $this->OpeninghoursService->getData()
+        );
+    }
 }

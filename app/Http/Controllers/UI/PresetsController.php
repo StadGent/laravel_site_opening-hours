@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
+/**
+ * @todo refactor to preset holidays
+ */
 class PresetsController extends Controller
 {
     /**

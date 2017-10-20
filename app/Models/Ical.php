@@ -9,14 +9,13 @@ use \ICal\ICal as ICalParser;
 /**
  * Model to keep specific Ical object per Openinghours
  * Can be called by openinghours->ical()
- * Is bound with IcalParser 
- * Uses limited Ical string date range to limit expensive overeagerness of parser * 
+ * Is bound with IcalParser
+ * Uses limited Ical string date range to limit expensive overeagerness of parser *
  */
 class Ical
 {
-
     /**
-     * @var mixed
+     * @var \ICal\ICal
      */
     private $parser;
 
@@ -92,14 +91,17 @@ class Ical
 
     /**
      * Create an ICAL string from a calendar
-     * 
+     *
      * @param  Calendar    $calendar     [description]
      * @param  Carbon|null $minTimestamp [description]
      * @param  Carbon|null $maxTimestamp [description]
      * @return [type]                    [description]
      */
-    protected function createIcalEventStringFromCalendar(Calendar $calendar, Carbon $minTimestamp = null, Carbon $maxTimestamp = null)
-    {
+    protected function createIcalEventStringFromCalendar(
+        Calendar $calendar,
+        Carbon $minTimestamp = null,
+        Carbon $maxTimestamp = null
+    ) {
         $icalString = '';
 
         foreach ($calendar->events as $event) {
@@ -140,7 +142,8 @@ class Ical
                 $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . "\n";
                 $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . "\n";
                 $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->endOfDay()->format('Ymd\THis') . "\n";
-                $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' . $calendar->id . "\n";
+                $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' ;
+                $icalString .=  $calendar->id . "\n";
                 $icalString .= "END:VEVENT\n";
             }
         }
@@ -151,7 +154,7 @@ class Ical
     /**
      * Check if there are events for a given day
      * Attr openNow respects the given time and adds an extra minute
-     * 
+     *
      * @param  Carbon  $date    [description]
      * @param  boolean $openNow [description]
      * @return [type]           [description]
