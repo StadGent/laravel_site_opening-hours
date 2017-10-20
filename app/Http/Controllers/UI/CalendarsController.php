@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DeleteCalendarRequest;
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
 use App\Repositories\CalendarRepository;
@@ -16,26 +15,6 @@ class CalendarsController extends Controller
     public function __construct(CalendarRepository $calendars)
     {
         $this->calendars = $calendars;
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @throws UnexpectedValueException
-     */
-    public function index()
-    {
-        throw new UnexpectedValueException('Not yet implemented');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @throws UnexpectedValueException
-     */
-    public function create()
-    {
-        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
@@ -76,16 +55,6 @@ class CalendarsController extends Controller
     public function show($id)
     {
         return response()->json($this->calendars->getById($id));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @throws UnexpectedValueException
-     */
-    public function edit()
-    {
-        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**
@@ -142,11 +111,10 @@ class CalendarsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param DeleteCalendarRequest $request
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteCalendarRequest $request, $calendarId)
+    public function destroy($calendarId)
     {
         $calendar = $this->calendars->getById($calendarId);
 

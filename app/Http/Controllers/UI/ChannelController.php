@@ -20,25 +20,6 @@ class ChannelController extends Controller
         $this->channels = $channels;
     }
 
-    /**
-     * Get all entities
-     *
-     * @throws UnexpectedValueException
-     */
-    public function index()
-    {
-        throw new UnexpectedValueException('Not yet implemented');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @throws UnexpectedValueException
-     */
-    public function create()
-    {
-        throw new UnexpectedValueException('Not yet implemented');
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -64,29 +45,6 @@ class ChannelController extends Controller
         );
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @todo someone pls check or this has any functionality
-     * @return \Illuminate\Http\Response
-     */
-    public function show()
-    {
-        $start = Carbon::today();
-        $end = Carbon::today();
-
-        return [
-            'label' => 'telefonisch',
-            'openinghours' => [
-                [
-                    'active' => true,
-                    'start_date' => $start->subMonth()->toDateString(),
-                    'end_date' => $end->subMonth()->addYear()->toDateString(),
-                    'id' => 5,
-                ],
-            ],
-        ];
-    }
 
     /**
      * Get subset of Channels from Serivce
@@ -98,16 +56,6 @@ class ChannelController extends Controller
         $channels = $serviceRepo->getChannels();
 
         return response()->json($channels);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @throws UnexpectedValueException
-     */
-    public function edit()
-    {
-        throw new UnexpectedValueException('Not yet implemented');
     }
 
     /**

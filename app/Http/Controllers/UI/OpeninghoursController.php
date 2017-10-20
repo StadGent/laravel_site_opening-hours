@@ -19,27 +19,6 @@ class OpeninghoursController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @todo someone pls check or this has any functionality
-     * @return ???
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @throws UnexpectedValueException
-     */
-    public function create()
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param StoreOpeninghoursRequest $request
@@ -86,17 +65,6 @@ class OpeninghoursController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @todo someone pls check or this has any functionality
-     * @return ???
-     */
-    public function edit()
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -138,9 +106,9 @@ class OpeninghoursController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteOpeninghoursRequest $request, $id)
+    public function destroy(DeleteOpeninghoursRequest $request)
     {
-        $success = $this->openinghours->delete($id);
+        $success = $this->openinghours->delete($request->openinghours->id);
 
         if ($success) {
             return response()->json(['message' => 'De openingsuren werden verwijderd']);
