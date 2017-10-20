@@ -19,13 +19,15 @@ class RoboFile extends RoboFileBase
             ->remoteDirectory($currentProjectRoot, true)
             ->timeout(120)
             ->exec('php artisan queue:restart');
+
         return $collection;
     }
 
     /**
      * Run Tests.
      */
-    public function test() {
+    public function test()
+    {
         $this->stopOnFail(true);
         $this->taskPHPUnit()
             ->option('disallow-test-output')
@@ -40,22 +42,23 @@ class RoboFile extends RoboFileBase
     /**
      * Install precommit hook.
      */
-    public function precommitInstall() {
+    public function precommitInstall()
+    {
         // Create the git/hooks symlinks.
-         $files = array_diff(scandir(__DIR__ . '/.git-hooks'), ['..', '.']);
-         foreach ($files as $file) {
-             $this->say(sprintf('Add git hook : %s.', $file));
+        $files = array_diff(scandir(__DIR__ . '/.git-hooks'), ['..', '.']);
+        foreach ($files as $file) {
+            $this->say(sprintf('Add git hook : %s.', $file));
 
-             // Only if symlink does not exists yet.
-             $to = '.git/hooks/' . $file;
-             if (file_exists($to)) {
-                 $this->say('✔ Already exists.');
-                 continue;
-             }
-             $this->taskFilesystemStack()
-                 ->symlink(__DIR__ . '/.git-hooks/' . $file, $to)
-                 ->run();
-             $this->say('✔ Created symlink.');
-         }
+            // Only if symlink does not exists yet.
+            $to = '.git/hooks/' . $file;
+            if (file_exists($to)) {
+                $this->say('✔ Already exists.');
+                continue;
+            }
+            $this->taskFilesystemStack()
+                ->symlink(__DIR__ . '/.git-hooks/' . $file, $to)
+                ->run();
+            $this->say('✔ Created symlink.');
+        }
     }
 }

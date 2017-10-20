@@ -26,7 +26,7 @@ class JsonLdFormatter extends BaseFormatter
      * formatted hours per day, such as this one.
      *
      * @param Illuminate\Database\Eloquent\Model $data
-     * @return json-ld
+     * @return $this
      */
     public function render($data)
     {
@@ -37,7 +37,6 @@ class JsonLdFormatter extends BaseFormatter
 
         $graph = new \EasyRdf_Graph();
         $service = $graph->resource($this->service->uri, 'schema:Organization');
-        $channels = $this->service->channels;
         // get a raw render for the week:
         // $channel id + days index in english
         // for each channel create an openinghours specification

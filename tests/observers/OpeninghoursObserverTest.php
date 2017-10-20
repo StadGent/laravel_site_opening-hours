@@ -18,10 +18,11 @@ class OpeninghoursObserverTest extends \TestCase
             $mock = $this->createMock(\App\Services\OpeninghoursService::class, ['makeSyncJobsForExternalServices']);
             $mock->expects($this->once())
                 ->method('makeSyncJobsForExternalServices');
+
             return $mock;
         });
 
-        $openinghours        = \App\Models\Openinghours::first();
+        $openinghours = \App\Models\Openinghours::first();
         $openinghours->label = 'testLabel';
         $openinghours->save();
     }
@@ -36,6 +37,7 @@ class OpeninghoursObserverTest extends \TestCase
             $mock = $this->createMock(\App\Services\OpeninghoursService::class, ['makeSyncJobsForExternalServices']);
             $mock->expects($this->once())
                 ->method('makeSyncJobsForExternalServices');
+
             return $mock;
         });
 

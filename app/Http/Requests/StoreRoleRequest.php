@@ -14,6 +14,8 @@ class StoreRoleRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param UserRepository $users
+     * @param Request $request
      * @return bool
      */
     public function authorize(UserRepository $users, Request $request)
@@ -33,15 +35,20 @@ class StoreRoleRequest extends FormRequest
         return [
             'user_id' => 'required|numeric',
             'service_id' => 'required|numeric',
-            'role' => 'required|in:Owner,Member'
+            'role' => 'required|in:Owner,Member',
         ];
     }
 
+    /**
+     * Get the messages
+     *
+     * @return array
+     */
     public function messages()
     {
-        return $messages = [
+        return [
             'required' => 'Het veld is verplicht in te vullen.',
-            'numeric' => 'Het veld moet een numerieke waarde krijgen.'
+            'numeric' => 'Het veld moet een numerieke waarde krijgen.',
         ];
     }
 }

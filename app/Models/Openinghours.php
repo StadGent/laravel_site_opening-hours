@@ -29,6 +29,8 @@ class Openinghours extends Model
     ];
 
     /**
+     * Child Objects Calendar
+     *
      * @return Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function calendars()
@@ -37,6 +39,8 @@ class Openinghours extends Model
     }
 
     /**
+     * Parent Object Channel
+     *
      * @return Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function channel()
@@ -55,8 +59,8 @@ class Openinghours extends Model
     }
 
     /**
-     * Bind ICal with this->calendar collection 
-     * 
+     * Bind ICal with this->calendar collection
+     *
      * @return Ical
      */
     public function ical()

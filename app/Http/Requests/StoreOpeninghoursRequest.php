@@ -12,6 +12,8 @@ class StoreOpeninghoursRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param UserRepository $users
+     * @param Request $request
      * @return bool
      */
     public function authorize(UserRepository $users, Request $request)
@@ -42,15 +44,20 @@ class StoreOpeninghoursRequest extends FormRequest
     {
         return [
             'label' => 'required',
-            'channel_id' => 'required|numeric'
+            'channel_id' => 'required|numeric',
         ];
     }
 
+    /**
+     * Get the messages
+     *
+     * @return array
+     */
     public function messages()
     {
-        return $messages = [
+        return [
             'required' => 'Het veld is verplicht in te vullen.',
-            'numeric' => 'Het veld moet een numerieke waarde krijgen.'
+            'numeric' => 'Het veld moet een numerieke waarde krijgen.',
         ];
     }
 }

@@ -5,7 +5,6 @@ namespace Tests\Services;
 use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
-use App\Services\ICalService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -71,7 +70,11 @@ class OpeninghoursServiceTest extends \TestCase
         $this->OHService->isOpenNow($service);
         // check or all channels have a 'open' or 'gesloten' value
         foreach ($this->OHService->getData() as $channelBlock) {
-            $this->assertContains($channelBlock->openNow->label, [trans('openinghourApi.CLOSED'), trans('openinghourApi.OPEN'), null]);
+            $this->assertContains($channelBlock->openNow->label, [
+                trans('openinghourApi.CLOSED'),
+                trans('openinghourApi.OPEN'),
+                null,
+            ]);
         }
     }
 

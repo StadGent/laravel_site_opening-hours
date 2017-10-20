@@ -102,15 +102,15 @@ export default {
             //now we can fetch the channels
             this.channelDataQueue.push(this.route.service);
 
-            return this.$http.get('/api/ui/channels/getChannelsByService/' + this.route.service)
+            return this.$http.get('/api/ui/services/' + this.route.service + '/channels')
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
                 })
                 .then(() => {
-                    return this.$http.get('/api/ui/users/getUsersByService/' + this.route.service);
-                })
-                .then(({data}) => {
-                    this.$set(this.routeService, 'users', data);
+                    return this.$http.get('/api/ui/services/' + this.route.service + '/users')
+                    .then(({data}) => {
+                        this.$set(this.routeService, 'users', data);
+                    })
                 })
                 .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);

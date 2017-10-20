@@ -92,13 +92,13 @@ class OpeninghoursService
             $openNow = new \stdClass();
             $channelData->openNow = $openNow;
 
-            $openinghoursCollection = $currentChannel->openinghours()
+            $ohCollection = $currentChannel->openinghours()
                 ->where('start_date', '<=', $end->toDateString())
                 ->where('end_date', '>=', $start->toDateString())
                 ->where('active', '=', 1)
                 ->get();
 
-            foreach ($openinghoursCollection as $openinghours) {
+            foreach ($ohCollection as $openinghours) {
                 // addapt begin and end to dates of openinghours
                 $calendarBegin = new Carbon($openinghours->start_date);
                 if ($start > $openinghours->start_date) {
@@ -132,7 +132,6 @@ class OpeninghoursService
      */
     public function collectData(Carbon $start, Carbon $end, Service $service, Channel $channel = null)
     {
-
         if (!isset($service->id)) {
             throw new \Exception("Cannot get data without service model", 1);
         }
@@ -142,7 +141,6 @@ class OpeninghoursService
         $this->data = [];
 
         foreach ($activeChannels as $currentChannel) {
-
             $channelData = new \stdClass();
             $this->data[$currentChannel->id] = $channelData;
 
@@ -179,12 +177,12 @@ class OpeninghoursService
         $channelData = $this->data[$channel->id];
         $hoursObj = $channelData->openinghours;
 
-        $openinghoursCollection = $channel->openinghours()
+        $ohCollection = $channel->openinghours()
             ->where('start_date', '<=', $end->toDateString())
             ->where('end_date', '>=', $start->toDateString())
             ->get();
 
-        foreach ($openinghoursCollection as $openinghours) {
+        foreach ($ohCollection as $openinghours) {
             // addapt begin and end to dates of openinghours
             $calendarBegin = new Carbon($openinghours->start_date);
             if ($start > $openinghours->start_date) {
@@ -254,5 +252,4 @@ class OpeninghoursService
     {
         return $this->data;
     }
-
 }

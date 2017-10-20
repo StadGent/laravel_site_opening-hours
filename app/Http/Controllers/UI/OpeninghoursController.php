@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\UI;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteOpeninghoursRequest;
 use App\Http\Requests\StoreOpeninghoursRequest;
 use App\Repositories\ChannelRepository;
@@ -9,35 +10,18 @@ use App\Repositories\OpeninghoursRepository;
 
 class OpeninghoursController extends Controller
 {
+    /**
+     * @param OpeninghoursRepository $openinghours
+     */
     public function __construct(OpeninghoursRepository $openinghours)
     {
         $this->openinghours = $openinghours;
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param StoreOpeninghoursRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreOpeninghoursRequest $request)
@@ -59,33 +43,25 @@ class OpeninghoursController extends Controller
 
         $openinghours = $this->openinghours->getById($id);
 
-        if (! empty($openinghours)) {
+        if (!empty($openinghours)) {
             return response()->json($openinghours);
         }
 
-        return response()->json(['message' => 'Something went wrong while storing the new openingshours, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while storing the new openingshours, check the logs.'],
+            400
+        );
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int                       $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         return response()->json($this->openinghours->getById($id));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -117,7 +93,10 @@ class OpeninghoursController extends Controller
             return response()->json($this->openinghours->getById($id));
         }
 
-        return response()->json(['message' => 'Something went wrong while updating the openinghours, check the logs.'], 400);
+        return response()->json(
+            ['message' => 'Something went wrong while updating the openinghours, check the logs.'],
+            400
+        );
     }
 
     /**
@@ -127,11 +106,9 @@ class OpeninghoursController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteOpeninghoursRequest $request, $id)
+    public function destroy(DeleteOpeninghoursRequest $request)
     {
-        $openinghours = $this->openinghours->getFullObjectById($id);
-
-        $success = $this->openinghours->delete($id);
+        $success = $this->openinghours->delete($request->openinghours->id);
 
         if ($success) {
             return response()->json(['message' => 'De openingsuren werden verwijderd']);

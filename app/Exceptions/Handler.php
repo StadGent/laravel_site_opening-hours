@@ -7,10 +7,15 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
+    /**
+     * @var stdClass
+     */
+    private $errorObj;
     /**
      * A list of the exception types that should not be reported.
      *
@@ -24,6 +29,22 @@ class Handler extends ExceptionHandler
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
     ];
+    /**
+     * setup basic error Obj with main properties
+     *
+     * Optional properties that can be added:
+     * - details = [];
+     * - innererror = [];
+     *
+     * @return stdClass
+     */
+    private function initErrorObj()
+    {
+        $this->errorObj = new \stdClass();
+        $this->errorObj->code = "";
+        $this->errorObj->message = "";
+        $this->errorObj->target = "";
+    }
 
     /**
      * Report or log an exception.
@@ -41,10 +62,11 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * in case of expectsJson => handle into correct microsoft api error-object
+     * In case json is involved the output is set on json
+     * init correct api error-object (by Microsoft API guidelines)
      * https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#7102-error-condition-responses
      * http://docs.oasis-open.org/odata/odata-json-format/v4.0/os/odata-json-format-v4.0-os.html#_Toc372793091
-     * @todo logId should be created for reference
+     * search dynamic for handler method of exception type
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception  $exception
@@ -52,59 +74,14 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($request->expectsJson()) {
-            /** */
-            $errorObj = new \stdClass();
-            $errorObj->code = "";
-            $errorObj->message = "";
-            $errorObj->target = "";
-            /*******************************/
-            /*          Optional           */
-            /*******************************/
-            /* $errorObj->details = [];    */
-            /* $errorObj->innererror = []; */
-            /*******************************/
+        if ($request->isJson() || $request->expectsJson()) {
+            $this->initErrorObj();
+            $reflect = new \ReflectionClass($exception);
+            $method = 'handle' . $reflect->getShortName();
+            if (method_exists($this, $method)) {
+                $this->errorObj->code = $reflect->getShortName();
 
-            if ($exception instanceof NotFoundHttpException) {
-                $errorObj->code = "PathNotFound";
-                $errorObj->message = "The requested path could not match a route in the API";
-                $errorObj->target = "query";
-
-                return response()->json(['error' => $errorObj], 404);
-            }
-
-            // https://restpatterns.mindtouch.us/HTTP_Status_Codes/422_-_Unprocessable_Entity
-            if ($exception instanceof ModelNotFoundException) {
-                $fullmodel = $exception->getModel();
-                $choppedUpModel = explode('\\', $fullmodel);
-                $cleanedUpModel = array_pop($choppedUpModel);
-
-                $errorObj->code = "ModelNotFound";
-                $errorObj->message = $cleanedUpModel . " model is not found with given identifier";
-                $errorObj->target = $cleanedUpModel;
-
-                return response()->json(['error' => $errorObj], 422);
-            }
-            // https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#examples
-            if ($exception instanceof ValidationException) {
-                $errorObj->code = "NotValidParameter";
-                $errorObj->message = "Paramters did not pass validation";
-                $errorObj->target = "parameters";
-                $errorObj->details = [];
-
-                foreach ($exception->validator->errors()->getMessages() as $field => $message) {
-                    $details = new \stdClass();
-                    $details->code = "NotValidParameter";
-                    $details->message = $message[0];
-                    $details->target = $field;
-                    if ($field === 'Channel') {
-                        $details->code = "ParentChildMismatch";
-                        $details->message = "The requested service did not find a match for the given channel identifier";
-                    }
-                    $errorObj->details[] = $details;
-                }
-
-                return response()->json(['error' => $errorObj], 400);
+                return $this->$method($exception);
             }
         }
 
@@ -116,14 +93,99 @@ class Handler extends ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Auth\AuthenticationException  $exception
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response 401
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+        if ($request->isJson() || $request->expectsJson()) {
+            $this->errorObj = new \stdClass();
+            $this->errorObj->code = "AuthenticationException";
+            $this->errorObj->message = $exception->getMessage();
+            $this->errorObj->message .= "You are not autherised to make this request";
+
+            $this->errorObj->target = "query";
+
+            return response()->json(['error' => $this->errorObj], 401);
         }
 
         return redirect()->guest('login');
+    }
+
+    /**
+     * NotFoundHttpException
+     * The requested path could not match a route in the API
+     *
+     * @param NotFoundHttpException $exception
+     * @return \Illuminate\Http\Response 404
+     */
+    protected function handleNotFoundHttpException(NotFoundHttpException $exception)
+    {
+        $this->errorObj->message = "The requested path could not match a route in the API";
+        $this->errorObj->target = "query";
+
+        return response()->json(['error' => $this->errorObj], 404);
+    }
+
+    /**
+     * MethodNotAllowedHttpException
+     * The used HTTP method is not allowed on this route in the API
+     *
+     * @param MethodNotAllowedHttpException $exception
+     * @return \Illuminate\Http\Response 501
+     */
+    protected function handleMethodNotAllowedHttpException(MethodNotAllowedHttpException $exception)
+    {
+        $this->errorObj->message = "The used HTTP method is not allowed on this route in the API";
+        $this->errorObj->target = "query";
+
+        return response()->json(['error' => $this->errorObj], 405);
+    }
+
+    /**
+     * ModelNotFoundException
+     * The model is not found with given identifier
+     * https://restpatterns.mindtouch.us/HTTP_Status_Codes/422_-_Unprocessable_Entity
+     *
+     * @param ModelNotFoundException $exception
+     * @return \Illuminate\Http\Response 422
+     */
+    protected function handleModelNotFoundException(ModelNotFoundException $exception)
+    {
+        $fullmodel = $exception->getModel();
+        $choppedUpModel = explode('\\', $fullmodel);
+        $cleanedUpModel = array_pop($choppedUpModel);
+        $this->errorObj->message = $cleanedUpModel . " model is not found with given identifier";
+        $this->errorObj->target = $cleanedUpModel;
+
+        return response()->json(['error' => $this->errorObj], 422);
+    }
+
+    /**
+     * ValidationException
+     * Paramters did not pass validatio
+     * https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#examples
+     *
+     * @param ValidationException $exception
+     * @return \Illuminate\Http\Response 400
+     */
+    protected function handleValidationException(ValidationException $exception)
+    {
+        $this->errorObj->message = "Paramters did not pass validation";
+        $this->errorObj->target = "parameters";
+        $this->errorObj->details = [];
+
+        foreach ($exception->validator->errors()->getMessages() as $field => $message) {
+            $details = new \stdClass();
+            $details->code = "NotValidParameter";
+            $details->message = $message[0];
+            $details->target = $field;
+            if ($field === 'Channel') {
+                $details->code = "ParentChildMismatch";
+                $details->message = "The requested service did not find a match for the given channel identifier";
+            }
+            $this->errorObj->details[] = $details;
+        }
+
+        return response()->json(['error' => $this->errorObj], 400);
     }
 }

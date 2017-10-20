@@ -38,6 +38,11 @@ class QueryControllerTest extends \TestCase
         $this->channelKeys = $service->channels->pluck('id');
     }
 
+    /**
+     * requestTypeProvider
+     *
+     * @return array
+     */
     public function requestTypeProvider()
     {
         $dateParam = date('Y-m-d');
@@ -47,10 +52,14 @@ class QueryControllerTest extends \TestCase
             [['type' => 'open-now', 'format' => 'json-ld']],
             [['type' => 'open-now', 'format' => 'html']],
             [['type' => 'open-now', 'format' => 'text']],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days'))]],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'json-ld']],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'html']],
-            [['type' => 'openinghours', 'from' => $dateParam, 'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'text']],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days'))]],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'json-ld']],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'html']],
+            [['type' => 'openinghours', 'from' => $dateParam,
+                'until' => date('Y-m-d', strtotime($dateParam . ' + 10 days')), 'format' => 'text']],
             [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam]],
             [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam, 'format' => 'json-ld']],
             [['type' => 'openinghours', 'period' => 'day', 'date' => $dateParam, 'format' => 'html']],
@@ -66,7 +75,7 @@ class QueryControllerTest extends \TestCase
      * @group validation
      * @dataProvider requestTypeProvider
      **/
-    public function testValidateNoServiceArgumentIsAPathNotFoundError($typeParams)
+    public function testValidateNoServiceArgumentIsANotFoundHttpException($typeParams)
     {
         $this->serviceId = null;
         $typeParams['format'] = 'json';
@@ -74,7 +83,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(404);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "PathNotFound",
+                "code" => "NotFoundHttpException",
                 "message" => "The requested path could not match a route in the API",
                 "target" => "query",
             ],
@@ -86,7 +95,7 @@ class QueryControllerTest extends \TestCase
      * @group validation
      * @dataProvider requestTypeProvider
      */
-    public function testValidateInvallidServiceIdentifierIsAModelNotFoundError($typeParams)
+    public function testValidateInvallidServiceIdentifierIsAModelNotFoundException($typeParams)
     {
         $this->serviceId = 'notAServiceId';
         $typeParams['format'] = 'json';
@@ -94,7 +103,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(422);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "ModelNotFound",
+                "code" => "ModelNotFoundException",
                 "message" => "Service model is not found with given identifier",
                 "target" => "Service",
             ],
@@ -105,14 +114,14 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateServiceWithoutChannelsReturnsNotFoundError()
+    public function testValidateServiceWithoutChannelsReturnsValidationException()
     {
         $this->serviceId = factory(\App\Models\Service::class)->create(['label' => 'testChildlessService'])->id;
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('Y-m-d')]);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -136,7 +145,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -165,7 +174,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -194,7 +203,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -218,7 +227,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -242,7 +251,7 @@ class QueryControllerTest extends \TestCase
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
-                "code" => "NotValidParameter",
+                "code" => "ValidationException",
                 "message" => "Paramters did not pass validation",
                 "target" => "parameters",
                 "details" => [
@@ -256,10 +265,13 @@ class QueryControllerTest extends \TestCase
         ]);
     }
 
+    /**
+     * requestDateTypes
+     *
+     * @return array
+     */
     public function requestDateTypes()
     {
-        $dateParam = date('Y-m-d');
-
         return [
             [[
                 'from' => '2017-01-01',
@@ -311,7 +323,6 @@ class QueryControllerTest extends \TestCase
         if (!isset($typeParams['format']) || $typeParams['format'] === 'json') {
             $this->getContentStructureTested($call);
         }
-
     }
 
     /**
@@ -340,7 +351,6 @@ class QueryControllerTest extends \TestCase
      */
     public function testItGivesSevenDaysPerChannelOnTypeWeek()
     {
-        $dateParam = date('d-m-Y', strtotime('tomorrow'));
         $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => date('d-m-Y')]);
         $content = $this->getContentStructureTested($call);
 
@@ -357,7 +367,8 @@ class QueryControllerTest extends \TestCase
     public function testItGivesClosedForEachFirstMondayOfTheMonth()
     {
         $firstMondayOfSept2017 = '04-09-2017';
-        $fullWeekCall = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => $firstMondayOfSept2017]);
+        $fullWeekCall = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week',
+            'date' => $firstMondayOfSept2017]);
         $content = $this->getContentStructureTested($fullWeekCall);
 
         foreach ($content as $channelBlock) {
@@ -380,7 +391,6 @@ class QueryControllerTest extends \TestCase
      */
     public function doRequest($type, $params = null)
     {
-
         $path = '/api/services/' . $this->serviceId;
 
         if ($this->oneChannel()) {
@@ -410,15 +420,22 @@ class QueryControllerTest extends \TestCase
             $path,
             [],
             [
+                'Accept' => 'application/json',
                 'Accept-Encoding' => 'gzip, deflate',
                 'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
                 'X-Requested-With' => 'XMLHttpRequest',
-            ]);
+                'Accept-type' => 'application/json',
+            ]
+        );
     }
 
     /**
+     *
      * get contect from call
      * and do base tests
+     *
+     * @param uri $call
+     * @return array
      */
     public function getContentStructureTested($call)
     {
@@ -429,5 +446,4 @@ class QueryControllerTest extends \TestCase
 
         return $content;
     }
-
 }
