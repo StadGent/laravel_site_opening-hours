@@ -109,12 +109,11 @@ class UsersController extends Controller
     }
 
     /**
-     * @todo checkout $service->usersWithRole
+     * @todo checkout $service->usersWithRole()
      * @param Service $service
      */
     public function getFromService(Service $service)
     {
-        //return $service->usersWithRole();
         return app('UserRepository')->getAllInService($service->id);
     }
 }
