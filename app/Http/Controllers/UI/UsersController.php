@@ -98,8 +98,7 @@ class UsersController extends Controller
             throw new AuthenticationException("You can't delete yourself!!!");
         }
 
-        $success = $model->delete();
-
+        $success = $user->delete();
         if ($success !== false) {
             $users = $this->userRepository->getAll();
 
