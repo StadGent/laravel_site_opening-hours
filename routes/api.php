@@ -19,7 +19,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     // calendars
     Route::put('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
     Route::patch('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
-    Route::delete('/calendars/{calendar}', 'UI\CalendarsController@destory')->middleware('hasRoleInService');
+    Route::delete('/calendars/{calendar}', 'UI\CalendarsController@destroy')->middleware('hasRoleInService');
 
     // channels
     Route::post('/channels/{channel}', 'UI\ChannelController@store')->middleware('hasRoleInService');
@@ -34,7 +34,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::post('/openinghours/{openinghours}', 'UI\OpeninghoursController@store')->middleware('hasRoleInService');
     Route::put('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
     Route::patch('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
-    Route::delete('/openinghours/{openinghours}', 'UI\OpeninghoursController@destory')->middleware('hasRoleInService');
+    Route::delete('/openinghours/{openinghours}', 'UI\OpeninghoursController@destroy')->middleware('hasRoleInService');
 
     // Presets (refactor to holidays)
     Route::get('/presets', 'UI\PresetsController@index');
@@ -53,7 +53,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     // users
     Route::get('/users', 'UI\UsersController@index')->middleware('admin');
     Route::post('/users', 'UI\UsersController@store')->middleware('admin');
-    Route::delete('/users/{user}', 'UI\UsersController@destory')->middleware('admin');
+    Route::delete('/users/{user}', 'UI\UsersController@destroy')->middleware('admin');
     // subset
     Route::get('/services/{service}/users', 'UI\UsersController@getFromService')
         ->middleware('hasRoleInService');
