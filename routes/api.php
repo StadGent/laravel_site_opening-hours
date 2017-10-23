@@ -25,7 +25,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::post('/channels/{channel}', 'UI\ChannelController@store')->middleware('hasRoleInService');
     Route::put('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
     Route::patch('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
-    Route::delete('/channels/{channel}', 'UI\ChannelController@destory')->middleware('hasRoleInService');
+    Route::delete('/channels/{channel}', 'UI\ChannelController@destroy')->middleware('hasRoleInService');
     // subset
     Route::get('/services/{service}/channels', 'UI\ChannelController@getFromService');
 
