@@ -12,6 +12,11 @@ class SendRegisterConfirmation extends Mailable
     use Queueable, SerializesModels;
 
     /**
+     * @var User
+     */
+    public $user;
+
+    /**
      * Create a new message instance.
      *
      * @param User $user

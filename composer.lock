@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "838d04588a12e1402f53b2d022d7f2eb",
-    "content-hash": "cddba7bf825b6bd32b1d6ebc77ae7e4f",
+    "hash": "2ee34c63dcf810d15acb23da53beafd3",
+    "content-hash": "79305f5f49afd7e801150e4bf2b47185",
     "packages": [
         {
             "name": "adoy/fastcgi-client",
@@ -6322,6 +6322,6 @@
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "5.6.30"
+        "php": "5.6.20"
     }
 }

@@ -8,23 +8,35 @@ use DB;
 
 class UserRepository extends EloquentRepository
 {
+    /**
+     * @param User $user
+     */
     public function __construct(User $user)
     {
         parent::__construct($user);
     }
 
+    /**
+     * @param array $input
+     * @return mixed
+     */
     public function store(array $input)
     {
         $existingUser = $this->model->where('email', $input['email'])->first();
 
         if (empty($existingUser)) {
             $input = array_only($input, $this->model->getFillable());
+
             return parent::store($input);
         }
 
         return $existingUser->id;
     }
 
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function getById($userId)
     {
         $user = $this->model->find($userId);
@@ -76,7 +88,7 @@ class UserRepository extends EloquentRepository
     {
         $roleId = $this->getRoleId($role);
 
-        if (! empty(
+        if (!empty(
             DB::select(
                 'SELECT role_id FROM user_service_role WHERE user_id = ? AND service_id = ?',
                 [$userId, $serviceId]
@@ -84,6 +96,7 @@ class UserRepository extends EloquentRepository
         )
         ) {
             DB::connection()->enableQueryLog();
+
             return DB::update(
                 'UPDATE user_service_role SET role_id = ? WHERE  user_id = ? AND service_id = ?',
                 [$roleId, $userId, $serviceId]
@@ -116,7 +129,7 @@ class UserRepository extends EloquentRepository
 
             $roles[] = [
                 'role' => $role->name,
-                'service_id' => $result->service_id
+                'service_id' => $result->service_id,
             ];
         }
 
@@ -150,9 +163,9 @@ class UserRepository extends EloquentRepository
             [$userId, $serviceId]
         );
 
-        if (! empty($result)) {
+        if (!empty($result)) {
             $result = array_shift($result);
-            $role =  Role::find($result->role_id);
+            $role = Role::find($result->role_id);
 
             return $role['name'];
         }
@@ -196,6 +209,10 @@ class UserRepository extends EloquentRepository
         return DB::delete('DELETE FROM user_service_role WHERE user_id = ? AND service_id = ?', [$userId, $serviceId]);
     }
 
+    /**
+     * @param $role
+     * @return mixed
+     */
     private function getRoleId($role)
     {
         $role = Role::where('name', $role)->firstOrFail();
