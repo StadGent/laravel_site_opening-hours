@@ -26,9 +26,11 @@ $style = [
     /* Masthead ----------------------- */
 
     'email-masthead' => 'padding: 25px 0; text-align: center;',
-    'email-masthead_name' => 'font-size: 16px; font-weight: bold; color: #2F3133; text-decoration: none; text-shadow: 0 1px 0 white;',
+    'email-masthead_name' => 'font-size: 16px; font-weight: bold; color: #2F3133;
+    text-decoration: none; text-shadow: 0 1px 0 white;',
 
-    'email-body' => 'width: 100%; margin: 0; padding: 0; border-top: 1px solid #EDEFF2; border-bottom: 1px solid #EDEFF2; background-color: #FFF;',
+    'email-body' => 'width: 100%; margin: 0; padding: 0; border-top: 1px solid #EDEFF2;
+    border-bottom: 1px solid #EDEFF2; background-color: #FFF;',
     'email-body_inner' => 'width: auto; max-width: 570px; margin: 0 auto; padding: 0;',
     'email-body_cell' => 'padding: 35px;',
 
@@ -57,10 +59,10 @@ $style = [
     'button--green' => 'background-color: #22BC66;',
     'button--red' => 'background-color: #dc4d2f;',
     'button--blue' => 'background-color: #3869D4;',
+
+    'font_family' => 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;',
 ];
 ?>
-
-<?php $fontFamily = 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;';?>
 
 <body style="{{ $style['body'] }}">
     <table width="100%" cellpadding="0" cellspacing="0">
@@ -70,7 +72,8 @@ $style = [
                     <!-- Logo -->
                     <tr>
                         <td style="{{ $style['email-masthead'] }}">
-                            <a style="{{ $fontFamily }} {{ $style['email-masthead_name'] }}" href="{{ url('/') }}" target="_blank">
+                            <a style="{{ $style['font_family'] }} {{ $style['email-masthead_name'] }}"
+                            href="{{ url('/') }}" target="_blank">
                                 {{ config('app.name') }}
                             </a>
                         </td>
@@ -79,9 +82,10 @@ $style = [
                     <!-- Email Body -->
                     <tr>
                         <td style="{{ $style['email-body'] }}" width="100%">
-                            <table style="{{ $style['email-body_inner'] }}" align="center" width="570" cellpadding="0" cellspacing="0">
+                            <table style="{{ $style['email-body_inner'] }}"
+                            align="center" width="570" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="{{ $fontFamily }} {{ $style['email-body_cell'] }}">
+                                    <td style="{{ $style['font_family'] }} {{ $style['email-body_cell'] }}">
                                         <!-- Greeting -->
                                         <h1 style="{{ $style['header-1'] }}">
                                             Hallo!
@@ -97,12 +101,14 @@ $style = [
                     <!-- Footer -->
                     <tr>
                         <td>
-                            <table style="{{ $style['email-footer'] }}" align="center" width="570" cellpadding="0" cellspacing="0">
+                            <table style="{{ $style['email-footer'] }}" align="center" width="570" cellpadding="0"
+                            cellspacing="0">
                                 <tr>
-                                    <td style="{{ $fontFamily }} {{ $style['email-footer_cell'] }}">
+                                    <td style="{{ $style['font_family'] }} {{ $style['email-footer_cell'] }}">
                                         <p style="{{ $style['paragraph-sub'] }}">
                                             &copy; {{ date('Y') }}
-                                            <a style="{{ $style['anchor'] }}" href="{{ url('/') }}" target="_blank">{{ config('app.name') }}</a>.
+                                            <a style="{{ $style['anchor'] }}" href="{{ url('/') }}"
+                                            target="_blank">{{ config('app.name') }}</a>.
                                             Alle rechten voorbehouden.
                                         </p>
                                     </td>
