@@ -40,8 +40,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::get('/presets', 'UI\PresetsController@index');
 
     // roles
-    Route::put('/roles', 'UI\RolesController@update');
-    Route::patch('/roles', 'UI\RolesController@update');
+    Route::post('/roles', 'UI\RolesController@store');
     Route::delete('/roles', 'UI\RolesController@destroy');
 
     // services
@@ -55,7 +54,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::post('/users', 'UI\UsersController@store')->middleware('admin');
     Route::delete('/users/{user}', 'UI\UsersController@destroy')->middleware('admin');
     // subset
-    Route::get('/services/{service}/users', 'UI\UsersController@getFromService')
+    Route::get('/users/{service}/users', 'UI\UsersController@getFromService')
         ->middleware('hasRoleInService');
 });
 

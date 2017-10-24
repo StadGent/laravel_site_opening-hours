@@ -4,11 +4,14 @@ namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteUserRequest;
+use App\Mail\SendRegisterConfirmation;
 use App\Models\Role;
 use App\Models\Service;
+use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class UsersController extends Controller
 {
@@ -53,7 +56,7 @@ class UsersController extends Controller
             $input['password'] = '';
             $input['token'] = str_random(32);
 
-            $userId = $this->usersuserRepository->store($input);
+            $userId = $this->userRepository->store($input);
 
             $user = $this->userRepository->getById($userId);
 
@@ -62,9 +65,7 @@ class UsersController extends Controller
 
             $user->attachRole($appUserRole);
 
-            // Send a confirmation email
-            $mailer = app()->make('App\Mailers\SendGridMailer');
-            $mailer->sendEmailConfirmationTo($user['email'], $user['token']);
+            Mail::to($user)->send(new SendRegisterConfirmation($user));
         }
 
         if (!empty($user)) {
