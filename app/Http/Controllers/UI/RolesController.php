@@ -28,7 +28,7 @@ class RolesController extends Controller
      * @param  int                       $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreRoleRequest $request)
+    public function store(StoreRoleRequest $request)
     {
         $input = $request->input();
 

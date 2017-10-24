@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
+use App\Mail\SendRegisterConfirmation;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
-use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -21,7 +23,7 @@ class RegisterController extends Controller
     | validation and creation. By default this controller uses a trait to
     | provide this functionality without requiring any additional code.
     |
-    */
+     */
 
     use RegistersUsers;
 
@@ -51,25 +53,20 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $this->validator($request->all())->validate();
-
         $user = $this->create($request->all());
+        Mail::to($user)->send(new SendRegisterConfirmation($user));
 
-        // Attach the role of application user to the new user
-        $appUserRole = Role::where('name', 'AppUser')->first();
-
-        $user->attachRole($appUserRole);
-        $user->save();
-
-        $mailer = app()->make('App\Mailers\SendGridMailer');
-        $mailer->sendEmailConfirmationTo($user->email, $user->token);
-
-        if($request->ajax()){
-            return response()->json(['message' => 'De gebruiker werd succesvol aangemaakt.']);
+        if ($request->ajax()) {
+            return response()->json(['message' => 'De gebruiker werd succesvol aangsemaakt.']);
         }
 
         return redirect('/');
     }
 
+    /**
+     * @param Request $request
+     * @param $token
+     */
     public function showSetPassword(Request $request, $token)
     {
         $user = User::where('token', $token)->first();
@@ -80,10 +77,13 @@ class RegisterController extends Controller
 
         return view('auth.confirm')->with([
             'user' => $user,
-            'token' => $token
+            'token' => $token,
         ]);
     }
 
+    /**
+     * @param Request $request
+     */
     public function completeRegistration(Request $request)
     {
         $this->registrationCompletionValidator($request->all())->validate();
@@ -92,7 +92,7 @@ class RegisterController extends Controller
 
         $user = User::where('email', $input['email'])->first();
 
-        if (! empty($user)) {
+        if (!empty($user)) {
             $user->password = bcrypt($input['password']);
             $user->token = null;
             $user->save();
@@ -144,7 +144,7 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => '',
             'token' => str_random(32),
-            'verified' => false
+            'verified' => false,
         ]);
 
         return $user;
