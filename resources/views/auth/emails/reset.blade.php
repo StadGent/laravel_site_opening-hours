@@ -18,41 +18,42 @@ $style = [
                  text-align: center; text-decoration: none; -webkit-text-size-adjust: none;',
 
     'button-blue' => 'background-color: #3869D4;',
+
+    'font_family' => 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;',
 ];
-$fontFamily = 'font-family: Arial, \'Helvetica Neue\', Helvetica, sans-serif;';
 ?>
 @section('content')
 <p>U ontvangt deze mail omdat wij een aanvraag kregen om uw wachtwoord aan te passen.</p>
 <table style="{{ $style['body_action'] }}" align="center" width="100%" cellpadding="0" cellspacing="0">
-	<tr>
-	    <td align="center">
-	         <a href="{{ $actionUrl }}"
-	            style="{{ $fontFamily }} {{ $style['button'] }} {{ $style['button-blue'] }}"
-	            class="button"
-	            target="_blank">Wachtwoord aanpassen</a>
-	    </td>
-	</tr>
+    <tr>
+        <td align="center">
+             <a href="{{ $actionUrl }}"
+                style="{{ $style['font_family'] }} {{ $style['button'] }} {{ $style['button-blue'] }}"
+                class="button"
+                target="_blank">Wachtwoord aanpassen</a>
+        </td>
+    </tr>
 </table>
 <p>Indien u uw wachtwoord niet wenst aan te passen, hoeft u geen verdere stappen te ondernemen.</p>
 
 <!-- Salutation -->
 <p style="{{ $style['paragraph'] }}">
-	Met vriendelijke groeten,<br>{{ config('app.name') }}
+    Met vriendelijke groeten,<br>{{ config('app.name') }}
 </p>
- <table style="{{ $style['body_sub'] }}">
-	<tr>
-	    <td style="{{ $fontFamily }}">
-	        <p style="{{ $style['paragraph-sub'] }}">
-	            Indien het niet lukt om de "Wachtwoord aanpassen" knop te gebruiken,
-	            kknip en plak onderstaande URL in uw web browser:
-	        </p>
+<table style="{{ $style['body_sub'] }}">
+    <tr>
+        <td style="{{ $style['font_family'] }}">
+            <p style="{{ $style['paragraph-sub'] }}">
+                Indien het niet lukt om de "Wachtwoord aanpassen" knop te gebruiken,
+                knip en plak onderstaande URL in uw web browser:
+            </p>
 
-	        <p style="{{ $style['paragraph-sub'] }}">
-	            <a style="{{ $style['anchor'] }}" href="{{ $actionUrl }}" target="_blank">
-	                {{ $actionUrl }}
-	            </a>
-	        </p>
-	    </td>
-	</tr>
+            <p style="{{ $style['paragraph-sub'] }}">
+                <a style="{{ $style['anchor'] }}" href="{{ $actionUrl }}" target="_blank">
+                    {{ $actionUrl }}
+                </a>
+            </p>
+        </td>
+    </tr>
 </table>
 @endsection
