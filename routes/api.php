@@ -39,6 +39,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     // Presets (refactor to holidays)
     Route::get('/presets', 'UI\PresetsController@index');
 
+    // todo restrict to admin and owners
     // roles
     Route::put('/roles', 'UI\RolesController@update');
     Route::patch('/roles', 'UI\RolesController@update');

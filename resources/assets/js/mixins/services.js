@@ -67,9 +67,6 @@ export default {
                     this.serviceLock = false;
                 })
                 .then(() => {
-                    console.info('services fetched');
-                })
-                .then(() => {
                     //fetch channel in case of direct url access.
                     if (this.route.channel > -1) {
                         this.fetchChannels();
@@ -99,18 +96,10 @@ export default {
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
                 })
-                .then(() => {
-                    return this.$http.get('/api/ui/services/' + this.route.service + '/users')
-                        .then(({data}) => {
-                            this.$set(this.routeService, 'users', data);
-                        })
-                })
+                .then(this.fetchUsers(this.route.service))
                 .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
                     this.updateService();
-                })
-                .then(() => {
-                    console.info('channels & users fetched for service');
                 })
                 .then(this.statusReset)
                 .catch(fetchError);

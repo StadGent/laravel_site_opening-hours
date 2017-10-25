@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     changeRole () {
-      Hub.$emit('createRole', this.u)
+      Hub.$emit('patchRole', this.u)
     },
     invite () {
       Hub.$emit('inviteUser', this.u)
