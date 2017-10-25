@@ -100,7 +100,7 @@ export default {
             user.role = user.role || 'Member';
             user.user_id = user.user_id || user.id;
 
-            if(!user.user_id){
+            if (!user.user_id) {
                 this.statusUpdate({message: 'oeps... user ID is missing'});
                 return;
             }
@@ -112,75 +112,89 @@ export default {
                 .catch(fetchError)
         });
         Hub.$on('deleteRole', role => {
+            this.statusUpdate(null, {active: true});
+
             if (!role.user_id || !role.service_id) {
-                return alert('Toegang kon niet ontzegd worden.')
+                this.statusUpdate(null, {message: 'Toegang kon niet ontzegd worden.'});
+                return;
             }
             if (!confirm('Toegang ontzeggen?')) {
-                return console.log('Delete role canceled')
+                this.statusUpdate(null, {message: 'Delete role canceled'});
+                return;
             }
 
-            this.$http.delete('/api/ui/roles?service_id=' + role.service_id + '&user_id=' + role.user_id).then(() => {
-                this.fetchServices();
-                this.modalClose()
-            }).catch(fetchError)
-        })
-
+            this.$http.delete('/api/ui/roles?service_id=' + role.service_id + '&user_id=' + role.user_id)
+                .then(() => {
+                    this.fetchServices();
+                    this.modalClose();
+                }).catch(fetchError)
+        });
         Hub.$on('fetchUser', newRole => {
+            this.statusUpdate(null, {active: true});
+
             if (!newRole.service_id) {
                 newRole.service_id = this.routeService.id
             }
-            newRole.role = newRole.role || 'Member'
-            newRole.user_id = newRole.user_id || newRole.id
+            newRole.role = newRole.role || 'Member';
+            newRole.user_id = newRole.user_id || newRole.id;
             if (!newRole.user_id && !newRole.email) {
                 // Cannot continue without at least one of these
-                return console.error('createRole: email is missing')
+                this.statusUpdate(null, {message: 'createRole: email is missing'});
+                return;
             } else if (!newRole.user_id) {
                 // Create the missing user based on user.email
                 // After the creation, the role will be added too
-                Hub.$emit('createUser', newRole)
+                Hub.$emit('createUser', newRole);
                 return
             }
 
             this.$http.post('/api/ui/roles', newRole).then(() => {
-                this.fetchUsers()
-                this.fetchServices()
-                this.modalClose()
+                this.fetchUsers();
+                this.fetchServices();
+                this.modalClose();
             }).catch(fetchError)
-        })
+        });
 
         Hub.$on('createUser', newUser => {
+            this.statusUpdate(null, {active: true});
+
             if (newUser.id) {
-                return console.error('createRole: this user probably already exists')
+                this.statusUpdate(null, {message: 'createRole: this user probably already exists'});
+                return;
             }
             if (!newUser.email) {
-                return console.error('createRole: email is missing')
+                this.statusUpdate(null, {message: 'createRole: email is missing'});
+                return;
             }
-            newUser.name = newUser.name || newUser.email
+
+            newUser.name = newUser.name || newUser.email;
 
             this.$http.post('/api/ui/users', newUser).then(({data}) => {
-                Object.assign(newUser, data)
+                Object.assign(newUser, data);
                 if (newUser.role) {
-                    Hub.$emit('createRole', newUser)
+                    Hub.$emit('createRole', newUser);
                 } else {
-                    this.fetchServices()
+                    this.fetchServices();
                 }
-                this.fetchUsers()
-                this.modalClose()
+                this.fetchUsers();
+                this.modalClose();
             }).catch(fetchError)
-        })
-
+        });
+        //todo can we remove this?
         Hub.$on('inviteUser', user => {
             alert('Uitnodiging opnieuw verzenden? (werkt nog niet)')
-        })
-
+        });
         Hub.$on('deleteUser', user => {
+            this.statusUpdate(null, {active: true});
+
             if (!user.id) {
-                return console.error('deleteRole: id is required')
+                this.statusUpdate(null, {message: 'deleteRole: id is required'});
+                return;
             }
             this.$http.delete('/api/ui/users/' + user.id).then(() => {
-                this.fetchUsers()
-                this.fetchServices()
-                this.modalClose()
+                this.fetchUsers();
+                this.fetchServices();
+                this.modalClose();
             }).catch(fetchError)
         })
     }
