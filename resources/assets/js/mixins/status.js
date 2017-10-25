@@ -11,7 +11,7 @@ export default {
     },
 
     computed: {
-        isStatusActive(){
+        isStatusActive() {
             return this.status.text || this.status.error || this.status.active;
         }
     },
@@ -19,12 +19,18 @@ export default {
     },
     methods: {
         statusUpdate: function (err, data) {
-            if(err) {
-                this.status.error = 'Error ' + err.status + ' -  ' + 'Neem een print screen en neem contact op met de servicedesk.';
+            if (err) {
+
+                if (err.status) {
+                    this.status.error = 'Error ' + err.status + ' -  ' + 'Neem een print screen en neem contact op met de servicedesk.';
+                }
+                else {
+                    this.status.error = err.message;
+                }
             }
-            else if (data){
+            else if (data) {
                 this.status.text = data.text || '';
-                this.status.active = data.active ;
+                this.status.active = data.active;
             }
         },
         statusReset: function () {
