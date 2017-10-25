@@ -1,6 +1,5 @@
 // Variables
 @import "variables";
-
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "vendor/bootstrap-year";
@@ -25,9 +24,11 @@ body {
 .container-breadcrumb {
   margin-bottom: 0;
 }
+
 .breadcrumb > .active > a {
   color: #777;
 }
+
 .breadcrumb {
   margin-bottom: 0;
   padding: 1.5em 0;
@@ -35,14 +36,15 @@ body {
   border: none;
   font-size: 1.2em;
 
-  li:last-of-type{
+  li:last-of-type {
     font-weight: 900;
   }
 
-  a{
+  a {
     color: inherit;
   }
 }
+
 .pre-wrap {
   white-space: pre-wrap;
 }
@@ -52,27 +54,33 @@ body {
 .table-hover > tbody > tr:hover {
   cursor: pointer;
 }
+
 .table-list {
   margin-bottom: 0;
   padding-left: 20px;
 }
+
 .table-message {
   padding: 5em 0;
   .row & {
     padding: 5em 1em;
   }
 }
-.table > tbody{
+
+.table > tbody {
   background-color: $color-lightest-blue;
 }
+
 .text-danger > a {
   color: inherit;
 }
+
 .td-btn {
   padding-top: 4px !important;
   padding-bottom: 4px !important;
   width: 1px;
 }
+
 .td-clickstop {
   cursor: auto;
 }
@@ -81,28 +89,28 @@ body {
 
 .table {
   margin-top: 15px;
-  border-collapse:collapse;
+  border-collapse: collapse;
   margin-bottom: 80px;
 
-  >thead{
+  > thead {
     background-color: $color-color-white-blue;
   }
-  >thead>tr>th {
+  > thead > tr > th {
     border: none;
     padding: 1em;
   }
-  >tbody>tr{
-    border-bottom:1px solid rgba(0,0,0,0.1);
+  > tbody > tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
-  >thead>tr>th,
-  >tbody>tr>td {
+  > thead > tr > th,
+  > tbody > tr > td {
     border: none;
     padding-left: 1em;
     vertical-align: middle;
 
     &:first-child {
       padding-left: 3em;
-      &.td-sortable{
+      &.td-sortable {
         padding-left: calc(3em + 20px);
       }
     }
@@ -110,7 +118,7 @@ body {
       padding-right: 3em;
     }
 
-    &.td-sortable{
+    &.td-sortable {
       padding-left: calc(1em + 20px);
     }
   }
@@ -122,9 +130,11 @@ body {
   user-select: none;
   cursor: pointer;
 }
+
 .th-sortable:hover {
   text-decoration: underline;
 }
+
 .th-sortable::before {
   display: inline-block;
   vertical-align: top;
@@ -134,10 +144,12 @@ body {
   opacity: .2;
   background: url(data:image/gif;base64,R0lGODlhCwALAJEAAAAAAP///xUVFf///yH5BAEAAAMALAAAAAALAAsAAAIUnC2nKLnT4or00PvyrQwrPzUZshQAOw==) no-repeat center left;
 }
+
 .th-sortable.down::before {
   opacity: 1;
   background-image: url(data:image/gif;base64,R0lGODlhCwALAJEAAAAAAP///xUVFf///yH5BAEAAAMALAAAAAALAAsAAAIPnI+py+0/hJzz0IruwjsVADs=);
 }
+
 .th-sortable.up::before {
   opacity: 1;
   background-image: url(data:image/gif;base64,R0lGODlhCwALAJEAAAAAAP///xUVFf///yH5BAEAAAMALAAAAAALAAsAAAIRnC2nKLnT4or00Puy3rx7VQAAOw==);
@@ -150,6 +162,7 @@ body {
   margin: 0 9px;
   border-left: 1px solid $navbar-default-border;
 }
+
 @media (max-width: 767px) {
   .navbar-collapse .nav > .divider-vertical {
     display: none;
@@ -201,11 +214,13 @@ body {
   height: 100%;
   margin: 0 -15px;
 }
+
 .wrapper-above-save {
   height: calc(100% - 4.7em);
   padding: 0 15px;
   overflow: auto;
 }
+
 .wrapper-save-btn {
   border-top: 1px solid #ccc;
   padding-top: 15px;
@@ -225,30 +240,35 @@ a.panel {
     }
   }
 }
+
 .panel-move .panel-heading {
   cursor: move;
 }
+
 .panel-move svg {
   vertical-align: top
 }
+
 .btn-icon {
   padding: 6px;
   min-width: 30px;
   font-size: 12px;
   line-height: 12px;
-  >svg {
+  > svg {
     fill: #fff;
     width: 16px;
     height: 16px;
     vertical-align: top;
   }
 }
+
 .btn-subtle {
   background: none;
   border-color: transparent;
   pointer-events: none;
 }
-h1+h3 {
+
+h1 + h3 {
   margin-top: 10px;
 }
 
@@ -261,17 +281,21 @@ h1+h3 {
   bottom: 0;
   background: white;
 }
+
 .pagination {
   margin: 10px 0;
 }
+
 .pagination > li > a {
   text-align: center;
   min-width: 38px;
 }
+
 .slideup-enter-active,
 .slideup-leave-active {
   transition: transform .3s
 }
+
 .slideup-enter,
 .slideup-leave-active {
   transform: translateY(100%);
@@ -290,50 +314,55 @@ h1+h3 {
   right: 0;
   border-top: 1px solid #ccc;
   background: #fff;
-  &>div {
+  & > div {
     height: 100%;
     overflow: auto;
   }
 }
+
 .version-cals {
   width: 30em;
 }
+
 .version-preview {
   border-left: 1px solid #ccc;
   padding-top: 1em;
   width: calc(100% - 30em);
   background: #eee;
 }
+
 .calendar {
   overflow: hidden;
 }
+
 .calendar .month-container {
   min-width: 180px;
   text-align: center;
   height: 230px;
   padding: 0;
-  >table {
+  > table {
     border: 1px solid #ccc;
     background: white;
   }
 }
 
 /* Version > Preview > Topdown layer render */
-@mixin layer($num: 0, $background: #000, $color: white, $content: 'A'){
+@mixin layer($num: 0, $background: #000, $color: white, $content: 'A') {
   .layer-#{$num} {
     background: $background;
     color: $color;
-    border-color: mix($background, #000, 70%)!important;
+    border-color: mix($background, #000, 70%) !important;
     &::after {
       content: $content;
     }
-    &+.layer-#{$num} {
+    & + .layer-#{$num} {
       &:after {
         display: none;
       }
     }
   }
 }
+
 @include layer(0, $lightblue, white, 'A')
 @include layer(1, $yellow, black, 'B')
 @include layer(2, $red, white, 'C')
@@ -345,7 +374,7 @@ h1+h3 {
 @include layer(8, #a09b96, white, 'I')
 @include layer(9, #e0cae3, black, 'J')
 @include layer(10, #e5e3c7, black, 'K')
- 
+
 .calendar-topview {
   table.month th.month-title {
     font-size: 14px;
@@ -364,7 +393,7 @@ h1+h3 {
     width: 26px;
     height: 26px;
   }
-  .layer>.day-content {
+  .layer > .day-content {
     font-size: 9px;
     height: 100%;
     padding: 2px 0 0 4px !important;
@@ -388,10 +417,12 @@ h1+h3 {
     border-bottom: 1px solid #ddd;
   }
 }
+
 .cal-header {
   line-height: 32px;
   display: flex;
 }
+
 .cal-img {
   margin-right: 1rem;
   width: 32px;
@@ -401,6 +432,7 @@ h1+h3 {
   text-align: center;
   border-radius: 4px;
 }
+
 .cal-action {
   display: inline-block;
   padding: .6em 1em;
@@ -410,36 +442,42 @@ h1+h3 {
     border-color: #ccc;
   }
 }
+
 .cal-info {
   display: flex;
   flex-grow: 1;
 }
+
 .cal-name {
   flex-grow: 1;
 }
+
 .cal-drag {
   font-size: 12px;
 }
+
 .tooltip {
   white-space: pre;
   transition: none;
   pointer-events: none;
 }
+
 .top-right {
   float: right;
   margin-top: 15px;
   margin-right: 0;
 }
+
 .cal {
   transition: all .3s;
 }
+
 .list-enter,
 .list-leave-to,
 .list-leave-active {
   opacity: 0;
   transform: translateY(-30px);
 }
-
 
 /* Modal > Content */
 
@@ -485,9 +523,9 @@ h1+h3 {
 }
 
 .btn[disabled] {
-  color: #aaa!important;
-  background-color: #eee!important;
-  border-color: #ccc!important;
+  color: #aaa !important;
+  background-color: #eee !important;
+  border-color: #ccc !important;
   opacity: 1;
   text-decoration: line-through;
 }
@@ -496,4 +534,85 @@ h1+h3 {
   float: right;
   margin-top: 6px;
   font-size: 16px;
+}
+
+.status {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+
+  .status__message {
+    padding: 5px 15px;
+    animation: ease-in once;
+    animation-name: floatUp;
+    animation-duration: .5s;
+  }
+
+  .status__progress {
+
+    position: relative;
+    overflow: hidden;
+    height: .5rem;
+
+    animation: ease-in once;
+    animation-name: floatUp;
+    animation-duration: .5s;
+
+    span {
+      display: inline-block;
+      width: 18%;
+      bottom: 0;
+      height: .5rem;
+      background-color: #007DB3;
+      position: absolute;
+      animation: linear infinite;
+      animation-name: load;
+      animation-duration: 3s;
+      border-radius: 1rem;
+    }
+  }
+
+  &.status--error {
+
+    .status__progress {
+      span {
+        background-color: #b30000;
+        width: 100%;
+        animation: none;
+        border-radius: 0;
+      }
+    }
+  }
+}
+
+.modal .status {
+
+  position: relative;
+  margin: 15px -15px -15px;
+  width: calc(100% + 30px);
+
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+  80% {
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes load {
+  0% {
+    right: 100%;
+  }
+  100% {
+    right: -25%;
+  }
 }

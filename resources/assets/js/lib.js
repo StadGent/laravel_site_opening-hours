@@ -226,12 +226,16 @@ export function fetchError (response) {
     return
   }
   if (parseInt(response.status) === 452) {
-    Laravel.csrfToken = response.body.token
-    alert('De pagina was te lang geopend. (CSRF token is verlopen)\n\nProbeer eens opnieuw.')
+    Laravel.csrfToken = response.body.token;
+    alert('De pagina was te lang geopend. (CSRF token is verlopen)\n\nProbeer eens opnieuw.');
   } else if (response.body && response.body.message) {
-    alert(response.body.message)
+    alert(response.body.message);
   }
-  console.warn(response)
+
+  this.statusText = 'De server gaf een error terug: ' + response.status;
+  console.warn(response);
+
+  this.statusUpdate(response);
 }
 
 // Returns a function, that, when invoked, will only be triggered at most once

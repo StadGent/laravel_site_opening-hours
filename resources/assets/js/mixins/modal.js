@@ -31,9 +31,12 @@ export default {
       for (const key in this.modal) {
         this.modal[key] = null
       }
+      this.$root.statusReset();
+    },
+    modalWait() {
+        this.$set(this.modal, 'wait', true);
     },
     requestService() {
-      console.log('req');
       this.modal.text = 'requestService'
     },
 
