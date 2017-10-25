@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Mail\SendPasswordResetNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
 use Laratrust\Traits\LaratrustUserTrait;
 use Laravel\Passport\HasApiTokens;
 
@@ -44,14 +46,14 @@ class User extends Authenticatable
     ];
 
     /**
-     * @param $token
-     * @return mixed
+     * Inject translated SendPasswordResetNotification
+     *
+     * @param string $token
+     * @return void
      */
     public function sendPasswordResetNotification($token)
     {
-        $mailer = app()->make('App\Mailers\SendGridMailer');
-
-        return $mailer->sendResetLinkEmail($this->email, $token);
+        Mail::to($this)->send(new SendPasswordResetNotification($token));
     }
 
     /**

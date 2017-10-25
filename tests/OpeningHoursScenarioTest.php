@@ -21,7 +21,7 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpenNowIsOpen()
     {
-        $call = $this->doRequest('/api/services/1/open-now?testDateTime=2017-09-05 10:00:00');
+        $call = $this->doRequest('GET', '/api/services/1/open-now?testDateTime=2017-09-05 10:00:00');
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
@@ -38,7 +38,7 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpenNowIsClosed()
     {
-        $call = $this->doRequest('/api/services/1/open-now?testDateTime=2017-09-05 12:05:00');
+        $call = $this->doRequest('GET', '/api/services/1/open-now?testDateTime=2017-09-05 12:05:00');
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
@@ -55,7 +55,7 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursFromUntil()
     {
-        $call = $this->doRequest('/api/services/1/openinghours?from=2017-09-03&until=2017-09-06');
+        $call = $this->doRequest('GET', '/api/services/1/openinghours?from=2017-09-03&until=2017-09-06');
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
@@ -80,7 +80,7 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursDayOnRegularDay()
     {
-        $call = $this->doRequest('/api/services/1/openinghours/day?date=2017-09-05');
+        $call = $this->doRequest('GET', '/api/services/1/openinghours/day?date=2017-09-05');
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
@@ -103,7 +103,7 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursDayOnExceptionCloseDay()
     {
-        $call = $this->doRequest('/api/services/1/openinghours/day?date=2017-09-04');
+        $call = $this->doRequest('GET', '/api/services/1/openinghours/day?date=2017-09-04');
         $content = $this->getContentStructureTested($call);
         $expected = [];
         foreach ($this->channels as $channel) {
@@ -121,7 +121,7 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursWeek()
     {
-        $call = $this->doRequest('/api/services/1/openinghours/week?date=2017-09-05');
+        $call = $this->doRequest('GET', '/api/services/1/openinghours/week?date=2017-09-05');
         $content = $this->getContentStructureTested($call);
         foreach ($this->channels as $channel) {
             $expected[] = [
@@ -157,40 +157,15 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursMonth()
     {
-        $call = $this->doRequest('/api/services/1/openinghours/month?date=2017-09-05');
+        $call = $this->doRequest('GET', '/api/services/1/openinghours/month?date=2017-09-05');
         $this->getContentStructureTested($call);
     }
 
     /**
-     * do request according to the given format
+     * @param $content
      */
-    public function doRequest($path)
+    protected function extraStructureTest($content)
     {
-        return $this->json(
-            'GET',
-            $path,
-            [],
-            [
-                'Accept-Encoding' => 'gzip, deflate',
-                'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
-                'X-Requested-With' => 'XMLHttpRequest',
-                'Accept' => 'application/json',
-                'Accept-type' => 'application/json',
-            ]
-        );
-    }
-
-    /**
-     * get contect from call
-     * and do base tests
-     */
-    public function getContentStructureTested($call)
-    {
-        // check status code
-        $call->seeStatusCode(200);
-        $content = $call->decodeResponseJson();
         $this->assertCount(count($this->channels), $content);
-
-        return $content;
     }
 }
