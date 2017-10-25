@@ -14,6 +14,8 @@ export default {
   },
   methods: {
     fetchUsers(id) {
+
+      console.log("%c fetching users...", 'color: white; background-color: red; font-weight: bold;');
       return this.$http.get('/api/ui/users')
         .then(({ data }) => {
           this.users = (data || []).map(expandUser)

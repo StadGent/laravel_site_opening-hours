@@ -101,7 +101,7 @@ class Handler extends ExceptionHandler
             $this->errorObj = new \stdClass();
             $this->errorObj->code = "AuthenticationException";
             $this->errorObj->message = $exception->getMessage();
-            $this->errorObj->message .= "You are not autherised to make this request";
+            $this->errorObj->message .= "You are not authorised to make this request";
 
             $this->errorObj->target = "query";
 
@@ -131,7 +131,7 @@ class Handler extends ExceptionHandler
      * The used HTTP method is not allowed on this route in the API
      *
      * @param MethodNotAllowedHttpException $exception
-     * @return \Illuminate\Http\Response 501
+     * @return \Illuminate\Http\Response 405
      */
     protected function handleMethodNotAllowedHttpException(MethodNotAllowedHttpException $exception)
     {

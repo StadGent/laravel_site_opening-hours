@@ -52,24 +52,16 @@ export default {
         updateService() {
             let index = this.serviceIndex;
             if (index === -1) return;
-
-            console.info('updateService, index = ' + index);
-
             this.$set(this.services, index, this.routeService);
         },
         fetchServices() {
+            this.statusUpdate(null, {active: true});
 
             this.serviceLock = true;
 
             return this.$http.get('/api/ui/services')
                 .then(({data}) => {
-
                     this.services = data || [];
-                    this.serviceLock = false;
-
-                    // legacy? used to fetch versions for channels...
-                    // this.versionDataQueue.forEach(this.applyVersionData);
-                    // this.versionDataQueue = [];
                 })
                 .then(() => {
                     this.serviceLock = false;
@@ -82,9 +74,12 @@ export default {
                     if (this.route.channel > -1) {
                         this.fetchChannels();
                     }
-                }).catch(fetchError);
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         },
         fetchChannels() {
+            this.statusUpdate(null, {active: true});
 
             //return if channels are already being fetched for the routeService.
             if (this.channelDataQueue.indexOf(this.route.service) !== -1) return;
@@ -92,10 +87,8 @@ export default {
             //check if global services array is already populated
             if (Object.keys(this.routeService).length === 0) return;
 
-
             //check if routeservice is part of services array
             if (this.serviceIndex === -1) {
-                console.warn('services: trying to fetch channels for unknown service...');
                 return;
             }
 
@@ -108,21 +101,22 @@ export default {
                 })
                 .then(() => {
                     return this.$http.get('/api/ui/services/' + this.route.service + '/users')
-                    .then(({data}) => {
-                        this.$set(this.routeService, 'users', data);
-                    })
+                        .then(({data}) => {
+                            this.$set(this.routeService, 'users', data);
+                        })
                 })
                 .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
-
                     this.updateService();
                 })
                 .then(() => {
                     console.info('channels & users fetched for service');
                 })
+                .then(this.statusReset)
                 .catch(fetchError);
         },
         fetchVersion() {
+            this.statusUpdate(null, {active: true});
 
             if (!this.route.version || this.route.version < 1) return;
 
@@ -136,6 +130,7 @@ export default {
                     this.applyVersionData(data);
                     this.versionDataQueue = this.versionDataQueue.filter(version => version !== this.route.version);
                 })
+                .then(this.statusReset)
                 .catch(fetchError);
         },
         applyVersionData(data) {
@@ -156,6 +151,7 @@ export default {
             return this.services.find(s => s.id === id) || {};
         },
         fetchPresets(next) {
+            //todo save these
             Vue.http.get('/api/ui/presets')
                 .then(({data}) => {
                     next(data);
@@ -166,51 +162,72 @@ export default {
 
         Hub.$on('fetchChannels', this.fetchChannels);
         Hub.$on('activateService', service => {
+            this.statusUpdate(null, {active: true});
+
             if (!service.id) {
                 return console.error('activateService: id is missing');
             }
             service.draft = false;
 
-            this.$http.put('/api/ui/services/' + service.id, {draft: false}).then(({data}) => {
-                service.draft = data.draft;
-            }).catch(fetchError);
+            this.$http.put('/api/ui/services/' + service.id, {draft: false})
+                .then(({data}) => {
+                    service.draft = data.draft;
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         });
         Hub.$on('deactivateService', service => {
+            this.statusUpdate(null, {active: true});
+
             if (!service.id) {
                 return console.error('deactivateService: id is missing');
             }
             service.draft = true;
 
-            this.$http.put('/api/ui/services/' + service.id, {draft: true}).then(({data}) => {
-                service.draft = data.draft;
-            }).catch(fetchError);
+            this.$http.put('/api/ui/services/' + service.id, {draft: true})
+                .then(({data}) => {
+                    service.draft = data.draft;
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         });
         Hub.$on('createChannel', channel => {
+            this.statusUpdate(null, {active: true});
+
             if (!channel.srv) {
                 return console.error('createChannel: service is missing');
             }
 
             channel.service_id = channel.srv && channel.srv.id;
-            this.$http.post('/api/ui/channels', channel).then(({data}) => {
-                // this.fetchServices();
-                this.fetchChannels();
-                this.modalClose();
-                this.toChannel(data.id);
-            }).catch(fetchError)
+            this.$http.post('/api/ui/channels', channel)
+                .then(({data}) => {
+                    this.fetchChannels();
+                    this.modalClose();
+                    this.toChannel(data.id);
+                })
+                .then(this.statusReset)
+                .catch(fetchError)
         });
         Hub.$on('deleteChannel', channel => {
+            this.statusUpdate(null, {active: true});
+
             if (!channel.id) {
                 return console.error('deleteChannel: id is missing');
             }
             if (!confirm('Zeker dat je dit kanaal wil verwijderen?')) {
                 return;
             }
-            this.$http.delete('/api/ui/channels/' + channel.id).then(() => {
-                this.fetchServices();
-                this.modalClose();
-            }).catch(fetchError);
+            this.$http.delete('/api/ui/channels/' + channel.id)
+                .then(() => {
+                    this.fetchServices();
+                    this.modalClose();
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         });
         Hub.$on('createVersion', input => {
+            this.statusUpdate(null, {active: true});
+
             const version = Object.assign(createVersion(), input);
             if (!version.channel_id) {
                 version.channel_id = this.route.channel;
@@ -218,7 +235,6 @@ export default {
             if (!version.service_id) {
                 version.service_id = this.route.service;
             }
-            console.log('Create version', inert(version));
 
             // This will trigger 4 API requests
             // * create new version
@@ -226,28 +242,38 @@ export default {
             // * create first calendar in newly created version
             // * get first calendar
             // The user can now edit the first calendar of the new version
-            this.$http.post('/api/ui/openinghours', version).then(({data}) => {
-                this.modalClose();
-                this.fetchChannels().then(() => {
-                    Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
-                        openinghours_id: data.id
-                    }), 'calendar');
-                });
+            this.$http.post('/api/ui/openinghours', version)
+                .then(({data}) => {
+                    this.modalClose();
+                    this.fetchChannels().then(() => {
+                        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
+                            openinghours_id: data.id
+                        }), 'calendar');
+                    });
 
 
-            }).catch(fetchError)
+                })
+                .then(this.statusReset)
+                .catch(fetchError)
         });
         Hub.$on('updateVersion', version => {
+            this.statusUpdate(null, {active: true});
+
             if (!version || !version.id) {
                 return console.warn('id is missing', version);
             }
 
-            this.$http.put('/api/ui/openinghours/' + version.id, version).then(({data}) => {
-                this.fetchServices();
-                this.modalClose();
-            }).catch(fetchError);
+            this.$http.put('/api/ui/openinghours/' + version.id, version)
+                .then(({data}) => {
+                    this.fetchServices();
+                    this.modalClose();
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         });
         Hub.$on('deleteVersion', version => {
+            this.statusUpdate(null, {active: true});
+
             if (!version || !version.id) {
                 return console.warn('id is missing', version);
             }
@@ -255,48 +281,59 @@ export default {
                 return;
             }
 
-            this.$http.delete('/api/ui/openinghours/' + version.id).then(() => {
-                this.modalClose();
-                this.toChannel(version.channel_id);
-                this.fetchServices();
-            }).catch(fetchError);
+            this.$http.delete('/api/ui/openinghours/' + version.id)
+                .then(() => {
+                    this.modalClose();
+                    this.toChannel(version.channel_id);
+                    this.fetchServices();
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         });
         Hub.$on('createCalendar', (calendar, done) => {
+            this.statusUpdate(null, {active: true});
+
             if (!calendar.openinghours_id) {
                 calendar.openinghours_id = this.route.version;
             }
-            console.log('Create calendar', inert(calendar));
 
             if (calendar.id) {
-                this.$http.put('/api/ui/calendars/' + calendar.id, calendar).then(({data}) => {
+                this.$http.put('/api/ui/calendars/' + calendar.id, calendar)
+                    .then(({data}) => {
 
-                    const index = this.routeVersion.calendars.findIndex(c => c.id === data.id);
-                    if (index === -1) {
-                        console.log(inert(this.routeVersion.calendars));
-                        return console.warn('did not find this calendar', data);
-                    }
-                    this.$set(this.routeVersion.calendars, index, data);
-                    this.updateService();
+                        const index = this.routeVersion.calendars.findIndex(c => c.id === data.id);
+                        if (index === -1) {
+                            return;
+                        }
+                        this.$set(this.routeVersion.calendars, index, data);
+                        this.updateService();
 
-                    done && this.toVersion(data.openinghours_id);
-                }).catch(fetchError)
+                        done && this.toVersion(data.openinghours_id);
+                    })
+                    .then(this.statusReset)
+                    .catch(fetchError)
             } else {
-                this.$http.post('/api/ui/calendars', calendar).then(({data}) => {
+                this.$http.post('/api/ui/calendars', calendar)
+                    .then(({data}) => {
 
-                    //todo why??
-                    //calendarEditor filters on cal.layer... but this is not a field in the calendar model
-                    data.layer = -data.priority;
+                        //todo why??
+                        //calendarEditor filters on cal.layer... but this is not a field in the calendar model
+                        data.layer = -data.priority;
 
-                    if (!this.routeVersion.calendars) {
-                        this.$set(this.routeVersion, 'calendars', [])
-                    }
-                    this.routeVersion.calendars.push(data);
-                    this.toVersion(data.openinghours_id);
-                    this.toCalendar(data.id);
-                }).catch(fetchError);
+                        if (!this.routeVersion.calendars) {
+                            this.$set(this.routeVersion, 'calendars', [])
+                        }
+                        this.routeVersion.calendars.push(data);
+                        this.toVersion(data.openinghours_id);
+                        this.toCalendar(data.id);
+                    })
+                    .then(this.statusReset)
+                    .catch(fetchError);
             }
         });
         Hub.$on('deleteCalendar', calendar => {
+            this.statusUpdate(null, {active: true});
+
             if (!calendar.id) {
                 return console.warn('deleteCalendar: id is missing');
             }
@@ -304,11 +341,13 @@ export default {
                 return;
             }
 
-            this.$http.delete('/api/ui/calendars/' + calendar.id).then(() => {
-
-                this.fetchVersion(true);
-                this.toVersion();
-            }).catch(fetchError)
+            this.$http.delete('/api/ui/calendars/' + calendar.id)
+                .then(() => {
+                    this.fetchVersion(true);
+                    this.toVersion();
+                })
+                .then(this.statusReset)
+                .catch(fetchError)
         })
     }
 }
