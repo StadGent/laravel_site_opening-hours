@@ -14,12 +14,13 @@ use Carbon\Carbon;
  */
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(App\Models\SUser::class, function (Faker\Generator $faker) {
+$factory->define(App\Models\User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'password' => bcrypt('secret'),
         'remember_token' => str_random(10),
+        'token' => str_random(10),
     ];
 });
 

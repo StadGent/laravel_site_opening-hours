@@ -17,12 +17,13 @@
 
 Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     // calendars
+    Route::post('/calendars', 'UI\CalendarsController@store')->middleware('hasRoleInService');
     Route::put('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
     Route::patch('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
     Route::delete('/calendars/{calendar}', 'UI\CalendarsController@destroy')->middleware('hasRoleInService');
 
     // channels
-    Route::post('/channels/{channel}', 'UI\ChannelController@store')->middleware('hasRoleInService');
+    Route::post('/channels', 'UI\ChannelController@store')->middleware('hasRoleInService');
     Route::put('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
     Route::patch('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
     Route::delete('/channels/{channel}', 'UI\ChannelController@destroy')->middleware('hasRoleInService');
@@ -31,7 +32,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 
     // openinghours
     Route::get('/openinghours/{openinghours}', 'UI\OpeninghoursController@show');
-    Route::post('/openinghours/{openinghours}', 'UI\OpeninghoursController@store')->middleware('hasRoleInService');
+    Route::post('/openinghours', 'UI\OpeninghoursController@store')->middleware('hasRoleInService');
     Route::put('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
     Route::patch('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
     Route::delete('/openinghours/{openinghours}', 'UI\OpeninghoursController@destroy')->middleware('hasRoleInService');
@@ -40,8 +41,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::get('/presets', 'UI\PresetsController@index');
 
     // roles
-    Route::put('/roles', 'UI\RolesController@update');
-    Route::patch('/roles', 'UI\RolesController@update');
+    Route::post('/roles', 'UI\RolesController@store');
     Route::delete('/roles', 'UI\RolesController@destroy');
 
     // services
