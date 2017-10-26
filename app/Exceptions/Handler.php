@@ -143,14 +143,14 @@ class Handler extends ExceptionHandler
 
     /**
      * MethodNotAllowedHttpException
-     * The used HTTP method is not allowed on this route in the API
+     * The used HTTP Accept header is not allowed on this route in the API
      *
      * @param NotAcceptableHttpException $exception
      * @return \Illuminate\Http\Response 406
      */
     protected function handleNotAcceptableHttpException(NotAcceptableHttpException $exception)
     {
-        $this->errorObj->message = "The used HTTP method is not allowed on this route in the API";
+        $this->errorObj->message = "The used HTTP Accept header is not allowed on this route in the API";
         $this->errorObj->target = "query";
 
         return response()->json(['error' => $this->errorObj], 406);

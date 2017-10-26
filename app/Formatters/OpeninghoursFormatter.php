@@ -87,9 +87,6 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
             throw new \Exception("No data given for formatter" . self::class, 1);
         }
 
-        $activeFormatter = null;
-
-        $formats = [];
         $prefered = $this->getBestSupportedMimeType(array_keys($this->formatters, null, true));
         foreach ($prefered as $format => $weight) {
             if (isset($this->formatters[$format]) && $weight !== 0) {
@@ -115,7 +112,7 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
     public function getBestSupportedMimeType($mimeTypes)
     {
         // Values will be stored in this array
-        $AcceptTypes = [];
+        $acceptTypes = [];
 
         if (!$this->request) {
             throw new \Exception("Error Processing Request as in absence of a request", 1);
@@ -135,19 +132,19 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
             }
             // mime-type $a is accepted with the quality $q
             // WARNING: $q == 0 means, that mime-type isn’t supported!
-            $AcceptTypes[$a] = $q;
+            $acceptTypes[$a] = $q;
         }
-        arsort($AcceptTypes);
+        arsort($acceptTypes);
 
         // if no parameter was passed, just return parsed data
         if (!$mimeTypes) {
-            return $AcceptTypes;
+            return $acceptTypes;
         }
 
         $mimeTypes = array_map('strtolower', (array) $mimeTypes);
 
         // let’s check our supported types:
-        foreach ($AcceptTypes as $mime => $q) {
+        foreach ($acceptTypes as $mime => $q) {
             if ($q && in_array($mime, $mimeTypes, true)) {
                 return $mime;
             }
