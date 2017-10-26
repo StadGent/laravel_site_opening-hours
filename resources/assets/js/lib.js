@@ -232,9 +232,7 @@ export function fetchError (response) {
     alert(response.body.message);
   }
 
-  this.statusText = 'De server gaf een error terug: ' + response.status;
   console.warn(response);
-
   this.statusUpdate(response);
 }
 
