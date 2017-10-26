@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\Formatters;
+namespace Tests\Formatters\Openinghours;
 
 use App\Models\DayInfo;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class OpeninghoursFormatterTest extends \TestCase
+class JsonFormatterTest extends \TestCase
 {
     use DatabaseTransactions;
 
     /**
-     * @var App\Formatters\Openinghours
+     * @var App\Formatters\Openinghours\JsonFormatter
      */
     private $formatter;
 
@@ -24,7 +24,7 @@ class OpeninghoursFormatterTest extends \TestCase
     {
         parent::setup();
 
-        $this->formatter = app('OpeninghoursFormatter');
+        $this->formatter = app('OHJsonFormatter');
 
         $this->service = \App\Models\Service::first();
         foreach ($this->service->channels as $channel) {
@@ -48,44 +48,17 @@ class OpeninghoursFormatterTest extends \TestCase
                 ],
             ];
         }
+        $this->formatter->setDateTimeFormats('d-m-Y', 'H:i');
     }
 
     /**
      * @test
-     * @group validation
+     * @group content
      */
-    public function testAddUnknownFormatThrowsError()
+    public function testFormatJsonJustReturnsOriginalData()
     {
-        $this->setExpectedException(
-            'Exception',
-            'NotAFormatter is not supported as format for App\Formatters\OpeninghoursFormatter'
-        );
-        $this->formatter->addFormat('NotAFormatter');
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function testNoDataThrowsError()
-    {
-        $this->setExpectedException(
-            'Exception',
-            'No data given for formatterApp\Formatters\OpeninghoursFormatter'
-        );
-        $this->formatter->render([]);
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function testRequestUnknownFormatThrowsError()
-    {
-        $this->setExpectedException(
-            'Exception',
-            'Error Processing Request as in absence of a request'
-        );
-        $this->formatter->render(['thisIsData' => true]);
+        $this->formatter->render($this->data);
+        $output = $this->formatter->getOutput();
+        $this->assertEquals(array_values($this->data), $output);
     }
 }

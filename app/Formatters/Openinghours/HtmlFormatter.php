@@ -11,7 +11,7 @@ class HtmlFormatter extends BaseFormatter
     /**
      * @var string
      */
-    protected $supportFormat = 'html';
+    protected $supportFormat = 'text/html';
     /**
      * Render a schedule into HTML based on an array structure
      * @todo use (blade) template ???
@@ -31,7 +31,7 @@ class HtmlFormatter extends BaseFormatter
             }
 
             foreach ($channelObj->openinghours as $ohObj) {
-                $formattedSchedule .= "<div>" . date('d-m-Y', strtotime($ohObj->date)) . "</div>";
+                $formattedSchedule .= "<div>" . date($this->dateFormat, strtotime($ohObj->date)) . "</div>";
                 $formattedSchedule .= "<ul>";
 
                 if (!$ohObj->open) {
@@ -41,7 +41,8 @@ class HtmlFormatter extends BaseFormatter
                 }
 
                 foreach ($ohObj->hours as $hoursObj) {
-                    $formattedSchedule .= "<li>" . $hoursObj['from'] . " - " . $hoursObj['until'] . "</li>";
+                    $formattedSchedule .= "<li>" . date($this->timeFormat, strtotime($hoursObj['from'])) . " - " .
+                    date($this->timeFormat, strtotime($hoursObj['until'])) . "</li>";
                 }
                 $formattedSchedule .= "</ul>";
             }

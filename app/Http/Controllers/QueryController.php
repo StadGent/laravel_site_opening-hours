@@ -46,9 +46,8 @@ class QueryController extends Controller
     {
         $this->OpeninghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
         // output format with json as default
-        $this->OpeninghoursFormatter->setService($service);
+        $this->OpeninghoursFormatter->setRequest($request);
         $output = $this->OpeninghoursFormatter->render(
-            $request->input('format') ?: 'json',
             $this->OpeninghoursService->getData()
         );
 
@@ -59,7 +58,7 @@ class QueryController extends Controller
      * Collection of openinghours with custom from - till
      *
      * @todo  check the correct output by Accept header
-     * @param Request $request
+     * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
      * @return \Illuminate\Http\Response
@@ -71,6 +70,7 @@ class QueryController extends Controller
         $output = $this->generateOutput(
             $start->startOfDay(),
             $end->endOfDay(),
+            $request,
             $service,
             $channel,
             $request->input('format')
@@ -83,7 +83,7 @@ class QueryController extends Controller
      * Collection of openinghours for one day
      *
      * @todo  check the correct output by Accept header
-     * @param Request $request
+     * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
      * @return \Illuminate\Http\Response
@@ -92,7 +92,7 @@ class QueryController extends Controller
     {
         $start = new Carbon($request['date']);
         $end = $start->copy()->endOfDay();
-        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
+        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
         return response()->make($output);
     }
@@ -102,7 +102,7 @@ class QueryController extends Controller
      *
      * @todo  check the correct output by Accept header
      * @todo  find week based on given locale
-     * @param Request $request
+     * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
      * @return \Illuminate\Http\Response
@@ -112,7 +112,7 @@ class QueryController extends Controller
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
-        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
+        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
         return response()->make($output);
     }
@@ -121,7 +121,7 @@ class QueryController extends Controller
      * Collection of openinghours for one month
      *
      * @todo  check the correct output by Accept header
-     * @param Request $request
+     * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
      * @return \Illuminate\Http\Response
@@ -131,7 +131,7 @@ class QueryController extends Controller
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfMonth();
         $end = $date->copy()->endOfMonth();
-        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
+        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
         return response()->make($output);
     }
@@ -140,7 +140,7 @@ class QueryController extends Controller
      * Collection of openinghours for one year
      *
      * @todo  check the correct output by Accept header
-     * @param Request $request
+     * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
      * @return \Illuminate\Http\Response
@@ -150,7 +150,7 @@ class QueryController extends Controller
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
-        $output = $this->generateOutput($start, $end, $service, $channel, $request->input('format'));
+        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
         return response()->make($output);
     }
@@ -160,18 +160,23 @@ class QueryController extends Controller
      *
      * @param Carbon $start
      * @param Carbon $end
+     * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
      * @param string $format
      * @return mixed
      */
-    private function generateOutput(Carbon $start, Carbon $end, Service $service, Channel $channel, $format)
-    {
+    private function generateOutput(
+        Carbon $start,
+        Carbon $end,
+        GetQueryRequest $request,
+        Service $service,
+        Channel $channel
+    ) {
         $this->OpeninghoursService->collectData($start, $end, $service, $channel);
-        $this->OpeninghoursFormatter->setService($service);
+        $this->OpeninghoursFormatter->setRequest($request);
 
         return $this->OpeninghoursFormatter->render(
-            $format ?: 'json',
             $this->OpeninghoursService->getData()
         );
     }

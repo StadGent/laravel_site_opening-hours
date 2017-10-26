@@ -13,7 +13,7 @@ class JsonFormatter extends BaseFormatter
     /**
      * @var string
      */
-    protected $supportFormat = 'json';
+    protected $supportFormat = 'application/json';
     /**
      * render
      * @param Illuminate\Database\Eloquent\Model $data

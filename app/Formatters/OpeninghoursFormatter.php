@@ -3,7 +3,10 @@
 namespace App\Formatters;
 
 use App\Formatters\Openinghours\BaseFormatter;
+use App\Http\Requests\GetQueryRequest;
 use App\Models\Service;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 /**
  * Formatter class for Openinghours
@@ -23,6 +26,11 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
     private $formatters = [];
 
     /**
+     * @var mixed
+     */
+    private $request;
+
+    /**
      * Adds format to endpointformatter
      *
      * Checksor format can be found in the correct namespace
@@ -35,7 +43,7 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
         if (!($formatter instanceof BaseFormatter)) {
             throw new \Exception($formatter . " is not supported as format for " . self::class, 1);
         }
-        $this->formatters[] = $formatter;
+        $this->formatters[$formatter->getSupportFormat()] = $formatter;
 
         return $this;
     }
@@ -59,30 +67,93 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
     }
 
     /**
+     * @param Request $request
+     */
+    public function setRequest(GetQueryRequest $request)
+    {
+        $this->request = $request;
+    }
+
+    /**
      * Render data according to the given format
      *
      * @param  string $format to match with available formats
      * @param  array $data   data to transform
      * @return mixed         formatted data
      */
-    public function render($format, $data)
+    public function render($data)
     {
         if (!$data) {
             throw new \Exception("No data given for formatter" . self::class, 1);
         }
 
         $activeFormatter = null;
-        foreach ($this->formatters as $formatter) {
-            if ($formatter->getSupportFormat() === $format) {
-                $activeFormatter = $formatter;
-                $activeFormatter->service = $this->service;
-                break;
+
+        $formats = [];
+        $prefered = $this->getBestSupportedMimeType(array_keys($this->formatters, null, true));
+        foreach ($prefered as $format => $weight) {
+            if (isset($this->formatters[$format]) && $weight !== 0) {
+                $this->formatters[$format]->setRequest($this->request);
+
+                return $this->formatters[$format]->render($data)->getOutput();
             }
         }
-        if (!$activeFormatter) {
-            throw new \Exception("The given format " . $format . " is not available in " . self::class, 1);
+        throw new NotAcceptableHttpException();
+    }
+
+    /**
+     * Credit for snippit: Maciej Łebkowski
+     * https://stackoverflow.com/a/1087498/4174548
+     *
+     * it is good enough as we use it, althou it does not support wildcards:
+     *  " *_/_*" or "*_/json "or "application/_*"
+     * (extra underscores used as not to interrupt my comment)
+     *
+     * @param $mimeTypes
+     * @return null
+     */
+    public function getBestSupportedMimeType($mimeTypes)
+    {
+        // Values will be stored in this array
+        $AcceptTypes = [];
+
+        if (!$this->request) {
+            throw new \Exception("Error Processing Request as in absence of a request", 1);
         }
 
-        return $activeFormatter->render($data)->getOutput();
+        // Accept header is case insensitive, and whitespace isn’t important
+        $accept = strtolower(str_replace(' ', '', $this->request->headers->get('Accept')));
+        // divide it into parts in the place of a ","
+        $accept = explode(',', $accept);
+        foreach ($accept as $a) {
+            // the default quality is 1.
+            $q = 1;
+            // check if there is a different quality
+            if (strpos($a, ';q=')) {
+                // divide "mime/type;q=X" into two parts: "mime/type" i "X"
+                list($a, $q) = explode(';q=', $a);
+            }
+            // mime-type $a is accepted with the quality $q
+            // WARNING: $q == 0 means, that mime-type isn’t supported!
+            $AcceptTypes[$a] = $q;
+        }
+        arsort($AcceptTypes);
+
+        // if no parameter was passed, just return parsed data
+        if (!$mimeTypes) {
+            return $AcceptTypes;
+        }
+
+        $mimeTypes = array_map('strtolower', (array) $mimeTypes);
+
+        // let’s check our supported types:
+        foreach ($AcceptTypes as $mime => $q) {
+            if ($q && in_array($mime, $mimeTypes, true)) {
+                return $mime;
+            }
+        }
+        // no mime-type found
+
+        return;
     }
 }
