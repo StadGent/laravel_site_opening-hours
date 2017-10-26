@@ -96,7 +96,11 @@ export default {
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
                 })
-                .then(this.fetchUsers(this.route.service))
+                .then(()=>{
+                    if(this.isOwner) {
+                        this.fetchUsers(this.route.service)
+                    }
+                })
                 .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
                     this.updateService();
