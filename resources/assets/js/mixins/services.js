@@ -145,40 +145,38 @@ export default {
                 .then(({data}) => {
                     next(data);
                 }).catch(fetchError);
+        },
+        patchServiceStatus (service) {
+            this.statusUpdate(null, {active: true});
+
+            this.$http.put('/api/ui/services/' + service.id, {draft: service.draft})
+                .then(({data}) => {
+                    service.draft = data.draft;
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         }
     },
     mounted() {
 
         Hub.$on('fetchChannels', this.fetchChannels);
         Hub.$on('activateService', service => {
-            this.statusUpdate(null, {active: true});
 
             if (!service.id) {
                 return console.error('activateService: id is missing');
             }
             service.draft = false;
 
-            this.$http.put('/api/ui/services/' + service.id, {draft: false})
-                .then(({data}) => {
-                    service.draft = data.draft;
-                })
-                .then(this.statusReset)
-                .catch(fetchError);
+            this.patchServiceStatus(service);
         });
         Hub.$on('deactivateService', service => {
-            this.statusUpdate(null, {active: true});
 
             if (!service.id) {
                 return console.error('deactivateService: id is missing');
             }
             service.draft = true;
 
-            this.$http.put('/api/ui/services/' + service.id, {draft: true})
-                .then(({data}) => {
-                    service.draft = data.draft;
-                })
-                .then(this.statusReset)
-                .catch(fetchError);
+            this.patchServiceStatus(service);
         });
         Hub.$on('createChannel', channel => {
             this.statusUpdate(null, {active: true});
