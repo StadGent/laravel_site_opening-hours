@@ -67,7 +67,7 @@ class Ical
      */
     public function createIcalString(Carbon $from, Carbon $till, $initParser = true)
     {
-        $this->icalString = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+        $this->icalString = "BEGIN:VCALENDAR" . PHP_EOL . "VERSION:2.0" . PHP_EOL . "CALSCALE:GREGORIAN" . PHP_EOL;
 
         foreach ($this->calendars as $calendar) {
             $this->icalString .= $this->createIcalEventStringFromCalendar($calendar, $from, $till);
@@ -134,17 +134,17 @@ class Ical
                     $endDate->minute = 59;
                 }
 
-                $icalString .= "BEGIN:VEVENT\n";
-                $icalString .= 'SUMMARY:' . $calendar->label . "\n";
-                $icalString .= 'STATUS:' . $status . "\n";
-                $icalString .= 'PRIORITY:' . ($calendar->priority + 20) . "\n";
-                $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . "\n";
-                $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . "\n";
-                $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . "\n";
-                $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->endOfDay()->format('Ymd\THis') . "\n";
+                $icalString .= "BEGIN:VEVENT" . PHP_EOL;
+                $icalString .= 'SUMMARY:' . $calendar->label . PHP_EOL;
+                $icalString .= 'STATUS:' . $status . PHP_EOL;
+                $icalString .= 'PRIORITY:' . ($calendar->priority + 20) . PHP_EOL;
+                $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . PHP_EOL;
+                $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . PHP_EOL;
+                $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . PHP_EOL;
+                $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->endOfDay()->format('Ymd\THis') . PHP_EOL;
                 $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' ;
-                $icalString .=  $calendar->id . "\n";
-                $icalString .= "END:VEVENT\n";
+                $icalString .=  $calendar->id . PHP_EOL;
+                $icalString .= "END:VEVENT" . PHP_EOL;
             }
         }
 
