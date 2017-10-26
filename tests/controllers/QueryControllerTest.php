@@ -79,7 +79,8 @@ class QueryControllerTest extends \TestCase
     {
         $this->serviceId = null;
         $typeParams['format'] = 'json';
-        $call = $this->doRequest('GET', $typeParams);
+        $path = $this->assemblePath($typeParams);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(404);
         $call->seeJsonEquals([
             "error" => [
@@ -99,7 +100,8 @@ class QueryControllerTest extends \TestCase
     {
         $this->serviceId = 'notAServiceId';
         $typeParams['format'] = 'json';
-        $call = $this->doRequest('GET', $typeParams);
+        $path = $this->assemblePath($typeParams);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(422);
         $call->seeJsonEquals([
             "error" => [
@@ -117,7 +119,8 @@ class QueryControllerTest extends \TestCase
     public function testValidateServiceWithoutChannelsReturnsValidationException()
     {
         $this->serviceId = factory(\App\Models\Service::class)->create(['label' => 'testChildlessService'])->id;
-        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('Y-m-d')]);
+        $path = $this->assemblePath(['type' => 'openinghours', 'period' => 'day', 'date' => date('Y-m-d')]);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
@@ -141,7 +144,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursRequiresFromUntilParameters()
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours']);
+        $path = $this->assemblePath(['type' => 'openinghours', ]);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
@@ -170,7 +174,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursFromUntilParametersMustBeVallidDateFormat()
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => 'notADate', 'until' => 'notADate']);
+        $path = $this->assemblePath(['type' => 'openinghours', 'from' => 'notADate', 'until' => 'notADate']);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
@@ -199,7 +204,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursFromMustComeBeforUntil()
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2016-01-01']);
+        $path = $this->assemblePath(['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2016-01-01']);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
@@ -223,7 +229,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursFromUntilParametersMustBeWithinOneYear()
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2018-01-05']);
+        $path = $this->assemblePath(['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2018-01-05']);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
@@ -247,7 +254,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursWithPeriodRequiresDateParameter()
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day']);
+        $path = $this->assemblePath(['type' => 'openinghours', 'period' => 'day']);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
             "error" => [
@@ -307,7 +315,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursDatesCanHandlePHPDateFormats($dateTypes)
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours'] + $dateTypes);
+        $path = $this->assemblePath(['type' => 'openinghours'] + $dateTypes);
+        $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(200);
     }
 
@@ -319,7 +328,8 @@ class QueryControllerTest extends \TestCase
     public function testItHasOnlyOneChannelkeyWhenChannelParamIsGiven($typeParams)
     {
         $this->channelKeys = $this->channelKeys->first();
-        $call = $this->doRequest('GET', $typeParams);
+        $path = $this->assemblePath($typeParams);
+        $call = $this->doRequest('GET', $path);
         if (!isset($typeParams['format']) || $typeParams['format'] === 'json') {
             $this->getContentStructureTested($call);
         }
@@ -331,7 +341,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testItReturnsGoodResultsOnTypeOpenNow()
     {
-        $call = $this->doRequest('GET', ['type' => 'open-now']);
+        $path = $this->assemblePath(['type' => 'open-now']);
+        $call = $this->doRequest('GET', $path);
         $this->getContentStructureTested($call);
     }
 
@@ -341,7 +352,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testItReturnsGoodResultsOnTypeDayWithDateParam()
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'day', 'date' => date('d-m-Y')]);
+        $path = $this->assemblePath(['type' => 'openinghours', 'period' => 'day', 'date' => date('d-m-Y')]);
+        $call = $this->doRequest('GET', $path);
         $this->getContentStructureTested($call);
     }
 
@@ -351,7 +363,8 @@ class QueryControllerTest extends \TestCase
      */
     public function testItGivesSevenDaysPerChannelOnTypeWeek()
     {
-        $call = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week', 'date' => date('d-m-Y')]);
+        $path = $this->assemblePath(['type' => 'openinghours', 'period' => 'week', 'date' => date('d-m-Y')]);
+        $call = $this->doRequest('GET', $path);
         $content = $this->getContentStructureTested($call);
 
         foreach ($content as $channelBlock) {
@@ -367,9 +380,10 @@ class QueryControllerTest extends \TestCase
     public function testItGivesClosedForEachFirstMondayOfTheMonth()
     {
         $firstMondayOfSept2017 = '04-09-2017';
-        $fullWeekCall = $this->doRequest('GET', ['type' => 'openinghours', 'period' => 'week',
-            'date' => $firstMondayOfSept2017]);
-        $content = $this->getContentStructureTested($fullWeekCall);
+        $path = $this->assemblePath(['type' => 'openinghours', 'period' => 'week', 'date' => $firstMondayOfSept2017]);
+        $call = $this->doRequest('GET', $path);
+
+        $content = $this->getContentStructureTested($call);
 
         foreach ($content as $channelBlock) {
             // first 0 key is monday
@@ -387,11 +401,11 @@ class QueryControllerTest extends \TestCase
     }
 
     /**
-     * do request according to the given format
+     * assemble the path on the given params
      */
-    public function doRequest($type, $params = null)
+    protected function assemblePath($params)
     {
-        $path = '/api/services/' . $this->serviceId;
+        $path = $this->apiUrl . '/services/' . $this->serviceId;
 
         if ($this->oneChannel()) {
             $path .= '/channels/' . $this->channelKeys;
@@ -411,22 +425,7 @@ class QueryControllerTest extends \TestCase
             }
         }
 
-        if (isset($params['format']) && $params['format'] !== 'json') {
-            return $this->call($type, $path);
-        }
-
-        return $this->json(
-            'GET',
-            $path,
-            [],
-            [
-                'Accept' => 'application/json',
-                'Accept-Encoding' => 'gzip, deflate',
-                'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
-                'X-Requested-With' => 'XMLHttpRequest',
-                'Accept-type' => 'application/json',
-            ]
-        );
+        return $path;
     }
 
     /**
