@@ -13,7 +13,7 @@ class JsonLdFormatter extends BaseFormatter
     /**
      * @var string
      */
-    protected $supportFormat = 'json-ld';
+    protected $supportFormat = 'application/ld+json';
     /**
      * contains the uri of the active record service
      * @var string

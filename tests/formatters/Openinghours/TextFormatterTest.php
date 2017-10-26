@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\Formatters;
+namespace Tests\Formatters\Openinghours;
 
 use App\Models\DayInfo;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class OpeninghoursFormatterTest extends \TestCase
+class TextFormatterTest extends \TestCase
 {
     use DatabaseTransactions;
 
     /**
-     * @var App\Formatters\Openinghours
+     * @var App\Formatters\Openinghours\HtmlFormatter
      */
     private $formatter;
 
@@ -24,7 +24,7 @@ class OpeninghoursFormatterTest extends \TestCase
     {
         parent::setup();
 
-        $this->formatter = app('OpeninghoursFormatter');
+        $this->formatter = app('OHTextFormatter');
 
         $this->service = \App\Models\Service::first();
         foreach ($this->service->channels as $channel) {
@@ -48,44 +48,28 @@ class OpeninghoursFormatterTest extends \TestCase
                 ],
             ];
         }
+        $this->formatter->setDateTimeFormats('d-m-Y', 'H:i');
     }
 
     /**
      * @test
-     * @group validation
+     * @group content
+     * @todo check content when structure is known
      */
-    public function testAddUnknownFormatThrowsError()
+    public function testFormatTextGivesAString()
     {
-        $this->setExpectedException(
-            'Exception',
-            'NotAFormatter is not supported as format for App\Formatters\OpeninghoursFormatter'
-        );
-        $this->formatter->addFormat('NotAFormatter');
-    }
+        $this->formatter->render($this->data);
+        $output = $this->formatter->getOutput();
+        $result = '';
+        foreach ($this->service->channels as $channel) {
+            $result .= $channel->label . ":";
+            $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00";
+        }
+        // remove all EOL's
+        $removedEOL = str_replace(PHP_EOL, '', $output);
+        // remove fancy double lines under channel names
+        $cleanedoutput = str_replace('=', '', $removedEOL);
 
-    /**
-     * @test
-     * @group validation
-     */
-    public function testNoDataThrowsError()
-    {
-        $this->setExpectedException(
-            'Exception',
-            'No data given for formatterApp\Formatters\OpeninghoursFormatter'
-        );
-        $this->formatter->render([]);
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function testRequestUnknownFormatThrowsError()
-    {
-        $this->setExpectedException(
-            'Exception',
-            'Error Processing Request as in absence of a request'
-        );
-        $this->formatter->render(['thisIsData' => true]);
+        $this->assertEquals($result, $cleanedoutput);
     }
 }
