@@ -7,6 +7,7 @@ use App\Http\Requests\DeleteOpeninghoursRequest;
 use App\Http\Requests\StoreOpeninghoursRequest;
 use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
+use Illuminate\Http\Request;
 
 class OpeninghoursController extends Controller
 {
@@ -102,11 +103,11 @@ class OpeninghoursController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  DeleteOpeninghoursRequest $request
-     * @param  int                       $id
+     * @param  Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteOpeninghoursRequest $request)
+    public function destroy(Request $request)
     {
         $success = $this->openinghours->delete($request->openinghours->id);
 
