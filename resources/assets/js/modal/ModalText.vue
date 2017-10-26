@@ -52,7 +52,6 @@
               <b>Pas op!</b> Het is de bedoeling dat je alleen mensen uitnodigt van Mijn Gent.
             </div>
           </div>
-
           <div v-if="modal.text == 'newUser' || modal.text == 'newRoleForUser'">
             <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
               <label for="recipient-name" class="control-label">Rol</label>
@@ -77,20 +76,21 @@
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
-            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex">Voeg toe</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
+            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex || modal.wait">Voeg toe</button>
+            <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
-            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
+            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex || modal.wait">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+            <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">
-            <button type="submit" class="btn btn-primary" @click="createRole">Uitnodigen</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
+            <button type="submit" class="btn btn-primary" @click="createRole" :disabled="modal.wait">Uitnodigen</button>
+            <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else>
-            <button type="submit" class="btn btn-primary" @click="modalClose">OK</button>
+            <button type="submit" class="btn btn-primary" @click="modalClose" :disabled="modal.wait">OK</button>
           </div>
+          <status></status>
         </div>
       </form>
     </div>
@@ -100,6 +100,7 @@
 <script>
 import InputChannel from '../components/InputChannel.vue'
 import Pikaday from '../components/Pikaday.vue'
+import Status from '../components/Status.vue'
 
 import { Hub, toDatetime } from '../lib.js'
 
@@ -136,12 +137,18 @@ export default {
   },
   methods: {
     createChannel () {
+
+      this.modalWait();
+
       if (!this.modal.label) {
         this.modal.label = 'Algemeen'
       }
       Hub.$emit('createChannel', this.modal)
     },
     createVersion () {
+
+      this.modalWait();
+
       if (!this.modal.label) {
         this.modal.label = this.nextVersionLabel
       }
@@ -183,6 +190,9 @@ export default {
       Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },
     createRole () {
+
+      this.modalWait();
+
       this.modal.strict = true;
       if (this.modal.usr) {
         this.modal.user_id = this.modal.usr.id
@@ -197,12 +207,13 @@ export default {
     }
   },
   updated () {
-    const inp = this.$el.querySelector('input')
+    const inp = this.$el.querySelector('input');
     inp && inp.focus()
   },
   components: {
     InputChannel,
-    Pikaday
+    Pikaday,
+    Status,
   }
 }
 </script>
