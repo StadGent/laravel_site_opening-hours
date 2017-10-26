@@ -17,12 +17,6 @@ class LocaleService
      * @var ChannelService
      */
     private static $instance;
-    /**
-     * \Request::server('HTTP_ACCEPT_LANGUAGE')
-     *
-     * @var string
-     */
-    private $httpAcceptLang;
 
     /**
      * @var string
