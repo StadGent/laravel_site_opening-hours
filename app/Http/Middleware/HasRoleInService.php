@@ -38,7 +38,7 @@ class HasRoleInService
     /**
      * @param Request $request
      */
-    private function findTheServiceInTheRequest(Request $request)
+    protected function findTheServiceInTheRequest(Request $request)
     {
         switch (true) {
             case isset($request->calendar):
@@ -49,6 +49,8 @@ class HasRoleInService
                 return $request->channel->service->id;
             case isset($request->service):
                 return $request->service->id;
+            case isset($request->service_id):
+                return $request->service_id;
 
             default:
                 throw new AuthenticationException("Unauthorized");
