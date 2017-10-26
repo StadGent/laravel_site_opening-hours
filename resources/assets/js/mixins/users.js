@@ -7,6 +7,11 @@ export default {
             users: (window.initialUsers || []).map(expandUser)
         }
     },
+    created() {
+        if(this.isAdmin){
+            this.fetchUsers();
+        }
+    },
     computed: {
         routeUser() {
             return this.users.find(u => u.id === this.route.user) || {}
@@ -15,9 +20,8 @@ export default {
     methods: {
         fetchUsers(service) {
             this.statusUpdate(null, {active: true});
-            if (service) {
-                console.log("%c fetching users for: " + service, 'color: white; background-color: green; font-weight: bold;');
 
+            if (service) {
                 return this.$http.get('/api/ui/services/' + service + '/users')
                     .then(({data}) => {
                         this.$set(this.routeService, 'users', data);
@@ -25,7 +29,6 @@ export default {
                     .catch(fetchError)
             }
             else {
-                console.log("%c fetching users...", 'color: white; background-color: red; font-weight: bold;');
                 return this.$http.get('/api/ui/users')
                     .then(({data}) => {
                         this.users = (data || []).map(expandUser);
@@ -59,8 +62,6 @@ export default {
         }
     },
     mounted() {
-        //todo don't fetch all users!
-        this.fetchUsers();
 
         //todo split createRole & patchRole
         Hub.$on('createRole', newRole => {
