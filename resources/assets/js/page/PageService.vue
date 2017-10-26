@@ -28,7 +28,9 @@
             <th class="text-right">Ontzeg toegang tot dienst</th>
           </tr>
         </thead>
-        <tbody is="row-user-owner" v-for="u in sortedUsers" :u="u"></tbody>
+        <tbody>
+          <tr is="row-user-owner" v-for="u in sortedUsers" :u="u"></tr>
+        </tbody>
       </table>
     </div>
 

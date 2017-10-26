@@ -1,7 +1,9 @@
 <template>
-  <tbody>
-    <tr :class="{'warning':!u.verified}" @click="href('#!user/'+u.id)">
-      <td>
+    <tr :class="{'warning':!u.verified}">
+      <td v-if="this.$root.isAdmin">
+        <a v-if="this.$root.isAdmin" :href="'#!user/'+u.id">{{ u.name }}</a>
+      </td>
+      <td v-else>
         {{ u.name }}
       </td>
       <td>
@@ -21,7 +23,6 @@
         </button>
       </td>
     </tr>
-  </tbody>
 </template>
 
 <script>

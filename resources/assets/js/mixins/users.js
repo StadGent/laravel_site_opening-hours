@@ -18,11 +18,12 @@ export default {
         },
     },
     methods: {
-        fetchUsers(service) {
+        fetchUsers(service_ID) {
             this.statusUpdate(null, {active: true});
 
-            if (service) {
-                return this.$http.get('/api/ui/services/' + service + '/users')
+            if (service_ID) {
+                console.log('fetching users for ' + service_ID);
+                return this.$http.get('/api/ui/services/' + service_ID + '/users')
                     .then(({data}) => {
                         this.$set(this.routeService, 'users', data);
                     })
