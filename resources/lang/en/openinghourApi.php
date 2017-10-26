@@ -11,6 +11,13 @@ return [
 
     'OPEN'   => 'open',
     'CLOSED' => 'closed',
+
+    'FROM_HOUR' => 'from',
+    'UNTIL_HOUR' => 'to',
+    'FROM_DATA' => 'from',
+    'UNTIL_DATA' => 'to',
+    'SHORT_HOUR' => 'h',
+
     'day_0'  => 'Sunday',
     'day_1'  => 'Monday',
     'day_2'  => 'Tuesday',
