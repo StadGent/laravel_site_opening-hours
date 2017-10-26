@@ -19,18 +19,18 @@ export default {
     },
     methods: {
         statusUpdate: function (err, data) {
-            if (err) {
+            if (err && err.status)
+                this.status.error = 'Error ' + err.status + ' -  ' + 'Neem een print screen en neem contact op met de servicedesk.';
 
-                if (err.status) {
-                    this.status.error = 'Error ' + err.status + ' -  ' + 'Neem een print screen en neem contact op met de servicedesk.';
-                }
-                else {
-                    this.status.error = err.message;
-                }
+            else if (err) {
+                this.status.error = err.message;
             }
             else if (data) {
                 this.status.text = data.text || '';
                 this.status.active = data.active;
+            }
+            else {
+                this.status.text = 'Er is een onbekende fout opgetreden.';
             }
         },
         statusReset: function () {
