@@ -7,24 +7,26 @@ export default {
         }
     },
     created() {
-        if(this.isAdmin){
+        if (this.isAdmin) {
             this.fetchUsers();
         }
     },
-    computed: {
-        routeUser() {
-            return this.users.find(u => u.id === this.route.user) || {}
-        },
-    },
+    computed: {},
     methods: {
         fetchUsers(service_ID) {
             this.statusUpdate(null, {active: true});
 
             if (service_ID) {
-                console.log('fetching users for ' + service_ID);
                 return this.$http.get('/api/ui/services/' + service_ID + '/users')
                     .then(({data}) => {
                         this.$set(this.routeService, 'users', data);
+                    }, (error) => {
+                        // because we send requests not knowing if the user is authorized,
+                        // we must intercept this error.
+                        // todo: don't send requests not knowing if...
+                        if (error.status !== 401) {
+                            throw error;
+                        }
                     })
                     .catch(fetchError)
             }
@@ -44,9 +46,6 @@ export default {
             switch (role) {
                 case 'admin':
                     translation = 'Admin';
-                    break;
-                case 'AppUser':
-                    translation = 'Gebruiker';
                     break;
                 case 'Member':
                     translation = 'Lid';
@@ -107,8 +106,9 @@ export default {
             }
 
             this.$http.patch('/api/ui/roles', user)
-            // todo don't fetch all users, you only need the one.
-                .then(this.fetchUsers(this.route.service))
+                .then(({data}) => {
+                    user.role = data.role;
+                })
                 .then(this.statusReset)
                 .catch(fetchError)
         });

@@ -54,7 +54,7 @@ class RolesController extends Controller {
         $success = $this->users->linkToService($input['user_id'], $input['service_id'], $input['role']);
 
         if ($success) {
-            return response()->json(['message' => 'De rol werd toegevoegd.']);
+            return response()->json(['role' => $input['role']]);
         }
 
         return response()->json(['message' => 'Er is iets misgegaan tijdens het aanpassen van de rol.'], 400);
