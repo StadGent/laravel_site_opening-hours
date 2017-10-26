@@ -19,9 +19,12 @@ export default {
     },
     methods: {
         statusUpdate: function (err, data) {
-            if (err && err.status)
-                this.status.error = 'Error ' + err.status + ' -  ' + 'Neem een print screen en neem contact op met de servicedesk.';
-
+            if (err && err.status) {
+                this.status.error = 'Error '
+                    + err.status
+                    + ' -  '
+                    + 'Neem een print screen en neem contact op met de servicedesk.';
+            }
             else if (err) {
                 this.status.error = err.message;
             }
