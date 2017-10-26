@@ -32,6 +32,7 @@ class QueryController extends Controller
     {
         $this->OpeninghoursService = app('OpeninghoursService');
         $this->OpeninghoursFormatter = app('OpeninghoursFormatter');
+        $this->localeService = app('LocaleService');
     }
 
     /**
@@ -44,6 +45,7 @@ class QueryController extends Controller
      */
     public function nowOpenAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
+        $this->localeService->setRequest($request);
         $this->OpeninghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
         // output format with json as default
         $this->OpeninghoursFormatter->setRequest($request);
@@ -173,6 +175,7 @@ class QueryController extends Controller
         Service $service,
         Channel $channel
     ) {
+        $this->localeService->setRequest($request);
         $this->OpeninghoursService->collectData($start, $end, $service, $channel);
         $this->OpeninghoursFormatter->setRequest($request);
 

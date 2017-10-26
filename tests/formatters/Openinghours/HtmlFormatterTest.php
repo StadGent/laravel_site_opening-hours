@@ -60,10 +60,15 @@ class HtmlFormatterTest extends \TestCase
     {
         $this->formatter->render($this->data);
         $output = $this->formatter->getOutput();
-        $result = "<div>";
+        $result = '<div vocab="http://schema.org/" typeof="Library">';
         foreach ($this->service->channels as $channel) {
-            $result .= "<h4>" . $channel->label . "</h4><div>15-09-2017</div><ul><li>09:00 - 12:00</li>" .
-                "<li>13:00 - 17:00</li></ul>";
+            $result .= '<h1>' . $channel->label . '</h1>' .
+                '<div property="openingHoursSpecification" typeof="OpeningHoursSpecification">' .
+                '<time property="validFrom validThrough" datetime="2017-09-15">15-09-2017</time>:  ' .
+                'van <time property="opens" content="09:00:00">09:00</time> ' .
+                'tot <time property="closes" content="12:00:00">12:00</time>  ' .
+                'van <time property="opens" content="13:00:00">13:00</time> ' .
+                'tot <time property="closes" content="17:00:00">17:00</time> </div>';
         }
         $result .= "</div>";
         $this->assertEquals($result, $output);

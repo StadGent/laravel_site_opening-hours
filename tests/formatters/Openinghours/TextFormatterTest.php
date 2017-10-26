@@ -63,7 +63,7 @@ class TextFormatterTest extends \TestCase
         $result = '';
         foreach ($this->service->channels as $channel) {
             $result .= $channel->label . ":";
-            $result .= "15-09-2017:    09:00 - 12:00   13:00 - 17:00";
+            $result .= "15-09-2017:    van 09:00  tot 12:00   van 13:00  tot 17:00";
         }
         // remove all EOL's
         $removedEOL = str_replace(PHP_EOL, '', $output);
