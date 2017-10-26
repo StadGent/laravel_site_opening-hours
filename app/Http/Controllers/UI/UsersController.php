@@ -4,11 +4,14 @@ namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteUserRequest;
+use App\Mail\SendRegisterConfirmation;
 use App\Models\Role;
 use App\Models\Service;
+use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class UsersController extends Controller
 {
@@ -46,32 +49,24 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         // Check if the user already exists
-        $user = $this->userRepository->where('email', $request->input('email'))->first();
-
-        if (empty($user)) {
-            $input = $request->input();
-            $input['password'] = '';
-            $input['token'] = str_random(32);
-
-            $userId = $this->usersuserRepository->store($input);
-
-            $user = $this->userRepository->getById($userId);
-
-            // Attach the role of application user to the new user
-            $appUserRole = Role::where('name', 'AppUser')->first();
-
-            $user->attachRole($appUserRole);
-
-            // Send a confirmation email
-            $mailer = app()->make('App\Mailers\SendGridMailer');
-            $mailer->sendEmailConfirmationTo($user['email'], $user['token']);
+        if (!$this->userRepository->where('email', $request->input('email'))->get()->isEmpty()) {
+            // find correct duplicate data error code
+            return response()->json(['message' => 'This User already exists in the DB.'], 400);
         }
 
-        if (!empty($user)) {
-            return response()->json($user);
+        $input = $request->input();
+        $input['password'] = '';
+        $input['token'] = str_random(32);
+
+        $userId = $this->userRepository->store($input);
+        $user = $this->userRepository->getById($userId);
+        if (!$user) {
+            return response()->json(['message' => 'Something went wrong while storing the user, check the logs.'], 400);
         }
 
-        return response()->json(['message' => 'Something went wrong while storing the user, check the logs.'], 400);
+        Mail::to($user)->send(new SendRegisterConfirmation($user));
+
+        return response()->json($user);
     }
 
     /**
