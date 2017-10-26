@@ -101,7 +101,7 @@ export default {
             user.user_id = user.user_id || user.id;
 
             if (!user.user_id) {
-                this.statusUpdate({message: 'oeps... user ID is missing'});
+                this.statusUpdate({message: 'User ID is missing'});
                 return;
             }
 
