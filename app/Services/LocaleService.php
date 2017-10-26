@@ -39,6 +39,7 @@ class LocaleService
     {
         $httpAcceptLang = $request->server('HTTP_ACCEPT_LANGUAGE');
         $this->requestLocale = $this->validateRequestLocale($httpAcceptLang);
+        \App::setLocale(substr($this->requestLocale, 0, 2));
         $this->format = $this->fetchTheFormat($this->requestLocale);
     }
 

@@ -39,18 +39,6 @@ abstract class BaseFormatter implements FormatterInterface
     abstract public function render($data);
 
     /**
-     * Set request to LocaleService to get the locale format
-     *
-     * @param Request $request
-     */
-    public function setRequest(Request $request)
-    {
-        $localeService = app('LocaleService');
-        $localeService->setRequest($request);
-        $this->dateFormat = $localeService->getDateFormat();
-        $this->timeFormat = $localeService->getTimeFormat();
-    }
-    /**
      * Be able to manipulate the formats without an actual http request
      *
      * initial purpose is to be set for unit tests
@@ -96,7 +84,10 @@ abstract class BaseFormatter implements FormatterInterface
             }
 
             foreach ($ohObj->hours as $hoursObj) {
-                $text .= '   ' . date($this->timeFormat, strtotime($hoursObj['from'])) . " - " .
+                $text .= '   ' . trans('openinghourApi.FROM_HOUR') . ' ' . date(
+                    $this->timeFormat,
+                 strtotime($hoursObj['from'])
+                ) . "  " . trans('openinghourApi.UNTIL_HOUR') . " " .
                 date($this->timeFormat, strtotime($hoursObj['until']));
             }
             $text .= PHP_EOL;

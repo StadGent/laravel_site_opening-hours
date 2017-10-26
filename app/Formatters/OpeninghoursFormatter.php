@@ -59,14 +59,6 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
     }
 
     /**
-     * @param Service $service
-     */
-    public function setService(Service $service)
-    {
-        $this->service = $service;
-    }
-
-    /**
      * @param Request $request
      */
     public function setRequest(GetQueryRequest $request)
@@ -87,10 +79,15 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
             throw new \Exception("No data given for formatter" . self::class, 1);
         }
 
+        $localeService = app('LocaleService');
         $prefered = $this->getBestSupportedMimeType(array_keys($this->formatters, null, true));
         foreach ($prefered as $format => $weight) {
             if (isset($this->formatters[$format]) && $weight !== 0) {
-                $this->formatters[$format]->setRequest($this->request);
+                $this->formatters[$format]->service = $this->request->service;
+                $this->formatters[$format]->setDateTimeFormats(
+                    $localeService->getDateFormat(),
+                    $localeService->getTimeFormat()
+                );
 
                 return $this->formatters[$format]->render($data)->getOutput();
             }
