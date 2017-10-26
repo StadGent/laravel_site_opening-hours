@@ -11,7 +11,7 @@ class HtmlFormatter extends BaseFormatter
     /**
      * @var string
      */
-    protected $supportFormat = 'html';
+    protected $supportFormat = 'text/html';
     /**
      * Render a schedule into HTML based on an array structure
      * @todo use (blade) template ???
@@ -21,29 +21,38 @@ class HtmlFormatter extends BaseFormatter
      */
     public function render($data)
     {
-        $formattedSchedule = '<div>';
+        $formattedSchedule = '<div vocab="http://schema.org/" typeof="Library">';
 
         foreach ($data as $channelObj) {
-            $formattedSchedule .= "<h4>$channelObj->channel</h4>";
+            $formattedSchedule .= "<h1>$channelObj->channel</h1>";
             if (isset($channelObj->openNow)) {
                 $formattedSchedule .= "<div>" . $channelObj->openNow->label . "</div>";
                 continue;
             }
 
             foreach ($channelObj->openinghours as $ohObj) {
-                $formattedSchedule .= "<div>" . date('d-m-Y', strtotime($ohObj->date)) . "</div>";
-                $formattedSchedule .= "<ul>";
-
+                $formattedSchedule .= '<div property="openingHoursSpecification" typeof="OpeningHoursSpecification">' .
+                '<time property="validFrom validThrough" datetime="' . date('Y-m-d', strtotime($ohObj->date)) . '">' .
+                date($this->dateFormat, strtotime($ohObj->date)) . '</time>: ';
                 if (!$ohObj->open) {
-                    $formattedSchedule .= trans('openinghourApi.CLOSED');
-                    $formattedSchedule .= "</ul>";
+                    $formattedSchedule .= '<time property="closes" datetime="' .
+                    date('Y-m-d', strtotime($ohObj->date)) . '">' .
+                    trans('openinghourApi.CLOSED') .
+                        '</time></div>';
                     continue;
                 }
 
                 foreach ($ohObj->hours as $hoursObj) {
-                    $formattedSchedule .= "<li>" . $hoursObj['from'] . " - " . $hoursObj['until'] . "</li>";
+                    $formattedSchedule .= ' ' . trans('openinghourApi.FROM_HOUR') . ' ' .
+                    '<time property="opens" content="' . date('H:i:s', strtotime($hoursObj['from'])) . '">' .
+                    date($this->timeFormat, strtotime($hoursObj['from'])) .
+                    '</time> ' .
+                    trans('openinghourApi.UNTIL_HOUR') . ' ' .
+                    '<time property="closes" content="' . date('H:i:s', strtotime($hoursObj['until'])) . '">' .
+                    date($this->timeFormat, strtotime($hoursObj['until'])) .
+                        '</time> ';
                 }
-                $formattedSchedule .= "</ul>";
+                $formattedSchedule .= "</div>";
             }
         }
         $formattedSchedule .= '</div>';

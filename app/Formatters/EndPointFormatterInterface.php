@@ -14,7 +14,7 @@ interface EndPointFormatterInterface
      * @param  string $format
      * @param  array $data   data to transform
      */
-    public function render($format, $data);
+    public function render($data);
 
     /**
      *

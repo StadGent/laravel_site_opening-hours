@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
+
 abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
     /**
@@ -44,27 +46,41 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
     /**
      * do request according to the given format
      */
-    public function doRequest($verb, $path, $params = [])
+    public function doRequest($method, $path, $params = [])
     {
         if ($this->debug) {
-            Log::debug($verb . ' -> ' . $path);
+            Log::debug($method . ' -> ' . $path);
         }
-        if (isset($params['format']) && $params['format'] !== 'json') {
-            return $this->call($verb, $path);
-        }
+        $request = isset($params['format']) ?: 'json';
 
-        return $this->json(
-            $verb,
+        $formats = [
+            'json' => 'application/json',
+            'json-ld' => 'application/ld+json',
+            'html' => 'text/html',
+            'text' => 'text/plain',
+        ];
+        $accept = $formats[$request];
+
+        $content = json_encode($params);
+
+        $headers = [
+            'CONTENT_LENGTH' => mb_strlen($content, '8bit'),
+            'CONTENT_TYPE' => $accept,
+            'Accept-Language' => 'nl-BE,nl;q=0.8,en-US;q=0.6,en;q=0.4',
+            'X-Requested-With' => 'XMLHttpRequest',
+            'Accept' =>  $accept,
+            'Accept-type' => $accept,
+        ];
+        $this->call(
+            $method,
             $path,
-            $params,
-            [
-                'Accept' => 'application/json',
-                'Accept-Encoding' => 'gzip, deflate',
-                'Accept-Language' => 'nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4',
-                'X-Requested-With' => 'XMLHttpRequest',
-                'Accept-type' => 'application/json',
-            ]
+            [],
+            [],
+            [],
+            $this->transformHeadersToServerVars($headers),
+            $content
         );
+        return $this;
     }
 
     /**
@@ -75,11 +91,11 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
      * @param uri $call
      * @return array
      */
-    public function getContentStructureTested($call)
+    public function getContentStructureTested()
     {
         // check status code
-        $call->seeStatusCode(200);
-        $content = $call->decodeResponseJson();
+        $this->seeStatusCode(200);
+        $content = $this->decodeResponseJson();
         // set extra checks
         $this->extraStructureTest($content);
 
