@@ -3,8 +3,7 @@ import {fetchError, Hub} from '../lib.js'
 export default {
     data() {
         return {
-            // WARNING: all user data must be passed through expandUser()
-            users: (window.initialUsers || []).map(expandUser)
+            users: (window.initialUsers || [])
         }
     },
     created() {
@@ -32,7 +31,7 @@ export default {
             else {
                 return this.$http.get('/api/ui/users')
                     .then(({data}) => {
-                        this.users = (data || []).map(expandUser);
+                        this.users = data || [];
                     })
                     .then(this.statusReset)
                     .catch(fetchError)
@@ -200,17 +199,4 @@ export default {
             }).catch(fetchError)
         })
     }
-}
-
-export function expandUser(u) {
-
-    u.roles = u.roles || [];
-    u.services = u.roles.map(r => r.service_id);
-
-    u.role = {};
-    for (let i = 0; i < u.roles.length - 1; i++) {
-        u.role[u.roles[i].service] = u.roles[i].role
-    }
-
-    return u
 }

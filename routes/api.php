@@ -40,10 +40,10 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     // Presets (refactor to holidays)
     Route::get('/presets', 'UI\PresetsController@index');
 
-    // todo restrict to admin and owners
     // roles
-    Route::post('/roles', 'UI\RolesController@store');
-    Route::delete('/roles', 'UI\RolesController@destroy');
+    Route::patch('/roles', 'UI\RolesController@update')->middleware('isOwner');
+    Route::post('/roles', 'UI\RolesController@store')->middleware('isOwner');
+    Route::delete('/roles', 'UI\RolesController@destroy')->middleware('isOwner');
 
     // services
     Route::get('/services', 'UI\ServicesController@index');
@@ -56,8 +56,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::post('/users', 'UI\UsersController@store')->middleware('admin');
     Route::delete('/users/{user}', 'UI\UsersController@destroy')->middleware('admin');
     // subset
-    Route::get('/services/{service}/users', 'UI\UsersController@getFromService')
-        ->middleware('hasRoleInService');
+    Route::get('/services/{service}/users', 'UI\UsersController@getFromService')->middleware('isOwner');
 });
 
 /****************/

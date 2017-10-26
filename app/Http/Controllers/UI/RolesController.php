@@ -11,25 +11,24 @@ use App\Repositories\UserRepository;
  * RolesController takes care of CRUD'ing of roles
  * amongst users
  */
-class RolesController extends Controller
-{
+class RolesController extends Controller {
+
     /**
      * @param UserRepository $users
      */
-    public function __construct(UserRepository $users)
-    {
+    public function __construct(UserRepository $users) {
         $this->users = $users;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     *
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRoleRequest $request)
-    {
+    public function store(StoreRoleRequest $request) {
         $input = $request->input();
 
         $success = $this->users->linkToService($input['user_id'], $input['service_id'], $input['role']);
@@ -42,13 +41,33 @@ class RolesController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified resource in storage.
      *
-     * @param  int                       $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteRoleRequest $request)
-    {
+    public function update(StoreRoleRequest $request) {
+        $input = $request->input();
+
+        $success = $this->users->linkToService($input['user_id'], $input['service_id'], $input['role']);
+
+        if ($success) {
+            return response()->json(['message' => 'De rol werd toegevoegd.']);
+        }
+
+        return response()->json(['message' => 'Er is iets misgegaan tijdens het aanpassen van de rol.'], 400);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int $id
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(DeleteRoleRequest $request) {
         $input = $request->input();
 
         $success = $this->users->removeRoleInService($input['user_id'], $input['service_id']);

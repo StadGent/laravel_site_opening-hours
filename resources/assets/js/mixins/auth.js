@@ -1,5 +1,3 @@
-import { expandUser } from './users.js'
-
 export default {
   data () {
     const userDefault = {
@@ -13,7 +11,7 @@ export default {
     Object.assign(userDefault, window.initialUser || ls('user'))
 
     return {
-      user: expandUser(userDefault)
+      user: userDefault
     }
   },
   computed: {

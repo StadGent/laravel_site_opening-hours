@@ -97,7 +97,6 @@ export default {
                     this.$set(this.routeService, 'channels', data);
                 })
                 .then(()=>{
-                    console.log(inert(this.routeService));
                     this.fetchUsers(this.route.service)
                 })
                 .then(() => {
@@ -293,8 +292,7 @@ export default {
 
                         const index = this.routeVersion.calendars.findIndex(c => c.id === data.id);
                         if (index === -1) {
-                            return;
-                        }
+                            return;                        }
                         this.$set(this.routeVersion.calendars, index, data);
                         this.updateService();
 
