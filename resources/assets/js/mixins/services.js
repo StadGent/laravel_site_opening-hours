@@ -97,9 +97,8 @@ export default {
                     this.$set(this.routeService, 'channels', data);
                 })
                 .then(()=>{
-                    if(this.isOwner) {
-                        this.fetchUsers(this.route.service)
-                    }
+                    console.log(inert(this.routeService));
+                    this.fetchUsers(this.route.service)
                 })
                 .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
