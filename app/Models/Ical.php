@@ -106,6 +106,7 @@ class Ical
 
         foreach ($calendar->events as $event) {
             $until = new Carbon($event->until);
+            $until->endOfDay();
 
             if (!empty($maxTimestamp) && $event->until > $maxTimestamp && $maxTimestamp > $event->start_date) {
                 $until = $maxTimestamp;
@@ -115,15 +116,18 @@ class Ical
                 // Performance tweak
                 $startDate = new Carbon($event->start_date);
                 $endDate = new Carbon($event->end_date);
+                if ($startDate < $minTimestamp) {
+                    $startDate->day = $minTimestamp->day;
+                    $startDate->month = $minTimestamp->month;
+                    $startDate->year = $minTimestamp->year;
+                    $startDate->subDays(2);
+                }
 
-                $startDate->day = $minTimestamp->day;
-                $startDate->month = $minTimestamp->month;
-                $startDate->year = $minTimestamp->year;
-                $startDate->subDay(2);
-
-                $endDate->day = $startDate->day;
-                $endDate->month = $startDate->month;
-                $endDate->year = $startDate->year;
+                if ($endDate > $maxTimestamp) {
+                    $endDate->day = $maxTimestamp->day;
+                    $endDate->month = $maxTimestamp->month;
+                    $endDate->year = $maxTimestamp->year;
+                }
 
                 $status = 'OPEN';
                 if ($calendar->closinghours === 1) {
@@ -144,7 +148,7 @@ class Ical
                 $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->endOfDay()->format('Ymd\THis') . PHP_EOL;
                 $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' ;
                 $icalString .=  $calendar->id . PHP_EOL;
-                $icalString .= "END:VEVENT" . PHP_EOL;
+                $icalString .= "END:VEVENT" . PHP_EOL . PHP_EOL;
             }
         }
 
@@ -159,45 +163,81 @@ class Ical
      * @param  boolean $openNow [description]
      * @return [type]           [description]
      */
-    public function getDayInfo(Carbon $date, $openNow = false)
+    public function getOpenAt(Carbon $date = null)
     {
+        if (null === $date) {
+            $date = new Carbon();
+        }
         $startDate = $date->copy()->startOfDay();
         $endDate = $date->copy()->endOfDay();
+        $datePeriod = new \DatePeriod($startDate, new \DateInterval('P1D'), $endDate);
+        // Get the info for today.
+        $data = $this->getPeriodInfo($datePeriod);
+        $today = reset($data);
+        if ($today->open === false) {
+            return true;
+        }
+        foreach ($today->hours as $slot) {
+            $opens = [];
+            $closes = [];
+            list($opens['h'], $opens['i']) = explode(':', $slot['from']);
+            list($closes['h'], $closes['i']) = explode(':', $slot['until']);
+            $opensCarbon = $date->copy()->setTime(intval($opens['h']), intval($opens['i']), 0);
+            $closesCarbon = $date->copy()->setTime(intval($closes['h']), intval($closes['i']), 0);
+            if ($date->between($opensCarbon, $closesCarbon)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if there are events for a given day
+     * Attr openNow respects the given time and adds an extra minute
+     *
+     * @param  DatePeriod  $datePeriod    [description]
+     * @return DayInfo[]                  [description]
+     */
+    public function getPeriodInfo(\DatePeriod $datePeriod)
+    {
+        $startDate = new Carbon($datePeriod->getStartDate());
+        $endDate = new Carbon($datePeriod->getEndDate());
 
         if (empty($this->icalString)) {
             $this->initParser($startDate, $endDate);
         }
 
-        if ($openNow) {
-            $startDate = $date->copy();
-            $endDate = $date->copy()->addMinute();
+        $data = [];
+        // Prefill data.
+        foreach ($datePeriod as $day) {
+            $carbonDay = Carbon::instance($day);
+            $dayInfo = new DayInfo($carbonDay);
+            $data[$carbonDay->toDateString()] = $dayInfo;
         }
-
-        $dayInfo = new DayInfo($startDate);
         $events = $this->parser->eventsFromRange($startDate, $endDate);
+        usort($events, function ($a, $b) {
+            return $a->priority - $b->priority;
+        });
         foreach ($events as $event) {
-            if ($dayInfo->open === false) {
+            $start = $event->dtstart;
+            $end = $event->dtend;
+            $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
+            $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
+            $dayInfo = $data[$dtStart->toDateString()];
+            if ($dayInfo->open !== null) {
                 continue;
             }
 
-            $dayInfo->open = false;
-            if ($event->status === 'OPEN') {
-                $dayInfo->open = true;
-                $start = $event->dtstart;
-                $end = $event->dtend;
-
-                $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
-                $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
-
-                $dayInfo->hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
+            $dayInfo->open = ($event->status === 'OPEN');
+            $dayInfo->hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
+        }
+        foreach ($datePeriod as $day) {
+            $carbonDay = Carbon::instance($day);
+            if ($data[$carbonDay->toDateString()]->open === null) {
+                $data[$carbonDay->toDateString()]->open = false;
             }
         }
-
-        if ($dayInfo->open === null) {
-            $dayInfo->open = false;
-        }
-
-        return $dayInfo;
+        return $data;
     }
 
     /**
