@@ -15,8 +15,9 @@ class HasRoleInService
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
+     *
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -71,7 +72,6 @@ class HasRoleInService
                 return $service->id;
             case isset($request->service_id):
                 return $request->service_id;
-
             default:
                 throw new AuthenticationException("Unauthorized");
         }

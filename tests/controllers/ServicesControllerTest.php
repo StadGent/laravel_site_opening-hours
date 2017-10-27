@@ -93,7 +93,7 @@ class ServicesControllerTest extends \TestCase
      * @test
      * @dataProvider requestTypeProvider
      */
-    public function testRequestsByUserWithRoleAndCheckStatusCode($userRole, $verb, $pathArg, $data, $statusCode)
+    public function testServiceRequests($userRole, $verb, $pathArg, $data, $statusCode)
     {
         $this->requestsByUserWithRoleAndCheckStatusCode($userRole, $verb, $pathArg, $data, $statusCode);
     }
