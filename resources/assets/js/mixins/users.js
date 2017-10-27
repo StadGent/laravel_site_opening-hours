@@ -60,18 +60,27 @@ export default {
         Hub.$on('createRole', newRole => {
             this.statusUpdate(null, {active: true});
 
-            if (!newRole.service_id) {
-                newRole.service_id = this.routeService.id
-            }
             if (!newRole.service_id && newRole.srv) {
                 newRole.service_id = newRole.srv.id
             }
+            else {
+                newRole.service_id = this.routeService.id
+            }
+
             newRole.role = newRole.role || 'Member';
             newRole.user_id = newRole.user_id || newRole.id;
+
+            // only admin can assign specific users
+            // owner does not know if user exists
+
             if (!newRole.user_id && !newRole.email) {
                 // Cannot continue without at least one of these
-                return console.error('createRole: email is missing')
+                this.statusUpdate(null, {message: 'createRole: email is missing'});
+                this.modalResume();
+                return;
             } else if (!newRole.user_id) {
+
+                // TODO change to createOrUpdateUser
                 // Create the missing user based on user.email
                 // After the creation, the role will be added too
                 Hub.$emit('createUser', newRole);
@@ -80,6 +89,8 @@ export default {
 
             this.$http.post('/api/ui/roles', newRole)
                 .then(() => {
+
+                // TODO don't fetch everything...
                     this.fetchUsers();
                     this.fetchServices();
                     this.modalClose();
@@ -170,7 +181,9 @@ export default {
                 } else {
                     this.fetchServices();
                 }
-                this.fetchUsers();
+                if(this.isAdmin){
+                    this.fetchUsers();
+                }
                 this.modalClose();
             }).catch(fetchError)
         });
