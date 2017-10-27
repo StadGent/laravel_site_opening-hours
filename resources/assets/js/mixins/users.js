@@ -1,4 +1,5 @@
 import {fetchError, Hub} from '../lib.js'
+import {ADMIN, OWNER, MEMBER} from "../constants";
 
 export default {
     data() {
@@ -32,7 +33,8 @@ export default {
                     .then(this.statusReset)
                     .catch(fetchError)
             }
-            else {
+            // only admin can fetch all users
+            else if (this.isAdmin) {
                 return this.$http.get('/api/ui/users')
                     .then(({data}) => {
                         this.users = data || [];
@@ -44,11 +46,11 @@ export default {
         translateRole(role) {
             switch (role) {
                 case 'admin':
-                    return 'Admin';
+                    return ADMIN;
                 case 'Member':
-                    return 'Lid';
+                    return MEMBER;
                 case 'Owner':
-                    return 'Eigenaar';
+                    return OWNER;
                 default:
                     return role;
             }
@@ -56,7 +58,9 @@ export default {
     },
     mounted() {
 
-        //todo split createRole & patchRole
+        // todo change this name
+        // triggered in the 'invite user' modals.
+        // backend will create or update the user.
         Hub.$on('createRole', newRole => {
             this.statusUpdate(null, {active: true});
 
@@ -129,6 +133,8 @@ export default {
                     this.modalClose();
                 }).catch(fetchError)
         });
+
+        // todo: can this go?
         Hub.$on('fetchUser', newRole => {
             this.statusUpdate(null, {active: true});
 
@@ -154,6 +160,8 @@ export default {
                 this.modalClose();
             }).catch(fetchError)
         });
+
+        // todo: can this go?
         Hub.$on('createUser', newUser => {
             this.statusUpdate(null, {active: true});
 
@@ -180,10 +188,6 @@ export default {
                 }
                 this.modalClose();
             }).catch(fetchError)
-        });
-//todo can we remove this?
-        Hub.$on('inviteUser', user => {
-            alert('Uitnodiging opnieuw verzenden? (werkt nog niet)')
         });
         Hub.$on('deleteUser', user => {
             this.statusUpdate(null, {active: true});
