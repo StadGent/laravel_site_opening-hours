@@ -194,13 +194,20 @@ export default {
       this.modalWait();
 
       this.modal.strict = true;
+
+      if(!this.validEmail) {
+          this.modalResume();
+          return alert('Dit is geen geldig e-mail adres');
+      }
       if (this.modal.usr) {
         this.modal.user_id = this.modal.usr.id
       }
       if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
+          this.modalResume();
         return
       }
       if (!this.modal.service_id && !this.modal.srv) {
+          this.modalResume();
         return alert('Kies een dienst')
       }
       Hub.$emit('createRole', this.modal)
