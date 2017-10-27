@@ -195,12 +195,13 @@ export default {
 
       this.modal.strict = true;
 
-      if(!this.validEmail) {
+      if(!this.modal.usr && !this.validEmail) {
           this.modalResume();
           return alert('Dit is geen geldig e-mail adres');
       }
       if (this.modal.usr) {
-        this.modal.user_id = this.modal.usr.id
+        this.modal.user_id = this.modal.usr.id;
+        this.modal.email = this.modal.usr.email;
       }
       if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
           this.modalResume();
@@ -210,6 +211,7 @@ export default {
           this.modalResume();
         return alert('Kies een dienst')
       }
+
       Hub.$emit('createRole', this.modal)
     }
   },

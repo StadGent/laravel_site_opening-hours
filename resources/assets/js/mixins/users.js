@@ -64,11 +64,8 @@ export default {
         Hub.$on('createRole', newRole => {
             this.statusUpdate(null, {active: true});
 
-            if (!newRole.service_id && newRole.srv) {
-                newRole.service_id = newRole.srv.id
-            }
-            else {
-                newRole.service_id = this.routeService.id
+            if (!newRole.service_id) {
+                newRole.service_id = newRole.srv.id || this.routeService.id;
             }
 
             newRole.role = newRole.role || 'Member';
@@ -89,7 +86,10 @@ export default {
                 .then(({data}) => {
 
                     // add user to service users
-                    this.routeService.users.push(data);
+                    let serviceIndex = this.services.findIndex(s => s.id === newRole.service_id);
+                    if(serviceIndex > -1 && this.services[serviceIndex].users) {
+                        this.services[serviceIndex].users.push(data);
+                    }
 
                     // update all users if Admin
                     if (this.isAdmin) {
