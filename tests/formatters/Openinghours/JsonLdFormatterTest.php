@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\Formatters;
+namespace Tests\Formatters\Openinghours;
 
 use App\Models\DayInfo;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class OpeninghoursFormatterTest extends \TestCase
+class JsonLdFormatterTest extends \TestCase
 {
     use DatabaseTransactions;
 
     /**
-     * @var App\Formatters\Openinghours
+     * @var App\Formatters\Openinghours\HtmlFormatter
      */
     private $formatter;
 
@@ -24,7 +24,7 @@ class OpeninghoursFormatterTest extends \TestCase
     {
         parent::setup();
 
-        $this->formatter = app('OpeninghoursFormatter');
+        $this->formatter = app('OHJsonLdFormatter');
 
         $this->service = \App\Models\Service::first();
         foreach ($this->service->channels as $channel) {
@@ -52,40 +52,14 @@ class OpeninghoursFormatterTest extends \TestCase
 
     /**
      * @test
-     * @group validation
+     * @group content
+     * @todo check content when structure is known
      */
-    public function testAddUnknownFormatThrowsError()
+    public function testFormatJsonLdEhNotSureYet()
     {
-        $this->setExpectedException(
-            'Exception',
-            'NotAFormatter is not supported as format for App\Formatters\OpeninghoursFormatter'
-        );
-        $this->formatter->addFormat('NotAFormatter');
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function testNoDataThrowsError()
-    {
-        $this->setExpectedException(
-            'Exception',
-            'No data given for formatterApp\Formatters\OpeninghoursFormatter'
-        );
-        $this->formatter->render([]);
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function testRequestUnknownFormatThrowsError()
-    {
-        $this->setExpectedException(
-            'Exception',
-            'Error Processing Request as in absence of a request'
-        );
-        $this->formatter->render(['thisIsData' => true]);
+        $this->formatter->service = $this->service;
+        $this->formatter->render($this->data);
+        $output = $this->formatter->getOutput();
+        // No errors ... no problems
     }
 }

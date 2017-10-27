@@ -21,8 +21,8 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpenNowIsOpen()
     {
-        $call = $this->doRequest('GET', '/api/services/1/open-now?testDateTime=2017-09-05 10:00:00');
-        $content = $this->getContentStructureTested($call);
+        $this->doRequest('GET', '/api/services/1/open-now?testDateTime=2017-09-05 10:00:00');
+        $content = $this->getContentStructureTested();
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = ['channel' => $channel->label, 'channelId' => $channel->id,
@@ -38,8 +38,8 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpenNowIsClosed()
     {
-        $call = $this->doRequest('GET', '/api/services/1/open-now?testDateTime=2017-09-05 12:05:00');
-        $content = $this->getContentStructureTested($call);
+        $this->doRequest('GET', '/api/services/1/open-now?testDateTime=2017-09-05 12:05:00');
+        $content = $this->getContentStructureTested();
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = ['channel' => $channel->label, 'channelId' => $channel->id,
@@ -55,8 +55,8 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursFromUntil()
     {
-        $call = $this->doRequest('GET', '/api/services/1/openinghours?from=2017-09-03&until=2017-09-06');
-        $content = $this->getContentStructureTested($call);
+        $this->doRequest('GET', '/api/services/1/openinghours?from=2017-09-03&until=2017-09-06');
+        $content = $this->getContentStructureTested();
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = [
@@ -80,8 +80,8 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursDayOnRegularDay()
     {
-        $call = $this->doRequest('GET', '/api/services/1/openinghours/day?date=2017-09-05');
-        $content = $this->getContentStructureTested($call);
+        $this->doRequest('GET', '/api/services/1/openinghours/day?date=2017-09-05');
+        $content = $this->getContentStructureTested();
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = [
@@ -103,8 +103,8 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursDayOnExceptionCloseDay()
     {
-        $call = $this->doRequest('GET', '/api/services/1/openinghours/day?date=2017-09-04');
-        $content = $this->getContentStructureTested($call);
+        $this->doRequest('GET', '/api/services/1/openinghours/day?date=2017-09-04');
+        $content = $this->getContentStructureTested();
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = [
@@ -121,8 +121,8 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursWeek()
     {
-        $call = $this->doRequest('GET', '/api/services/1/openinghours/week?date=2017-09-05');
-        $content = $this->getContentStructureTested($call);
+        $this->doRequest('GET', '/api/services/1/openinghours/week?date=2017-09-05');
+        $content = $this->getContentStructureTested();
         foreach ($this->channels as $channel) {
             $expected[] = [
                 'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
@@ -157,8 +157,8 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursMonth()
     {
-        $call = $this->doRequest('GET', '/api/services/1/openinghours/month?date=2017-09-05');
-        $this->getContentStructureTested($call);
+        $this->doRequest('GET', '/api/services/1/openinghours/month?date=2017-09-05');
+        $this->getContentStructureTested();
     }
 
     /**

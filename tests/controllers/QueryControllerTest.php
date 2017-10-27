@@ -144,7 +144,7 @@ class QueryControllerTest extends \TestCase
      */
     public function testValidateOpeninhoursRequiresFromUntilParameters()
     {
-        $path = $this->assemblePath(['type' => 'openinghours', ]);
+        $path = $this->assemblePath(['type' => 'openinghours']);
         $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);
         $call->seeJsonEquals([
@@ -426,23 +426,5 @@ class QueryControllerTest extends \TestCase
         }
 
         return $path;
-    }
-
-    /**
-     *
-     * get contect from call
-     * and do base tests
-     *
-     * @param uri $call
-     * @return array
-     */
-    public function getContentStructureTested($call)
-    {
-        // check status code
-        $call->seeStatusCode(200);
-        $content = $call->decodeResponseJson();
-        $this->assertCount(count($this->channelKeys), $content);
-
-        return $content;
     }
 }

@@ -13,7 +13,7 @@ class JsonLdFormatter extends BaseFormatter
     /**
      * @var string
      */
-    protected $supportFormat = 'json-ld';
+    protected $supportFormat = 'application/ld+json';
     /**
      * contains the uri of the active record service
      * @var string
@@ -30,8 +30,8 @@ class JsonLdFormatter extends BaseFormatter
      */
     public function render($data)
     {
-        if (!$this->service) {
-            throw new \Exception("JSON-LD formatter needs a service to be set", 1);
+        if (!$this->service || !($this->service instanceof \App\Models\Service)) {
+            throw new \Exception("JSON-LD formatter needs a service instance of \App\Models\Service", 1);
         }
         \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
 
