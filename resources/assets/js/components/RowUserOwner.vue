@@ -40,9 +40,6 @@
             changeRole() {
                 Hub.$emit('patchRole', this.u)
             },
-            invite() {
-                Hub.$emit('inviteUser', this.u)
-            }
         }
     }
 </script>

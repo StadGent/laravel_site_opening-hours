@@ -49,9 +49,6 @@ export default {
     }
   },
   methods: {
-    invite () {
-      Hub.$emit('inviteUser', this.u)
-    },
     rm () {
       Hub.$emit('deleteUser', this.u)
     }
