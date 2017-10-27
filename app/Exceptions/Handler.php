@@ -6,8 +6,10 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
@@ -74,15 +76,13 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($request->isJson() || $request->expectsJson()) {
-            $this->initErrorObj();
-            $reflect = new \ReflectionClass($exception);
-            $method = 'handle' . $reflect->getShortName();
-            if (method_exists($this, $method)) {
-                $this->errorObj->code = $reflect->getShortName();
+        $this->initErrorObj();
+        $reflect = new \ReflectionClass($exception);
+        $method = 'handle' . $reflect->getShortName();
+        if (method_exists($this, $method)) {
+            $this->errorObj->code = $reflect->getShortName();
 
-                return $this->$method($exception);
-            }
+            return $this->$method($exception);
         }
 
         return parent::render($request, $exception);
@@ -139,6 +139,21 @@ class Handler extends ExceptionHandler
         $this->errorObj->target = "query";
 
         return response()->json(['error' => $this->errorObj], 405);
+    }
+
+    /**
+     * MethodNotAllowedHttpException
+     * The used HTTP Accept header is not allowed on this route in the API
+     *
+     * @param NotAcceptableHttpException $exception
+     * @return \Illuminate\Http\Response 406
+     */
+    protected function handleNotAcceptableHttpException(NotAcceptableHttpException $exception)
+    {
+        $this->errorObj->message = "The used HTTP Accept header is not allowed on this route in the API";
+        $this->errorObj->target = "query";
+
+        return response()->json(['error' => $this->errorObj], 406);
     }
 
     /**
