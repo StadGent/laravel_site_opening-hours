@@ -205,13 +205,7 @@ class Ical
      */
     public function getPeriodInfo(\DatePeriod $datePeriod)
     {
-        $startDate = new Carbon($datePeriod->getStartDate());
-        $endDate = new Carbon($datePeriod->getEndDate());
-
-        if (empty($this->icalString)) {
-            $this->initParser($startDate, $endDate);
-        }
-
+        $events = $this->getEvents($datePeriod);
         $data = [];
         // Prefill data.
         foreach ($datePeriod as $day) {
@@ -219,8 +213,6 @@ class Ical
             $dayInfo = new DayInfo($carbonDay);
             $data[$carbonDay->toDateString()] = $dayInfo;
         }
-        $events = $this->parser->eventsFromRange($startDate, $endDate);
-        usort($events, [$this, 'sortEvents']);
         foreach ($events as $event) {
             $start = $event->dtstart;
             $end = $event->dtend;
@@ -243,6 +235,26 @@ class Ical
             }
         }
         return $data;
+    }
+
+    /**
+     * Parse all events from the ical string for a given period
+     * @param \DatePeriod $datePeriod
+     *
+     * @return \ICal\Event[]
+     */
+    protected function getEvents(\DatePeriod $datePeriod)
+    {
+        $startDate = new Carbon($datePeriod->getStartDate());
+        $endDate = new Carbon($datePeriod->getEndDate());
+
+        if (empty($this->icalString)) {
+            $this->initParser($startDate, $endDate);
+        }
+
+        $events = $this->parser->eventsFromRange($startDate, $endDate);
+        usort($events, [$this, 'sortEvents']);
+        return $events;
     }
 
     /**
