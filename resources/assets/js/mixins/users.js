@@ -44,7 +44,7 @@ export default {
         translateRole(role) {
             switch (role) {
                 case 'admin':
-                    return'Admin';
+                    return 'Admin';
                 case 'Member':
                     return 'Lid';
                 case 'Owner':
@@ -78,25 +78,19 @@ export default {
                 this.statusUpdate(null, {message: 'createRole: email is missing'});
                 this.modalResume();
                 return;
-            } else if (!newRole.user_id) {
-
-                // TODO change to createOrUpdateUser
-                // Create the missing user based on user.email
-                // After the creation, the role will be added too
-                Hub.$emit('createUser', newRole);
-                return
             }
 
-            this.$http.post('/api/ui/roles', newRole)
-                .then(() => {
-
-                // TODO don't fetch everything...
-                    this.fetchUsers();
-                    this.fetchServices();
-                    this.modalClose();
+            // backend will create the user if not found
+            this.$http.post('/api/ui/inviteuser', newRole)
+                .then((data) => {
+                    console.log(inert(data))
+                    // todo handle result
+                    // update channel users
+                    // update all users if Admin
                 })
+                .then(this.modalClose)
                 .then(this.statusReset)
-                .catch(fetchError)
+
         });
         Hub.$on('patchRole', user => {
             this.statusUpdate(null, {active: true});
@@ -181,13 +175,13 @@ export default {
                 } else {
                     this.fetchServices();
                 }
-                if(this.isAdmin){
+                if (this.isAdmin) {
                     this.fetchUsers();
                 }
                 this.modalClose();
             }).catch(fetchError)
         });
-        //todo can we remove this?
+//todo can we remove this?
         Hub.$on('inviteUser', user => {
             alert('Uitnodiging opnieuw verzenden? (werkt nog niet)')
         });
