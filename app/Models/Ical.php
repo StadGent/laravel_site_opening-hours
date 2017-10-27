@@ -111,7 +111,7 @@ class Ical
             $startDate = new Carbon($event->start_date);
             $endDate = new Carbon($event->end_date);
 
-            if (!$startDate->between($minTimestamp, $maxTimestamp) && !$endDate->between($maxTimestamp, $maxTimestamp)) {
+            if (!$startDate->lessThanOrEqualTo($maxTimestamp) && !$endDate->greaterThanOrEqualTo($minTimestamp)) {
                 continue;
             }
 
@@ -180,7 +180,7 @@ class Ical
         $data = $this->getPeriodInfo($datePeriod);
         $today = reset($data);
         if ($today->open === false) {
-            return true;
+            return false;
         }
         foreach ($today->hours as $slot) {
             $opens = [];
@@ -220,21 +220,21 @@ class Ical
             $data[$carbonDay->toDateString()] = $dayInfo;
         }
         $events = $this->parser->eventsFromRange($startDate, $endDate);
-        usort($events, function ($a, $b) {
-            return $a->priority - $b->priority;
-        });
+        usort($events, [$this, 'sortEvents']);
         foreach ($events as $event) {
             $start = $event->dtstart;
             $end = $event->dtend;
             $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
             $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
             $dayInfo = $data[$dtStart->toDateString()];
-            if ($dayInfo->open !== null) {
+            if ($dayInfo->open === false) {
                 continue;
             }
 
             $dayInfo->open = ($event->status === 'OPEN');
-            $dayInfo->hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
+            if ($dayInfo->open) {
+                $dayInfo->hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
+            }
         }
         foreach ($datePeriod as $day) {
             $carbonDay = Carbon::instance($day);
@@ -251,5 +251,21 @@ class Ical
     public function __toString()
     {
         return $this->icalString;
+    }
+
+    public function sortEvents (\ICal\Event $a, \ICal\Event $b) {
+        $result = $a->priority - $b->priority;
+        if ($result !== 0) {
+          return $result;
+        }
+        $aStart = Carbon::createFromFormat('Ymd\THis', $a->dtstart);
+        $bStart = Carbon::createFromFormat('Ymd\THis', $b->dtstart);
+        if ($aStart > $bStart || $aStart < $bStart) {
+          return $aStart > $bStart;
+        }
+
+        $aEnd = Carbon::createFromFormat('Ymd\THis', $a->dtend);
+        $bEnd = Carbon::createFromFormat('Ymd\THis', $b->dtend);
+        return $aEnd > $bEnd;
     }
 }
