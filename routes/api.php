@@ -25,8 +25,6 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     // channels
     Route::get('/services/{service}/channels', 'UI\ChannelController@getFromService');
     Route::post('/services/{service}/channels', 'UI\ChannelController@store')->middleware('hasRoleInService');
-    Route::put('/services/{service}/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
-    Route::patch('/services/{service}/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
     Route::delete('/services/{service}/channels/{channel}', 'UI\ChannelController@destroy')->middleware('hasRoleInService');
 
     // openinghours
@@ -56,6 +54,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::delete('/users/{user}', 'UI\UsersController@destroy')->middleware('admin');
     // subset
     Route::get('/services/{service}/users', 'UI\UsersController@getFromService')->middleware('isOwner');
+    Route::post('/inviteuser', 'UI\UsersController@invite')->middleware('isOwner');
 });
 
 /****************/
@@ -65,7 +64,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 /* Work models **/
 Route::get('/services', 'ServicesController@index');
 Route::get('/services/{service}', 'ServicesController@show');
-Route::get('/services/{service}/channels', 'ChannelController@getFromService')->middleware('hasRoleInService');;
+Route::get('/services/{service}/channels', 'ChannelController@getFromService')->middleware('hasRoleInService');
 
 /**************************/
 /*  Openinghours results  */

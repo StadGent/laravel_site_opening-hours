@@ -12,6 +12,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class UsersController extends Controller
 {
@@ -110,5 +111,32 @@ class UsersController extends Controller
     public function getFromService(Service $service)
     {
         return app('UserRepository')->getAllInService($service->id);
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function invite(Request $request)
+    {
+        $user = User::where('email', $request->input('email'));
+        if ($user->isEmpty()) {
+            $user = $this->store($request);
+        }
+
+        $role = false;
+        if ($request->input('role')) {
+            $role = Role::where('name', $request->input('role'))->first();
+        }
+        if ($request->input('role_id')) {
+            $role = Role::find($request->input('role_id'));
+        }
+        if (!isset($role->id)) {
+            throw new ValidationException(['message' => ['role' => 'Vallid role is required to invite a user']]);
+        }
+
+        $this->userRepository->linkToService($user->id, $request->input('service_id'), $role->name);
+        $user->fresh();
+
+        return $user;
     }
 }
