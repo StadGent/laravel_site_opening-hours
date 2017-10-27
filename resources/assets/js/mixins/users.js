@@ -92,8 +92,9 @@ export default {
                     this.routeService.users.push(data);
 
                     // update all users if Admin
-                    if(this.isAdmin){
-                        if(this.users.findIndex(u => u.id === data.id) > -1) {
+                    if (this.isAdmin) {
+                        let index = this.users.findIndex(u => u.id === data.id);
+                        if (index > -1) {
                             this.$set(this.users, index, data);
                         }
                         else {
@@ -138,11 +139,26 @@ export default {
             }
 
             this.$http.delete('/api/ui/roles?service_id=' + role.service_id + '&user_id=' + role.user_id)
-                .then((data) => {
-                    console.log(inert(data));
-                    // this.fetchServices();
+                .then(() => {
 
-                    this.
+                    let index = this.routeService.users.findIndex(u => u.id === role.user_id);
+                    if (index > -1) {
+                        this.routeService.users.splice(index, 1);
+                    }
+
+                    if (this.isAdmin) {
+
+                        let userIndex = this.users.findIndex(u => u.id === role.user_id);
+
+                        if (userIndex > -1) {
+
+                            let roleIndex = this.users[userIndex].roles.findIndex(r => r.service_id === role.service_id);
+                            if (roleIndex > -1) {
+                                this.users[userIndex].roles.splice(roleIndex, 1);
+                            }
+                        }
+                    }
+
                     this.modalClose();
                 }).catch(fetchError)
         });
