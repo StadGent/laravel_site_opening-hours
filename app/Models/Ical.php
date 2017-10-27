@@ -111,7 +111,7 @@ class Ical
             $startDate = new Carbon($event->start_date);
             $endDate = new Carbon($event->end_date);
 
-            if (!$startDate->lessThanOrEqualTo($maxTimestamp) && !$endDate->greaterThanOrEqualTo($minTimestamp)) {
+            if ($startDate->greaterThan($maxTimestamp) || $until->lessThan($minTimestamp)) {
                 continue;
             }
 
@@ -150,10 +150,10 @@ class Ical
                 $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . PHP_EOL;
                 $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . PHP_EOL;
                 $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . PHP_EOL;
-                $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->endOfDay()->format('Ymd\THis') . PHP_EOL;
+                $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . PHP_EOL;
                 $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' ;
                 $icalString .=  $calendar->id . PHP_EOL;
-                $icalString .= "END:VEVENT" . PHP_EOL . PHP_EOL;
+                $icalString .= "END:VEVENT" . PHP_EOL;
             }
         }
 
