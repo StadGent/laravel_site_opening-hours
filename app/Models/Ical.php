@@ -253,15 +253,16 @@ class Ical
         return $this->icalString;
     }
 
-    public function sortEvents (\ICal\Event $a, \ICal\Event $b) {
+    public function sortEvents(\ICal\Event $a, \ICal\Event $b)
+    {
         $result = $a->priority - $b->priority;
         if ($result !== 0) {
-          return $result;
+            return $result;
         }
         $aStart = Carbon::createFromFormat('Ymd\THis', $a->dtstart);
         $bStart = Carbon::createFromFormat('Ymd\THis', $b->dtstart);
         if ($aStart > $bStart || $aStart < $bStart) {
-          return $aStart > $bStart;
+            return $aStart > $bStart;
         }
 
         $aEnd = Carbon::createFromFormat('Ymd\THis', $a->dtend);
