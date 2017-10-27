@@ -115,7 +115,7 @@ class UserRepository extends EloquentRepository
      * @param  integer $userId
      * @return array
      */
-    private function getAllRolesForUser($userId)
+    public function getAllRolesForUser($userId)
     {
         $results = DB::select(
             'SELECT * FROM user_service_role WHERE user_id = ?',
