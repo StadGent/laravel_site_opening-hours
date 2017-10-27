@@ -11,7 +11,7 @@ class TextFormatter extends BaseFormatter
     /**
      * @var string
      */
-    protected $supportFormat = 'text';
+    protected $supportFormat = 'text/plain';
     /**
      * Create a readable text
      *
