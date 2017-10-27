@@ -111,10 +111,9 @@ class OpeninghoursService
                 // create Ical and collect data
                 $ical = $openinghours->ical();
                 $ical->createIcalString($calendarBegin, $calendarEnd);
-                $dayInfo = $ical->getDayInfo($calendarBegin, true);
-                // set results to endData
-                $openNow->status = $dayInfo->open ? true : false;
-                $openNow->label = $dayInfo->open ? trans('openinghourApi.OPEN') : trans('openinghourApi.CLOSED');
+                $open = $ical->getOpenAt($calendarBegin);
+                $openNow->status = $open ? true : false;
+                $openNow->label = $open ? trans('openinghourApi.OPEN') : trans('openinghourApi.CLOSED');
             }
         }
 
@@ -193,13 +192,11 @@ class OpeninghoursService
                 $calendarEnd = clone $end;
             }
 
-            $datePeriod = new \DatePeriod($calendarBegin, $this->dayInterval, $calendarEnd);
+            $datePeriod = new \DatePeriod($calendarBegin->startOfDay(), $this->dayInterval, $calendarEnd->endOfDay());
 
             $ical = $openinghours->ical();
             $ical->createIcalString($calendarBegin, $calendarEnd);
-            foreach ($datePeriod as $day) {
-                $channelData->openinghours[$day->toDateString()] = $ical->getDayInfo($day);
-            }
+            $channelData->openinghours = $ical->getPeriodInfo($datePeriod);
         }
 
         return $this;
