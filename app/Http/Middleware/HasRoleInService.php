@@ -10,8 +10,8 @@ use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 
-class HasRoleInService {
-
+class HasRoleInService
+{
     /**
      * Handle an incoming request.
      *
@@ -20,7 +20,8 @@ class HasRoleInService {
      *
      * @return mixed
      */
-    public function handle($request, Closure $next) {
+    public function handle($request, Closure $next)
+    {
         if ($request->user('api')->hasRole('Admin')) {
             return $next($request);
         }
@@ -38,8 +39,9 @@ class HasRoleInService {
     /**
      * @param Request $request
      */
-    private function findTheServiceInTheRequest(Request $request) {
-        switch (TRUE) {
+    private function findTheServiceInTheRequest(Request $request)
+    {
+        switch (true) {
             case isset($request->calendar):
                 return Calendar::findOrFail($request->calendar)
                     ->openinghours
@@ -61,7 +63,8 @@ class HasRoleInService {
                     ->service
                     ->id;
             case isset($request->service):
-                return $request->service->id;
+                return Service::findOrFail($request->service)
+                    ->id;
             case isset($request->service_id):
                 return $request->service_id;
 
