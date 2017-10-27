@@ -5,6 +5,7 @@ namespace App\Formatters\Openinghours;
 use App\Formatters\FormatterInterface;
 use App\Models\Openinghours;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 /**
  *
@@ -22,14 +23,39 @@ abstract class BaseFormatter implements FormatterInterface
     protected $supportFormat = null;
 
     /**
+     * @var string
+     */
+    protected $dateFormat = '';
+
+    /**
+     * @var string
+     */
+    protected $timeFormat = '';
+
+    /**
      *
      * @param Illuminate\Database\Eloquent\Model $data
      */
     abstract public function render($data);
 
     /**
+     * Be able to manipulate the formats without an actual http request
+     *
+     * initial purpose is to be set for unit tests
+     *
+     * @param string $dateFormat
+     * @param string $timeFormat
+     */
+    public function setDateTimeFormats($dateFormat, $timeFormat)
+    {
+        $this->dateFormat = $dateFormat;
+        $this->timeFormat = $timeFormat;
+    }
+
+    /**
      * Getter of supportFormat
-     * @return string $this->supportFormat
+     *
+     * @return string
      */
     public function getSupportFormat()
     {
@@ -43,14 +69,14 @@ abstract class BaseFormatter implements FormatterInterface
     /**
      * Print a textual representation of a day schedule
      *
-     * @param  string|array $dayInfo
+     * @param  array $openinghours
      * @return string
      */
     protected function makeTextForDayInfo($openinghours)
     {
         $text = '';
         foreach ($openinghours as $ohObj) {
-            $text .= date('d-m-Y', strtotime($ohObj->date)) . ': ';
+            $text .= date($this->dateFormat, strtotime($ohObj->date)) . ': ';
             if (!$ohObj->open) {
                 $text .= '   ' . trans('openinghourApi.CLOSED');
                 $text .= PHP_EOL;
@@ -58,7 +84,11 @@ abstract class BaseFormatter implements FormatterInterface
             }
 
             foreach ($ohObj->hours as $hoursObj) {
-                $text .= '   ' . $hoursObj['from'] . " - " . $hoursObj['until'];
+                $text .= '   ' . trans('openinghourApi.FROM_HOUR') . ' ' . date(
+                    $this->timeFormat,
+                 strtotime($hoursObj['from'])
+                ) . "  " . trans('openinghourApi.UNTIL_HOUR') . " " .
+                date($this->timeFormat, strtotime($hoursObj['until']));
             }
             $text .= PHP_EOL;
         }

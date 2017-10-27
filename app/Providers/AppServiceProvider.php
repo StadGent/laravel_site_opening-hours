@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        /** OBSERVERS **/
+        /* OBSERVERS */
         Calendar::observe(CalendarObserver::class);
         Channel::observe(ChannelObserver::class);
         Openinghours::observe(OpeninghoursObserver::class);
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        /** REPOSITORIES **/
+        /* REPOSITORIES **/
         $this->app->bind('UserRepository', function ($app) {
             return new \App\Repositories\UserRepository(
                 new \App\Models\User()
@@ -75,7 +75,7 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        /** SERVICES **/
+        /* SERVICES **/
         $this->app->singleton('ChannelService', function ($app) {
             return \App\Services\ChannelService::getInstance();
         });
@@ -92,7 +92,11 @@ class AppServiceProvider extends ServiceProvider
             return \App\Services\VestaService::getInstance();
         });
 
-        /** FORMATTERS **/
+        $this->app->singleton('LocaleService', function ($app) {
+            return \App\Services\LocaleService::getInstance();
+        });
+
+        /* FORMATTERS **/
         $this->app->bind('OHJsonFormatter', function () {
             return new \App\Formatters\Openinghours\JsonFormatter();
         });
