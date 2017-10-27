@@ -4,14 +4,14 @@ namespace Tests\Controllers\UI;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ServicesControllerTest extends \TestCase
+class ChannelControllerTest extends \TestCase
 {
     use DatabaseTransactions;
 
     /**
      * @var string
      */
-    protected $apiUrl = '/api/ui/services';
+    protected $apiUrl = '/api/ui/services/1/channels';
     /**
      * @test
      */
@@ -32,7 +32,8 @@ class ServicesControllerTest extends \TestCase
         $this->actingAs($user, 'api');
         $call = $this->doRequest('GET', $this->apiUrl);
         $content = $this->getContentStructureTested($call);
-        $this->assertCount(count(\App\Models\Service::all()), $content);
+        $service = \App\Models\Service::find(1);
+        $this->assertCount($service->channels->count(), $content);
     }
 
     /**
@@ -45,7 +46,8 @@ class ServicesControllerTest extends \TestCase
 
         $call = $this->doRequest('GET', $this->apiUrl);
         $content = $this->getContentStructureTested($call);
-        $this->assertCount(1, $content);
+        $service = \App\Models\Service::find(1);
+        $this->assertCount($service->channels->count(), $content);
     }
 
     /**
@@ -55,37 +57,38 @@ class ServicesControllerTest extends \TestCase
      * ['userRole', verb', 'uri', 'data', 'responce status'] // Resource controller action
      * @return array
      */
+    
     public function requestTypeProvider()
     {
         return [
             //  unauth user
-            ['unauth', 'get', '', [], '401'], // index
-            ['unauth', 'post', '', [], '405'], // store
-            ['unauth', 'get', '1', [], '401'], // show
+            ['unauth', 'get', '', [], '401'], // getFromService
+            ['unauth', 'post', '', [], '401'], // store
+            ['unauth', 'get', '1', [], '405'], // show
             ['unauth', 'put', '1', [], '401'], // update (full)
             ['unauth', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['unauth', 'delete', '1', [], '405'], // destroy
+            ['unauth', 'delete', '1', [], '401'], // destroy
             // admin user
-            ['admin', 'get', '', [], '200'], // index
-            ['admin', 'post', '', [], '405'], // store
-            ['admin', 'get', '1', [], '200'], // show
+            ['admin', 'get', '', [], '200'], // getFromService
+            ['admin', 'post', '', ['label' => 'test', 'service_id' => 1], '200'], // store
+            ['admin', 'get', '1', [], '405'], // show
             ['admin', 'put', '1', [], '200'], // update (full)
             ['admin', 'patch', '1', ['draft' => false], '200'], // update (partial)
-            ['admin', 'delete', '1', [], '405'], // destroy
+            ['admin', 'delete', '1', [], '200'], // destroy
             // owner user
-            ['owner', 'get', '', [], '200'], // index
-            ['owner', 'post', '', [], '405'], // store
-            ['owner', 'get', '1', [], '200'], // show
+            ['owner', 'get', '', [], '200'], // getFromService
+            ['owner', 'post', '', ['label' => 'test', 'service_id' => 1], '200'], // store
+            ['owner', 'get', '1', [], '405'], // show
             ['owner', 'put', '1', [], '200'], // update (full)
             ['owner', 'patch', '1', ['draft' => false], '200'], // update (partial)
-            ['owner', 'delete', '1', [], '405'], // destroy
+            ['owner', 'delete', '1', [], '200'], // destroy
             // member user
-            ['member', 'get', '', [], '200'], // index
-            ['member', 'post', '', [], '405'], // store
-            ['member', 'get', '1', [], '200'], // show
-            ['member', 'put', '1', [], '401'], // update (full)
-            ['member', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['member', 'delete', '1', [], '405'], // destroy
+            ['member', 'get', '', [], '200'], // getFromService
+            ['member', 'post', '', ['label' => 'test', 'service_id' => 1], '200'], // store
+            ['member', 'get', '1', [], '405'], // show
+            ['member', 'put', '1', [], '200'], // update (full)
+            ['member', 'patch', '1', ['draft' => false], '200'], // update (partial)
+            ['member', 'delete', '1', [], '200'], // destroy
         ];
     }
 

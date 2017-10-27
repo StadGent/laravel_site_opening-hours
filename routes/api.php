@@ -23,12 +23,11 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     Route::delete('/calendars/{calendar}', 'UI\CalendarsController@destroy')->middleware('hasRoleInService');
 
     // channels
-    Route::post('/channels', 'UI\ChannelController@store')->middleware('hasRoleInService');
-    Route::put('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
-    Route::patch('/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
-    Route::delete('/channels/{channel}', 'UI\ChannelController@destroy')->middleware('hasRoleInService');
-    // subset
     Route::get('/services/{service}/channels', 'UI\ChannelController@getFromService');
+    Route::post('/services/{service}/channels', 'UI\ChannelController@store')->middleware('hasRoleInService');
+    Route::put('/services/{service}/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
+    Route::patch('/services/{service}/channels/{channel}', 'UI\ChannelController@update')->middleware('hasRoleInService');
+    Route::delete('/services/{service}/channels/{channel}', 'UI\ChannelController@destroy')->middleware('hasRoleInService');
 
     // openinghours
     Route::get('/openinghours/{openinghours}', 'UI\OpeninghoursController@show');
@@ -48,8 +47,8 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
     // services
     Route::get('/services', 'UI\ServicesController@index');
     Route::get('/services/{service}', 'UI\ServicesController@show');
-    Route::put('/services/{service}', 'UI\ServicesController@update')->middleware('hasRoleInService');
-    Route::patch('/services/{service}', 'UI\ServicesController@update')->middleware('hasRoleInService');
+    Route::put('/services/{service}', 'UI\ServicesController@update')->middleware('isOwner');
+    Route::patch('/services/{service}', 'UI\ServicesController@update')->middleware('isOwner');
 
     // users
     Route::get('/users', 'UI\UsersController@index')->middleware('admin');
@@ -66,7 +65,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 /* Work models **/
 Route::get('/services', 'ServicesController@index');
 Route::get('/services/{service}', 'ServicesController@show');
-Route::get('/services/{service}/channels', 'ChannelController@getFromService');
+Route::get('/services/{service}/channels', 'ChannelController@getFromService')->middleware('hasRoleInService');;
 
 /**************************/
 /*  Openinghours results  */
