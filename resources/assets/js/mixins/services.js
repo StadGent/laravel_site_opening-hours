@@ -189,7 +189,7 @@ export default {
             }
 
             channel.service_id = channel.srv && channel.srv.id;
-            this.$http.post('/api/ui/channels', channel)
+            this.$http.post('/api/ui/services/' + channel.service_id + '/channels', channel)
                 .then(({data}) => {
                     this.routeService.channels.push(data);
                     this.modalClose();
@@ -209,7 +209,7 @@ export default {
                 this.statusReset();
                 return;
             }
-            this.$http.delete('/api/ui/channels/' + channel.id)
+            this.$http.delete('/api/ui/services/' + channel.service_id + '/channels/' + channel.id)
                 .then(() => {
 
                     // remove channel from routeService

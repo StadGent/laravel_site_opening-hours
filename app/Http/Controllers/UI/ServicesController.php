@@ -63,15 +63,6 @@ class ServicesController extends Controller
      */
     public function update(Request $request, Service $service)
     {
-        // should be handled by routes... but just to be sure
-        if (!$request->user('api')) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
-        }
-        // only allowed for admin user
-        if (!$request->user('api')->hasRole('Admin')) {
-            return response()->json(['message' => 'Method not allowed'], 405);
-        }
-
         // The only field we allow to be updated is the draft flag
         $draft = $request->input('draft', null);
 

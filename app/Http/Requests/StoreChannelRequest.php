@@ -15,11 +15,9 @@ class StoreChannelRequest extends FormRequest
      * @param Request $request
      * @return bool
      */
-    public function authorize(UserRepository $users, Request $request)
+    public function authorize(Request $request)
     {
-        return $this->user()->hasRole('Admin')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Member');
+        return true;
     }
 
     /**

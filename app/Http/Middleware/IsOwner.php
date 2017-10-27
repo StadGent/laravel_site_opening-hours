@@ -17,9 +17,8 @@ class IsOwner extends HasRoleInService
      */
     public function handle($request, Closure $next)
     {
-
         if ($request->user('api')->hasRole('Admin')) {
-          return $next($request);
+            return $next($request);
         }
 
         $requestServiceId = $this->findTheServiceInTheRequest($request);
@@ -30,7 +29,7 @@ class IsOwner extends HasRoleInService
         if ($allowedServices
           ->where('id', $requestServiceId)
           ->count()) {
-          return $next($request);
+            return $next($request);
         }
 
         throw new AuthenticationException("Unauthorized");

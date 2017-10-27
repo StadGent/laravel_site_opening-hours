@@ -42,13 +42,33 @@ class HasRoleInService
     {
         switch (true) {
             case isset($request->calendar):
-                return $request->calendar->openinghours->channel->service->id;
+                $calendar = $request->calendar;
+                if (!($request->calendar instanceof Calendar)) {
+                    $calendar = Calendar::find($calendar);
+                }
+
+                return $calendar->openinghours->channel->service->id;
             case isset($request->openinghours):
-                return $request->openinghours->channel->service->id;
+                $openinghours = $request->openinghours;
+                if (!($request->openinghours instanceof Openinghours)) {
+                    $openinghours = Openinghours::find($openinghours);
+                }
+
+                return $openinghours->channel->service->id;
             case isset($request->channel):
-                return $request->channel->service->id;
+                $channel = $request->channel;
+                if (!($request->channel instanceof Channel)) {
+                    $channel = Channel::find($channel);
+                }
+
+                return $channel->service->id;
             case isset($request->service):
-                return $request->service->id;
+                $service = $request->service;
+                if (!($request->service instanceof Service)) {
+                    $service = Service::find($service);
+                }
+
+                return $service->id;
             case isset($request->service_id):
                 return $request->service_id;
 
