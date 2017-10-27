@@ -108,14 +108,19 @@ class Ical
             $until = new Carbon($event->until);
             $until->endOfDay();
 
-            if (!empty($maxTimestamp) && $event->until > $maxTimestamp && $maxTimestamp > $event->start_date) {
+            $startDate = new Carbon($event->start_date);
+            $endDate = new Carbon($event->end_date);
+
+            if (!$startDate->between($minTimestamp, $maxTimestamp) && !$endDate->between($maxTimestamp, $maxTimestamp)) {
+                continue;
+            }
+
+            if (!empty($maxTimestamp) && $until->greaterThan($maxTimestamp) && $maxTimestamp->greaterThan($startDate)) {
                 $until = $maxTimestamp;
             }
 
-            if ($until >= $minTimestamp || empty($minTimestamp)) {
+            if (empty($minTimestamp) || $until->greaterThanOrEqualTo($minTimestamp)) {
                 // Performance tweak
-                $startDate = new Carbon($event->start_date);
-                $endDate = new Carbon($event->end_date);
                 if ($startDate < $minTimestamp) {
                     $startDate->day = $minTimestamp->day;
                     $startDate->month = $minTimestamp->month;
