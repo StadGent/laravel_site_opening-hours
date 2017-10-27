@@ -42,24 +42,16 @@ export default {
             }
         },
         translateRole(role) {
-
-            let translation;
-
             switch (role) {
                 case 'admin':
-                    translation = 'Admin';
-                    break;
+                    return'Admin';
                 case 'Member':
-                    translation = 'Lid';
-                    break;
+                    return 'Lid';
                 case 'Owner':
-                    translation = 'Eigenaar';
-                    break;
+                    return 'Eigenaar';
                 default:
-                    translation = role;
+                    return role;
             }
-
-            return translation;
         }
     },
     mounted() {
@@ -157,7 +149,6 @@ export default {
                 this.modalClose();
             }).catch(fetchError)
         });
-
         Hub.$on('createUser', newUser => {
             this.statusUpdate(null, {active: true});
 
