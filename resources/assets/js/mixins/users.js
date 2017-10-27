@@ -14,6 +14,7 @@ export default {
     computed: {},
     methods: {
         fetchUsers(service_ID) {
+
             this.statusUpdate(null, {active: true});
 
             if (service_ID) {
@@ -28,6 +29,7 @@ export default {
                             throw error;
                         }
                     })
+                    .then(this.statusReset)
                     .catch(fetchError)
             }
             else {
