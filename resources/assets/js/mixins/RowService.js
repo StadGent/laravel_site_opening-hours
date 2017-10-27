@@ -1,4 +1,9 @@
 import {hasActiveOh, hasOh} from "../lib";
+import {
+    SERVICE_COMPLETE, SERVICE_COMPLETE_TOOLTIP, SERVICE_INACTIVE_OH, SERVICE_INACTIVE_OH_TOOLTIP, SERVICE_MISSING_OH,
+    SERVICE_MISSING_OH_TOOLTIP, SERVICE_NO_CH, SERVICE_NO_CH_TOOLTIP,
+    TEST
+} from "../constants";
 
 export default {
     props: ['s'],
@@ -8,56 +13,56 @@ export default {
         },
         statusClass() {
             return {
-                'text-success': this.statusMessage === '✓ Volledig',
-                'warning': this.statusMessage !== '✓ Volledig'
+                'text-success': this.statusMessage === SERVICE_COMPLETE,
+                'warning': this.statusMessage !== SERVICE_COMPLETE
             }
         },
-        statusMessage() {
+        statusMessage: function () {
 
             if (!this.s.channels) {
                 if (this.s.countChannels === 0) {
-                    return 'Geen kanalen';
+                    return SERVICE_NO_CH;
                 }
 
                 if (this.s.has_missing_oh === 1 || this.s.has_missing_oh === true) {
-                    return 'Ontbrekende kalender(s)';
+                    return SERVICE_MISSING_OH;
                 }
 
                 if (this.s.has_inactive_oh === 1 || this.s.has_inactive_oh === true) {
-                    return 'Ontbrekende actieve kalender(s)';
+                    return SERVICE_INACTIVE_OH;
                 }
             }
             else {
 
                 if (this.s.channels.length === 0) {
-                    return 'Geen kanalen';
+                    return SERVICE_NO_CH;
                 }
 
                 // Not every channel of the service has at least 1 version
                 if (this.s.channels.filter(ch => !hasOh(ch).length).length) {
-                    return 'Ontbrekende kalender(s)'
+                    return SERVICE_MISSING_OH;
                 }
 
                 // Not every channel of the service has at least 1 active version
                 if (this.s.channels.filter(ch => !hasActiveOh(ch).length).length) {
-                    return 'Ontbrekende actieve kalender(s)'
+                    return SERVICE_INACTIVE_OH;
                 }
             }
 
-            return '✓ Volledig';
+            return SERVICE_COMPLETE;
         },
 
         // TODO: refactor into structured set of messages
         statusTooltip() {
             switch (this.statusMessage) {
-                case 'Geen kanalen':
-                    return 'Deze dienst heeft geen kanalen.';
-                case 'Ontbrekende kalender(s)':
-                    return 'Minstens 1 van de kanalen van deze dienst heeft geen versie.';
-                case 'Ontbrekende actieve kalender(s)':
-                    return 'Alle kanalen hebben een versie maar minstens 1 kanaal heeft geen versie die nu geldt. Een versie geldt niet als deze verlopen is of pas in de toekomst actief wordt.';
-                case '✓ Volledig':
-                    return 'Alle kanalen hebben minstens een kalenderversie die nu geldig is.';
+                case SERVICE_NO_CH:
+                    return SERVICE_NO_CH_TOOLTIP;
+                case SERVICE_MISSING_OH:
+                    return SERVICE_MISSING_OH_TOOLTIP;
+                case SERVICE_INACTIVE_OH:
+                    return SERVICE_INACTIVE_OH_TOOLTIP;
+                case SERVICE_COMPLETE:
+                    return SERVICE_COMPLETE_TOOLTIP;
             }
         }
     },

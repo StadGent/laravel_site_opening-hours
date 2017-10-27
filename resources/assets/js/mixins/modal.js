@@ -68,15 +68,15 @@ export default {
     },
 
     newUser(srv) {
-      this.modal.text = 'newUser'
+      this.modal.text = 'newUser';
       this.modal.role = 'Member'
     },
     newRole(srv) {
-      this.modal.text = 'newRole'
+      this.modal.text = 'newRole';
       this.modal.srv = srv
     },
     newRoleForUser(usr) {
-      this.modal.text = 'newRoleForUser'
+      this.modal.text = 'newRoleForUser';
       this.modal.usr = usr
       this.modal.role = 'Member'
     }

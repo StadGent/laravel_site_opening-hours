@@ -2,13 +2,12 @@
   <div class="container">
     <h1>Kanalen <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
 
-    <span v-if="isOwner">
-      <div class="btn-group">
-        <button type="button" class="btn btn-primary" :class="{active: !route.tab2}" @click="route.tab2=0">Toon kanalen</button>
-        <button type="button" class="btn btn-primary" :class="{active: route.tab2}" @click="route.tab2='users'">Toon gebruikers</button>
-      </div>
-      <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
-    </span>
+    <div v-if="isOwner" class="btn-group">
+      <button type="button" class="btn btn-primary" :class="{active: !route.tab2}" @click="route.tab2=0">Toon kanalen</button>
+      <button type="button" class="btn btn-primary" :class="{active: route.tab2}" @click="route.tab2='users'">Toon gebruikers</button>
+    </div>
+
+    <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
     <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)" :disabled="$root.isRecreatex">+ Nieuw kanaal</button>
 
     <div v-if="isOwner&&route.tab2==='users'" class="row">
@@ -76,11 +75,6 @@
         </tbody>
       </table>
     </div>
-
- <!--    <div style="padding-top:10em">
-      <h3>Debug info</h3>
-      <pre v-text="srv"></pre>
-    </div> -->
   </div>
 </template>
 
@@ -101,12 +95,8 @@ export default {
       service: null
     }
   },
-    created() {
-//      if(!this.srv.channels) {
-//          console.info('no channels found, fetching now...');
-//          Hub.$emit('fetchChannels');
-//      }
-    },
+  created() {
+  },
   computed: {
     srv () {
       return this.$root.routeService

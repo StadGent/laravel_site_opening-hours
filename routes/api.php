@@ -53,7 +53,7 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 
     // users
     Route::get('/users', 'UI\UsersController@index')->middleware('admin');
-    Route::post('/users', 'UI\UsersController@store')->middleware('admin');
+    Route::post('/users', 'UI\UsersController@store')->middleware('isOwner');
     Route::delete('/users/{user}', 'UI\UsersController@destroy')->middleware('admin');
     // subset
     Route::get('/services/{service}/users', 'UI\UsersController@getFromService')->middleware('isOwner');
