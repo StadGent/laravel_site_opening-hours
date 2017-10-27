@@ -10,17 +10,17 @@ use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 
-class HasRoleInService
-{
+class HasRoleInService {
+
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
+     *
      * @return mixed
      */
-    public function handle($request, Closure $next)
-    {
+    public function handle($request, Closure $next) {
         if ($request->user('api')->hasRole('Admin')) {
             return $next($request);
         }
@@ -38,17 +38,32 @@ class HasRoleInService
     /**
      * @param Request $request
      */
-    private function findTheServiceInTheRequest(Request $request)
-    {
-        switch (true) {
+    private function findTheServiceInTheRequest(Request $request) {
+        switch (TRUE) {
             case isset($request->calendar):
-                return $request->calendar->openinghours->channel->service->id;
+                return Calendar::findOrFail($request->calendar)
+                    ->openinghours
+                    ->channel
+                    ->service
+                    ->id;
             case isset($request->openinghours):
-                return $request->openinghours->channel->service->id;
+                return Openinghours::findOrFail($request->openinghours)
+                    ->channel
+                    ->service
+                    ->id;
+            case isset($request->openinghours_id):
+                return Openinghours::findOrFail($request->openinghours_id)
+                    ->channel
+                    ->service
+                    ->id;
             case isset($request->channel):
-                return $request->channel->service->id;
+                return Channel::findOrFail($request->channel)
+                    ->service
+                    ->id;
             case isset($request->service):
                 return $request->service->id;
+            case isset($request->service_id):
+                return $request->service_id;
 
             default:
                 throw new AuthenticationException("Unauthorized");
