@@ -86,11 +86,20 @@ export default {
 
             // backend will create the user if not found
             this.$http.post('/api/ui/inviteuser', newRole)
-                .then((data) => {
-                    console.log(inert(data))
-                    // todo handle result
-                    // update channel users
+                .then(({data}) => {
+
+                    // add user to service users
+                    this.routeService.users.push(data);
+
                     // update all users if Admin
+                    if(this.isAdmin){
+                        if(this.users.findIndex(u => u.id === data.id) > -1) {
+                            this.$set(this.users, index, data);
+                        }
+                        else {
+                            this.users.push(data);
+                        }
+                    }
                 })
                 .then(this.modalClose)
                 .then(this.statusReset)
@@ -129,67 +138,15 @@ export default {
             }
 
             this.$http.delete('/api/ui/roles?service_id=' + role.service_id + '&user_id=' + role.user_id)
-                .then(() => {
-                    this.fetchServices();
+                .then((data) => {
+                    console.log(inert(data));
+                    // this.fetchServices();
+
+                    this.
                     this.modalClose();
                 }).catch(fetchError)
         });
 
-        // todo: can this go?
-        Hub.$on('fetchUser', newRole => {
-            this.statusUpdate(null, {active: true});
-
-            if (!newRole.service_id) {
-                newRole.service_id = this.routeService.id
-            }
-            newRole.role = newRole.role || 'Member';
-            newRole.user_id = newRole.user_id || newRole.id;
-            if (!newRole.user_id && !newRole.email) {
-                // Cannot continue without at least one of these
-                this.statusUpdate(null, {message: 'createRole: email is missing'});
-                return;
-            } else if (!newRole.user_id) {
-                // Create the missing user based on user.email
-                // After the creation, the role will be added too
-                Hub.$emit('createUser', newRole);
-                return
-            }
-
-            this.$http.post('/api/ui/roles', newRole).then(() => {
-                this.fetchUsers();
-                this.fetchServices();
-                this.modalClose();
-            }).catch(fetchError)
-        });
-
-        // todo: can this go?
-        Hub.$on('createUser', newUser => {
-            this.statusUpdate(null, {active: true});
-
-            if (newUser.id) {
-                this.statusUpdate(null, {message: 'createRole: this user probably already exists'});
-                return;
-            }
-            if (!newUser.email) {
-                this.statusUpdate(null, {message: 'createRole: email is missing'});
-                return;
-            }
-
-            newUser.name = newUser.name || newUser.email;
-
-            this.$http.post('/api/ui/users', newUser).then(({data}) => {
-                Object.assign(newUser, data);
-                if (newUser.role) {
-                    Hub.$emit('createRole', newUser);
-                } else {
-                    this.fetchServices();
-                }
-                if (this.isAdmin) {
-                    this.fetchUsers();
-                }
-                this.modalClose();
-            }).catch(fetchError)
-        });
         Hub.$on('deleteUser', user => {
             this.statusUpdate(null, {active: true});
 
