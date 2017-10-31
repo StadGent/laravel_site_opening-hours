@@ -34,15 +34,16 @@ class RolesController extends Controller
     {
         $input = $request->input();
 
-        $success = $this->users->linkToService($input['user_id'],
-            $input['service_id'], $input['role']);
+        $success = $this
+            ->users
+            ->linkToService($input['user_id'], $input['service_id'], $input['role']);
 
         if ($success) {
             return response()->json(['message' => 'De rol werd toegevoegd.']);
         }
 
-        return response()->json(['message' => 'Er is iets misgegaan tijdens het toevoegen van de rol.'],
-            400);
+        return response()
+            ->json(['message' => 'Er is iets misgegaan tijdens het toevoegen van de rol.'], 400);
     }
 
     /**
@@ -57,15 +58,16 @@ class RolesController extends Controller
     {
         $input = $request->input();
 
-        $success = $this->users->linkToService($input['user_id'],
-            $input['service_id'], $input['role']);
+        $success = $this
+            ->users
+            ->linkToService($input['user_id'], $input['service_id'], $input['role']);
 
         if ($success) {
             return response()->json(['role' => $input['role']]);
         }
 
-        return response()->json(['message' => 'Er is iets misgegaan tijdens het aanpassen van de rol.'],
-            400);
+        return response()
+            ->json(['message' => 'Er is iets misgegaan tijdens het aanpassen van de rol.'], 400);
     }
 
     /**
@@ -86,7 +88,7 @@ class RolesController extends Controller
             return response()->json(['message' => 'De gebruiker werd bijgewerkt.']);
         }
 
-        return response()->json(['message' => 'Er is iets foutgegaan bij het bewerken van een gebruiker.'],
-            400);
+        return response()
+            ->json(['message' => 'Er is iets foutgegaan bij het bewerken van een gebruiker.'], 400);
     }
 }

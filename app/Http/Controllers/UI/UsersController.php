@@ -52,12 +52,10 @@ class UsersController extends Controller
     private function store(Request $request)
     {
         // Check if the user already exists
-        if ( ! $this->userRepository->where('email', $request->input('email'))
-            ->get()
-            ->isEmpty()) {
+        if (!$this->userRepository->where('email', $request->input('email'))->get()->isEmpty()) {
             // find correct duplicate data error code
-            return response()->json(['message' => 'This User already exists in the DB.'],
-                400);
+            return response()
+                ->json(['message' => 'This User already exists in the DB.'], 400);
         }
 
         $input = $request->input();
@@ -66,7 +64,7 @@ class UsersController extends Controller
 
         $userId = $this->userRepository->store($input);
         $user = $this->userRepository->getById($userId);
-        if ( ! $user) {
+        if (!$user) {
             return response()->json(['message' => 'Something went wrong while storing the user, check the logs.'],
                 400);
         }
@@ -109,8 +107,8 @@ class UsersController extends Controller
             return response()->json($users);
         }
 
-        return response()->json('Something went wrong while deleting the user, check the logs for more info.',
-            400);
+        return response()
+            ->json('Something went wrong while deleting the user, check the logs for more info.', 400);
     }
 
     /**
@@ -141,12 +139,12 @@ class UsersController extends Controller
         if ($request->input('role_id')) {
             $role = Role::find($request->input('role_id'));
         }
-        if ( ! isset($role->id)) {
+        if (!isset($role->id)) {
             throw new ValidationException(['message' => ['role' => 'Vallid role is required to invite a user']]);
         }
 
-        $this->userRepository->linkToService($user->id,
-            $request->input('service_id'), $role->name);
+        $this->userRepository
+            ->linkToService($user->id, $request->input('service_id'), $role->name);
         $user->fresh();
 
         $user->role = $role->name;
