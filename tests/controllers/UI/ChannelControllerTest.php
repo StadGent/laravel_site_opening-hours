@@ -17,8 +17,6 @@ class ChannelControllerTest extends \TestCase
      */
     public function testGetNoUiServicesWithoutAuth()
     {
-        //$this->withoutMiddleware();
-
         $call = $this->doRequest('GET', $this->apiUrl);
         $call->seeStatusCode(401);
     }
@@ -55,6 +53,7 @@ class ChannelControllerTest extends \TestCase
      *
      * Datastructure:
      * ['userRole', verb', 'uri', 'data', 'responce status'] // Resource controller action
+     *
      * @return array
      */
     

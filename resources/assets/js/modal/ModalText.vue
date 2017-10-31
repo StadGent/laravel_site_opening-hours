@@ -103,6 +103,7 @@ import Pikaday from '../components/Pikaday.vue'
 import Status from '../components/Status.vue'
 
 import { Hub, toDatetime } from '../lib.js'
+import {CHOOSE_SERVICE, NO_VALID_EMAIL, OH_INVALID_RANGE} from "../constants";
 
 export default {
   computed: {
@@ -168,7 +169,7 @@ export default {
         });
 
         if (invalid) {
-          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.')
+          return alert(OH_INVALID_RANGE);
         }
 
         // Update the event until date
@@ -195,9 +196,9 @@ export default {
 
       this.modal.strict = true;
 
-      if(!this.modal.usr && !this.validEmail) {
+      if (!this.modal.usr && !this.validEmail) {
           this.modalResume();
-          return alert('Dit is geen geldig e-mail adres');
+          return alert(NO_VALID_EMAIL);
       }
       if (this.modal.usr) {
         this.modal.user_id = this.modal.usr.id;
@@ -209,7 +210,7 @@ export default {
       }
       if (!this.modal.service_id && !this.modal.srv) {
           this.modalResume();
-        return alert('Kies een dienst')
+        return alert(CHOOSE_SERVICE)
       }
 
       Hub.$emit('inviteUser', this.modal)
