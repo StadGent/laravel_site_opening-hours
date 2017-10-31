@@ -212,7 +212,7 @@ export default {
         return alert('Kies een dienst')
       }
 
-      Hub.$emit('createRole', this.modal)
+      Hub.$emit('inviteUser', this.modal)
     }
   },
   updated () {
