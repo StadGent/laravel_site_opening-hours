@@ -15,8 +15,8 @@ class HasRoleInService
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      *
      * @return mixed
      */
@@ -39,35 +39,39 @@ class HasRoleInService
     /**
      * @param Request $request
      */
-    private function findTheServiceInTheRequest(Request $request)
+    protected function findTheServiceInTheRequest(Request $request)
     {
         switch (true) {
             case isset($request->calendar):
-                return Calendar::findOrFail($request->calendar)
-                    ->openinghours
-                    ->channel
-                    ->service
-                    ->id;
+                $calendar = $request->calendar;
+                if (!($request->calendar instanceof Calendar)) {
+                    $calendar = Calendar::find($calendar);
+                }
+
+                return $calendar->openinghours->channel->service->id;
             case isset($request->openinghours):
-                return Openinghours::findOrFail($request->openinghours)
-                    ->channel
-                    ->service
-                    ->id;
-            case isset($request->openinghours_id):
-                return Openinghours::findOrFail($request->openinghours_id)
-                    ->channel
-                    ->service
-                    ->id;
+                $openinghours = $request->openinghours;
+                if (!($request->openinghours instanceof Openinghours)) {
+                    $openinghours = Openinghours::find($openinghours);
+                }
+
+                return $openinghours->channel->service->id;
             case isset($request->channel):
-                return Channel::findOrFail($request->channel)
-                    ->service
-                    ->id;
+                $channel = $request->channel;
+                if (!($request->channel instanceof Channel)) {
+                    $channel = Channel::find($channel);
+                }
+
+                return $channel->service->id;
             case isset($request->service):
-                return Service::findOrFail($request->service)
-                    ->id;
+                $service = $request->service;
+                if (!($request->service instanceof Service)) {
+                    $service = Service::find($service);
+                }
+
+                return $service->id;
             case isset($request->service_id):
                 return $request->service_id;
-
             default:
                 throw new AuthenticationException("Unauthorized");
         }

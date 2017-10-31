@@ -57,8 +57,6 @@ import RowUserService from '../components/RowUserService.vue'
 import RowUserServiceAdmin from '../components/RowUserServiceAdmin.vue'
 import ThSort from '../components/ThSort.vue'
 
-import { expandUser } from '../mixins/users.js'
-
 import { orderBy } from '../lib.js'
 
 export default {
@@ -108,7 +106,7 @@ export default {
     fetchUser (id) {
       this.$http.get('/api/ui/users/' + id)
         .then(({ data }) => {
-          this.fetchedUser = expandUser(data)
+          this.fetchedUser = data;
         })
     }
   },
