@@ -58,10 +58,9 @@ export default {
     },
     mounted() {
 
-        // todo change this name
         // triggered in the 'invite user' modals.
         // backend will create or update the user.
-        Hub.$on('createRole', newRole => {
+        Hub.$on('inviteUser', newRole => {
             this.statusUpdate(null, {active: true});
 
             if (!newRole.service_id) {
@@ -76,7 +75,7 @@ export default {
 
             if (!newRole.user_id && !newRole.email) {
                 // Cannot continue without at least one of these
-                this.statusUpdate(null, {message: 'createRole: email is missing'});
+                this.statusUpdate(null, {message: 'Email is missing'});
                 this.modalResume();
                 return;
             }
