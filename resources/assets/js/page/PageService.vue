@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Kanalen <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
+    <h1>{{ route.tab2 ? 'Gebruikers' : 'Kanalen'}} <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
 
     <div v-if="isOwner" class="btn-group">
       <button type="button" class="btn btn-primary" :class="{active: !route.tab2}" @click="route.tab2=0">Toon kanalen</button>
@@ -22,7 +22,7 @@
           <tr>
             <th-sort by="name">Naam gebruiker</th-sort>
             <th-sort by="email">E-mailadres</th-sort>
-            <th>Gebruikers beheren</th>
+            <th>Lid of eigenaar</th>
             <th-sort by="verified">Actief</th-sort>
             <th class="text-right">Ontzeg toegang tot dienst</th>
           </tr>

@@ -104,7 +104,6 @@ export default {
                 .then(this.modalClose)
                 .then(this.statusReset)
                 .catch(fetchError)
-
         });
         Hub.$on('patchRole', user => {
             this.statusUpdate(null, {active: true});

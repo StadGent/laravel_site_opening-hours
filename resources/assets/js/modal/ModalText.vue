@@ -57,12 +57,12 @@
               <label for="recipient-name" class="control-label">Rol</label>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> Lid
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> {{$root.translateRole("Member")}}
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> Beheerder
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner">  {{$root.translateRole("Owner")}}
                 </label>
               </div>
             </div>

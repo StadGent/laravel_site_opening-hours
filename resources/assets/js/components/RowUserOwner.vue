@@ -11,15 +11,15 @@
         </td>
         <td>
             <select title="Gebruikers beheren" aria-label="Gebruikers beheren"
-                    :disabled="isSelf" @change="changeRole" v-model="u.role">
-                <option value="Owner">Ja</option>
-                <option value="Member">Nee</option>
+                    :disabled="isSelf || isAdmin" @change="changeRole" v-model="u.role">
+                <option value="Owner"> {{ $root.translateRole("Owner") }}</option>
+                <option value="Member">{{ $root.translateRole("Member") }}</option>
             </select>
         </td>
         <td v-if="u.verified" class="text-success">&checkmark;</td>
         <td v-else class="text-warning">&cross;</td>
         <td class="td-btn text-right">
-            <button :disabled="isSelf" @click="$parent.banUser(u)" class="btn btn-default btn-icon">
+            <button :disabled="isSelf || isAdmin" @click="$parent.banUser(u)" class="btn btn-default btn-icon">
                 <i class="glyphicon glyphicon-ban-circle"></i>
             </button>
         </td>
@@ -34,6 +34,9 @@
         computed: {
             isSelf() {
                 return this.u.id === this.$root.user.id;
+            },
+            isAdmin() {
+                return this.u.role === "Admin";
             }
         },
         methods: {
