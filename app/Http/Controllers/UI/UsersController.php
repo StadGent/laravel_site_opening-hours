@@ -65,8 +65,8 @@ class UsersController extends Controller
         $userId = $this->userRepository->store($input);
         $user = $this->userRepository->getById($userId);
         if (!$user) {
-            return response()->json(['message' => 'Something went wrong while storing the user, check the logs.'],
-                400);
+            return response()
+                ->json(['message' => 'Something went wrong while storing the user, check the logs.'], 400);
         }
 
         Mail::to($user)->send(new SendRegisterConfirmation($user));
