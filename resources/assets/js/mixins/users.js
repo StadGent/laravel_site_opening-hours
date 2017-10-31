@@ -86,7 +86,7 @@ export default {
 
                     // add user to service users
                     let serviceIndex = this.services.findIndex(s => s.id === newRole.service_id);
-                    if(serviceIndex > -1 && this.services[serviceIndex].users) {
+                    if (serviceIndex > -1 && this.services[serviceIndex].users) {
                         this.services[serviceIndex].users.push(data);
                     }
 

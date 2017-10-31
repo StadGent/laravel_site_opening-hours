@@ -13,6 +13,7 @@ class StoreChannelRequest extends FormRequest
      *
      * @param UserRepository $users
      * @param Request $request
+     *
      * @return bool
      */
     public function authorize(Request $request)

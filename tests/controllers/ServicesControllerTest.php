@@ -53,6 +53,7 @@ class ServicesControllerTest extends \TestCase
      *
      * Datastructure:
      * ['userRole', verb', 'uri', 'data', 'responce status'] // Resource controller action
+     *
      * @return array
      */
     public function requestTypeProvider()
