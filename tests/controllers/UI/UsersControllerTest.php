@@ -19,21 +19,21 @@ class UsersControllerTest extends \TestCase
     /**
      * @test
      */
-    public function testAnInvitedNewUserGetsAMail()
+    public function testAUserStoreGetsAMail()
     {
         $user = \App\Models\User::find(1);
         $this->actingAs($user, 'api');
 
         $newUser = factory(User::class)->make();
+
         Mail::fake();
 
         $request = [
             'email' => $newUser->email,
-            'role' => 'Member',
-            'service_id' => 1,
+            'name' => $newUser->email,
             'text' => "newUser"];
 
-        $call = $this->doRequest('POST', '/api/ui/inviteuser', $request);
+        $call = $this->doRequest('POST', $this->apiUrl, $request);
 
         $savedUser = User::latest()->first();
         // Perform order shipping...

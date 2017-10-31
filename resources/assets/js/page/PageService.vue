@@ -1,13 +1,14 @@
 <template>
   <div class="container">
-    <h1>{{ route.tab2 ? 'Gebruikers' : 'Kanalen'}} <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
+    <h1>Kanalen <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
 
-    <div v-if="isOwner" class="btn-group">
-      <button type="button" class="btn btn-primary" :class="{active: !route.tab2}" @click="route.tab2=0">Toon kanalen</button>
-      <button type="button" class="btn btn-primary" :class="{active: route.tab2}" @click="route.tab2='users'">Toon gebruikers</button>
-    </div>
-
-    <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
+    <span v-if="isOwner">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" :class="{active: !route.tab2}" @click="route.tab2=0">Toon kanalen</button>
+        <button type="button" class="btn btn-primary" :class="{active: route.tab2}" @click="route.tab2='users'">Toon gebruikers</button>
+      </div>
+      <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
+    </span>
     <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)" :disabled="$root.isRecreatex">+ Nieuw kanaal</button>
 
     <div v-if="isOwner&&route.tab2==='users'" class="row">
@@ -22,14 +23,12 @@
           <tr>
             <th-sort by="name">Naam gebruiker</th-sort>
             <th-sort by="email">E-mailadres</th-sort>
-            <th>Lid of eigenaar</th>
+            <th>Gebruikers beheren</th>
             <th-sort by="verified">Actief</th-sort>
             <th class="text-right">Ontzeg toegang tot dienst</th>
           </tr>
         </thead>
-        <tbody>
-          <tr is="row-user-owner" v-for="u in sortedUsers" :u="u"></tr>
-        </tbody>
+        <tbody is="row-user-owner" v-for="u in sortedUsers" :u="u"></tbody>
       </table>
     </div>
 
@@ -75,6 +74,11 @@
         </tbody>
       </table>
     </div>
+
+ <!--    <div style="padding-top:10em">
+      <h3>Debug info</h3>
+      <pre v-text="srv"></pre>
+    </div> -->
   </div>
 </template>
 
@@ -95,8 +99,12 @@ export default {
       service: null
     }
   },
-  created() {
-  },
+    created() {
+//      if(!this.srv.channels) {
+//          console.info('no channels found, fetching now...');
+//          Hub.$emit('fetchChannels');
+//      }
+    },
   computed: {
     srv () {
       return this.$root.routeService

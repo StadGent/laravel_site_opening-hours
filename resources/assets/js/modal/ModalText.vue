@@ -57,12 +57,12 @@
               <label for="recipient-name" class="control-label">Rol</label>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> {{$root.translateRole("Member")}}
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> Lid
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner">  {{$root.translateRole("Owner")}}
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> Beheerder
                 </label>
               </div>
             </div>
@@ -103,7 +103,6 @@ import Pikaday from '../components/Pikaday.vue'
 import Status from '../components/Status.vue'
 
 import { Hub, toDatetime } from '../lib.js'
-import {CHOOSE_SERVICE, NO_VALID_EMAIL, OH_INVALID_RANGE} from "../constants";
 
 export default {
   computed: {
@@ -169,7 +168,7 @@ export default {
         });
 
         if (invalid) {
-          return alert(OH_INVALID_RANGE);
+          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.')
         }
 
         // Update the event until date
@@ -195,25 +194,16 @@ export default {
       this.modalWait();
 
       this.modal.strict = true;
-
-      if (!this.modal.usr && !this.validEmail) {
-          this.modalResume();
-          return alert(NO_VALID_EMAIL);
-      }
       if (this.modal.usr) {
-        this.modal.user_id = this.modal.usr.id;
-        this.modal.email = this.modal.usr.email;
+        this.modal.user_id = this.modal.usr.id
       }
       if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
-          this.modalResume();
         return
       }
       if (!this.modal.service_id && !this.modal.srv) {
-          this.modalResume();
-        return alert(CHOOSE_SERVICE)
+        return alert('Kies een dienst')
       }
-
-      Hub.$emit('inviteUser', this.modal)
+      Hub.$emit('createRole', this.modal)
     }
   },
   updated () {

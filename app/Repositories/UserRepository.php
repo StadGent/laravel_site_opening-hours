@@ -18,7 +18,6 @@ class UserRepository extends EloquentRepository
 
     /**
      * @param array $input
-     *
      * @return mixed
      */
     public function store(array $input)
@@ -36,7 +35,6 @@ class UserRepository extends EloquentRepository
 
     /**
      * @param $userId
-     *
      * @return mixed
      */
     public function getById($userId)
@@ -60,7 +58,6 @@ class UserRepository extends EloquentRepository
      *
      * @param  integer $limit
      * @param  integer $offset
-     *
      * @return array
      */
     public function getAll($limit = 50, $offset = 0)
@@ -85,7 +82,6 @@ class UserRepository extends EloquentRepository
      * @param  integer $userId
      * @param  integer $serviceId
      * @param  string  $role      The name of the role
-     *
      * @return boolean
      */
     public function linkToService($userId, $serviceId, $role)
@@ -117,10 +113,9 @@ class UserRepository extends EloquentRepository
      * Get all of the roles of a user
      *
      * @param  integer $userId
-     *
      * @return array
      */
-    public function getAllRolesForUser($userId)
+    private function getAllRolesForUser($userId)
     {
         $results = DB::select(
             'SELECT * FROM user_service_role WHERE user_id = ?',
@@ -147,7 +142,6 @@ class UserRepository extends EloquentRepository
      * @param  integer $userId
      * @param  integer $serviceId
      * @param  string  $role      The name of the role
-     *
      * @return boolean
      */
     public function hasRoleInService($userId, $serviceId, $role)
@@ -160,7 +154,6 @@ class UserRepository extends EloquentRepository
      *
      * @param  integer $userId
      * @param  integer $serviceId
-     *
      * @return string  The name of the role
      */
     public function getRoleInService($userId, $serviceId)
@@ -182,7 +175,6 @@ class UserRepository extends EloquentRepository
      * Get all users in a service
      *
      * @param  integer $serviceId
-     *
      * @return array
      */
     public function getAllInService($serviceId)
@@ -210,7 +202,6 @@ class UserRepository extends EloquentRepository
      *
      * @param  integer $userId
      * @param  integer $serviceId
-     *
      * @return boolean
      */
     public function removeRoleInService($userId, $serviceId)
@@ -220,7 +211,6 @@ class UserRepository extends EloquentRepository
 
     /**
      * @param $role
-     *
      * @return mixed
      */
     private function getRoleId($role)

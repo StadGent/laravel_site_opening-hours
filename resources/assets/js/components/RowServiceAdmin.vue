@@ -14,6 +14,7 @@
       </td>
       <td  class="text-muted td-sortable" :title="s.updated_at">
         <div>{{ s.updated_at | date }}</div>
+        <div>{{ s.updated_by }}</div>
       </td>
       <td class="td-btn text-right" @click="deactivate(s)">
         <button class="btn btn-default btn-icon">

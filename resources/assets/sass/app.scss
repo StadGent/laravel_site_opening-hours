@@ -51,6 +51,10 @@ body {
 
 /* Table */
 
+.table-hover > tbody > tr:hover {
+  cursor: pointer;
+}
+
 .table-list {
   margin-bottom: 0;
   padding-left: 20px;
@@ -103,7 +107,6 @@ body {
     border: none;
     padding-left: 1em;
     vertical-align: middle;
-    width: auto;
 
     &:first-child {
       padding-left: 3em;

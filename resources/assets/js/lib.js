@@ -232,7 +232,7 @@ export function fetchError (response) {
     alert(response.body.message);
   }
 
-  console.error(response);
+  console.warn(response);
   this.statusUpdate(response);
 }
 

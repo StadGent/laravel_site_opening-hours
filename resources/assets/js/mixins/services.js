@@ -1,6 +1,5 @@
 import {fetchError, Hub} from '../lib.js';
 import {createVersion, createFirstCalendar} from '../defaults.js';
-import {hasActiveOh, hasOh} from "../lib";
 
 export default {
     data() {
@@ -97,9 +96,7 @@ export default {
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
                 })
-                .then(() => {
-                    this.fetchUsers(this.route.service)
-                })
+                .then(this.fetchUsers(this.route.service))
                 .then(() => {
                     this.channelDataQueue = this.channelDataQueue.filter(service => service !== this.route.service);
                     this.updateService();
@@ -149,7 +146,7 @@ export default {
                     next(data);
                 }).catch(fetchError);
         },
-        patchServiceStatus(service) {
+        patchServiceStatus (service) {
             this.statusUpdate(null, {active: true});
 
             this.$http.put('/api/ui/services/' + service.id, {draft: service.draft})
@@ -189,9 +186,9 @@ export default {
             }
 
             channel.service_id = channel.srv && channel.srv.id;
-            this.$http.post('/api/ui/services/' + channel.service_id + '/channels', channel)
+            this.$http.post('/api/ui/channels', channel)
                 .then(({data}) => {
-                    this.routeService.channels.push(data);
+                    this.fetchChannels();
                     this.modalClose();
                     this.toChannel(data.id);
                 })
@@ -202,18 +199,14 @@ export default {
             this.statusUpdate(null, {active: true});
 
             if (!channel.id) {
-                this.statusUpdate(null, {message: 'deleteChannel: id is missing'});
-                return;
+                return console.error('deleteChannel: id is missing');
             }
             if (!confirm('Zeker dat je dit kanaal wil verwijderen?')) {
-                this.statusReset();
                 return;
             }
-            this.$http.delete('/api/ui/services/' + channel.service_id + '/channels/' + channel.id)
+            this.$http.delete('/api/ui/channels/' + channel.id)
                 .then(() => {
-
-                    // remove channel from routeService
-                    this.routeService.channels = this.routeService.channels.filter(c => c.id !== channel.id);
+                    this.fetchServices();
                     this.modalClose();
                 })
                 .then(this.statusReset)
@@ -239,9 +232,6 @@ export default {
             this.$http.post('/api/ui/openinghours', version)
                 .then(({data}) => {
                     this.modalClose();
-
-                    this.routeService.has_missing_oh = true;
-
                     this.fetchChannels().then(() => {
                         Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
                             openinghours_id: data.id

@@ -52,41 +52,33 @@ class ServicesControllerTest extends \TestCase
      * Data provider for requests
      *
      * Datastructure:
-     * ['userRole', verb', 'uri', 'data', 'responce status'] // Resource controller action
-     *
+     * ['userId', verb', 'uri', 'data', 'responce status'] // Resource controller action
      * @return array
      */
     public function requestTypeProvider()
     {
         return [
             //  unauth user
-            ['unauth', 'get', '', [], '200'], // index
-            ['unauth', 'post', '', [], '405'], // store
-            ['unauth', 'get', '1', [], '200'], // show
-            ['unauth', 'put', '1', [], '405'], // update (full)
-            ['unauth', 'patch', '1', ['draft' => false], '405'], // update (partial)
-            ['unauth', 'delete', '1', [], '405'], // destroy
+            ['', 'get', '', [], '200'], // index
+            ['', 'post', '', [], '405'], // store
+            ['', 'get', '1', [], '200'], // show
+            ['', 'put', '1', [], '405'], // update (full)
+            ['', 'patch', '1', ['draft' => false], '405'], // update (partial)
+            ['', 'delete', '1', [], '405'], // destroy
             // admin user
-            ['admin', 'get', '', [], '200'], // index
-            ['admin', 'post', '', [], '405'], // store
-            ['admin', 'get', '1', [], '200'], // show
-            ['admin', 'put', '1', [], '405'], // update (full)
-            ['admin', 'patch', '1', ['draft' => false], '405'], // update (partial)
-            ['admin', 'delete', '1', [], '405'], // destroy
-            // owner user
-            ['owner', 'get', '', [], '200'], // index
-            ['owner', 'post', '', [], '405'], // store
-            ['owner', 'get', '1', [], '200'], // show
-            ['owner', 'put', '1', [], '405'], // update (full)
-            ['owner', 'patch', '1', ['draft' => false], '405'], // update (partial)
-            ['owner', 'delete', '1', [], '405'], // destroy
-            // member user
-            ['member', 'get', '', [], '200'], // index
-            ['member', 'post', '', [], '405'], // store
-            ['member', 'get', '1', [], '200'], // show
-            ['member', 'put', '1', [], '405'], // update (full)
-            ['member', 'patch', '1', ['draft' => false], '405'], // update (partial)
-            ['member', 'delete', '1', [], '405'], // destroy
+            ['1', 'get', '', [], '200'], // index
+            ['1', 'post', '', [], '405'], // store
+            ['1', 'get', '1', [], '200'], // show
+            ['1', 'put', '1', [], '405'], // update (full)
+            ['1', 'patch', '1', ['draft' => false], '405'], // update (partial)
+            ['1', 'delete', '1', [], '405'], // destroy
+            // regular user
+            ['2', 'get', '', [], '200'], // index
+            ['2', 'post', '', [], '405'], // store
+            ['2', 'get', '1', [], '200'], // show
+            ['2', 'put', '1', [], '405'], // update (full)
+            ['2', 'patch', '1', ['draft' => false], '405'], // update (partial)
+            ['2', 'delete', '1', [], '405'], // destroy
         ];
     }
 
@@ -94,9 +86,14 @@ class ServicesControllerTest extends \TestCase
      * @test
      * @dataProvider requestTypeProvider
      */
-    public function testServiceRequests($userRole, $verb, $pathArg, $data, $statusCode)
+    public function testRequestsByUserWithRoleAndCheckStatusCode($userId, $verb, $pathArg, $data, $statusCode)
     {
-        $this->requestsByUserWithRoleAndCheckStatusCode($userRole, $verb, $pathArg, $data, $statusCode);
+        if ($userId) {
+            $authUser = \App\Models\User::find($userId);
+            $this->actingAs($authUser, 'api');
+        }
+        $path = $this->assemblePath($pathArg);
+        $this->doRequest($verb, $path);
     }
 
     /**

@@ -42,7 +42,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'token',
+        'password', 'remember_token',
     ];
 
     /**
@@ -63,7 +63,6 @@ class User extends Authenticatable
      */
     public function services()
     {
-        return $this->belongsToMany('App\Models\Service', 'user_service_role', 'user_id', 'service_id')
-          ->withPivot(['role_id']);
+        return $this->belongsToMany('App\Models\Service', 'user_service_role', 'user_id', 'service_id');
     }
 }

@@ -22,7 +22,7 @@ class UsersTableSeeder extends Seeder
             $password = 'opening' . $name;
 
             $user = User::create([
-                'name' => $name . 'user',
+                'name' => $name,
                 'email' => $name . '@foo.bar',
                 'password' => bcrypt($password),
             ]);

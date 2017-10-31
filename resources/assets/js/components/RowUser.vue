@@ -1,7 +1,7 @@
 <template>
     <tr :class="{'warning':!u.verified}" @click="href('#!user/'+u.id)">
       <td class="td-sortable">
-        <a v-if="this.$root.isAdmin" :href="'#!user/'+u.id">{{ u.name }}</a>
+        {{ u.name }}
       </td>
       <td class="td-sortable">
         {{ u.email }}
@@ -49,6 +49,9 @@ export default {
     }
   },
   methods: {
+    invite () {
+      Hub.$emit('inviteUser', this.u)
+    },
     rm () {
       Hub.$emit('deleteUser', this.u)
     }

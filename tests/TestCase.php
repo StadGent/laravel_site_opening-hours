@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
+
 abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
     /**
@@ -44,37 +46,29 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
     /**
      * do request according to the given format
      */
-    public function doRequest($method, $path, $data = [])
+    public function doRequest($method, $path, $params = [])
     {
         if ($this->debug) {
             Log::debug($method . ' -> ' . $path);
         }
+        $request = isset($params['format']) ?: 'json';
+
         $formats = [
             'json' => 'application/json',
             'json-ld' => 'application/ld+json',
             'html' => 'text/html',
             'text' => 'text/plain',
         ];
-
-        $request = 'json';
-        if (isset($data['format'])) {
-            $request = $data['format'];
-            if (!array_key_exists($data['format'], $formats)) {
-                $request = 'json';
-            }
-
-            unset($data['format']);
-        }
         $accept = $formats[$request];
 
-        $content = json_encode($data);
+        $content = json_encode($params);
 
         $headers = [
             'CONTENT_LENGTH' => mb_strlen($content, '8bit'),
             'CONTENT_TYPE' => $accept,
             'Accept-Language' => 'nl-BE,nl;q=0.8,en-US;q=0.6,en;q=0.4',
             'X-Requested-With' => 'XMLHttpRequest',
-            'Accept' => $accept,
+            'Accept' =>  $accept,
             'Accept-type' => $accept,
         ];
         $this->call(
@@ -86,7 +80,6 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
             $this->transformHeadersToServerVars($headers),
             $content
         );
-
         return $this;
     }
 
@@ -114,17 +107,5 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
      */
     protected function extraStructureTest($content)
     {
-    }
-
-    public function requestsByUserWithRoleAndCheckStatusCode($userRole, $verb, $pathArg, $data, $statusCode)
-    {
-        if ($userRole !== 'unauth') {
-            $authUser = \App\Models\User::where('name', $userRole . 'user')->first();
-            $this->actingAs($authUser, 'api');
-        }
-
-        $path = $this->assemblePath($pathArg);
-        $this->doRequest($verb, $path, $data);
-        $this->seeStatusCode($statusCode);
     }
 }
