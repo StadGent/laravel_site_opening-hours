@@ -81,8 +81,8 @@ class RolesController extends Controller
     {
         $input = $request->input();
 
-        $success = $this->users->removeRoleInService($input['user_id'],
-            $input['service_id']);
+        $success = $this->users
+            ->removeRoleInService($input['user_id'], $input['service_id']);
 
         if ($success) {
             return response()->json(['message' => 'De gebruiker werd bijgewerkt.']);
