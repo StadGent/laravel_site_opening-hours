@@ -62,6 +62,10 @@ class UsersController extends Controller
         $input['password'] = '';
         $input['token'] = str_random(32);
 
+        if (!isset($input['name'])) {
+            $input['name'] = $input['email'];
+        }
+
         $userId = $this->userRepository->store($input);
         $user = $this->userRepository->getById($userId);
         if (!$user) {
