@@ -109,7 +109,7 @@ class OpeninghoursController extends Controller
      */
     public function destroy(Request $request)
     {
-        $success = $this->openinghours->delete($request->openinghours->id);
+        $success = $this->openinghours->delete($request->openinghours);
 
         if ($success) {
             return response()->json(['message' => 'De openingsuren werden verwijderd']);

@@ -64,7 +64,8 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 /* Work models **/
 Route::get('/services', 'ServicesController@index');
 Route::get('/services/{service}', 'ServicesController@show');
-Route::get('/services/{service}/channels', 'ChannelController@getFromService')->middleware('hasRoleInService');
+Route::get('/services/{service}/channels', 'ChannelController@getFromService');
+Route::get('/services/{service}/channels/{channel}', 'ChannelController@show');
 
 /**************************/
 /*  Openinghours results  */

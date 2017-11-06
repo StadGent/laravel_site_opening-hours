@@ -49,6 +49,10 @@ class HasRoleInService
                 }
 
                 return $calendar->openinghours->channel->service->id;
+            case isset($request->openinghours_id):
+                $openinghours = Openinghours::find($request->openinghours_id);
+
+                return $openinghours->channel->service->id;
             case isset($request->openinghours):
                 $openinghours = $request->openinghours;
                 if (!($request->openinghours instanceof Openinghours)) {
@@ -56,6 +60,10 @@ class HasRoleInService
                 }
 
                 return $openinghours->channel->service->id;
+            case isset($request->channel_id):
+                $channel = Channel::find($request->channel_id);
+
+                return $channel->service->id;
             case isset($request->channel):
                 $channel = $request->channel;
                 if (!($request->channel instanceof Channel)) {
