@@ -39,17 +39,18 @@ Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
 
     // roles
     Route::patch('/roles', 'UI\RolesController@update')->middleware('isOwner');
-    Route::post('/roles', 'UI\RolesController@store')->middleware('isOwner');
+    // Route::post('/roles', 'UI\RolesController@store')->middleware('isOwner');
     Route::delete('/roles', 'UI\RolesController@destroy')->middleware('isOwner');
 
     // services
     Route::get('/services', 'UI\ServicesController@index');
-    Route::get('/services/{service}', 'UI\ServicesController@show');
+    // Route::get('/services/{service}', 'UI\ServicesController@show');
     Route::put('/services/{service}', 'UI\ServicesController@update')->middleware('isOwner');
     Route::patch('/services/{service}', 'UI\ServicesController@update')->middleware('isOwner');
 
     // users
     Route::get('/users', 'UI\UsersController@index')->middleware('admin');
+    Route::get('/users/{user}', 'UI\UsersController@show')->middleware('admin');
     Route::delete('/users/{user}', 'UI\UsersController@destroy')->middleware('admin');
     // subset
     Route::get('/services/{service}/users', 'UI\UsersController@getFromService')->middleware('isOwner');

@@ -47,17 +47,6 @@ class CalendarsController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        return response()->json($this->calendars->getById($id));
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param UpdateCalendarRequest $request
@@ -85,27 +74,6 @@ class CalendarsController extends Controller
             ['message' => 'Something went wrong while updating the calendar, check the logs.'],
             400
         );
-    }
-
-    /**
-     * Bulk insert events
-     *
-     * @param integer $id
-     * @param array $events
-     * @return void
-     */
-    private function bulkInsert($calendarId, $events)
-    {
-        // Make sure the calendar_id is passed with the event
-        // so it gets linked properly
-        array_walk($events, function (&$event) use ($calendarId) {
-            $event['calendar_id'] = $calendarId;
-        });
-
-        // Detach the current events from the calendar, then bulk insert them
-        app('EventRepository')->deleteForCalendar($calendarId);
-
-        return app('EventRepository')->bulkInsert($events);
     }
 
     /**
