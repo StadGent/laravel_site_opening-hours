@@ -230,7 +230,7 @@ export function fetchError(response) {
         Laravel.csrfToken = response.body.token;
         alert('De pagina was te lang geopend. (CSRF token is verlopen)\n\nProbeer eens opnieuw.');
     }
-    if(this.modalActive){
+    if (this.modalActive) {
         this.modalResume();
     }
 
