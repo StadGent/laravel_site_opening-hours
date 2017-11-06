@@ -36,6 +36,9 @@ export default {
     modalWait() {
         this.$set(this.modal, 'wait', true);
     },
+    modalResume() {
+      this.$set(this.modal, 'wait', false);
+    },
     requestService() {
       this.modal.text = 'requestService'
     },
