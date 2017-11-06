@@ -1,5 +1,3 @@
-import { expandUser } from './users.js'
-
 export default {
   data () {
     const userDefault = {
@@ -7,13 +5,13 @@ export default {
       name: 'Voornaam Naam',
       roles: [],
       admin: false
-    }
-    lsDefault('user', userDefault)
+    };
+    lsDefault('user', userDefault);
 
-    Object.assign(userDefault, window.initialUser || ls('user'))
+    Object.assign(userDefault, window.initialUser || ls('user'));
 
     return {
-      user: expandUser(userDefault)
+      user: userDefault
     }
   },
   computed: {
@@ -38,7 +36,7 @@ export default {
           Object.assign(this.user, {
             id: 0,
             name: 'Naamloos'
-          })
+          });
           window.location.reload()
         })
     }
@@ -55,9 +53,9 @@ export const rootAuthMixin = {
     user: {
       deep: true,
       handler  (v) {
-        console.log('Update user', inert(this.user))
+        console.log('Update user', inert(this.user));
         ls('user', v)
       }
     }
   }
-}
+};

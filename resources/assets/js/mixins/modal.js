@@ -21,7 +21,7 @@ export default {
     modalActive() {
       for (const key in this.modal) {
         if (key !== 'srv' && this.modal[key]) {
-          return true
+          return true;
         }
       }
     }
@@ -29,21 +29,24 @@ export default {
   methods: {
     modalClose() {
       for (const key in this.modal) {
-        this.modal[key] = null
+        this.modal[key] = null;
       }
       this.$root.statusReset();
     },
     modalWait() {
         this.$set(this.modal, 'wait', true);
     },
+    modalResume() {
+      this.$set(this.modal, 'wait', false);
+    },
     requestService() {
-      this.modal.text = 'requestService'
+      this.modal.text = 'requestService';
     },
 
     newChannel(srv) {
       this.modal.text = 'newChannel';
       this.modal.label = '';
-      this.modal.srv = srv
+      this.modal.srv = srv;
     },
     newVersion(srv) {
       this.modal = Object.assign(this.modal, createVersion());
@@ -54,31 +57,31 @@ export default {
       if (expires) {
         this.modal.start_date = expires.slice(0, 4) + '-01-01';
         this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + VERSION_YEARS - 1) + '-12-31';
-        this.modal.label = ''
+        this.modal.label = '';
       }
     },
     newCalendar(srv) {
       this.modal.text = 'newCalendar';
-      this.modal.srv = srv
+      this.modal.srv = srv;
     },
 
     editVersion(v) {
       this.modal.text = 'newVersion';
-      Object.assign(this.modal, v)
+      Object.assign(this.modal, v);
     },
 
     newUser(srv) {
-      this.modal.text = 'newUser'
-      this.modal.role = 'Member'
+      this.modal.text = 'newUser';
+      this.modal.role = 'Member';
     },
     newRole(srv) {
-      this.modal.text = 'newRole'
-      this.modal.srv = srv
+      this.modal.text = 'newRole';
+      this.modal.srv = srv;
     },
     newRoleForUser(usr) {
-      this.modal.text = 'newRoleForUser'
-      this.modal.usr = usr
-      this.modal.role = 'Member'
+      this.modal.text = 'newRoleForUser';
+      this.modal.usr = usr;
+      this.modal.role = 'Member';
     }
   }
 }

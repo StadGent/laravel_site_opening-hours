@@ -129,11 +129,11 @@
                     return alert('Er kan geen uitzondering toegevoegd worden.\n(Max. 1 normale uren + 10 uitzonderingen)')
                 }
 
-                const maxLayer = Math.max.apply(0, this.calendars.map(c => parseInt(c.layer)))
+                const maxLayer = Math.max.apply(0, this.calendars.map(c => parseInt(c.layer)));
 
                 const newCal = this.calendars.length ? createCalendar(maxLayer + 1, {
                     start_date: toDatetime(this.version.start_date)
-                }) : createFirstCalendar(this.version)
+                }) : createFirstCalendar(this.version);
 
                 Hub.$emit('createCalendar', newCal)
             }
