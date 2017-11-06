@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ChannelController extends Controller
 {
@@ -14,8 +15,15 @@ class ChannelController extends Controller
      *
      * @return \App\Models\Channel
      */
-    public function show(Channel $channel)
+    public function show(Service $service, Channel $channel)
     {
+        if (!$service->channels->find($channel)) {
+            $ModelNotFoundException = new ModelNotFoundException("The requested channel is not a child of the service in the path");
+            $ModelNotFoundException->setModel(Channel::class);
+
+            throw $ModelNotFoundException;
+        }
+
         return $channel;
     }
 

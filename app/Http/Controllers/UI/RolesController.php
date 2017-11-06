@@ -30,30 +30,6 @@ class RolesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRoleRequest $request)
-    {
-        $input = $request->input();
-
-        $success = $this
-            ->users
-            ->linkToService($input['user_id'], $input['service_id'], $input['role']);
-
-        if ($success) {
-            return response()->json(['message' => 'De rol werd toegevoegd.']);
-        }
-
-        return response()
-            ->json(['message' => 'Er is iets misgegaan tijdens het toevoegen van de rol.'], 400);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function update(StoreRoleRequest $request)
     {
         $input = $request->input();

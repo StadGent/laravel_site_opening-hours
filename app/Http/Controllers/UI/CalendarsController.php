@@ -101,4 +101,24 @@ class CalendarsController extends Controller
 
         return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
     }
+
+    /**
+     * Bulk insert events
+     *
+     * @param $calendarId
+     * @param $events
+     */
+    private function bulkInsert($calendarId, $events)
+    {
+        // Make sure the calendar_id is passed with the event
+        // so it gets linked properly
+        array_walk($events, function (&$event) use ($calendarId) {
+            $event['calendar_id'] = $calendarId;
+        });
+
+        // Detach the current events from the calendar, then bulk insert them
+        app('EventRepository')->deleteForCalendar($calendarId);
+
+        return app('EventRepository')->bulkInsert($events);
+    }
 }
