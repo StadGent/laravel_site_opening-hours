@@ -75,7 +75,7 @@ export default {
       return this.$root.users || []
     },
     usr () {
-      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || this.fetchedUser || this.fetchUser(this.route.id) || {}
+      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || {}
     },
 
     // Services
@@ -103,12 +103,6 @@ export default {
     }
   },
   methods: {
-    fetchUser (id) {
-      this.$http.get('/api/ui/users/' + id)
-        .then(({ data }) => {
-          this.fetchedUser = data;
-        })
-    }
   },
   components: {
     RowUserService,

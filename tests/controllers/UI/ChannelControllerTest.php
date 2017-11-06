@@ -12,41 +12,6 @@ class ChannelControllerTest extends \TestCase
      * @var string
      */
     protected $apiUrl = '/api/ui/services/1/channels';
-    /**
-     * @test
-     */
-    public function testGetNoUiServicesWithoutAuth()
-    {
-        $call = $this->doRequest('GET', $this->apiUrl);
-        $call->seeStatusCode(401);
-    }
-
-    /**
-     * @test
-     */
-    public function testGetUiServicesAsAdminRole()
-    {
-        $user = \App\Models\User::find(1);
-        $this->actingAs($user, 'api');
-        $call = $this->doRequest('GET', $this->apiUrl);
-        $content = $this->getContentStructureTested($call);
-        $service = \App\Models\Service::find(1);
-        $this->assertCount($service->channels->count(), $content);
-    }
-
-    /**
-     * @test
-     */
-    public function testGetUiServicesAsMemberRole()
-    {
-        $user = \App\Models\User::find(2);
-        $this->actingAs($user, 'api');
-
-        $call = $this->doRequest('GET', $this->apiUrl);
-        $content = $this->getContentStructureTested($call);
-        $service = \App\Models\Service::find(1);
-        $this->assertCount($service->channels->count(), $content);
-    }
 
     /**
      * Data provider for requests
