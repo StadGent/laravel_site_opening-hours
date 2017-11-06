@@ -229,8 +229,9 @@ export function fetchError(response) {
     if (parseInt(response.status) === 452) {
         Laravel.csrfToken = response.body.token;
         alert('De pagina was te lang geopend. (CSRF token is verlopen)\n\nProbeer eens opnieuw.');
-    } else if (response.body && response.body.message) {
-        alert(response.body.message);
+    }
+    if(this.modalActive){
+        this.modalResume();
     }
 
     console.warn(response);
