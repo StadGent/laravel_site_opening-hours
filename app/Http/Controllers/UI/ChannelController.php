@@ -86,7 +86,6 @@ class ChannelController extends Controller
      */
     public function destroy($service, $channel)
     {
-
         if (empty($this->channels->getFullObjectById($channel))) {
             return response()->json(['message' => 'Het kanaal werd niet gevonden.'], 400);
         }
