@@ -60,10 +60,16 @@
             <!-- Other calendars have more options -->
             <div v-else>
                 <h3>{{ cal.label }}</h3>
-                <label>
-                    <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
-                </label>
-                <br>
+                <fieldset>
+                    <div>
+                        <label><input type="radio" name="closinghours" @change="toggleClosing"
+                                      :checked="cal.closinghours"> Gesloten </label>
+                    </div>
+                    <div>
+                        <label><input type="radio" name="closinghours" @change="toggleClosing"
+                                      :checked="!cal.closinghours"> Open</label>
+                    </div>
+                </fieldset>
 
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
                               @rm="rmEvent(i)"></event-editor>
@@ -294,7 +300,7 @@
                 if (start.getMonth() === until.getMonth()) {
                     if (start.getDate() === until.getDate()) {
                         return start.getDate() + ' ' + MONTHS[start.getMonth()]
-                     }
+                    }
                     return start.getDate() + ' - ' + until.getDate() + ' ' + MONTHS[start.getMonth()]
                 }
                 return start.getDate() + ' ' + MONTHS[start.getMonth()] + ' - ' + until.getDate() + ' ' + MONTHS[until.getMonth()]
