@@ -84,15 +84,13 @@ class ChannelController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($service, $channel)
     {
-        $channel = $this->channels->getFullObjectById($id);
-
-        if (empty($channel)) {
+        if (empty($this->channels->getFullObjectById($channel))) {
             return response()->json(['message' => 'Het kanaal werd niet gevonden.'], 400);
         }
 
-        $this->channels->delete($id);
+        $this->channels->delete($channel);
 
         return response()->json(['Het kanaal werd verwijderd.']);
     }
