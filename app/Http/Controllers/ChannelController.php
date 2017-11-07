@@ -18,10 +18,11 @@ class ChannelController extends Controller
     public function show(Service $service, Channel $channel)
     {
         if (!$service->channels->find($channel)) {
-            $ModelNotFoundException = new ModelNotFoundException("The requested channel is not a child of the service in the path");
-            $ModelNotFoundException->setModel(Channel::class);
+            $message = "The requested channel is not a child of the service in the path";
+            $exception = new ModelNotFoundException($message);
+            $exception->setModel(Channel::class);
 
-            throw $ModelNotFoundException;
+            throw $exception;
         }
 
         return $channel;
