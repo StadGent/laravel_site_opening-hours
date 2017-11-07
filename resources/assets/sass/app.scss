@@ -613,3 +613,33 @@ h1 + h3 {
     right: -25%;
   }
 }
+
+.btn-toggle {
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 4px;
+  display: inline-block;
+  background: #e5e5e5;
+
+  input[type="radio"] {
+    display: none;
+
+    &:checked+label {
+      font-weight: bold;
+      border-bottom: 2px solid $green;
+      opacity: 1;
+      background: $darkblue;
+      color: white;
+      text-decoration: none;
+    }
+  }
+
+  label {
+    padding: .5rem;
+    font-weight: normal;
+    margin: 0;
+    opacity: .8;
+    cursor: pointer;
+    text-decoration: line-through;
+
+  }
+}
