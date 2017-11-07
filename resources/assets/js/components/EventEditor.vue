@@ -3,8 +3,7 @@
         <div class="row" :class="{ 'has-error text-danger': !isUntilValid }" v-if="event.rrule && $parent.cal.layer"
              style="margin-bottom:15px;">
             <div :class="'col-xs-' + (closinghours ? 5 : 6)">
-                <label class="control-label">{{ closinghours ? 'Gesloten' : 'Geldig'
-                    }} {{ options.freq == RRule.DAILY ? 'van' : 'op' }}</label>
+                <label class="control-label">Geldig vanaf</label>
                 <pikaday class="form-control inp-startDate" v-model="eventStartDate" :options="pikadayStart"/>
             </div>
             <div :class="'col-xs-' + (closinghours ? 5 : 6)">
@@ -18,8 +17,6 @@
                 <div class="close close--col" style="padding-top: 30px;" @click="$emit('rm')">&times;</div>
             </div>
         </div>
-
-
         <div class="form-horizontal" v-if="event.rrule">
             <!-- Choose the period -->
             <div class="form-group" v-if="!prevEventSameLabel && $parent.cal.layer">
@@ -199,14 +196,6 @@
                 </div>
             </div>
         </div>
-
-        <!--<pre>{{ event.rrule }}
-        {{ options }}</pre>-->
-
-        <div class="row" v-if="!nextEventSameLabel">
-            <br>
-        </div>
-
         <!-- Single event: not recurring -->
         <div v-if="!event.rrule">
             gewone lijst van dagen
