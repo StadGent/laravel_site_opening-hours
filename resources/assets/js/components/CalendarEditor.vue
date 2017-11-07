@@ -79,7 +79,6 @@
                 </p>
             </div>
         </div>
-
         <div class="calendar-editor__buttons">
             <div class="text-right">
                 <button type="button" class="btn btn-default pull-left" @click="rmCalendar()"
@@ -96,10 +95,6 @@
                 <button type="button" class="btn btn-primary" @click="save" v-else>Bewaar</button>
             </div>
         </div>
-
-        <!--
-            <pre>{{ cal }}</pre>
-            <pre class="cal-render" style="margin-top:10em">{{ events }}</pre> -->
     </form>
 </template>
 

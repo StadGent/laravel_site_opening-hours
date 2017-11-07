@@ -1,18 +1,6 @@
 <template>
 
-        <div class="container">
-            <!--<h1>{{ channel.label || 'Kanaal zonder naam' }}-->
-                <!--<small>{{ version.label || '' }}</small>-->
-            <!--</h1>-->
-
-            <!--&lt;!&ndash; Calender view options &ndash;&gt;-->
-            <!--<div>-->
-                <!--<button type="button" class="btn btn-default" @click="editVersion(version)"-->
-                        <!--:disabled="$root.isRecreatex">-->
-                    <!--Bewerk naam en geldigheidsperiode-->
-                <!--</button>-->
-            <!--</div>-->
-        <!--</div>-->
+    <div class="container">
 
         <div class="version-split row">
             <div class="version-cals col-sm-6 col-md-5 col-lg-4">
@@ -22,9 +10,9 @@
                 <!-- Showing list of calendars -->
                 <div v-else>
                     <div>
-                    <h1>{{ version.label }}</h1>
+                        <h1>{{ version.label }}</h1>
                         <p>Van <strong>{{ formatDate(version.start_date) }}</strong>
-                        tot <strong>{{ formatDate(version.end_date) }}</strong></p>
+                            tot <strong>{{ formatDate(version.end_date) }}</strong></p>
 
                         <button type="button" class="btn btn-default" @click="editVersion(version)"
                                 :disabled="$root.isRecreatex">
@@ -160,7 +148,7 @@
             },
             formatDate(string) {
                 let date = new Date(string).toLocaleDateString();
-                if(date !== 'Invalid date') {
+                if (date !== 'Invalid date') {
                     return date;
                 }
                 else {
