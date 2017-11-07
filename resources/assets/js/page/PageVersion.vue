@@ -23,14 +23,9 @@
                 <div v-else>
                     <div>
                     <h1>{{ version.label }}</h1>
-                        <dl>
-                            <dt>Kanaal</dt>
-                            <dd>{{ channel.label }}</dd>
-                            <dt>Van</dt>
-                            <dd>{{ formatDate(version.start_date) }}</dd>
-                            <dt>tot</dt>
-                            <dd>{{ new Date(version.end_date).toLocaleDateString() }}</dd>
-                        </dl>
+                        <p>Van <strong>{{ formatDate(version.start_date) }}</strong>
+                        tot <strong>{{ formatDate(version.end_date) }}</strong></p>
+
                         <button type="button" class="btn btn-default" @click="editVersion(version)"
                                 :disabled="$root.isRecreatex">
                             Bewerk naam en geldigheidsperiode
