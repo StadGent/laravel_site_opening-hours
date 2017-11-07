@@ -4,20 +4,12 @@
             <small>{{ version.label || '' }}</small>
         </h1>
 
-        <!-- Version actions -->
-        <div class="pull-right">
-            <div class="btn-group">
-                <!--         <button type="button" class="btn btn-default" :class="{active: !tab}" @click="tab=0">Toon periodes</button>
-                        <button type="button" class="btn btn-default" :class="{active: tab=='users'}" @click="tab='users'" disabled>Toon open en gesloten</button> -->
-            </div>
-        </div>
-
         <!-- Calender view options -->
-        <p>
+        <div>
             <button type="button" class="btn btn-default" @click="editVersion(version)" :disabled="$root.isRecreatex">
                 Bewerk naam en geldigheidsperiode
             </button>
-        </p>
+        </div>
 
         <div class="version-split">
             <div class="version-cals col-sm-6 col-md-5 col-lg-4">
@@ -30,11 +22,11 @@
                     <p>
                         De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
                     </p>
-                    <p>
+                    <div>
                         <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length"
                                 :disabled="$root.isRecreatex">Voeg uitzonderingen toe
                         </button>
-                    </p>
+                    </div>
                     <transition-group name="list" tag="div">
                         <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
                             <header class="cal-header">
@@ -66,11 +58,11 @@
 
                     <!-- This should never happen -->
                     <div v-if="!reversedCalendars.length">
-                        <p>
+                        <div>
                             <button class="btn btn-link" @click="addCalendar" :disabled="$root.isRecreatex">
                                 Voeg openingsuren toe
                             </button>
-                        </p>
+                        </div>
                     </div>
                 </div>
             </div>
