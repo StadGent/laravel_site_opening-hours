@@ -305,6 +305,7 @@ h1 + h3 {
   align-items:stretch;
   background: #fff;
   padding-bottom: 15px;
+  max-height: calc(100vh - 150px);
 
   & > div {
     //height: 100%;

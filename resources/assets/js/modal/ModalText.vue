@@ -42,6 +42,11 @@
                 <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="pikadayEnd" />
               </div>
             </div>
+
+            <div v-if="modal.id" class="alert alert-warning">
+              <strong>Opgelet!</strong> <br>
+              Wanneer je de einddatum wijzigt heeft dit geen effect op de einddatum van de bestaande uitzonderingen.
+            </div>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
             <div class="form-group" :class="{'has-error':!validEmail, 'has-success':allowedEmail}">
