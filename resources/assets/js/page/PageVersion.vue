@@ -1,50 +1,70 @@
 <template>
-    <div class="container">
-        <h1>{{ channel.label || 'Kanaal zonder naam' }}
-            <small>{{ version.label || '' }}</small>
-        </h1>
 
-        <!-- Calender view options -->
-        <div>
-            <button type="button" class="btn btn-default" @click="editVersion(version)" :disabled="$root.isRecreatex">
-                Bewerk naam en geldigheidsperiode
-            </button>
-        </div>
+        <div class="container">
+            <!--<h1>{{ channel.label || 'Kanaal zonder naam' }}-->
+                <!--<small>{{ version.label || '' }}</small>-->
+            <!--</h1>-->
 
-        <div class="version-split">
+            <!--&lt;!&ndash; Calender view options &ndash;&gt;-->
+            <!--<div>-->
+                <!--<button type="button" class="btn btn-default" @click="editVersion(version)"-->
+                        <!--:disabled="$root.isRecreatex">-->
+                    <!--Bewerk naam en geldigheidsperiode-->
+                <!--</button>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <div class="version-split row">
             <div class="version-cals col-sm-6 col-md-5 col-lg-4">
                 <!-- Editing a calendar -->
                 <calendar-editor v-if="$root.routeCalendar.events" :cal="$root.routeCalendar"></calendar-editor>
 
                 <!-- Showing list of calendars -->
                 <div v-else>
-                    <h2>Prioriteitenlijst periodes</h2>
-                    <p>
-                        De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
-                    </p>
                     <div>
-                        <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length"
-                                :disabled="$root.isRecreatex">Voeg uitzonderingen toe
+                    <h1>{{ version.label }}</h1>
+                        <dl>
+                            <dt>Kanaal</dt>
+                            <dd>{{ channel.label }}</dd>
+                            <dt>Van</dt>
+                            <dd>{{ formatDate(version.start_date) }}</dd>
+                            <dt>tot</dt>
+                            <dd>{{ new Date(version.end_date).toLocaleDateString() }}</dd>
+                        </dl>
+                        <button type="button" class="btn btn-default" @click="editVersion(version)"
+                                :disabled="$root.isRecreatex">
+                            Bewerk naam en geldigheidsperiode
                         </button>
                     </div>
-                    <transition-group name="list" tag="div">
-                        <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
-                            <header class="cal-header">
-                                <div class="cal-action cal-info" @click="toCalendar($root.isRecreatex ? -1 : cal.id)">
-                                    <div class="cal-img" :class="'layer-'+cal.layer"></div>
-                                    <div class="cal-name">{{ cal.label }}</div>
-                                    <div class="cal-view" v-if="!$root.isRecreatex">Bekijk</div>
-                                </div>
-                                <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)"
-                                     v-if="!$root.isRecreatex">Lager
-                                </div>
-                                <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)"
-                                     v-if="!$root.isRecreatex">Hoger
-                                </div>
-                            </header>
-                        </div>
-                    </transition-group>
-
+                    <div>
+                        <h2>Prioriteitenlijst periodes</h2>
+                        <p>
+                            De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
+                        </p>
+                        <p>
+                            <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length"
+                                    :disabled="$root.isRecreatex">Voeg uitzonderingen toe
+                            </button>
+                        </p>
+                        <transition-group name="list" tag="div">
+                            <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
+                                <header class="cal-header">
+                                    <div class="cal-action cal-info"
+                                         @click="toCalendar($root.isRecreatex ? -1 : cal.id)">
+                                        <div class="cal-img" :class="'layer-'+cal.layer"></div>
+                                        <div class="cal-name">{{ cal.label }}</div>
+                                        <div class="cal-view" v-if="!$root.isRecreatex">Bekijk</div>
+                                    </div>
+                                    <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)"
+                                         v-if="!$root.isRecreatex">Lager
+                                    </div>
+                                    <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)"
+                                         v-if="!$root.isRecreatex">Hoger
+                                    </div>
+                                </header>
+                            </div>
+                        </transition-group>
+                    </div>
                     <!-- Encourage to add calendars after first one -->
                     <div class="text-center" v-if="reversedCalendars.length === 1 && !$root.isRecreatex">
                         <p style="padding-top:3em">
@@ -58,11 +78,11 @@
 
                     <!-- This should never happen -->
                     <div v-if="!reversedCalendars.length">
-                        <div>
+                        <p>
                             <button class="btn btn-link" @click="addCalendar" :disabled="$root.isRecreatex">
                                 Voeg openingsuren toe
                             </button>
-                        </div>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -71,6 +91,7 @@
             </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -141,6 +162,15 @@
                 }) : createFirstCalendar(this.version);
 
                 Hub.$emit('createCalendar', newCal);
+            },
+            formatDate(string) {
+                let date = new Date(string).toLocaleDateString();
+                if(date !== 'Invalid date') {
+                    return date;
+                }
+                else {
+                    return '';
+                }
             }
         },
         components: {

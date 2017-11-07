@@ -205,22 +205,10 @@ body {
   margin: 0 -10px;
 }
 
-/* Wrapper */
+/* Calendar editor */
 
-.wrapper-height100 {
-  height: 100%;
-  margin: 0 -15px;
-}
+.calendar-editor {
 
-.wrapper-above-save {
-  height: calc(100% - 4.7em);
-  padding: 0 15px;
-  overflow: auto;
-}
-
-.wrapper-save-btn {
-  border-top: 1px solid #ccc;
-  padding-top: 15px;
 }
 
 /* Panel */
@@ -301,18 +289,22 @@ h1 + h3 {
 /* Version > Preview */
 
 .version-split {
-  position: fixed;
-  z-index: 3;
-  top: 200px;
-  // Temp
-  // top: 217px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border-top: 1px solid #ccc;
+  //position: fixed;
+  //z-index: 3;
+  //top: 200px;
+  //// Temp
+  //// top: 217px;
+  //bottom: 0;
+  //left: 0;
+  //right: 0;
+  //border-top: 1px solid #ccc;
+  display: flex;
+  align-items:stretch;
   background: #fff;
+  padding-bottom: 15px;
+
   & > div {
-    height: 100%;
+    //height: 100%;
     overflow: auto;
   }
 }
@@ -322,7 +314,7 @@ h1 + h3 {
 }
 
 .version-preview {
-  border-left: 1px solid #ccc;
+  border: 1px solid #ccc;
   padding-top: 1em;
   width: calc(100% - 30em);
   background: #eee;
