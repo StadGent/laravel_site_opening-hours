@@ -60,16 +60,14 @@
             <!-- Other calendars have more options -->
             <div v-else>
                 <h3>{{ cal.label }}</h3>
-                <fieldset>
-                    <div>
-                        <label><input type="radio" name="closinghours" @change="toggleClosing"
-                                      :checked="cal.closinghours"> Gesloten </label>
-                    </div>
-                    <div>
-                        <label><input type="radio" name="closinghours" @change="toggleClosing"
-                                      :checked="!cal.closinghours"> Open</label>
-                    </div>
+                <fieldset class="btn-toggle">
+                    <input type="radio" id="closinghours_true" name="closinghours" class="visuallyhidden" @change="toggleClosing"
+                           :checked="cal.closinghours"><label for="closinghours_true">Gesloten</label>
+                    <input type="radio" id="closinghours_false" name="closinghours" class="visuallyhidden" @change="toggleClosing"
+                           :checked="!cal.closinghours"><label for="closinghours_false">Open</label>
                 </fieldset>
+
+                <hr>
 
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
                               @rm="rmEvent(i)"></event-editor>
