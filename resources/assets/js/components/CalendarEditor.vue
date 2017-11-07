@@ -1,6 +1,6 @@
 <template>
-    <form class="wrapper-height100" @submit.prevent>
-        <div class="wrapper-above-save">
+    <form class="calendar-editor" @submit.prevent>
+        <div class="calendar-editor__fields">
             <div class="cal-img top-right" :class="'layer-'+cal.layer"></div>
 
             <!-- First calendar is always weekly -->
@@ -76,8 +76,8 @@
             </div>
         </div>
 
-        <div class="wrapper-save-btn">
-            <div class="col-xs-12 text-right">
+        <div class="calendar-editor__buttons">
+            <div class="text-right">
                 <button type="button" class="btn btn-default pull-left" @click="rmCalendar()"
                         :disabled="$root.isRecreatex">Verwijder
                 </button>
