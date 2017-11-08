@@ -51,10 +51,6 @@ body {
 
 /* Table */
 
-.table-hover > tbody > tr:hover {
-  cursor: pointer;
-}
-
 .table-list {
   margin-bottom: 0;
   padding-left: 20px;
@@ -107,6 +103,7 @@ body {
     border: none;
     padding-left: 1em;
     vertical-align: middle;
+    width: auto;
 
     &:first-child {
       padding-left: 3em;
@@ -208,24 +205,6 @@ body {
   margin: 0 -10px;
 }
 
-/* Wrapper */
-
-.wrapper-height100 {
-  height: 100%;
-  margin: 0 -15px;
-}
-
-.wrapper-above-save {
-  height: calc(100% - 4.7em);
-  padding: 0 15px;
-  overflow: auto;
-}
-
-.wrapper-save-btn {
-  border-top: 1px solid #ccc;
-  padding-top: 15px;
-}
-
 /* Panel */
 
 a.panel {
@@ -303,33 +282,50 @@ h1 + h3 {
 
 /* Version > Preview */
 
+
+
 .version-split {
-  position: fixed;
-  z-index: 3;
-  top: 200px;
-  // Temp
-  // top: 217px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border-top: 1px solid #ccc;
+  display: flex;
+  flex-wrap: wrap;
+  align-items:stretch;
   background: #fff;
+  margin-bottom: 1rem;
+  position: relative;
+
   & > div {
-    height: 100%;
     overflow: auto;
+    flex: 1 1 auto;
+  }
+
+  .version-cals {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .version-preview {
+    border: 1px solid #ccc;
+    padding-top: 1em;
+    margin-right: 0;
+    margin-left: auto;
+    background: #eee;
+  }
+
+  @media (min-width: 768px) {
+
+    flex-wrap: nowrap;
+
+    & > div {
+      flex: 0 1 auto;
+    }
+
+    .version-cals {
+      position: absolute;
+      height: 100%;
+    }
   }
 }
 
-.version-cals {
-  width: 30em;
-}
 
-.version-preview {
-  border-left: 1px solid #ccc;
-  padding-top: 1em;
-  width: calc(100% - 30em);
-  background: #eee;
-}
 
 .calendar {
   overflow: hidden;

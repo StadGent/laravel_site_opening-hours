@@ -4,10 +4,11 @@ namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreChannelRequest;
+use App\Models\Channel;
 use App\Models\Service;
 use App\Repositories\ChannelRepository;
 use App\Repositories\ServicesRepository;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class ChannelController extends Controller
@@ -19,7 +20,6 @@ class ChannelController extends Controller
     {
         $this->channels = $channels;
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -45,7 +45,6 @@ class ChannelController extends Controller
         );
     }
 
-
     /**
      * Get subset of Channels from Serivce
      * @param $id
@@ -59,40 +58,22 @@ class ChannelController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $input = $request->input();
-
-        $success = $this->channels->update($id, $input);
-
-        if ($success) {
-            return response()->json($this->channels->getById($id));
-        }
-
-        return response()->json(['message' => 'Something went wrong while updating the channel, check the logs.'], 400);
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param  Service $service
+     * @param  Channel $channel
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Service $service, Channel $channel)
     {
-        $channel = $this->channels->getFullObjectById($id);
+        if (!$service->channels->find($channel)) {
+            $exception = new ModelNotFoundException();
+            $exception->setModel(Channel::class);
 
-        if (empty($channel)) {
-            return response()->json(['message' => 'Het kanaal werd niet gevonden.'], 400);
+            throw $exception;
         }
 
-        $this->channels->delete($id);
+        $channel->delete();
 
         return response()->json(['Het kanaal werd verwijderd.']);
     }

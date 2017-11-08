@@ -11,7 +11,7 @@
 
           <button type="button" class="btn btn-primary" @click="newUser" v-if="route.tab == 'users'">+ Gebruiker uitnodigen</button>
           <button type="button" class="btn btn-primary" @click="draft = !draft" v-if="!route.tab">
-              {{draft ? "Terug naar active diensten" : "+ Activeer diensten"}}
+              {{draft ? "Terug naar actieve diensten" : "+ Activeer diensten"}}
           </button>
         </span>
           <span v-else>
@@ -21,6 +21,7 @@
             <div class="form-group">
                 <input aria-label="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
                        v-model="query"
+                       v-if="this.showSearch"
                        @input="route.offset=0"
                        class="form-control"
                        :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
@@ -31,7 +32,7 @@
       </div>
 
     <!-- Users -->
-    <div v-if="isAdmin&&route.tab==='users'" class="row">
+    <div v-if="isAdmin&&route.tab==='users'">
       <div v-if="!users.length" class="table-message">
         <h3 class="text-muted">
           Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
@@ -63,7 +64,7 @@
     </div>
 
     <!-- Services -->
-    <div v-else class="row">
+    <div v-else>
       <div v-if="!allowedServices.length" class="table-message">
         <h3 class="text-muted" v-if="isAdmin && !draft">Er zijn geen actieve diensten.</h3>
         <h3 class="text-muted" v-else-if="isAdmin && draft">Er zijn geen inactieve diensten.</h3>
@@ -138,6 +139,12 @@ export default {
     }
   },
   computed: {
+
+    // Search
+    showSearch () {
+      return (this.route.tab === "users" && (this.pagedUsers.length !== 0 || this.query !== '')) ||
+          (this.pagedServices.length !== 0 || this.query !== '');
+    },
 
     // Services
     allowedServices () {

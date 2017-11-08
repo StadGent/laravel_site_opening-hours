@@ -81,7 +81,6 @@ export default {
       this.replaceHash()
     },
     toVersion(c) {
-      console.log('going to version');
       route.page = 'version'
       if (typeof c !== 'undefined') {
         route.version = parseInt(c || 0)

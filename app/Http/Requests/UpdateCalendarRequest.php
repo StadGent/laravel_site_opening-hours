@@ -19,7 +19,7 @@ class UpdateCalendarRequest extends FormRequest
     public function authorize(UserRepository $users, Request $request)
     {
         // Get the service of the calendar
-        $calendar = Calendar::with('openinghours.channel.service')->find($request->id);
+        $calendar = Calendar::with('openinghours.channel.service')->find($request->calendar);
 
         if (empty($calendar) || empty($calendar->openinghours->channel->service->id)) {
             return false;
