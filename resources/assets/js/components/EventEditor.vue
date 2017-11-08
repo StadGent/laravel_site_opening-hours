@@ -53,10 +53,8 @@
                     </select>
                 </div>
             </div>
-
             <!-- Yearly -->
             <div v-if="options.freq==RRule.YEARLY" class="form-group">
-
                 <div class="col-xs-12">
                     <strong>Op</strong>
                 </div>
@@ -107,10 +105,8 @@
                     </div>
                 </div>
             </div>
-
             <!-- Monthly -->
             <div v-else-if="options.freq==RRule.MONTHLY" class="form-group">
-
                 <div class="col-xs-12">
                     <strong>Op</strong>
                 </div>
@@ -156,10 +152,8 @@
                     </div>
                 </div>
             </div>
-
             <!-- Weekly -->
             <div v-else-if="options.freq==RRule.WEEKLY" class="form-group">
-
                 <div class="col-xs-12">
                     <strong>Op</strong>
                 </div>
@@ -172,7 +166,6 @@
                     </button>
                 </div>
             </div>
-
             <!-- Openinghours -->
             <div v-if="!closinghours" class="form-group"
                  :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
@@ -190,13 +183,7 @@
                            placeholder="_ _ : _ _">
                 </div>
             </div>
-
         </div>
-        <!-- Single event: not recurring -->
-        <div v-if="!event.rrule">
-            gewone lijst van dagen
-        </div>
-
         <hr>
     </div>
 </template>
@@ -238,16 +225,8 @@
                 return this.$parent.cal.closinghours
             },
             // If the label of the previous event is the same, you can not choose the period
-            prevEventDivider() {
-                return !this.parent[this.prop - 1] || (this.parent[this.prop - 1] || {}).label != this.event.label;
-            },
-            // If the label of the previous event is the same, you can not choose the period
             prevEventSameLabel() {
                 return this.event.label && (this.parent[this.prop - 1] || {}).label == this.event.label;
-            },
-            // If the label of the next event is not the same, you can add weekly hours
-            nextEventSameLabel() {
-                return this.event.label && (this.parent[this.prop + 1] || {}).label == this.event.label;
             },
             // The current event being edited
             event() {
