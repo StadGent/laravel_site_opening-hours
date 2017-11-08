@@ -31,7 +31,6 @@
               <label for="recipient-name" class="control-label">Naam van de versie</label>
               <input type="text" class="form-control" v-model="modal.label" :placeholder="nextVersionLabel">
             </div>
-
             <div class="row form-group">
               <div class="col-sm-6">
                 <label for="start_date" class="control-label">Geldig van</label>
@@ -42,7 +41,6 @@
                 <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="pikadayEnd" />
               </div>
             </div>
-
             <div v-if="modal.id" class="alert alert-warning">
               <strong>Opgelet!</strong> <br>
               Wanneer je de einddatum wijzigt heeft dit geen effect op de einddatum van de bestaande uitzonderingen.
