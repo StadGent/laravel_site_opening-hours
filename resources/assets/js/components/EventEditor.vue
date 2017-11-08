@@ -1,5 +1,5 @@
 <template>
-    <div @change="sync">
+    <div @change="sync" >
         <div class="row" :class="{ 'has-error text-danger': !isUntilValid }" v-if="event.rrule && $parent.cal.layer"
              style="margin-bottom:15px;">
             <div :class="'col-xs-' + (closinghours ? 5 : 6)">
@@ -165,13 +165,13 @@
                 <div class="form-inline-always" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
                     <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
                     <span v-if="!closinghours">
-            van
-            <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime"
-                   placeholder="_ _ : _ _">
-            tot
-            <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime"
-                   placeholder="_ _ : _ _">
-          </span>
+                        van
+                        <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime"
+                               placeholder="_ _ : _ _">
+                        tot
+                        <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime"
+                               placeholder="_ _ : _ _">
+                    </span>
                     <span v-else>hele dag gesloten</span>
                     <div class="close" @click="$emit('rm')" v-if="!$parent.cal.layer">&times;</div>
                 </div>
