@@ -407,15 +407,18 @@ h1 + h3 {
 
 .cal {
   border-top: 1px solid #ddd;
-  margin: 0 -1em;
   background: white;
   &:last-child {
     border-bottom: 1px solid #ddd;
   }
+
+  .btn.btn-link {
+    white-space: normal;
+    text-align: left;
+  }
 }
 
 .cal-header {
-  line-height: 32px;
   display: flex;
 }
 
@@ -427,21 +430,18 @@ h1 + h3 {
   font-size: 18px;
   text-align: center;
   border-radius: 4px;
+  flex: 0 0 auto;
 }
 
 .cal-action {
   display: inline-block;
   padding: .6em 1em;
-  cursor: pointer;
-  &:hover {
-    background: #eee;
-    border-color: #ccc;
-  }
 }
 
 .cal-info {
   display: flex;
   flex-grow: 1;
+  align-items: center;
 }
 
 .cal-name {

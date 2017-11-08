@@ -154,18 +154,17 @@
             </div>
             <!-- Weekly -->
             <div v-else-if="options.freq==RRule.WEEKLY" class="form-group">
-                <div class="col-xs-12">
+                <div :class="{'col-xs-12' : $parent.cal.layer, 'col-xs-10': !$parent.cal.layer}">
                     <strong>Op</strong>
+                </div>
+                <div v-if="!$parent.cal.layer" class="col-xs-2">
+                    <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
                 <div class="col-xs-5" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
                     <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
                 </div>
-                <div v-if="!$parent.cal.layer">
-                    <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"
-                            :disabled="$root.isRecreatex"><b>+</b> Voeg meer dagen toe
-                    </button>
-                </div>
             </div>
+
             <!-- Openinghours -->
             <div v-if="!closinghours" class="form-group"
                  :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
@@ -183,6 +182,12 @@
                            placeholder="_ _ : _ _">
                 </div>
             </div>
+        </div>
+
+        <div v-if="!$parent.cal.layer">
+            <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"
+                    :disabled="$root.isRecreatex"><b>+</b> Voeg meer dagen toe
+            </button>
         </div>
         <hr>
     </div>
