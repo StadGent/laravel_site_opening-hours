@@ -14,6 +14,19 @@ class ChannelControllerTest extends \TestCase
     protected $apiUrl = '/api/services/1/channels';
 
     /**
+     * @test
+     */
+    public function testFailOnGetWithChannelFromOtherService()
+    {
+        $this->json('get', $this->apiUrl . '/' . '15');
+        $this->seeStatusCode(422);
+        $content = $this->decodeResponseJson();
+        $this->assertEquals('Channel model is not found with given identifier', $content['error']['message']);
+        $this->assertEquals('Channel', $content['error']['target']);
+        $this->assertEquals('ModelNotFoundException', $content['error']['code']);
+    }
+
+    /**
      * Data provider for requests
      *
      * Datastructure:
@@ -21,7 +34,6 @@ class ChannelControllerTest extends \TestCase
      *
      * @return array
      */
-    
     public function requestTypeProvider()
     {
         return [

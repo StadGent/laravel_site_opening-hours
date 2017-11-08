@@ -14,6 +14,20 @@ class ChannelControllerTest extends \TestCase
     protected $apiUrl = '/api/ui/services/1/channels';
 
     /**
+     * @test
+     */
+    public function testFailOnDestroyWithWrongId()
+    {
+        $authUser = \App\Models\User::where('name', 'adminuser')->first();
+        $this->actingAs($authUser, 'api');
+
+        $this->doRequest('delete', '/api/ui/services/2/channels/1');
+        $this->seeStatusCode(422);
+        $content = $this->decodeResponseJson();
+        $this->assertEquals('Channel model is not found with given identifier', $content['error']['message']);
+    }
+
+    /**
      * Data provider for requests
      *
      * Datastructure:
@@ -21,7 +35,6 @@ class ChannelControllerTest extends \TestCase
      *
      * @return array
      */
-    
     public function requestTypeProvider()
     {
         return [
