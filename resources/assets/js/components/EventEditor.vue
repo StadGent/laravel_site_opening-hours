@@ -1,7 +1,7 @@
 <template>
-    <div @change="sync" >
-        <div class="row" :class="{ 'has-error text-danger': !isUntilValid }" v-if="event.rrule && $parent.cal.layer"
-             style="margin-bottom:15px;">
+    <div @change="sync" class="form-horizontal event-editor">
+        <div class="form-group" :class="{ 'has-error text-danger': !isUntilValid }"
+             v-if="event.rrule && $parent.cal.layer">
             <div class="col-xs-5">
                 <label class="control-label">Geldig vanaf</label>
                 <pikaday class="form-control inp-startDate" v-model="eventStartDate" :options="pikadayStart"/>
@@ -14,11 +14,11 @@
                 <div class="close close--col" style="padding-top: 30px;" @click="$emit('rm')">&times;</div>
             </div>
         </div>
-        <div class="form-horizontal" v-if="event.rrule">
+        <div v-if="event.rrule">
             <!-- Choose the period -->
             <div class="form-group" v-if="!prevEventSameLabel && $parent.cal.layer">
-                <label class="col-xs-3 control-label">Regelmaat</label>
-                <div class="col-xs-4">
+                <label for="optionFreq" class="col-xs-12">Regelmaat</label>
+                <div class="col-xs-5" id="optionFreq">
                     <select v-model="optionFreq" class="form-control">
                         <option :value="RRule.YEARLY">Jaarlijks</option>
                         <option :value="RRule.MONTHLY">Maandelijks</option>
@@ -26,24 +26,24 @@
                         <option :value="RRule.DAILY">Dagelijks</option>
                     </select>
                 </div>
-                <div class="col-xs-5" v-if="options.freq==RRule.MONTHLY">
-                    <select v-model="optionInterval" class="form-control">
+                <div class="col-xs-5" v-else-if="options.freq==RRule.MONTHLY">
+                    <select v-model="optionInterval" class="form-control" aria-label="herhaling">
                         <option :value="null">elke maand</option>
                         <option :value="2">tweemaandelijks</option>
                         <option :value="3">elk kwartaal</option>
                         <option :value="4">viermaandelijks</option>
                     </select>
                 </div>
-                <div class="col-xs-5" v-if="options.freq==RRule.WEEKLY">
-                    <select v-model="optionInterval" class="form-control">
+                <div class="col-xs-5" v-else-if="options.freq==RRule.WEEKLY">
+                    <select v-model="optionInterval" class="form-control" aria-label="herhaling">
                         <option :value="null">elke week</option>
                         <option :value="2">tweewekelijks</option>
                         <option :value="3">driewekelijks</option>
                         <option :value="4">vierwekelijks</option>
                     </select>
                 </div>
-                <div class="col-xs-5" v-if="options.freq==RRule.DAILY">
-                    <select v-model="optionInterval" class="form-control">
+                <div class="col-xs-5" v-else-if="options.freq==RRule.DAILY">
+                    <select v-model="optionInterval" class="form-control" aria-label="herhaling">
                         <option :value="null">elke dag</option>
                         <option :value="2">om de dag</option>
                         <option :value="3">om de drie dagen</option>
@@ -55,26 +55,26 @@
             </div>
 
             <!-- Yearly -->
-            <div v-if="options.freq==RRule.YEARLY">
+            <div v-if="options.freq==RRule.YEARLY" class="form-group">
 
+                <div class="col-xs-12">
+                    <strong>Op</strong>
+                </div>
                 <!-- bymonthday + bymonth -->
-                <div class="form-group" @click="weekOrMonth = 'monthday'">
-                    <label class="col-xs-3 control-label">
-                        <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="monthday"
-                               class="pull-left">
-                        op
+                <div class="col-xs-12" @click="weekOrMonth = 'monthday'">
+                    <label class="control-label">
+                        <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="monthday">
+                        &nbsp;{{ eventStartDayMonth }}
                     </label>
-                    <div class="col-xs-9" style="padding-top: 8px">
-                        {{ eventStartDayMonth }}
-                    </div>
                 </div>
                 <!-- bysetpos + byweekday + bymonth -->
-                <div class="form-group" @click="weekOrMonth = 'weekday'">
-                    <label class="col-xs-3 control-label">
-                        <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="weekday"
-                               class="pull-left">
-                        op de
-                    </label>
+                <div @click="weekOrMonth = 'weekday'">
+                    <div class="col-xs-3">
+                        <label class="control-label">
+                            <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="weekday">
+                            &nbsp;de
+                        </label>
+                    </div>
                     <div class="col-xs-3">
                         <select v-model="optionBysetpos" class="form-control">
                             <option value="-" disabled></option>
@@ -109,27 +109,27 @@
             </div>
 
             <!-- Monthly -->
-            <div v-else-if="options.freq==RRule.MONTHLY">
+            <div v-else-if="options.freq==RRule.MONTHLY" class="form-group">
 
+                <div class="col-xs-12">
+                    <strong>Op</strong>
+                </div>
                 <!-- bymonthday + bymonth -->
-                <div class="form-group" @click="weekOrMonth = 'monthday'">
-                    <label class="col-xs-3 control-label">
-                        <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="monthday"
-                               class="pull-left">
-                        op dag
+                <div class="col-xs-12" @click="weekOrMonth = 'monthday'">
+                    <label class="control-label">
+                        <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="monthday">
+                        &nbsp;dag&nbsp;{{ eventStartDayMonth.slice(0, 2) }}
                     </label>
-                    <div class="col-xs-9" style="padding-top: 8px">
-                        {{ eventStartDayMonth.slice(0, 2) }}
-                    </div>
                 </div>
                 <!-- bysetpos + byweekday + bymonth -->
-                <div class="form-group" @click="weekOrMonth = 'weekday'">
-                    <label class="col-xs-3 control-label">
-                        <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="weekday"
-                               class="pull-left">
-                        op de
-                    </label>
-                    <div class="col-xs-4" @click="weekOrMonth = 'weekday'">
+                <div @click="weekOrMonth = 'weekday'">
+                    <div class="col-xs-3">
+                        <label class="control-label">
+                            <input type="radio" :name="event.start_date" v-model="weekOrMonth" value="weekday">
+                            &nbsp;de&nbsp;
+                        </label>
+                    </div>
+                    <div class="col-xs-3" @click="weekOrMonth = 'weekday'">
                         <select v-model="optionBysetpos" class="form-control">
                             <option value="-" disabled></option>
                             <option value="1">eerste</option>
@@ -140,7 +140,7 @@
                             <option value="-1">laatste</option>
                         </select>
                     </div>
-                    <div class="col-xs-5" @click="weekOrMonth = 'weekday'">
+                    <div class="col-xs-3" @click="weekOrMonth = 'weekday'">
                         <select v-model="optionByweekday" class="form-control">
                             <option value="0">maandag</option>
                             <option value="1">dinsdag</option>
@@ -158,18 +158,21 @@
             </div>
 
             <!-- Weekly -->
-            <div v-else-if="options.freq==RRule.WEEKLY">
-                <div class="form-inline-always" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
+            <div v-else-if="options.freq==RRule.WEEKLY" class="form-group">
+
+                <div class="col-xs-12">
+                    <strong>Op</strong>
+                </div>
+                <div class="col-xs-5" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
                     <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
-                    <span v-if="!closinghours">
-                        van
-                        <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime"
-                               placeholder="_ _ : _ _">
-                        tot
-                        <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime"
-                               placeholder="_ _ : _ _">
-                    </span>
-                    <span v-else>hele dag gesloten</span>
+                </div>
+                <div class="col-xs-5" v-if="!closinghours">
+                    van
+                    <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime"
+                           placeholder="_ _ : _ _">
+                    tot
+                    <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime"
+                           placeholder="_ _ : _ _">
                 </div>
                 <div v-if="!$parent.cal.layer">
                     <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"

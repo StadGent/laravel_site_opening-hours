@@ -646,6 +646,22 @@ h1 + h3 {
     opacity: .8;
     cursor: pointer;
     text-decoration: line-through;
-
   }
+}
+
+.event-editor {
+  .form-group {
+    margin-bottom: .5rem;
+  }
+}
+
+.form-control {
+  .form-control--inline {
+    width: auto;
+    display: inline;
+  }
+}
+
+input[type=radio] {
+    vertical-align: middle;
 }
