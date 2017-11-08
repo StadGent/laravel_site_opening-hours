@@ -10,7 +10,7 @@
         <button class="btn btn-primary btn-lg" @click="newVersion" :disabled="$root.isRecreatex">Voeg een eerste versie toe</button>
       </p>
     </div>
-    <div v-else class="">
+    <div v-else>
       <table class="table table-hover">
         <thead>
           <tr>
