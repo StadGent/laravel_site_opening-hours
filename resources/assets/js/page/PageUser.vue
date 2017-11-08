@@ -26,7 +26,7 @@
         <button class="btn btn-lg btn-default" @click="newRoleForUser(usr)">Nodig uit voor een dienst</button>
       </p>
     </div>
-    <div v-else-if="isAdmin" class="row">
+    <div v-else-if="isAdmin">
       <table class="table table-hover table-service-admin">
         <thead>
           <tr>
@@ -38,7 +38,7 @@
         <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s"></tbody>
       </table>
     </div>
-    <div v-else class="row">
+    <div v-else>
       <table class="table table-hover table-service">
         <thead>
           <tr>
@@ -56,8 +56,6 @@
 import RowUserService from '../components/RowUserService.vue'
 import RowUserServiceAdmin from '../components/RowUserServiceAdmin.vue'
 import ThSort from '../components/ThSort.vue'
-
-import { expandUser } from '../mixins/users.js'
 
 import { orderBy } from '../lib.js'
 
@@ -77,7 +75,7 @@ export default {
       return this.$root.users || []
     },
     usr () {
-      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || this.fetchedUser || this.fetchUser(this.route.id) || {}
+      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || {}
     },
 
     // Services
@@ -105,12 +103,6 @@ export default {
     }
   },
   methods: {
-    fetchUser (id) {
-      this.$http.get('/api/ui/users/' + id)
-        .then(({ data }) => {
-          this.fetchedUser = expandUser(data)
-        })
-    }
   },
   components: {
     RowUserService,

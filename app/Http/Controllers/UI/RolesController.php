@@ -13,6 +13,7 @@ use App\Repositories\UserRepository;
  */
 class RolesController extends Controller
 {
+
     /**
      * @param UserRepository $users
      */
@@ -24,39 +25,46 @@ class RolesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     *
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRoleRequest $request)
+    public function update(StoreRoleRequest $request)
     {
         $input = $request->input();
 
-        $success = $this->users->linkToService($input['user_id'], $input['service_id'], $input['role']);
+        $success = $this
+            ->users
+            ->linkToService($input['user_id'], $input['service_id'], $input['role']);
 
         if ($success) {
-            return response()->json(['message' => 'De rol werd toegevoegd.']);
+            return response()->json(['role' => $input['role']]);
         }
 
-        return response()->json(['message' => 'Er is iets misgegaan tijdens het toevoegen van de rol.'], 400);
+        return response()
+            ->json(['message' => 'Er is iets misgegaan tijdens het aanpassen van de rol.'], 400);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int                       $id
+     * @param  int $id
+     *
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteRoleRequest $request)
     {
         $input = $request->input();
 
-        $success = $this->users->removeRoleInService($input['user_id'], $input['service_id']);
+        $success = $this->users
+            ->removeRoleInService($input['user_id'], $input['service_id']);
 
         if ($success) {
             return response()->json(['message' => 'De gebruiker werd bijgewerkt.']);
         }
 
-        return response()->json(['message' => 'Er is iets foutgegaan bij het bewerken van een gebruiker.'], 400);
+        return response()
+            ->json(['message' => 'Er is iets foutgegaan bij het bewerken van een gebruiker.'], 400);
     }
 }
