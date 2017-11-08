@@ -166,14 +166,6 @@
                 <div class="col-xs-5" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
                     <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
                 </div>
-                <div class="col-xs-5" v-if="!closinghours">
-                    van
-                    <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime"
-                           placeholder="_ _ : _ _">
-                    tot
-                    <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime"
-                           placeholder="_ _ : _ _">
-                </div>
                 <div v-if="!$parent.cal.layer">
                     <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"
                             :disabled="$root.isRecreatex"><b>+</b> Voeg meer dagen toe
@@ -181,18 +173,24 @@
                 </div>
             </div>
 
-            <!-- Daily -->
-            <div v-if="options.freq!=RRule.WEEKLY&&!closinghours">
-                <div class="form-inline-always text-center"
-                     :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
-                    van
-                    <input type="text" class="form-control control-time inp-startTime" v-model.lazy="eventStartTime"
+            <!-- Openinghours -->
+            <div v-if="!closinghours" class="form-group"
+                 :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
+
+                <div class="col-xs-3">
+                    <label for="eventStartTime">Van</label>
+                    <input id="eventStartTime" type="text" class="form-control control-time inp-startTime"
+                           v-model.lazy="eventStartTime"
                            placeholder="_ _ : _ _">
-                    tot
-                    <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime"
+                </div>
+                <div class="col-xs-3">
+                    <label for="eventEndTime">tot</label>
+                    <input id="eventEndTime" type="text" class="form-control control-time inp-endTime"
+                           v-model.lazy="eventEndTime"
                            placeholder="_ _ : _ _">
                 </div>
             </div>
+
         </div>
         <!-- Single event: not recurring -->
         <div v-if="!event.rrule">
