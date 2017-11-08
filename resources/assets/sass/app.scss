@@ -614,6 +614,14 @@ h1 + h3 {
   }
 }
 
+.visuallyhidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px; width: 1px;
+  margin: -1px; padding: 0; border: 0;
+}
+
 .btn-toggle {
   border: 1px solid rgba(0,0,0,.2);
   border-radius: 4px;
@@ -621,7 +629,6 @@ h1 + h3 {
   background: #e5e5e5;
 
   input[type="radio"] {
-    display: none;
 
     &:checked+label {
       font-weight: bold;

@@ -61,9 +61,9 @@
             <div v-else>
                 <h3>{{ cal.label }}</h3>
                 <fieldset class="btn-toggle">
-                    <input type="radio" id="closinghours_true" name="closinghours" @change="toggleClosing"
+                    <input type="radio" id="closinghours_true" name="closinghours" class="visuallyhidden" @change="toggleClosing"
                            :checked="cal.closinghours"><label for="closinghours_true">Gesloten</label>
-                    <input type="radio" id="closinghours_false" name="closinghours" @change="toggleClosing"
+                    <input type="radio" id="closinghours_false" name="closinghours" class="visuallyhidden" @change="toggleClosing"
                            :checked="!cal.closinghours"><label for="closinghours_false">Open</label>
                 </fieldset>
 
