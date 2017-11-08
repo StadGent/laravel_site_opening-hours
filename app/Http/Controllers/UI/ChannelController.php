@@ -73,7 +73,7 @@ class ChannelController extends Controller
             throw $exception;
         }
 
-        $test = $channel->delete();
+        $channel->delete();
 
         return response()->json(['Het kanaal werd verwijderd.']);
     }
