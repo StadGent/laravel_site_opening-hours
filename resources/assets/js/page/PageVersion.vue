@@ -30,23 +30,46 @@
                             </button>
                         </p>
                         <transition-group name="list" tag="div">
-                            <div class="cal" v-for="cal in reversedCalendars" :key="cal.label">
+                            <div class="cal" v-if="cal.priority !== 0" v-for="cal in reversedCalendars"
+                                 :key="cal.label">
                                 <header class="cal-header">
-                                    <div class="cal-action cal-info"
-                                         @click="toCalendar($root.isRecreatex ? -1 : cal.id)">
+                                    <div class="cal-info">
                                         <div class="cal-img" :class="'layer-'+cal.layer"></div>
-                                        <div class="cal-name">{{ cal.label }}</div>
-                                        <div class="cal-view" v-if="!$root.isRecreatex">Bekijk</div>
-                                    </div>
-                                    <div class="cal-action cal-lower" @click="swapLayers(cal.layer, cal.layer - 1)"
-                                         v-if="!$root.isRecreatex">Lager
-                                    </div>
-                                    <div class="cal-action cal-higher" @click="swapLayers(cal.layer, cal.layer + 1)"
-                                         v-if="!$root.isRecreatex">Hoger
-                                    </div>
+                                        <div class="cal-name" @click="toCalendar($root.isRecreatex ? -1 : cal.id)">
+                                            <button class="btn btn-link">
+                                                {{ cal.label }}
+                                            </button>
+
+                                        </div>
+                                        <div class="cal-lower cal-action"
+                                             v-if="!$root.isRecreatex">
+                                            <button class="btn btn-default" :disabled="cal.layer <= 1"
+                                                    @click="swapLayers(cal.layer, cal.layer - 1)">
+                                                lager
+                                            </button>
+                                        </div>
+                                        <div class="cal-higher cal-action"
+                                             v-if="!$root.isRecreatex">
+                                            <button class="btn btn-default"
+                                                    :disabled="cal.layer === reversedCalendars.length - 1"
+                                                    @click="swapLayers(cal.layer, cal.layer + 1)">
+                                                hoger
+                                            </button>
+                                        </div>
                                 </header>
                             </div>
                         </transition-group>
+                        <div class="cal">
+                            <header class="cal-header">
+                                <div class="cal-action cal-info"
+                                     @click="toCalendar($root.isRecreatex ? -1 : this.baseCalendar.id)">
+                                    <div class="cal-img" :class="'layer-'+ this.baseCalendar.layer"></div>
+                                    <div class="cal-name">{{ baseCalendar.label }}</div>
+                                    <div class="cal-view" v-if="!$root.isRecreatex">Bekijk</div>
+                                </div>
+                            </header>
+                        </div>
+
                     </div>
                     <!-- Encourage to add calendars after first one -->
                     <div class="text-center" v-if="reversedCalendars.length === 1 && !$root.isRecreatex">
@@ -113,6 +136,11 @@
                     c.layer = -c.priority;
                     return c;
                 })
+            },
+            baseCalendar() {
+                return this.calendars.find((c) => {
+                    return c.priority === 0
+                }) || {}
             },
             reversedCalendars() {
                 return inert(this.calendars).reverse();
