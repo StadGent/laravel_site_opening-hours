@@ -612,3 +612,56 @@ h1 + h3 {
     right: -25%;
   }
 }
+
+.visuallyhidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px; width: 1px;
+  margin: -1px; padding: 0; border: 0;
+}
+
+.btn-toggle {
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 4px;
+  display: inline-block;
+  background: #e5e5e5;
+
+  input[type="radio"] {
+
+    &:checked+label {
+      font-weight: bold;
+      border-bottom: 2px solid $green;
+      opacity: 1;
+      background: $darkblue;
+      color: white;
+      text-decoration: none;
+    }
+  }
+
+  label {
+    padding: .5rem;
+    font-weight: normal;
+    margin: 0;
+    opacity: .8;
+    cursor: pointer;
+    text-decoration: line-through;
+  }
+}
+
+.event-editor {
+  .form-group {
+    margin-bottom: .5rem;
+  }
+}
+
+.form-control {
+  .form-control--inline {
+    width: auto;
+    display: inline;
+  }
+}
+
+input[type=radio] {
+    vertical-align: middle;
+}
