@@ -32,7 +32,7 @@
       </div>
 
     <!-- Users -->
-    <div v-if="isAdmin&&route.tab==='users'" class="">
+    <div v-if="isAdmin&&route.tab==='users'">
       <div v-if="!users.length" class="table-message">
         <h3 class="text-muted">
           Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
@@ -64,7 +64,7 @@
     </div>
 
     <!-- Services -->
-    <div v-else class="">
+    <div v-else>
       <div v-if="!allowedServices.length" class="table-message">
         <h3 class="text-muted" v-if="isAdmin && !draft">Er zijn geen actieve diensten.</h3>
         <h3 class="text-muted" v-else-if="isAdmin && draft">Er zijn geen inactieve diensten.</h3>
