@@ -2,18 +2,15 @@
     <div @change="sync" >
         <div class="row" :class="{ 'has-error text-danger': !isUntilValid }" v-if="event.rrule && $parent.cal.layer"
              style="margin-bottom:15px;">
-            <div :class="'col-xs-' + (closinghours ? 5 : 6)">
+            <div class="col-xs-5">
                 <label class="control-label">Geldig vanaf</label>
                 <pikaday class="form-control inp-startDate" v-model="eventStartDate" :options="pikadayStart"/>
             </div>
-            <div :class="'col-xs-' + (closinghours ? 5 : 6)">
+            <div class="col-xs-5">
                 <label class="control-label">tot en met</label>
                 <pikaday class="form-control inp-until" v-model="eventUntil" :options="pikadayUntil"/>
             </div>
-            <div :class="'col-xs-' + (closinghours ? 5 : 6)" v-else>
-                <label class="control-label"><a href="#" @click.prevent="show.endDate=1">tot en met...</a></label>
-            </div>
-            <div class="col-xs-2" v-if="closinghours">
+            <div class="col-xs-2">
                 <div class="close close--col" style="padding-top: 30px;" @click="$emit('rm')">&times;</div>
             </div>
         </div>
@@ -173,7 +170,6 @@
                                placeholder="_ _ : _ _">
                     </span>
                     <span v-else>hele dag gesloten</span>
-                    <div class="close" @click="$emit('rm')" v-if="!$parent.cal.layer">&times;</div>
                 </div>
                 <div v-if="!$parent.cal.layer">
                     <button type="button" class="btn btn-link" @click="$emit('add-event', prop, event)"
@@ -192,7 +188,6 @@
                     tot
                     <input type="text" class="form-control control-time inp-endTime" v-model.lazy="eventEndTime"
                            placeholder="_ _ : _ _">
-                    <div class="close" @click="$emit('rm')">&times;</div>
                 </div>
             </div>
         </div>
@@ -200,6 +195,8 @@
         <div v-if="!event.rrule">
             gewone lijst van dagen
         </div>
+
+        <hr>
     </div>
 </template>
 
