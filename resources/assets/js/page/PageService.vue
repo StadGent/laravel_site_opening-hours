@@ -10,7 +10,7 @@
     <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
     <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)" :disabled="$root.isRecreatex">+ Nieuw kanaal</button>
 
-    <div v-if="isOwner&&route.tab2==='users'" class="row">
+    <div v-if="isOwner&&route.tab2==='users'">
       <div v-if="!filteredUsers.length" class="table-message">
         <h3 class="text-muted">Er werden nog geen gebruikers aan deze dienst toegevoegd.</h3>
         <p>
@@ -33,7 +33,7 @@
       </table>
     </div>
 
-    <div v-else class="row">
+    <div v-else>
       <div v-if="!channels||!channels.length" class="table-message">
         <h3 class="text-muted">Er werden nog geen kanalen voor deze dienst aangemaakt.</h3>
         <p>
