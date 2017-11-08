@@ -13,6 +13,22 @@ class CalendarsControllerTest extends \TestCase
      */
     protected $apiUrl = '/api/ui/calendars';
 
+ 
+
+    /**
+     * @test
+     */
+    public function testFailOnDestroyWithWrongId()
+    {
+        $authUser = \App\Models\User::where('name', 'adminuser')->first();
+        $this->actingAs($authUser, 'api');
+
+        $this->doRequest('delete', $this->apiUrl . '/' . '95868_684_not_anID');
+        $this->seeStatusCode(400);
+        $content = $this->decodeResponseJson();
+        $this->assertEquals('De kalender werd niet verwijderd, er is iets foutgegaan.', $content['message']);
+    }
+
     /**
      * Data provider for requests
      *
@@ -48,8 +64,8 @@ class CalendarsControllerTest extends \TestCase
             ['owner', 'get', '', [], '405'], // index
             ['owner', 'post', '', $data, '200'], // store
             ['owner', 'get', '1', [], '405'], // show
-            ['owner', 'put', '1',  $data, '200'], // update (full)
-            ['owner', 'patch', '1',  $data, '200'], // update (partial)
+            ['owner', 'put', '1', $data, '200'], // update (full)
+            ['owner', 'patch', '1', $data, '200'], // update (partial)
             ['owner', 'delete', '1', [], '200'], // destroy
             // member user
             ['member', 'get', '', [], '405'], // index
