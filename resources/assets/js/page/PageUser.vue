@@ -26,7 +26,7 @@
         <button class="btn btn-lg btn-default" @click="newRoleForUser(usr)">Nodig uit voor een dienst</button>
       </p>
     </div>
-    <div v-else-if="isAdmin" class="row">
+    <div v-else-if="isAdmin">
       <table class="table table-hover table-service-admin">
         <thead>
           <tr>
@@ -38,7 +38,7 @@
         <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s"></tbody>
       </table>
     </div>
-    <div v-else class="row">
+    <div v-else>
       <table class="table table-hover table-service">
         <thead>
           <tr>
