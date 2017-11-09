@@ -17,9 +17,9 @@
         <div v-if="event.rrule">
             <!-- Choose the period -->
             <div class="form-group" v-if="!prevEventSameLabel && $parent.cal.layer">
-                <label for="optionFreq" class="col-xs-12">Regelmaat</label>
-                <div class="col-xs-5" id="optionFreq">
-                    <select v-model="optionFreq" class="form-control">
+                <label class="col-xs-12">Regelmaat</label>
+                <div class="col-xs-5">
+                    <select v-model="optionFreq" class="form-control" aria-label="Regelmaat">
                         <option :value="RRule.YEARLY">Jaarlijks</option>
                         <option :value="RRule.MONTHLY">Maandelijks</option>
                         <option :value="RRule.WEEKLY">Wekelijks</option>
@@ -170,14 +170,16 @@
                  :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
 
                 <div class="col-xs-3">
-                    <label for="eventStartTime">Van</label>
-                    <input id="eventStartTime" type="text" class="form-control control-time inp-startTime"
+                    <label>Van</label>
+                    <input type="text" class="form-control control-time inp-startTime"
+                           aria-label="Van"
                            v-model.lazy="eventStartTime"
                            placeholder="_ _ : _ _">
                 </div>
                 <div class="col-xs-3">
-                    <label for="eventEndTime">tot</label>
-                    <input id="eventEndTime" type="text" class="form-control control-time inp-endTime"
+                    <label >tot</label>
+                    <input type="text" class="form-control control-time inp-endTime"
+                           aria-label="tot"
                            v-model.lazy="eventEndTime"
                            placeholder="_ _ : _ _">
                 </div>
