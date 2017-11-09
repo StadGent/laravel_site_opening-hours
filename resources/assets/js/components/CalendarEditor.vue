@@ -9,10 +9,8 @@
                     van dienst <strong>{{ $root.routeService.label }}</strong>.</h3>
                 <p>Op welke dagen is dit kanaal normaal open?</p>
                 <p class="text-muted">Uitzonderingen kan je later instellen.</p>
-
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
                               @rm="rmEvent(i)"></event-editor>
-
                 <p v-if="!cal.events.length">
                     <button type="button" @click="pushFirstEvent" class="btn btn-link" :disabled="$root.isRecreatex">
                         + Voeg weekschema toe
@@ -39,7 +37,6 @@
                             <em>Bewaar</em>
                             om ook andere momenten toe te voegen
                         </p>
-
                         <div class="form-group">
                             <h4>Herhalende vakantiedagen</h4>
                             <div class="checkbox checkbox--preset" v-for="(preset, index) in presets">
@@ -62,17 +59,16 @@
             <div v-else>
                 <h3>{{ cal.label }}</h3>
                 <fieldset class="btn-toggle">
-                    <input type="radio" id="closinghours_true" name="closinghours" class="visuallyhidden" @change="toggleClosing"
+                    <input type="radio" id="closinghours_true" name="closinghours" class="visuallyhidden"
+                           @change="toggleClosing"
                            :checked="cal.closinghours"><label for="closinghours_true">Gesloten</label>
-                    <input type="radio" id="closinghours_false" name="closinghours" class="visuallyhidden" @change="toggleClosing"
+                    <input type="radio" id="closinghours_false" name="closinghours" class="visuallyhidden"
+                           @change="toggleClosing"
                            :checked="!cal.closinghours"><label for="closinghours_false">Open</label>
                 </fieldset>
-
                 <hr>
-
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
                               @rm="rmEvent(i)"></event-editor>
-
                 <p>
                     <button type="button" @click="pushEvent" class="btn btn-link" :disabled="$root.isRecreatex">
                         + Voeg nieuwe periode of dag toe
