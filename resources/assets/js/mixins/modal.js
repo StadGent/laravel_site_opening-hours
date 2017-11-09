@@ -8,7 +8,8 @@ export const modal = {
   strict: null,
   start_date: null,
   end_date: null,
-  text: null
+  text: null,
+  error: null
 };
 
 export default {

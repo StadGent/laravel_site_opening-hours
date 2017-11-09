@@ -232,10 +232,15 @@ export function fetchError(response) {
     }
     if (this.modalActive) {
         this.modalResume();
-    }
 
-    console.warn(response);
-    this.statusUpdate(response);
+        if(response.body.message) {
+            this.modal.error = response.body.message;
+        }
+    }
+    if(response.error) {
+        console.warn(response);
+        this.statusUpdate(response);
+    }
 }
 
 // Returns a function, that, when invoked, will only be triggered at most once
