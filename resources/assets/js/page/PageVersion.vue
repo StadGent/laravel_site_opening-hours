@@ -60,7 +60,6 @@
                                 </div>
                             </div>
                         </transition-group>
-
                         <h2>Basis openingsuren</h2>
                         <p>Op deze dagen is kanaal <strong>{{ channel.label }}</strong> normaal open.</p>
                         <div class="cal cal--one-line">
@@ -76,7 +75,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <!-- Encourage to add calendars after first one -->
                     <div class="text-center" v-if="reversedCalendars.length === 1 && !$root.isRecreatex">
