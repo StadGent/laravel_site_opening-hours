@@ -415,10 +415,15 @@ h1 + h3 {
     white-space: normal;
     text-align: left;
   }
+
+  &.cal--one-line {
+    border: none;
+  }
 }
 
 .cal-header {
   display: flex;
+  align-items: center;
 }
 
 .cal-img {
