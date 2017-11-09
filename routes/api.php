@@ -11,13 +11,12 @@
 |
  */
 
-/*************************/
-/*  Authenticated UI API  */
-/*************************/
-
-
 Route::group(['prefix' => 'v1'], function () {
 
+    /*************************/
+    /*  Authenticated UI API  */
+    /*************************/
+    
     Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
         // calendars
         Route::post('/calendars', 'UI\CalendarsController@store')->middleware('hasRoleInService');

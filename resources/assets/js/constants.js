@@ -11,7 +11,7 @@ export const MEMBER = 'Lid';
 export const OWNER = 'Eigenaar';
 export const ADMIN = 'Admin';
 
-export const API_PREFIX = '/api/v1';
+export const API_PREFIX = '/api/v1/ui';
 
 export const NO_VALID_EMAIL = 'Dit is geen geldig e-mail adres';
 export const CHOOSE_SERVICE = 'Kies een dienst';
