@@ -313,11 +313,6 @@ export default {
             } else {
                 this.$http.post(API_PREFIX + '/calendars', calendar)
                     .then(({data}) => {
-
-                        //todo why??
-                        //calendarEditor filters on cal.layer... but this is not a field in the calendar model
-                        data.layer = -data.priority;
-
                         if (!this.routeVersion.calendars) {
                             this.$set(this.routeVersion, 'calendars', [])
                         }

@@ -5,13 +5,12 @@
 
             <!-- First calendar is always weekly -->
             <div v-if="!cal.layer">
-                <h3>Stel de openingsuren in voor {{ $root.routeService.label
-                    }}. Op welke dagen is deze dienst normaal open?</h3>
+                <h3>Stel de openingsuren in voor kanaal <strong>{{ $root.routeChannel.label}}</strong>
+                    van dienst <strong>{{ $root.routeService.label }}</strong>.</h3>
+                <p>Op welke dagen is dit kanaal normaal open?</p>
                 <p class="text-muted">Uitzonderingen kan je later instellen.</p>
-
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
                               @rm="rmEvent(i)"></event-editor>
-
                 <p v-if="!cal.events.length">
                     <button type="button" @click="pushFirstEvent" class="btn btn-link" :disabled="$root.isRecreatex">
                         + Voeg weekschema toe
@@ -38,7 +37,6 @@
                             <em>Bewaar</em>
                             om ook andere momenten toe te voegen
                         </p>
-
                         <div class="form-group">
                             <h4>Herhalende vakantiedagen</h4>
                             <div class="checkbox checkbox--preset" v-for="(preset, index) in presets">
@@ -60,14 +58,17 @@
             <!-- Other calendars have more options -->
             <div v-else>
                 <h3>{{ cal.label }}</h3>
-                <label>
-                    <input type="checkbox" :checked="cal.closinghours" @change="toggleClosing"> Sluitingsuren
-                </label>
-                <br>
-
+                <fieldset class="btn-toggle">
+                    <input type="radio" id="closinghours_true" name="closinghours" class="visuallyhidden"
+                           @change="toggleClosing"
+                           :checked="cal.closinghours"><label for="closinghours_true">Gesloten</label>
+                    <input type="radio" id="closinghours_false" name="closinghours" class="visuallyhidden"
+                           @change="toggleClosing"
+                           :checked="!cal.closinghours"><label for="closinghours_false">Open</label>
+                </fieldset>
+                <hr>
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
                               @rm="rmEvent(i)"></event-editor>
-
                 <p>
                     <button type="button" @click="pushEvent" class="btn btn-link" :disabled="$root.isRecreatex">
                         + Voeg nieuwe periode of dag toe
@@ -289,7 +290,7 @@
                 if (start.getMonth() === until.getMonth()) {
                     if (start.getDate() === until.getDate()) {
                         return start.getDate() + ' ' + MONTHS[start.getMonth()]
-                     }
+                    }
                     return start.getDate() + ' - ' + until.getDate() + ' ' + MONTHS[start.getMonth()]
                 }
                 return start.getDate() + ' ' + MONTHS[start.getMonth()] + ' - ' + until.getDate() + ' ' + MONTHS[until.getMonth()]
