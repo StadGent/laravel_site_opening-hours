@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use Illuminate\Http\Request;
 
 class ServicesController extends Controller
 {
@@ -13,9 +14,9 @@ class ServicesController extends Controller
      *
      * @return Illuminate\Database\Eloquent\Collection
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Service::all();
+        return Service::where('label', 'like', '%' . $request->get('label', '') . '%')->get();
     }
 
     /**
