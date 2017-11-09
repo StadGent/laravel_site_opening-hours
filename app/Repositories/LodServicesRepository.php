@@ -55,11 +55,7 @@ class LodServicesRepository
      */
     private function makeSparqlService()
     {
-        return new SparqlService(
-            env('SPARQL_ENDPOINT'),
-            env('SPARQL_ENDPOINT_USERNAME'),
-            env('SPARQL_ENDPOINT_PASSWORD')
-        );
+        return app('SparqlService');
     }
 
     /**
