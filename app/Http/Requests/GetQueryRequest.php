@@ -91,21 +91,6 @@ class GetQueryRequest extends FormRequest
                     }
             }
 
-            /*
-             * If format is set, it must be found in the keys of OpeninghoursFormatter::OUTPUT_MAPPER.
-             */
-            if ($this->input('format')) {
-                $openinghoursFormatter = app('OpeninghoursFormatter');
-                foreach ($openinghoursFormatter->getFormatters() as $formatter) {
-                    $formatters[] = $formatter->getSupportFormat();
-                }
-
-                if (!in_array($this->input('format'), $formatters, true)) {
-                    $validator->errors()->add('format', 'The selected parameter format is invalid.' .
-                        $this->input('format'));
-                }
-            }
-
             // model binding gives correct App\Models\Service
             $service = $this->route('service');
 
