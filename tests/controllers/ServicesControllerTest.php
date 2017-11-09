@@ -11,7 +11,7 @@ class ServicesControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/services';
+    protected $apiUrl = '/api/v1/services';
 
     /**
      * Data provider for requests

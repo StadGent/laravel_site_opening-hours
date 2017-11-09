@@ -11,7 +11,7 @@ class CalendarsControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/ui/calendars';
+    protected $apiUrl = '/api/v1/ui/calendars';
 
  
 

@@ -14,7 +14,7 @@ class UsersControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/ui/users';
+    protected $apiUrl = '/api/v1/ui/users';
 
     /**
      * @test
@@ -33,7 +33,7 @@ class UsersControllerTest extends \TestCase
             'service_id' => 1,
             'text' => "newUser"];
 
-        $call = $this->doRequest('POST', '/api/ui/inviteuser', $request);
+        $call = $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
 
         $savedUser = User::latest()->first();
         // Perform order shipping...

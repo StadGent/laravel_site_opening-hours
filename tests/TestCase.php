@@ -12,7 +12,7 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api';
+    protected $apiUrl = '/api/v1';
 
     /**
      * @var mixed
