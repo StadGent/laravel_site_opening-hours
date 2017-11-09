@@ -76,6 +76,9 @@
               </select>
             </div>
           </div>
+          <div v-if="this.modal.error" class="alert alert-danger">
+            {{ modal.error }}
+          </div>
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
@@ -93,7 +96,6 @@
           <div v-else>
             <button type="submit" class="btn btn-primary" @click="modalClose" :disabled="modal.wait">OK</button>
           </div>
-          <status></status>
         </div>
       </form>
     </div>
