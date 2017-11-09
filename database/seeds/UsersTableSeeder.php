@@ -28,22 +28,32 @@ class UsersTableSeeder extends Seeder
             ]);
 
             $user->save();
-            $user->attachRole($roleConfig);
-
-            $this->command->info("* The '" . $name . "' user has been created, \r");
-            $this->command->info("  his stupid password is: '" . $password . "'\r\n");
-
-            if ($name != 'Admin') {
+            
+            if ($name === 'admin') {
+                $user->attachRole($roleConfig);
+            } else {
                 \DB::insert(
                     'INSERT INTO user_service_role (user_id, role_id, service_id) VALUES (?, ?, ?)',
                     [$user->id, $roleConfig->id, 1]
                 );
             }
+
+            $this->command->info("* The '" . $name . "' user has been created, \r");
+            $this->command->info("  his stupid password is: '" . $password . "'\r\n");
         }
-        $this->command->info("---------------------------------------------------------------- \r");
+        $this->setFooter();
+    }
+
+    /**
+     * Some nice candy for the eye footer
+     * With a WARNING !!!
+     */
+    private function setFooter()
+    {
+        $this->command->info("----------------------------------------------------------------\r");
         $this->command->info("| These STUPID and UNSAVE users are for testing purpusses only |\r");
         $this->command->info("|           NEVER EVER use this seed in production !!!         |\r");
-        $this->command->info("---------------------------------------------------------------- \r");
+        $this->command->info("----------------------------------------------------------------\r");
         $this->command->info(self::class . " seeded \r");
     }
 }
