@@ -11,7 +11,7 @@ class ChannelControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/services/1/channels';
+    protected $apiUrl = '/api/v1/services/1/channels';
 
     /**
      * @test

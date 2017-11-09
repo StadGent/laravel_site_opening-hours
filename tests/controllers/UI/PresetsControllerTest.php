@@ -11,7 +11,7 @@ class PresetsController extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/ui/presets';
+    protected $apiUrl = '/api/v1/ui/presets';
 
     public function testHappyPath()
     {

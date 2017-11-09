@@ -1,5 +1,5 @@
 import {fetchError, Hub} from '../lib.js'
-import {ADMIN, OWNER, MEMBER} from "../constants";
+import {ADMIN, OWNER, MEMBER, API_PREFIX} from "../constants.js";
 
 export default {
     data() {
@@ -19,7 +19,7 @@ export default {
             this.statusUpdate(null, {active: true});
 
             if (service_ID) {
-                return this.$http.get('/api/ui/services/' + service_ID + '/users')
+                return this.$http.get(API_PREFIX + '/services/' + service_ID + '/users')
                     .then(({data}) => {
                         this.$set(this.routeService, 'users', data);
                     }, (error) => {
@@ -35,7 +35,7 @@ export default {
             }
             // only admin can fetch all users
             else if (this.isAdmin) {
-                return this.$http.get('/api/ui/users')
+                return this.$http.get(API_PREFIX + '/users')
                     .then(({data}) => {
                         this.users = data || [];
                     })
@@ -81,7 +81,7 @@ export default {
             }
 
             // backend will create the user if not found
-            this.$http.post('/api/ui/inviteuser', newRole)
+            this.$http.post(API_PREFIX + '/inviteuser', newRole)
                 .then(({data}) => {
 
                     // add user to service users
@@ -117,7 +117,7 @@ export default {
                 return;
             }
 
-            this.$http.patch('/api/ui/roles', user)
+            this.$http.patch(API_PREFIX + '/roles', user)
                 .then(({data}) => {
                     user.role = data.role;
                 })
@@ -136,7 +136,7 @@ export default {
                 return;
             }
 
-            this.$http.delete('/api/ui/roles?service_id=' + role.service_id + '&user_id=' + role.user_id)
+            this.$http.delete(API_PREFIX + '/roles?service_id=' + role.service_id + '&user_id=' + role.user_id)
                 .then(() => {
 
                     let index = this.routeService.users.findIndex(u => u.id === role.user_id);
@@ -168,7 +168,7 @@ export default {
                 this.statusUpdate(null, {message: 'deleteRole: id is required'});
                 return;
             }
-            this.$http.delete('/api/ui/users/' + user.id).then(() => {
+            this.$http.delete(API_PREFIX + '/users/' + user.id).then(() => {
                 this.fetchUsers();
                 this.fetchServices();
                 this.modalClose();
