@@ -232,13 +232,11 @@ export function fetchError(response) {
     }
     if (this.modalActive) {
         this.modalResume();
-
         if(response.body.message) {
-            this.modal.error = response.body.message;
+            this.modalError(response.body.message);
         }
     }
     if(response.error) {
-        console.warn(response);
         this.statusUpdate(response);
     }
 }

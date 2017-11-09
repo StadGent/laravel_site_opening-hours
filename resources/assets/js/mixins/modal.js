@@ -43,7 +43,9 @@ export default {
     requestService() {
       this.modal.text = 'requestService';
     },
-
+    modalError(error) {
+       this.modal.error = error;
+    },
     newChannel(srv) {
       this.modal.text = 'newChannel';
       this.modal.label = '';
