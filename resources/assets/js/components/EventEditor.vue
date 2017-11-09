@@ -26,7 +26,7 @@
                         <option :value="RRule.DAILY">Dagelijks</option>
                     </select>
                 </div>
-                <div class="col-xs-5" v-else-if="options.freq==RRule.MONTHLY">
+                <div class="col-xs-5" v-if="options.freq==RRule.MONTHLY">
                     <select v-model="optionInterval" class="form-control" aria-label="herhaling">
                         <option :value="null">elke maand</option>
                         <option :value="2">tweemaandelijks</option>
