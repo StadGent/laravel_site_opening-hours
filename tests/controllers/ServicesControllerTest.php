@@ -65,6 +65,26 @@ class ServicesControllerTest extends \TestCase
     }
 
     /**
+     * @test
+     */
+    public function testServiceRequestWithFilters()
+    {
+
+        $this->doRequest('get', $this->apiUrl);
+        $content = $this->decodeResponseJson();
+        $this->assertEquals(21, count($content));
+
+        $this->doRequest('get', $this->apiUrl . '?label=uur');
+        $content = $this->decodeResponseJson();
+        $this->assertEquals(3, count($content));
+
+        $this->doRequest('get', $this->apiUrl . '?label=some-random-string');
+        $content = $this->decodeResponseJson();
+        $this->assertEquals(0, count($content));
+
+    }
+
+    /**
      * assemble the path on the given params
      */
     protected function assemblePath($params)
