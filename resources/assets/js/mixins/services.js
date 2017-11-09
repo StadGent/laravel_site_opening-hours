@@ -61,7 +61,7 @@ export default {
 
             this.serviceLock = true;
 
-            return this.$http.get(API_PREFIX+'/ui/services')
+            return this.$http.get(API_PREFIX + '/services')
                 .then(({data}) => {
                     this.services = data || [];
                 })
@@ -94,7 +94,7 @@ export default {
             //now we can fetch the channels
             this.channelDataQueue.push(this.route.service);
 
-            return this.$http.get(API_PREFIX+'/ui/services/' + this.route.service + '/channels')
+            return this.$http.get(API_PREFIX + '/services/' + this.route.service + '/channels')
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
                 })
@@ -118,7 +118,7 @@ export default {
 
             this.versionDataQueue.push(this.route.version);
 
-            return this.$http.get(API_PREFIX+'/ui/openinghours/' + this.route.version)
+            return this.$http.get(API_PREFIX + '/openinghours/' + this.route.version)
                 .then(({data}) => {
                     this.applyVersionData(data);
                     this.versionDataQueue = this.versionDataQueue.filter(version => version !== this.route.version);
@@ -145,7 +145,7 @@ export default {
         },
         fetchPresets(next) {
             //todo save these
-            Vue.http.get(API_PREFIX+'/ui/presets')
+            Vue.http.get(API_PREFIX + '/presets')
                 .then(({data}) => {
                     next(data);
                 }).catch(fetchError);
@@ -190,7 +190,7 @@ export default {
             }
 
             channel.service_id = channel.srv && channel.srv.id;
-            this.$http.post(API_PREFIX+'/ui/services/' + channel.service_id + '/channels', channel)
+            this.$http.post(API_PREFIX + '/services/' + channel.service_id + '/channels', channel)
                 .then(({data}) => {
                     this.routeService.channels.push(data);
                     this.modalClose();
@@ -237,7 +237,7 @@ export default {
             // * create first calendar in newly created version
             // * get first calendar
             // The user can now edit the first calendar of the new version
-            this.$http.post(API_PREFIX+'/ui/openinghours', version)
+            this.$http.post(API_PREFIX + '/openinghours', version)
                 .then(({data}) => {
                     this.modalClose();
 
@@ -279,7 +279,7 @@ export default {
                 return;
             }
 
-            this.$http.delete(API_PREFIX+'/ui/openinghours/' + version.id)
+            this.$http.delete(API_PREFIX + '/openinghours/' + version.id)
                 .then(() => {
                     this.modalClose();
                     this.toChannel(version.channel_id);
@@ -296,7 +296,7 @@ export default {
             }
 
             if (calendar.id) {
-                this.$http.put(API_PREFIX+'/ui/calendars/' + calendar.id, calendar)
+                this.$http.put(API_PREFIX + '/calendars/' + calendar.id, calendar)
                     .then(({data}) => {
 
                         const index = this.routeVersion.calendars.findIndex(c => c.id === data.id);
@@ -311,7 +311,7 @@ export default {
                     .then(this.statusReset)
                     .catch(fetchError)
             } else {
-                this.$http.post(API_PREFIX+'/ui/calendars', calendar)
+                this.$http.post(API_PREFIX + '/calendars', calendar)
                     .then(({data}) => {
 
                         //todo why??
@@ -339,7 +339,7 @@ export default {
                 return;
             }
 
-            this.$http.delete(API_PREFIX+'/ui/calendars/' + calendar.id)
+            this.$http.delete(API_PREFIX + '/calendars/' + calendar.id)
                 .then(() => {
                     this.fetchVersion(true);
                     this.toVersion();
