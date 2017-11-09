@@ -11,7 +11,7 @@ class OpeninghoursControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/ui/openinghours';
+    protected $apiUrl = '/api/v1/ui/openinghours';
 
     /**
      * Data provider for requests

@@ -11,7 +11,7 @@ class RolesControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/ui/roles';
+    protected $apiUrl = '/api/v1/ui/roles';
 
     /**
      * Data provider for requests
