@@ -1,5 +1,5 @@
 import {fetchError, Hub} from '../lib.js'
-import {ADMIN, OWNER, MEMBER, API_PREFIX, COULD_NOT_DENY_ACCESS} from "../constants.js";
+import {ADMIN, OWNER, MEMBER, API_PREFIX, COULD_NOT_DENY_ACCESS, NO_VALID_EMAIL, ID_MISSING} from "../constants.js";
 
 export default {
     data() {
@@ -15,8 +15,7 @@ export default {
     computed: {},
     methods: {
         fetchUsers(service_ID) {
-
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (service_ID) {
                 return this.$http.get(API_PREFIX + '/services/' + service_ID + '/users')
@@ -61,7 +60,7 @@ export default {
         // triggered in the 'invite user' modals.
         // backend will create or update the user.
         Hub.$on('inviteUser', newRole => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!newRole.service_id) {
                 newRole.service_id = newRole.srv.id || this.routeService.id;
@@ -75,8 +74,9 @@ export default {
 
             if (!newRole.user_id && !newRole.email) {
                 // Cannot continue without at least one of these
-                this.statusUpdate(null, {message: 'Email is missing'});
+                this.statusReset();
                 this.modalResume();
+                this.modalError(NO_VALID_EMAIL);
                 return;
             }
 
@@ -106,14 +106,14 @@ export default {
                 .catch(fetchError)
         });
         Hub.$on('patchRole', user => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             user.service_id = user.service_id || this.routeService.id;
             user.role = user.role || 'Member';
             user.user_id = user.user_id || user.id;
 
             if (!user.user_id) {
-                this.statusUpdate({message: 'User ID is missing'});
+                this.statusUpdate(ID_MISSING);
                 return;
             }
 
@@ -125,7 +125,7 @@ export default {
                 .catch(fetchError)
         });
         Hub.$on('deleteRole', role => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!role.user_id || !role.service_id) {
                 this.statusUpdate(COULD_NOT_DENY_ACCESS);
@@ -162,10 +162,10 @@ export default {
         });
 
         Hub.$on('deleteUser', user => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!user.id) {
-                this.statusUpdate(null, {message: 'deleteRole: id is required'});
+                this.statusUpdate(ID_MISSING);
                 return;
             }
             this.$http.delete(API_PREFIX + '/users/' + user.id).then(() => {

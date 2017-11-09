@@ -56,8 +56,7 @@ export default {
             this.$set(this.services, index, this.routeService);
         },
         fetchServices() {
-            this.statusUpdate(null, {active: true});
-
+            this.statusStart();
             this.serviceLock = true;
 
             return this.$http.get(API_PREFIX + '/services')
@@ -77,7 +76,7 @@ export default {
                 .catch(fetchError);
         },
         fetchChannels() {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             //return if channels are already being fetched for the routeService.
             if (this.channelDataQueue.indexOf(this.route.service) !== -1) return;
@@ -108,7 +107,7 @@ export default {
                 .catch(fetchError);
         },
         fetchVersion() {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!this.route.version || this.route.version < 1) return;
 
@@ -149,9 +148,9 @@ export default {
                 }).catch(fetchError);
         },
         patchServiceStatus(service) {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
-            this.$http.put(API_RREFIX+'/ui/services/' + service.id, {draft: service.draft})
+            this.$http.put(API_PREFIX+'/services/' + service.id, {draft: service.draft})
                 .then(({data}) => {
                     service.draft = data.draft;
                 })
@@ -183,7 +182,7 @@ export default {
             this.patchServiceStatus(service);
         });
         Hub.$on('createChannel', channel => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!channel.srv) {
                 this.statusUpdate(ID_MISSING);
@@ -201,7 +200,7 @@ export default {
                 .catch(fetchError)
         });
         Hub.$on('deleteChannel', channel => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!channel.id) {
                 this.statusUpdate(ID_MISSING);
@@ -222,7 +221,7 @@ export default {
                 .catch(fetchError);
         });
         Hub.$on('createVersion', input => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             const version = Object.assign(createVersion(), input);
             if (!version.channel_id) {
@@ -256,7 +255,7 @@ export default {
                 .catch(fetchError)
         });
         Hub.$on('updateVersion', version => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!version || !version.id) {
                 this.statusUpdate(ID_MISSING);
@@ -272,7 +271,7 @@ export default {
                 .catch(fetchError);
         });
         Hub.$on('deleteVersion', version => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!version || !version.id) {
                 this.statusUpdate(ID_MISSING);
@@ -293,7 +292,7 @@ export default {
                 .catch(fetchError);
         });
         Hub.$on('createCalendar', (calendar, done) => {
-            this.statusUpdate(null, {active: true});
+            this.statusStart();
 
             if (!calendar.openinghours_id) {
                 calendar.openinghours_id = this.route.version;
@@ -329,8 +328,7 @@ export default {
             }
         });
         Hub.$on('deleteCalendar', calendar => {
-            this.statusUpdate(null, {active: true});
-
+            this.statusStart();
 
             if (!calendar.id) {
                 this.statusUpdate(ID_MISSING);
