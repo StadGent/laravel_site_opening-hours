@@ -19,11 +19,16 @@ export default {
     },
     methods: {
         statusUpdate: function (err, data) {
-            if (err && err.body.error) {
-                this.status.error = 'Error'
-                    + err.status
-                    + ' - '
-                    + 'Neem een print screen en neem contact op met de servicedesk.';
+            if (err) {
+                if(err.body.error) {
+                    this.status.error = 'Error'
+                        + err.status
+                        + ' - '
+                        + 'Neem een print screen en neem contact op met de servicedesk.';
+                }
+                else if (err.body.message) {
+                    this.status.error = err.body.message;
+                }
             }
             else if (data) {
                 this.status.text = data.text || '';
