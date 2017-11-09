@@ -37,7 +37,7 @@ export default {
             }
             else if (data) {
                 this.status.text = data.text || '';
-                this.status.active = data.active;
+                this.status.active = true;
             }
             else {
                 this.status.text = UNKNOWN_ERROR;
@@ -47,6 +47,9 @@ export default {
             this.$set(this.status, 'active', false);
             this.$set(this.status, 'text', null);
             this.$set(this.status, 'error', null);
+        },
+        statusStart: function () {
+            this.status.active = true;
         }
     }
 }
