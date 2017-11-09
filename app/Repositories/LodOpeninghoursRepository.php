@@ -136,11 +136,7 @@ class LodOpeninghoursRepository
      */
     private function makeSparqlService()
     {
-        return new SparqlService(
-            env('SPARQL_WRITE_ENDPOINT'),
-            env('SPARQL_WRITE_ENDPOINT_USERNAME'),
-            env('SPARQL_WRITE_ENDPOINT_PASSWORD')
-        );
+        return app('SparqlService');
     }
 
     /**
