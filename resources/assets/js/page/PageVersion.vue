@@ -20,7 +20,7 @@
                         </button>
                     </div>
                     <div>
-                        <h2>Prioriteitenlijst periodes</h2>
+                        <h2>Prioriteitenlijst uitzonderingen</h2>
                         <p>
                             De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
                         </p>
@@ -62,7 +62,7 @@
                         </transition-group>
 
                         <h2>Basis openingsuren</h2>
-                        <p>Op deze dagen is de dienst normaal open.</p>
+                        <p>Op deze dagen is kanaal <strong>{{ channel.label }}</strong> normaal open.</p>
                         <div class="cal cal--one-line">
                             <div class="cal-header">
                                 <div class="cal-info">
