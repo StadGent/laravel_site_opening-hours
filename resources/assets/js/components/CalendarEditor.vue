@@ -79,7 +79,7 @@
         <div class="calendar-editor__buttons">
             <div class="text-right">
                 <button type="button" class="btn btn-default pull-left" @click="rmCalendar()"
-                        :disabled="$root.isRecreatex">Verwijder
+                        :disabled="$root.isRecreatex || cal.priority === 0">Verwijder
                 </button>
                 <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
                 <button type="submit" class="btn btn-primary" @click.prevent="showPresets = true"
