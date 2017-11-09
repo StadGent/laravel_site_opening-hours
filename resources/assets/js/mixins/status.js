@@ -1,3 +1,5 @@
+import {UNKNOWN_ERROR, VAGUE_ERROR} from "../constants";
+
 export default {
 
     data() {
@@ -20,14 +22,17 @@ export default {
     methods: {
         statusUpdate: function (err, data) {
             if (err) {
-                if(err.body.error) {
+                if(err.body && err.body.error) {
                     this.status.error = 'Error'
                         + err.status
                         + ' - '
-                        + 'Neem een print screen en neem contact op met de servicedesk.';
+                        + VAGUE_ERROR;
                 }
-                else if (err.body.message) {
+                else if (err.body && err.body.message) {
                     this.status.error = err.body.message;
+                }
+                else if (typeof err === 'string') {
+                    this.status.error = err;
                 }
             }
             else if (data) {
@@ -35,7 +40,7 @@ export default {
                 this.status.active = data.active;
             }
             else {
-                this.status.text = 'Er is een onbekende fout opgetreden.';
+                this.status.text = UNKNOWN_ERROR;
             }
         },
         statusReset: function () {

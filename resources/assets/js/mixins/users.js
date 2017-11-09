@@ -1,5 +1,5 @@
 import {fetchError, Hub} from '../lib.js'
-import {ADMIN, OWNER, MEMBER, API_PREFIX} from "../constants.js";
+import {ADMIN, OWNER, MEMBER, API_PREFIX, COULD_NOT_DENY_ACCESS} from "../constants.js";
 
 export default {
     data() {
@@ -128,11 +128,11 @@ export default {
             this.statusUpdate(null, {active: true});
 
             if (!role.user_id || !role.service_id) {
-                this.statusUpdate(null, {message: 'Toegang kon niet ontzegd worden.'});
+                this.statusUpdate(COULD_NOT_DENY_ACCESS);
                 return;
             }
             if (!confirm('Toegang ontzeggen?')) {
-                this.statusUpdate(null, {message: 'Delete role canceled'});
+                this.statusReset();
                 return;
             }
 
