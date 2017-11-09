@@ -81,17 +81,17 @@ class ServicesControllerTest extends \TestCase
         $content = $this->decodeResponseJson();
         $this->assertEquals(0, count($content));
 
-        $this->doRequest('get', $this->apiUrl . '?uri=ch');
+        $this->doRequest('get', $this->apiUrl . '?uri=http://dev.foo/cultuurdienst');
         $content = $this->decodeResponseJson();
-        $this->assertEquals(3, count($content));
+        $this->assertEquals(1, count($content));
 
         $this->doRequest('get', $this->apiUrl . '?uri=some-random-string');
         $content = $this->decodeResponseJson();
         $this->assertEquals(0, count($content));
 
-        $this->doRequest('get', $this->apiUrl . '?label=architectuur&uri=ch');
+        $this->doRequest('get', $this->apiUrl . '?label=uur&uri=ch');
         $content = $this->decodeResponseJson();
-        $this->assertEquals(1, count($content));
+        $this->assertEquals(0, count($content));
     }
 
     /**
