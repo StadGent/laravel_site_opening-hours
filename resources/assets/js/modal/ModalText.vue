@@ -174,7 +174,9 @@ export default {
         });
 
         if (invalid) {
-          return alert(OH_INVALID_RANGE);
+          this.modalResume();
+          this.modalError(OH_INVALID_RANGE);
+          return;
         }
 
         // Update the event until date
@@ -202,20 +204,22 @@ export default {
       this.modal.strict = true;
 
       if (!this.modal.usr && !this.validEmail) {
-          this.modalResume();
-          return alert(NO_VALID_EMAIL);
+        this.modalResume();
+        this.modalError(NO_VALID_EMAIL);
+        return;
       }
       if (this.modal.usr) {
         this.modal.user_id = this.modal.usr.id;
         this.modal.email = this.modal.usr.email;
       }
       if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
-          this.modalResume();
-        return
+        this.modalResume();
+        return;
       }
       if (!this.modal.service_id && !this.modal.srv) {
-          this.modalResume();
-        return alert(CHOOSE_SERVICE)
+        this.modalResume();
+        this.modalError(CHOOSE_SERVICE);
+        return;
       }
 
       Hub.$emit('inviteUser', this.modal)
