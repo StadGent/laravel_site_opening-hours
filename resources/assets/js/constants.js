@@ -11,6 +11,8 @@ export const MEMBER = 'Lid';
 export const OWNER = 'Eigenaar';
 export const ADMIN = 'Admin';
 
+export const API_PREFIX = '/api/v1';
+
 export const NO_VALID_EMAIL = 'Dit is geen geldig e-mail adres';
 export const CHOOSE_SERVICE = 'Kies een dienst';
 export const OH_INVALID_RANGE = 'Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.' +

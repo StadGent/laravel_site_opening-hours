@@ -11,7 +11,7 @@ class ChannelControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/ui/services/1/channels';
+    protected $apiUrl = '/api/v1/ui/services/1/channels';
 
     /**
      * @test
@@ -21,7 +21,7 @@ class ChannelControllerTest extends \TestCase
         $authUser = \App\Models\User::where('name', 'adminuser')->first();
         $this->actingAs($authUser, 'api');
 
-        $this->doRequest('delete', '/api/ui/services/2/channels/1');
+        $this->doRequest('delete', '/api/v1/ui/services/2/channels/1');
         $this->seeStatusCode(422);
         $content = $this->decodeResponseJson();
         $this->assertEquals('Channel model is not found with given identifier', $content['error']['message']);
