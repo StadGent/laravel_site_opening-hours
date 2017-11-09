@@ -8,7 +8,8 @@ export const modal = {
   strict: null,
   start_date: null,
   end_date: null,
-  text: null
+  text: null,
+  error: null
 };
 
 export default {
@@ -42,7 +43,9 @@ export default {
     requestService() {
       this.modal.text = 'requestService';
     },
-
+    modalError(error) {
+       this.modal.error = error;
+    },
     newChannel(srv) {
       this.modal.text = 'newChannel';
       this.modal.label = '';
