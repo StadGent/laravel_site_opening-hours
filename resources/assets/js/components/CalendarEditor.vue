@@ -5,8 +5,9 @@
 
             <!-- First calendar is always weekly -->
             <div v-if="!cal.layer">
-                <h3>Stel de openingsuren in voor {{ $root.routeService.label
-                    }}. Op welke dagen is deze dienst normaal open?</h3>
+                <h3>Stel de openingsuren in voor kanaal <strong>{{ $root.routeChannel.label}}</strong>
+                    van dienst <strong>{{ $root.routeService.label }}</strong>.</h3>
+                <p>Op welke dagen is deze dienst normaal open?</p>
                 <p class="text-muted">Uitzonderingen kan je later instellen.</p>
 
                 <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
