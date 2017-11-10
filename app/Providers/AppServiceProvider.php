@@ -96,6 +96,10 @@ class AppServiceProvider extends ServiceProvider
             return \App\Services\LocaleService::getInstance();
         });
 
+        $this->app->singleton('UserService', function ($app) {
+            return \App\Services\UserService::getInstance();
+        });
+
         /* FORMATTERS **/
         $this->app->bind('OHJsonFormatter', function () {
             return new \App\Formatters\Openinghours\JsonFormatter();

@@ -2,6 +2,7 @@
 
 namespace Tests\Controllers\UI;
 
+use App\Mail\SendInviteConfirmation;
 use App\Mail\SendRegisterConfirmation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -15,11 +16,128 @@ class UsersControllerTest extends \TestCase
      * @var string
      */
     protected $apiUrl = '/api/v1/ui/users';
+    /**
+     * Data provider for requests
+     *
+     * Datastructure:
+     * ['role_current_user', 'email_new_user', 'role', 'service_id']
+     * @return array
+     */
+    public function requestValidationProvider()
+    {
+        return [
+            ['admin', '', 'Owner', '1', '400'], // no email
+            ['admin', 'unknown', '', '1', '400'], // no role
+            ['admin', 'unknown', 'notARole', '1', '400'], // unknown role
+            ['admin', 'unknown', 'Member', '', '400'], // no service for owner
+            ['admin', 'admin@foo.bar', 'Member', '1', '401'], // cannot alter himself
+            ['admin', 'unknown', 'Owner', '', '400'], // no service for member
+            ['admin', 'unknown', 'Member', '54986468', '400'], // unknown service
+
+            ['admin', 'unknown', 'Admin', '', '200'], // can add admin
+            ['admin', 'unknown', 'Owner', '1', '200'], // can add owner
+            ['admin', 'unknown', 'Member', '1', '200'], // can add member
+
+            ['owner', 'unknown', 'Admin', '', '401'], // cannot add admin
+            ['owner', 'unknown', 'Owner', '5', '401'], // cannot assign others to not owned service
+            ['owner', 'owner@foo.bar', 'Owner', '5', '401'], // cannot assign himself to not owned service
+            ['owner', 'owner@foo.bar', 'Member', '5', '401'], // cannot assign himself to not owned service
+            ['owner', 'unknown', 'Owner', '1', '200'], // can add owner to owned service
+            ['owner', 'owner@foo.bar', 'Admin', '', '401'], // cannot make himself Admin
+            ['owner', 'owner@foo.bar', 'Member', '1', '401'], // cannot alter himself
+            ['owner', 'unknown', 'Member', '5', '401'], // cannot add member to other service
+            ['owner', 'unknown', 'Member', '1', '200'], // can add member to owned service
+
+            ['member', 'unknown', 'Admin', '', '401'], // cannot add admin
+            ['member', 'member@foo.bar', 'Admin', '', '401'], // cannot make himself Admin
+            ['member', 'unknown', 'Owner', '1', '401'], // cannot add owner
+            ['member', 'member@foo.bar', 'Owner', '1', '401'], // cannot make himself Owner
+            ['member', 'unknown', 'Member', '1', '401'], // cannot add member
+        ];
+    }
+
+    /**
+     * @test
+     * @group validation
+     * @dataProvider requestValidationProvider
+     */
+    public function testInviteNewUserValidation($userRole, $email, $role, $serviceId, $statusCode)
+    {
+        $authUser = \App\Models\User::where('name', $userRole . 'user')->first();
+        $this->actingAs($authUser, 'api');
+
+        $newUser = factory(User::class)->create();
+
+        if ($email) {
+            $request['email'] = $email == 'unknown' ? $newUser->email : $email;
+        }
+        if ($role) {
+            $request['role'] = $role;
+        }
+        if ($serviceId) {
+            $request['service_id'] = $serviceId;
+        }
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+        $this->seeStatusCode($statusCode);
+    }
 
     /**
      * @test
      */
-    public function testAnInvitedNewUserGetsAMail()
+    public function testWhenLinkedUserIsMadeAdminTheLinkToTheServicesAreRemoved()
+    {
+        $adminUser = \App\Models\User::where('name', 'adminuser')->first();
+        $this->actingAs($adminUser, 'api');
+
+        $ownerUser = \App\Models\User::where('name', 'owneruser')->first();
+
+        $this->assertCount(1, app('UserRepository')->getAllRolesForUser($ownerUser->id));
+
+        $request = [
+            'email' => $ownerUser->email,
+            'role' => 'Admin',
+        ];
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+        $this->assertCount(0, app('UserRepository')->getAllRolesForUser($ownerUser->id));
+    }
+
+    /**
+     * @test
+     */
+    public function testWhenAdminIsMadeOwnerHeIsRemovedFromTheGlobalAdminRole()
+    {
+        $adminUser = \App\Models\User::where('name', 'adminuser')->first();
+        $this->actingAs($adminUser, 'api');
+
+        $newUser = factory(User::class)->create();
+        // lets make new user Admin
+        $request['email'] = $newUser->email;
+        $request['role'] = 'Admin';
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+        $createdUser = $this->decodeResponseJson();
+        $result = \DB::select(
+            'SELECT * FROM role_user WHERE user_id = ?',
+            [$createdUser['id']]
+        );
+        $this->assertCount(1, $result);
+
+        // whoops little mistake: new user had to be Owner of Service 1
+        $request['email'] = $createdUser['email'];
+        $request['role'] = 'Owner';
+        $request['service_id'] = '1';
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+
+        $result = \DB::select(
+            'SELECT * FROM role_user WHERE user_id = ?',
+            [$createdUser['id']]
+        );
+        $this->assertCount(0, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function testAnInvitedNewUserGetsARegisterMailAndNotAnInviteMail()
     {
         $user = \App\Models\User::find(1);
         $this->actingAs($user, 'api');
@@ -31,9 +149,9 @@ class UsersControllerTest extends \TestCase
             'email' => $newUser->email,
             'role' => 'Member',
             'service_id' => 1,
-            'text' => "newUser"];
+        ];
 
-        $call = $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
 
         $savedUser = User::latest()->first();
         // Perform order shipping...
@@ -41,6 +159,46 @@ class UsersControllerTest extends \TestCase
         Mail::assertSent(SendRegisterConfirmation::class, function ($mail) use ($savedUser) {
             return $mail->user->token === $savedUser->token;
         });
+
+        // Mail::assertNotSent does not exist
+        $this->assertFalse(
+            Mail::sent(SendInviteConfirmation::class, function ($mail) use ($savedUser) {
+                return $mail->user->token === $savedUser->token;
+            })->count() > 1,
+            "Mailable was sent."
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function testAnInvitedKnownUserGetsAnInviteMailAndNotARegisterMail()
+    {
+        $user = \App\Models\User::find(1);
+        $this->actingAs($user, 'api');
+
+        $knownUser = \App\Models\User::find(2);
+        Mail::fake();
+
+        $request = [
+            'email' => $knownUser->email,
+            'role' => 'Member',
+            'service_id' => 2,
+        ];
+
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+
+        Mail::assertSent(SendInviteConfirmation::class, function ($mail) use ($knownUser) {
+            return $mail->user->token === $knownUser->token;
+        });
+
+        // Mail::assertNotSent does not exist
+        $this->assertFalse(
+            Mail::sent(SendRegisterConfirmation::class, function ($mail) use ($knownUser) {
+                return $mail->user->token === $knownUser->token;
+            })->count() > 1,
+            "Mailable was sent."
+        );
     }
 
     /**
@@ -89,6 +247,7 @@ class UsersControllerTest extends \TestCase
 
     /**
      * @test
+     * @group validation
      * @dataProvider requestTypeProvider
      */
     public function testUIUserRequests($userRole, $verb, $pathArg, $data, $statusCode)
