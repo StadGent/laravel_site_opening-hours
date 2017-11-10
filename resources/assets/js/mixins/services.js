@@ -150,7 +150,7 @@ export default {
         patchServiceStatus(service) {
             this.statusStart();
 
-            this.$http.put(API_PREFIX+'/services/' + service.id, {draft: service.draft})
+            this.$http.put(API_PREFIX + '/services/' + service.id, {draft: service.draft})
                 .then(({data}) => {
                     service.draft = data.draft;
                 })
@@ -210,7 +210,7 @@ export default {
                 this.statusReset();
                 return;
             }
-            this.$http.delete(API_RREFIX+'/ui/services/' + channel.service_id + '/channels/' + channel.id)
+            this.$http.delete(API_RREFIX + '/ui/services/' + channel.service_id + '/channels/' + channel.id)
                 .then(() => {
 
                     // remove channel from routeService
@@ -262,7 +262,7 @@ export default {
                 return;
             }
 
-            this.$http.put(API_RREFIX+'/ui/openinghours/' + version.id, version)
+            this.$http.put(API_RREFIX + '/ui/openinghours/' + version.id, version)
                 .then(({data}) => {
                     this.fetchServices();
                     this.modalClose();
