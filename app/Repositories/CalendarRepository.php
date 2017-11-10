@@ -7,7 +7,6 @@ use App\Models\Openinghours;
 
 class CalendarRepository extends EloquentRepository
 {
-
     public function __construct(Calendar $calendar)
     {
         parent::__construct($calendar);
@@ -35,7 +34,7 @@ class CalendarRepository extends EloquentRepository
     {
         $calendar = Calendar::find($modelId);
 
-        $lowerSiblings = Openinghours::find($calendar->openinghours_id)
+        Openinghours::find($calendar->openinghours_id)
             ->calendars
             ->filter(function ($sibling) use ($calendar) {
                 return $sibling->priority < $calendar->priority;
