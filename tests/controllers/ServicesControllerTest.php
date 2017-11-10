@@ -69,7 +69,6 @@ class ServicesControllerTest extends \TestCase
      */
     public function testServiceRequestWithFilters()
     {
-
         $this->doRequest('get', $this->apiUrl);
         $content = $this->decodeResponseJson();
         $this->assertEquals(21, count($content));
@@ -77,11 +76,26 @@ class ServicesControllerTest extends \TestCase
         $this->doRequest('get', $this->apiUrl . '?label=uur');
         $content = $this->decodeResponseJson();
         $this->assertEquals(3, count($content));
+        foreach ($content as $service) {
+            $this->assertContains('uur', $service['label']);
+        }
 
         $this->doRequest('get', $this->apiUrl . '?label=some-random-string');
         $content = $this->decodeResponseJson();
         $this->assertEquals(0, count($content));
 
+        $this->doRequest('get', $this->apiUrl . '?uri=http://dev.foo/cultuurdienst');
+        $content = $this->decodeResponseJson();
+        $this->assertEquals(1, count($content));
+        $this->assertEquals($content[0]['uri'], 'http://dev.foo/cultuurdienst');
+
+        $this->doRequest('get', $this->apiUrl . '?uri=some-random-string');
+        $content = $this->decodeResponseJson();
+        $this->assertEquals(0, count($content));
+
+        $this->doRequest('get', $this->apiUrl . '?label=uur&uri=ch');
+        $content = $this->decodeResponseJson();
+        $this->assertEquals(0, count($content));
     }
 
     /**
