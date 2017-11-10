@@ -34,16 +34,15 @@ class CalendarRepository extends EloquentRepository
     public function delete($modelId)
     {
         $calendar = Calendar::find($modelId);
-        $siblings = Openinghours::find($calendar->openinghours_id)
-            ->calendars()
-            ->get();
 
-        foreach ($siblings as $sibling) {
-            if ($sibling->priority < $calendar->priority) {
+        $lowerSiblings = Openinghours::find($calendar->openinghours_id)
+            ->calendars
+            ->filter(function ($sibling) use ($calendar) {
+                return $sibling->priority < $calendar->priority;
+            })->each(function ($sibling) {
                 $sibling->priority++;
                 $sibling->save();
-            }
-        }
+            });
 
         return parent::delete($modelId);
     }
