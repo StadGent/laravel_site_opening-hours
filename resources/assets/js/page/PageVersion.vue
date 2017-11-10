@@ -30,7 +30,7 @@
                             </button>
                         </p>
                         <transition-group name="list" tag="div">
-                            <div class="cal" v-if="cal.priority !== 0" v-for="cal in reversedCalendars"
+                            <div class="cal" v-if="cal.priority !== 0" v-for="(cal, index) in reversedCalendars"
                                  :key="cal.label">
                                 <div class="cal-header">
                                     <div class="cal-info">
@@ -44,7 +44,7 @@
                                     </div>
                                     <div class="cal-lower cal-action"
                                          v-if="!$root.isRecreatex">
-                                        <button class="btn btn-default" :disabled="cal.layer <= 1"
+                                        <button class="btn btn-default" :disabled="index === reversedCalendars.length - 2"
                                                 @click="swapLayers(cal.layer, cal.layer - 1)">
                                             lager
                                         </button>
@@ -52,7 +52,7 @@
                                     <div class="cal-higher cal-action"
                                          v-if="!$root.isRecreatex">
                                         <button class="btn btn-default"
-                                                :disabled="cal.layer === reversedCalendars.length - 1"
+                                                :disabled="index === 0"
                                                 @click="swapLayers(cal.layer, cal.layer + 1)">
                                             hoger
                                         </button>
