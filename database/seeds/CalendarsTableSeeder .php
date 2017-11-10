@@ -22,10 +22,17 @@ class CalendarsTableSeeder extends Seeder
 
             $openinghour->calendars()->save(factory(Calendar::class)
                     ->make([
-                        'label' => 'Erste maandag sluitingsdag',
+                        'label' => 'Eerste maandag sluitingsdag',
                         'priority' => '-1',
                         'closinghours' => '1',
                     ]));
+
+            $openinghour->calendars()->save(factory(Calendar::class)
+                ->make([
+                    'label' => 'Eerste maandag openingsuren',
+                    'priority' => '-2',
+                    'closinghours' => '0',
+                ]));
         }
         $this->command->info(self::class . " seeded \r");
     }
