@@ -16,7 +16,16 @@ class ServicesController extends Controller
      */
     public function index(Request $request)
     {
-        return Service::where('label', 'like', '%' . $request->get('label', '') . '%')->get();
+        $label = $request->get('label', '');
+        $uri = $request->get('uri', '');
+
+        $services = Service::where('label', 'like', '%' . $label . '%');
+
+        if (!empty($uri)) {
+            $services->where('uri', $uri);
+        }
+
+        return $services->get();
     }
 
     /**
