@@ -17,7 +17,7 @@ class CalendarRepository extends EloquentRepository
     {
         $calendar = $this->model->where('id', $id)->with('events')->first();
 
-        if ( ! empty($calendar)) {
+        if (!empty($calendar)) {
             return $calendar->toArray();
         }
 
