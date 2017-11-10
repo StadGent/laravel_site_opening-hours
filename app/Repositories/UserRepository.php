@@ -219,6 +219,14 @@ class UserRepository extends EloquentRepository
     }
 
     /**
+     * @param $userId
+     */
+    public function removeLinksToAllServices($userId)
+    {
+        return DB::delete('DELETE FROM user_service_role WHERE user_id = ?', [$userId]);
+    }
+
+    /**
      * @param $role
      *
      * @return mixed

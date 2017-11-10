@@ -5,6 +5,9 @@ namespace App\Http\Controllers\UI;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteRoleRequest;
 use App\Http\Requests\StoreRoleRequest;
+use App\Models\Role;
+use App\Models\Service;
+use App\Models\User;
 use App\Repositories\UserRepository;
 
 /**
@@ -13,7 +16,6 @@ use App\Repositories\UserRepository;
  */
 class RolesController extends Controller
 {
-
     /**
      * @param UserRepository $users
      */
@@ -32,14 +34,21 @@ class RolesController extends Controller
      */
     public function update(StoreRoleRequest $request)
     {
-        $input = $request->input();
+        $role = Role::where('name', $request->input('role'))->first();
+        $service = null;
+        if ($request->input('service_id')) {
+            $service = Service::find($request->input('service_id'));
+        }
 
-        $success = $this
-            ->users
-            ->linkToService($input['user_id'], $input['service_id'], $input['role']);
+        $user = User::find($request->input('user_id'));
+        $user = app('UserService')->setRoleToUser($user->email, $role, $service);
+        $assignedRoles = app('UserRepository')->getAllRolesForUser($user->id);
 
-        if ($success) {
-            return response()->json(['role' => $input['role']]);
+        foreach ($assignedRoles as $seriveRole) {
+            if ($seriveRole['service_id'] == $request->input('service_id') &&
+                $seriveRole['role'] === $request->input('role')) {
+                return response()->json(['role' => $request->input('role')]);
+            }
         }
 
         return response()

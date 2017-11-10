@@ -33,9 +33,9 @@ class StoreRoleRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|numeric',
-            'service_id' => 'required|numeric',
-            'role' => 'required|in:Owner,Member',
+            'user_id' => 'exists:users,id|required|numeric',
+            'service_id' => 'exists:services,id|required|numeric',
+            'role' => 'exists:roles,name|required',
         ];
     }
 

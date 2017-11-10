@@ -23,8 +23,11 @@ $style = [
 ];
 ?>
 @section('content')
-<p>Uw email adres werd zojuist toegevoegd aan het openingsurenplatform.<br />
-Gelieve op onderstaande knop te klikken om zo een wachtwoord in te stellen en uw gebruiker te activeren.</p>
+<p>Melding dat u toegevoegd werd aan de dienst "{{ $service }}" op het openingsurenplatform </p>
+
+@if (isset($actionUrl))
+<p>Het blijkt ook dat u uw gebruiker nog niet geactiveerd staat momenteel.<br />
+Gelieve op onderstaande knop te klikken om zo een wachtwoord in te stellen en toegang te krijgen tot {{ $service }}</p>
 <table style="{{ $style['body_action'] }}" align="center" width="100%" cellpadding="0" cellspacing="0">
   <tr>
       <td align="center">
@@ -35,12 +38,15 @@ Gelieve op onderstaande knop te klikken om zo een wachtwoord in te stellen en uw
       </td>
   </tr>
 </table>
-
+@else
+ <p>Deze mail is puur informatief, u hoeft verder geen actie te ondernemen.</p>
+@endif
 
 <!-- Salutation -->
 <p style="{{ $style['paragraph'] }}">
     Met vriendelijke groeten,<br>{{ config('app.name') }}
 </p>
+@if (isset($actionUrl))
  <table style="{{ $style['body_sub'] }}">
   <tr>
       <td style="{{ $style['font_family'] }}">
@@ -57,4 +63,5 @@ Gelieve op onderstaande knop te klikken om zo een wachtwoord in te stellen en uw
       </td>
   </tr>
 </table>
+@endif
 @endsection
