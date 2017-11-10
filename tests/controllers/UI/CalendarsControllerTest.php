@@ -52,28 +52,35 @@ class CalendarsControllerTest extends \TestCase
             ['unauth', 'get', '1', [], '405'], // show
             ['unauth', 'put', '1', [], '401'], // update (full)
             ['unauth', 'patch', '1', [], '401'], // update (partial)
+            ['unauth', 'delete', '2', [], '401'], // destroy
             ['unauth', 'delete', '1', [], '401'], // destroy
+
             // admin user
             ['admin', 'get', '', [], '405'], // index
             ['admin', 'post', '', $data, '200'], // store
             ['admin', 'get', '1', [], '405'], // show
             ['admin', 'put', '1', $data, '200'], // update (full)
             ['admin', 'patch', '1', $data, '200'], // update (partial)
-            ['admin', 'delete', '1', [], '200'], // destroy
+            ['admin', 'delete', '2', [], '200'], // destroy
+            ['admin', 'delete', '1', [], '400'], // destroy
+
             // owner user
             ['owner', 'get', '', [], '405'], // index
             ['owner', 'post', '', $data, '200'], // store
             ['owner', 'get', '1', [], '405'], // show
             ['owner', 'put', '1', $data, '200'], // update (full)
             ['owner', 'patch', '1', $data, '200'], // update (partial)
-            ['owner', 'delete', '1', [], '200'], // destroy
+            ['owner', 'delete', '2', [], '200'], // destroy
+            ['owner', 'delete', '1', [], '400'], // destroy
+
             // member user
             ['member', 'get', '', [], '405'], // index
             ['member', 'post', '', $data, '200'], // store
             ['member', 'get', '1', [], '405'], // show
             ['member', 'put', '1', $data, '200'], // update (full)
             ['member', 'patch', '1', $data, '200'], // update (partial)
-            ['member', 'delete', '1', [], '200'], // destroy
+            ['member', 'delete', '2', [], '200'], // destroy
+            ['member', 'delete', '1', [], '400'], // destroy
         ];
     }
 
