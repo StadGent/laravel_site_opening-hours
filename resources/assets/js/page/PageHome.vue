@@ -157,7 +157,12 @@ export default {
       return this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices
     },
     pagedServices () {
-        return this.sortedServices.slice(this.route.offset || 0, this.route.offset + pageSize);
+        let result = this.sortedServices.slice(this.route.offset || 0, this.route.offset + pageSize);
+        // if only one page remains: show rows for that page.
+        if (result.length === 0 && this.route.offset === pageSize) {
+            result = this.sortedServices;
+        }
+        return result;
     },
 
     // Users
