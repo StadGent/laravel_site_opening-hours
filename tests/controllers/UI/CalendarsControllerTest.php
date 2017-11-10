@@ -44,6 +44,7 @@ class CalendarsControllerTest extends \TestCase
         $this->assertEquals(-2, $cal['priority']);
 
         $this->doRequest('delete', $this->apiUrl . '/' . '2');
+        $this->seeStatusCode(200);
 
         $this->doRequest('get',$this->versionUrl . '/' . '1');
         $this->seeStatusCode(200);
