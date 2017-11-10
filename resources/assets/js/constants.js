@@ -16,7 +16,7 @@ export const API_PREFIX = '/api/v1/ui';
 export const NO_VALID_EMAIL = 'Dit is geen geldig e-mail adres';
 export const CHOOSE_SERVICE = 'Kies een dienst';
 export const OH_INVALID_RANGE = 'Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.' +
-    '\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.';
+    '<br>De wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.';
 export const UNKNOWN_ERROR = 'Er is een onbekende fout opgetreden.';
 export const VAGUE_ERROR = 'Neem een print screen en neem contact op met de servicedesk.';
 export const ID_MISSING = 'ID ontbreekt';

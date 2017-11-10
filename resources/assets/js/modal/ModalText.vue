@@ -76,9 +76,7 @@
               </select>
             </div>
           </div>
-          <div v-if="this.modal.error" class="alert alert-danger">
-            {{ modal.error }}
-          </div>
+          <div v-if="this.modal.error" class="alert alert-danger" v-html="modal.error"></div>
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
