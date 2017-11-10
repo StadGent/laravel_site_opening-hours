@@ -93,12 +93,12 @@ class CalendarsController extends Controller
             );
         }
 
-//        if ($calendar['priority'] === 0) {
-//            return response()->json(
-//                ['message' => 'De basiskalender kan je niet verwijderen.'],
-//                400
-//            );
-//        }
+        if ($calendar['priority'] === 0) {
+            return response()->json(
+                ['message' => 'De basiskalender kan je niet verwijderen.'],
+                400
+            );
+        }
 
         $success = $this->calendars->delete($calendarId);
 
