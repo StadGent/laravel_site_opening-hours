@@ -162,7 +162,7 @@ export default {
                 })
                 .then(this.statusReset)
                 .catch(fetchError);
-        },
+        }
     },
     mounted() {
 
@@ -202,7 +202,7 @@ export default {
                 this.statusReset();
                 return;
             }
-            this.$http.delete(API_RREFIX + '/services/' + channel.service_id + '/channels/' + channel.id)
+            this.$http.delete(API_PREFIX + '/services/' + channel.service_id + '/channels/' + channel.id)
                 .then(() => {
 
                     // remove channel from routeService
@@ -254,7 +254,7 @@ export default {
                 return;
             }
 
-            this.$http.put(API_RREFIX + '/openinghours/' + version.id, version)
+            this.$http.put(API_PREFIX + '/openinghours/' + version.id, version)
                 .then(({data}) => {
                     this.fetchServices();
                     this.modalClose();

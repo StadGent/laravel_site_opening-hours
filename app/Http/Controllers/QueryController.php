@@ -59,7 +59,6 @@ class QueryController extends Controller
     /**
      * Collection of openinghours with custom from - till
      *
-     * @todo  check the correct output by Accept header
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
@@ -74,8 +73,7 @@ class QueryController extends Controller
             $end->endOfDay(),
             $request,
             $service,
-            $channel,
-            $request->input('format')
+            $channel
         );
 
         return response()->make($output);
@@ -84,7 +82,6 @@ class QueryController extends Controller
     /**
      * Collection of openinghours for one day
      *
-     * @todo  check the correct output by Accept header
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
@@ -102,7 +99,6 @@ class QueryController extends Controller
     /**
      * Collection of openinghours for one week
      *
-     * @todo  check the correct output by Accept header
      * @todo  find week based on given locale
      * @param GetQueryRequest $request
      * @param Service $service
@@ -122,7 +118,6 @@ class QueryController extends Controller
     /**
      * Collection of openinghours for one month
      *
-     * @todo  check the correct output by Accept header
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
@@ -141,7 +136,6 @@ class QueryController extends Controller
     /**
      * Collection of openinghours for one year
      *
-     * @todo  check the correct output by Accept header
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
@@ -165,7 +159,6 @@ class QueryController extends Controller
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @param string $format
      * @return mixed
      */
     private function generateOutput(
