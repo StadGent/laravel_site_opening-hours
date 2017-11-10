@@ -147,8 +147,14 @@ export default {
                     next(data);
                 }).catch(fetchError);
         },
-        patchServiceStatus(service) {
+        patchServiceStatus(service, activate) {
             this.statusStart();
+
+            if (!service.id) {
+                this.statusUpdate(ID_MISSING);
+                return;
+            }
+            service.draft = !activate;
 
             this.$http.put(API_PREFIX + '/services/' + service.id, {draft: service.draft})
                 .then(({data}) => {
@@ -156,30 +162,16 @@ export default {
                 })
                 .then(this.statusReset)
                 .catch(fetchError);
-        }
+        },
     },
     mounted() {
 
         Hub.$on('fetchChannels', this.fetchChannels);
         Hub.$on('activateService', service => {
-
-            if (!service.id) {
-                this.statusUpdate(ID_MISSING);
-                return;
-            }
-            service.draft = false;
-
-            this.patchServiceStatus(service);
+            this.patchServiceStatus(service, true);
         });
         Hub.$on('deactivateService', service => {
-
-            if (!service.id) {
-                this.statusUpdate(ID_MISSING);
-                return;
-            }
-            service.draft = true;
-
-            this.patchServiceStatus(service);
+            this.patchServiceStatus(service, false);
         });
         Hub.$on('createChannel', channel => {
             this.statusStart();
