@@ -50,10 +50,12 @@ class LodOpeninghoursRepository
         }
 
         $queries = $this->createRemoveChannelQueries($channelId);
-
+        $result = true;
         foreach ($queries as $query) {
-            $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
+            $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST') && $result;
         }
+
+        return $result;
     }
 
     /**
@@ -75,9 +77,12 @@ class LodOpeninghoursRepository
 
         $queries = $this->createRemoveOpeninghoursQueries($openinghoursId);
 
+        $result = true;
         foreach ($queries as $query) {
-            $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST');
+            $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST') && $result;
         }
+
+        return $result;
     }
 
     /**
@@ -106,7 +111,11 @@ class LodOpeninghoursRepository
 
         $deleteQueries = $this->createRemoveOpeninghoursQueries($openinghoursId);
 
-        return ['header' => $headers, 'deleteQueries' => $deleteQueries, 'newTriples' => "INSERT DATA { GRAPH <$graphName> { $triples } }"];
+        return [
+            'header' => $headers,
+            'deleteQueries' => $deleteQueries,
+            'newTriples' => "INSERT DATA { GRAPH <$graphName> { $triples } }",
+        ];
     }
 
     /**
