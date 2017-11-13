@@ -52,6 +52,7 @@ class FetchServices implements ShouldQueue
                 } catch (\Exception $ex) {
                     \Log::error('An error occured while upserting services: ' . $ex->getMessage());
                     \Log::error($ex->getTraceAsString());
+                    $this->fail($ex);
                 }
             });
         }

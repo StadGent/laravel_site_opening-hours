@@ -44,6 +44,14 @@ class DeleteLodChannel implements ShouldQueue
      */
     public function handle()
     {
-        app(LodOpeninghoursRepository::class)->deleteChannel($this->channelId);
+        $result = app(LodOpeninghoursRepository::class)->deleteChannel($this->channelId);
+        if (!$result) {
+            $this->fail(new \Exception(sprintf(
+                'The %s job failed with service id %s and channel id %s. Check the logs for details',
+                static::class,
+                $this->serviceId,
+                $this->channelId
+            )));
+        }
     }
 }
