@@ -186,7 +186,7 @@ class SparqlService
     public function post($query, $format = null)
     {
         $this->lastResponseCode = null;
-        $uri = '?graph-uri=' . static::transformQuery($this->defaultGraph) . '&format=' . ($format ?: 'json');
+        $uri = '?format=' . ($format ?: 'json');
         $options = ['body' => $query];
 
         $options['headers']['Content-Type'] = 'application/sparql-update';
