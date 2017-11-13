@@ -18,14 +18,21 @@ class CalendarsTableSeeder extends Seeder
         $openinghours = Openinghours::all();
         foreach ($openinghours as $openinghour) {
             $openinghour->calendars()->save(factory(Calendar::class)
-                    ->make());
+                ->make());
 
             $openinghour->calendars()->save(factory(Calendar::class)
-                    ->make([
-                        'label' => 'Erste maandag sluitingsdag',
-                        'priority' => '-1',
-                        'closinghours' => '1',
-                    ]));
+                ->make([
+                    'label' => 'Eerste maandag sluitingsdag',
+                    'priority' => '-1',
+                    'closinghours' => '1',
+                ]));
+
+            $openinghour->calendars()->save(factory(Calendar::class)
+                ->make([
+                    'label' => 'Zaterdagmorgen open',
+                    'priority' => '-2',
+                    'closinghours' => '0',
+                ]));
         }
         $this->command->info(self::class . " seeded \r");
     }
