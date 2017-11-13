@@ -12,7 +12,7 @@ class CalendarsControllerTest extends \TestCase
      * @var string
      */
     protected $apiUrl = '/api/v1/ui/calendars';
-
+    protected $versionUrl = '/api/v1/ui/openinghours';
  
 
     /**
@@ -27,6 +27,32 @@ class CalendarsControllerTest extends \TestCase
         $this->seeStatusCode(400);
         $content = $this->decodeResponseJson();
         $this->assertEquals('De kalender werd niet verwijderd, er is iets foutgegaan.', $content['message']);
+    }
+
+    /**
+     * @test
+     */
+    public function testPriorityOfCalendarUpdatesWhenASiblingIsRemoved() {
+        $authUser = \App\Models\User::where('name', 'adminuser')->first();
+        $this->actingAs($authUser, 'api');
+
+        $this->doRequest('get', $this->versionUrl . '/' . '1');
+        $this->seeStatusCode(200);
+
+        $cal = $this->decodeResponseJson()['calendars'][2];
+        $this->assertEquals(3, $cal['id']);
+        $this->assertEquals(-2, $cal['priority']);
+
+        $this->doRequest('delete', $this->apiUrl . '/' . '2');
+        $this->seeStatusCode(200);
+
+        $this->doRequest('get',$this->versionUrl . '/' . '1');
+        $this->seeStatusCode(200);
+
+        $cal = $this->decodeResponseJson()['calendars'][1];
+        $this->assertEquals(3, $cal['id']);
+        $this->assertNotEquals(-2, $cal['priority']);
+        $this->assertEquals(-1, $cal['priority']);
     }
 
     /**
