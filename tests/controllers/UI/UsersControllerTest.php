@@ -15,7 +15,7 @@ class UsersControllerTest extends \TestCase
     /**
      * @var string
      */
-    protected $apiUrl = '/api/v1/ui/users';
+    protected $apiUrl = '/api/v1/ui';
     /**
      * Data provider for requests
      *
@@ -215,33 +215,39 @@ class UsersControllerTest extends \TestCase
 
         return [
             //  unauth user
-            ['unauth', 'get', '', [], '401'], // index
-            ['unauth', 'post', '', [], '405'], // store
-            ['unauth', 'get', '1', [], '401'], // show
-            ['unauth', 'put', '1', [], '405'], // update (full)
-            ['unauth', 'patch', '1', [], '405'], // update (partial)
-            ['unauth', 'delete', '1', [], '401'], // destroy
+            ['unauth', 'get', 'users', [], '401'], // index
+            ['unauth', 'post', 'users', [], '405'], // store
+            ['unauth', 'get', 'users/1', [], '401'], // show
+            ['unauth', 'put', 'users/1', [], '405'], // update (full)
+            ['unauth', 'patch', 'users/1', [], '405'], // update (partial)
+            ['unauth', 'delete', 'users/1', [], '401'], // destroy
             // admin user
-            ['admin', 'get', '', [], '200'], // index
-            ['admin', 'post', '', $data, '405'], // store
-            ['admin', 'get', '1', [], '200'], // show
-            ['admin', 'put', '1', $data, '405'], // update (full)
-            ['admin', 'patch', '1', $data, '405'], // update (partial)
-            ['admin', 'delete', '2', [], '200'], // destroy
+            ['admin', 'get', 'users', [], '200'], // index
+            ['admin', 'get', 'services/1/users', [], '200'], // index
+            ['admin', 'post', 'users', $data, '405'], // store
+            ['admin', 'get', 'users/1', [], '200'], // show
+            ['admin', 'put', 'users/1', $data, '405'], // update (full)
+            ['admin', 'patch', 'users/1', $data, '405'], // update (partial)
+            ['admin', 'delete', 'users/2', [], '200'], // destroy
+            ['admin', 'delete', 'users/1', [], '401'], // you can't delete yourself
             // owner user
-            ['owner', 'get', '', [], '401'], // index
-            ['owner', 'post', '', $data, '405'], // store
-            ['owner', 'get', '1', [], '401'], // show
-            ['owner', 'put', '1', $data, '405'], // update (full)
-            ['owner', 'patch', '1', $data, '405'], // update (partial)
-            ['owner', 'delete', '3', [], '401'], // destroy
+            ['owner', 'get', 'users', [], '401'], // index
+            ['owner', 'get', 'services/1/users', [], '200'], // getFromService
+            ['owner', 'get', 'services/2/users', [], '401'], // getFromService but not owned service
+            ['owner', 'post', 'users', $data, '405'], // store
+            ['owner', 'get', 'users/1', [], '401'], // show
+            ['owner', 'put', 'users/1', $data, '405'], // update (full)
+            ['owner', 'patch', 'users/1', $data, '405'], // update (partial)
+            ['owner', 'delete', 'users/3', [], '401'], // destroy
             // member user
-            ['member', 'get', '', [], '401'], // index
-            ['member', 'post', '', $data, '405'], // store
-            ['member', 'get', '1', [], '401'], // show
-            ['member', 'put', '1', $data, '405'], // update (full)
-            ['member', 'patch', '1', $data, '405'], // update (partial)
-            ['member', 'delete', '2', [], '401'], // destroy
+            ['member', 'get', 'users', [], '401'], // index
+            ['member', 'get', 'services/1/users', [], '401'], // getFromService
+            ['member', 'get', 'services/2/users', [], '401'], // getFromService but not owned service
+            ['member', 'post', 'users', $data, '405'], // store
+            ['member', 'get', 'users/1', [], '401'], // show
+            ['member', 'put', 'users/1', $data, '405'], // update (full)
+            ['member', 'patch', 'users/1', $data, '405'], // update (partial)
+            ['member', 'delete', 'users/2', [], '401'], // destroy
         ];
     }
 
