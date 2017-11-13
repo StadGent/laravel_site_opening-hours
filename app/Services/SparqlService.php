@@ -52,10 +52,10 @@ class SparqlService
     private static $instance;
 
     /**
-     * 
+     *
      * Private contructor for Singleton pattern
      * force set client with default values from .env file
-     * 
+     *
      * @return SparqlService
      */
     private function __construct()
@@ -65,7 +65,7 @@ class SparqlService
 
     /**
      * GetInstance for Singleton pattern
-     * 
+     *
      * @return SparqlService
      */
     public static function getInstance()
@@ -187,8 +187,9 @@ class SparqlService
     {
         $this->lastResponseCode = null;
         $uri = '?graph-uri=' . static::transformQuery($this->defaultGraph) . '&format=' . ($format ?: 'json');
-        $options = ['form_params' => ['query' => $query]];
+        $options = ['body' => $query];
 
+        $options['headers']['Content-Type'] = 'application/sparql-update';
         return $this->executeQuery('POST', $uri, $options);
     }
 
@@ -207,8 +208,8 @@ class SparqlService
     {
         $this->lastResponseCode = null;
         $uri = '?query=' . static::transformQuery($query) . '&format=' . ($format ?: 'json');
-
-        return $this->executeQuery('GET', $uri);
+        $options['headers']['Content-Type'] = 'application/sparql-query';
+        return $this->executeQuery('GET', $uri, $options);
     }
 
     /**
@@ -243,7 +244,6 @@ class SparqlService
     private function executeQuery($verb, $query, $options = [])
     {
         $options['auth'] = [$this->username, $this->password, 'digest'];
-        $options['Content-Type'] = 'application/sparql-query';
         $response = $this->guzzleClient->request($verb, $query, $options);
 
         return $this->handleResponse($response);
@@ -278,12 +278,12 @@ class SparqlService
             throw new \Exception($message);
         }
 
-        if ($this->lastResponseCode >= '400' && $this->lastResponseCode <= '500') {
+        if ($this->lastResponseCode >= 400 && $this->lastResponseCode <= 499) {
             $message = "The SPARQL endpoint returned an error.";
             throw new \Exception($message);
         }
 
-        if ($this->lastResponseCode == '500') {
+        if ($this->lastResponseCode >= 500) {
             $message = "The SPARQL endpoint returned a 500 error.";
             throw new \Exception($message);
         }
