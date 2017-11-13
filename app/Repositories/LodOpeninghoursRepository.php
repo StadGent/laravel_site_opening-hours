@@ -26,7 +26,7 @@ class LodOpeninghoursRepository
         foreach ($deleteQueries as $deleteQuery) {
             $deleteQuery = $header . ' ' . $deleteQuery;
 
-            $this->makeSparqlService()->performSparqlQuery($deleteQuery, 'GET');
+            $this->makeSparqlService()->performSparqlQuery($deleteQuery, 'POST');
         }
 
         $newTriples = $header . ' ' . $newTriples;
