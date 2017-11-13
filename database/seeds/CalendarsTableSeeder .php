@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 
 class CalendarsTableSeeder extends Seeder
 {
+
     /**
      * Run the database seeds.
      *
@@ -18,18 +19,18 @@ class CalendarsTableSeeder extends Seeder
         $openinghours = Openinghours::all();
         foreach ($openinghours as $openinghour) {
             $openinghour->calendars()->save(factory(Calendar::class)
-                    ->make());
-
-            $openinghour->calendars()->save(factory(Calendar::class)
-                    ->make([
-                        'label' => 'Eerste maandag sluitingsdag',
-                        'priority' => '-1',
-                        'closinghours' => '1',
-                    ]));
+                ->make());
 
             $openinghour->calendars()->save(factory(Calendar::class)
                 ->make([
-                    'label' => 'Eerste maandag openingsuren',
+                    'label' => 'Eerste maandag sluitingsdag',
+                    'priority' => '-1',
+                    'closinghours' => '1',
+                ]));
+
+            $openinghour->calendars()->save(factory(Calendar::class)
+                ->make([
+                    'label' => 'Zaterdagmorgen open',
                     'priority' => '-2',
                     'closinghours' => '0',
                 ]));
