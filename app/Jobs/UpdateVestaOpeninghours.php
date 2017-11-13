@@ -52,6 +52,14 @@ class UpdateVestaOpeninghours implements ShouldQueue
             \Log::warning('No output was created for VESTA for service with UID ' . $this->vestaUid);
         }
 
-        app('VestaService')->updateOpeninghours($this->vestaUid, $output);
+        $result = app('VestaService')->updateOpeninghours($this->vestaUid, $output);
+        if (!$result) {
+            $this->fail(new \Exception(sprintf(
+                'The %s job failed with vesta uid %s and service id %s. Check the logs for details',
+                static::class,
+                $this->vestaUid,
+                $this->serviceId
+            )));
+        }
     }
 }
