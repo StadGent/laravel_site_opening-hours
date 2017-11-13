@@ -18,36 +18,33 @@ class EventsTableSeeder extends Seeder
         $openinghours = Openinghours::all();
         foreach ($openinghours as $openinghour) {
             $calendars = $openinghour->calendars;
+
             $baseCalendar = $calendars->shift();
             $baseCalendar->events()->save(factory(Event::class)
-                    ->make([
-                        'start_date' => '2017-01-01 09:00',
-                        'end_date' => '2017-01-01 12:00',
-                    ]));
-
+                ->make([
+                    'start_date' => '2017-01-01 09:00',
+                    'end_date' => '2017-01-01 12:00',
+                ]));
             $baseCalendar->events()->save(factory(Event::class)
-                    ->make([
-                        'start_date' => '2017-01-01 13:00',
-                        'end_date' => '2017-01-01 17:00',
-                    ]));
+                ->make([
+                    'start_date' => '2017-01-01 13:00',
+                    'end_date' => '2017-01-01 17:00',
+                ]));
 
             $exceptionCalendar = $calendars->shift();
-
             $exceptionCalendar->events()->save(factory(Event::class)
-                    ->make([
-                        'rrule' => 'BYSETPOS=1;BYDAY=MO;FREQ=MONTHLY',
-                        'start_date' => '2017-01-01 09:00',
-                        'end_date' => '2017-01-01 18:00',
-                    ]));
+                ->make([
+                    'rrule' => 'BYSETPOS=1;BYDAY=MO;FREQ=MONTHLY',
+                    'start_date' => '2017-01-01 09:00',
+                    'end_date' => '2017-01-01 18:00',
+                ]));
 
             $exceptionCalendar = $calendars->shift();
-
             $exceptionCalendar->events()->save(factory(Event::class)
                 ->make([
                     'rrule' => 'BYDAY=SA;FREQ=WEEKLY;INTERVAL=2',
                     'start_date' => '2017-01-01 10:00',
                     'end_date' => '2017-01-01 12:00',
-                    'until' => '2018-12-31'
                 ]));
         }
         $this->command->info(self::class . " seeded \r");
