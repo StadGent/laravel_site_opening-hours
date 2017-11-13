@@ -17,8 +17,8 @@
         <div v-if="event.rrule">
             <!-- Choose the period -->
             <div class="form-group" v-if="!prevEventSameLabel && $parent.cal.layer">
-                <label class="col-xs-12">Regelmaat</label>
                 <div class="col-xs-5">
+                    <label>Regelmaat</label>
                     <select v-model="optionFreq" class="form-control" aria-label="Regelmaat">
                         <option :value="RRule.YEARLY">Jaarlijks</option>
                         <option :value="RRule.MONTHLY">Maandelijks</option>
@@ -27,7 +27,8 @@
                     </select>
                 </div>
                 <div class="col-xs-5" v-if="options.freq==RRule.MONTHLY">
-                    <select v-model="optionInterval" class="form-control" aria-label="herhaling">
+                    <label>Frequentie</label>
+                    <select v-model="optionInterval" class="form-control" aria-label="Frequentie">
                         <option :value="null">elke maand</option>
                         <option :value="2">tweemaandelijks</option>
                         <option :value="3">elk kwartaal</option>
@@ -35,7 +36,8 @@
                     </select>
                 </div>
                 <div class="col-xs-5" v-else-if="options.freq==RRule.WEEKLY">
-                    <select v-model="optionInterval" class="form-control" aria-label="herhaling">
+                    <label>Frequentie</label>
+                    <select v-model="optionInterval" class="form-control" aria-label="Frequentie">
                         <option :value="null">elke week</option>
                         <option :value="2">tweewekelijks</option>
                         <option :value="3">driewekelijks</option>
@@ -43,7 +45,8 @@
                     </select>
                 </div>
                 <div class="col-xs-5" v-else-if="options.freq==RRule.DAILY">
-                    <select v-model="optionInterval" class="form-control" aria-label="herhaling">
+                    <label>Frequentie</label>
+                    <select v-model="optionInterval" class="form-control" aria-label="Frequentie">
                         <option :value="null">elke dag</option>
                         <option :value="2">om de dag</option>
                         <option :value="3">om de drie dagen</option>
