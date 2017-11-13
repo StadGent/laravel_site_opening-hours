@@ -8,7 +8,6 @@ use Illuminate\Database\Seeder;
 
 class CalendarsTableSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
