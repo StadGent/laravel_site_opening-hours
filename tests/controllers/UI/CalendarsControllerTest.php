@@ -32,7 +32,7 @@ class CalendarsControllerTest extends \TestCase
     /**
      * @test
      */
-    public function testPriorityChange() {
+    public function testPriorityOfCalendarUpdatesWhenASiblingIsRemoved() {
         $authUser = \App\Models\User::where('name', 'adminuser')->first();
         $this->actingAs($authUser, 'api');
 

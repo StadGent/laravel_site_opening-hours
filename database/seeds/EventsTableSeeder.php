@@ -39,6 +39,16 @@ class EventsTableSeeder extends Seeder
                         'start_date' => '2017-01-01 09:00',
                         'end_date' => '2017-01-01 18:00',
                     ]));
+
+            $exceptionCalendar = $calendars->shift();
+
+            $exceptionCalendar->events()->save(factory(Event::class)
+                ->make([
+                    'rrule' => 'BYDAY=SA;FREQ=WEEKLY;INTERVAL=2',
+                    'start_date' => '2017-01-01 10:00',
+                    'end_date' => '2017-01-01 12:00',
+                    'until' => '2018-12-31'
+                ]));
         }
         $this->command->info(self::class . " seeded \r");
     }
