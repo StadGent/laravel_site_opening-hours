@@ -40,15 +40,6 @@ class LodOpeninghoursRepository
      */
     public function deleteChannel($channelId)
     {
-        $channelUri = createChannelUri($channelId);
-        $graph = env('SPARQL_WRITE_GRAPH');
-
-        if (empty($graph)) {
-            \Log::warning('No graph was configured, we could not delete the openinghours');
-
-            return false;
-        }
-
         $queries = $this->createRemoveChannelQueries($channelId);
         $result = true;
         foreach ($queries as $query) {
@@ -66,17 +57,7 @@ class LodOpeninghoursRepository
      */
     public function deleteOpeninghours($openinghoursId)
     {
-        $openinghoursUri = createOpeninghoursUri($openinghoursId);
-        $graph = env('SPARQL_WRITE_GRAPH');
-
-        if (empty($graph)) {
-            \Log::warning('No graph was configured, we could not delete the openinghours');
-
-            return false;
-        }
-
         $queries = $this->createRemoveOpeninghoursQueries($openinghoursId);
-
         $result = true;
         foreach ($queries as $query) {
             $result = $this->makeSparqlService()->performSparqlQuery($query, 'POST') && $result;
@@ -176,7 +157,7 @@ class LodOpeninghoursRepository
     private function createRemoveChannelQueries($channelId)
     {
         $channelUri = createChannelUri($channelId);
-        $graph = env('SPARQL_WRITE_GRAPH');
+        $graph = $this->getGraphName();
 
         return ["WITH <$graph>
             delete {
@@ -236,7 +217,7 @@ class LodOpeninghoursRepository
     private function createRemoveOpeninghoursQueries($openinghoursId)
     {
         $openinghoursUri = createOpeninghoursUri($openinghoursId);
-        $graph = env('SPARQL_WRITE_GRAPH');
+        $graph = $this->getGraphName();
 
         return ["WITH <$graph>
             delete {
