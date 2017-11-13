@@ -24,11 +24,16 @@
                         <p>
                             De uren in de periode met de hoogste prioriteit bepalen de openingsuren voor de kalender.
                         </p>
-                        <p>
+                        <p v-if="this.calendars.length <= 10">
                             <button class="btn btn-primary" @click="addCalendar" v-if="reversedCalendars.length"
                                     :disabled="$root.isRecreatex">Voeg uitzonderingen toe
                             </button>
                         </p>
+                        <div v-else class="alert alert-warning">
+                            Er kan geen uitzondering toegevoegd worden.
+                            <br>
+                            (Max. 1 normale uren + 10 uitzonderingen)
+                        </div>
                         <transition-group name="list" tag="div">
                             <div class="cal" v-if="cal.priority !== 0" v-for="(cal, index) in reversedCalendars"
                                  :key="cal.label">
