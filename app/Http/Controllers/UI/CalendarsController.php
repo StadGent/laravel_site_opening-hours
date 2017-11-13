@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UI;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
+use App\Models\Calendar;
 use App\Repositories\CalendarRepository;
 
 class CalendarsController extends Controller
@@ -14,6 +15,7 @@ class CalendarsController extends Controller
      */
     public function __construct(CalendarRepository $calendars)
     {
+        $this->middleware('hasRoleInService');
         $this->calendars = $calendars;
     }
 
@@ -28,22 +30,20 @@ class CalendarsController extends Controller
         $input = $request->input();
 
         $id = $this->calendars->store($input);
+        if (!$id = $this->calendars->store($input)) {
+            return response()->json(
+                ['message' => 'Something went wrong while storing the new channel, check the logs.'],
+                400
+            );
+        }
 
         // If events are passed, bulk insert them
         if (!empty($input['events']) && !empty($id)) {
             $this->bulkInsert($id, $input['events']);
         }
+        $calendar = $this->calendars->getById($id);
 
-        if (!empty($id)) {
-            $calendar = $this->calendars->getById($id);
-
-            return response()->json($calendar);
-        }
-
-        return response()->json(
-            ['message' => 'Something went wrong while storing the new channel, check the logs.'],
-            400
-        );
+        return response()->json($calendar);
     }
 
     /**
@@ -65,34 +65,24 @@ class CalendarsController extends Controller
          * update object AFTER bulk insert
          * to get all data correct for event on observer
          */
-        $success = $this->calendars->update($id, $input);
-        if ($success) {
-            return response()->json($this->calendars->getById($id));
+        if (!$this->calendars->update($id, $input)) {
+            return response()->json(
+                ['message' => 'Something went wrong while updating the calendar, check the logs.'],
+                400
+            );
         }
 
-        return response()->json(
-            ['message' => 'Something went wrong while updating the calendar, check the logs.'],
-            400
-        );
+        return response()->json($this->calendars->getById($id));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param Calendar $calendar
      * @return \Illuminate\Http\Response
      */
-    public function destroy($calendarId)
+    public function destroy(Calendar $calendar)
     {
-        $calendar = $this->calendars->getById($calendarId);
-
-        if (empty($calendar)) {
-            return response()->json(
-                ['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'],
-                400
-            );
-        }
-
         if ($calendar['priority'] === 0) {
             return response()->json(
                 ['message' => 'De basiskalender kan je niet verwijderen.'],
@@ -100,13 +90,11 @@ class CalendarsController extends Controller
             );
         }
 
-        $success = $this->calendars->delete($calendarId);
-
-        if ($success) {
-            return response()->json(['message' => 'De kalender werd verwijderd.']);
+        if (!$this->calendars->delete($calendar->id)) {
+            return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
         }
 
-        return response()->json(['message' => 'De kalender werd niet verwijderd, er is iets foutgegaan.'], 400);
+        return response()->json(['message' => 'De kalender werd verwijderd.']);
     }
 
     /**

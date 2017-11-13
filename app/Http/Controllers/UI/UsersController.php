@@ -28,6 +28,8 @@ class UsersController extends Controller
      */
     public function __construct(UserRepository $userRepository)
     {
+        $this->middleware('admin')->only(['index', 'show', 'destroy']);
+        $this->middleware('isOwner')->only(['getFromService', 'invite']);
         $this->userRepository = $userRepository;
         $this->userService = app('UserService');
     }
@@ -69,16 +71,9 @@ class UsersController extends Controller
         if (\Auth::user()->id === $user->id) {
             throw new AuthenticationException("You can't delete yourself!!!");
         }
+        $user->delete();
 
-        $success = $user->delete();
-        if ($success !== false) {
-            $users = $this->userRepository->getAll();
-
-            return response()->json($users);
-        }
-
-        return response()
-            ->json('Something went wrong while deleting the user, check the logs for more info.', 400);
+        return response()->json($this->userRepository->getAll());
     }
 
     /**

@@ -4,27 +4,38 @@ namespace App\Repositories;
 
 use App\Models\Channel;
 use App\Models\Openinghours;
-use Carbon\Carbon;
 use App\Models\Service;
+use Carbon\Carbon;
 
 class ChannelRepository extends EloquentRepository
 {
+    /**
+     * @param Channel $channel
+     */
     public function __construct(Channel $channel)
     {
         parent::__construct($channel);
     }
 
+    /**
+     * @param $openinghoursId
+     * @return null
+     */
     public function getByOpeninghoursId($openinghoursId)
     {
         $openinghours = Openinghours::find($openinghoursId);
 
-        if (! empty($openinghours)) {
+        if (!empty($openinghours)) {
             return $openinghours->channel;
         }
 
         return;
     }
 
+    /**
+     * @param $channelId
+     * @return mixed
+     */
     public function getByIdWithOpeninghours($channelId)
     {
         return $this->model->with('openinghours')->find($channelId);
@@ -76,20 +87,22 @@ class ChannelRepository extends EloquentRepository
      */
     public function hasOpeninghoursForInterval($channelId, $start, $end, $id = null)
     {
-        $start = Carbon::createFromFormat('Y-m-d', $start);
-        $end = Carbon::createFromFormat('Y-m-d', $end);
+        $start = Carbon::createFromFormat('Y-m-d', $start)->startOfDay();
+        $end = Carbon::createFromFormat('Y-m-d', $end)->endOfDay();
 
         $openinghours = Openinghours::where('channel_id', $channelId)
-                            ->where(function ($query) use ($start, $end) {
-                                $query->whereBetween('start_date', [$start, $end])
-                                        ->orWhereBetween('end_date', [$start, $end]);
-                            });
+            ->whereRaw(
+                \DB::raw(
+                    "('" . $start . "' BETWEEN start_date AND end_date OR " .
+                    "'" . $end . "' BETWEEN start_date AND end_date) "
+                )
+            );
 
         // Exclude the openinghours instance
-        if (! empty($id)) {
+        if (!empty($id)) {
             $openinghours->where('id', '!=', $id);
         }
 
-        return ! empty($openinghours->first());
+        return !empty($openinghours->first());
     }
 }

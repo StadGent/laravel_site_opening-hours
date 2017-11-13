@@ -21,6 +21,7 @@ class RolesController extends Controller
      */
     public function __construct(UserRepository $users)
     {
+        $this->middleware('isOwner');
         $this->users = $users;
     }
 
@@ -28,19 +29,13 @@ class RolesController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     *
      * @return \Illuminate\Http\Response
      */
     public function update(StoreRoleRequest $request)
     {
-        $role = Role::where('name', $request->input('role'))->first();
-        $service = null;
-        if ($request->input('service_id')) {
-            $service = Service::find($request->input('service_id'));
-        }
-
         $user = User::find($request->input('user_id'));
+        $role = Role::where('name', $request->input('role'))->first();
+        $service = Service::find($request->input('service_id'));
         $user = app('UserService')->setRoleToUser($user->email, $role, $service);
         $assignedRoles = app('UserRepository')->getAllRolesForUser($user->id);
 
@@ -58,22 +53,22 @@ class RolesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
-     *
+     * @param  DeleteRoleRequest $request
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteRoleRequest $request)
     {
         $input = $request->input();
+        $user = User::find($request->input('user_id'));
 
         $success = $this->users
             ->removeRoleInService($input['user_id'], $input['service_id']);
 
-        if ($success) {
-            return response()->json(['message' => 'De gebruiker werd bijgewerkt.']);
+        if (!$success) {
+            return response()
+                ->json(['message' => 'Er is iets foutgegaan bij het bewerken van een gebruiker.'], 400);
         }
 
-        return response()
-            ->json(['message' => 'Er is iets foutgegaan bij het bewerken van een gebruiker.'], 400);
+        return response()->json(['message' => 'De gebruiker werd bijgewerkt.']);
     }
 }

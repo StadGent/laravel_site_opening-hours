@@ -41,8 +41,8 @@ class ServicesControllerTest extends \TestCase
             ['owner', 'get', '', [], '200'], // index
             ['owner', 'post', '', [], '405'], // store
             ['owner', 'get', '1', [], '405'], // show
-            ['owner', 'put', '1', [], '200'], // update (full)
-            ['owner', 'patch', '1', ['draft' => false], '200'], // update (partial)
+            ['owner', 'put', '1', [], '401'], // update (full)
+            ['owner', 'patch', '1', ['draft' => false], '401'], // update (partial)
             ['owner', 'delete', '1', [], '405'], // destroy
             // member user
             ['member', 'get', '', [], '200'], // index

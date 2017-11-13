@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DeleteOpeninghoursRequest;
 use App\Http\Requests\StoreOpeninghoursRequest;
+use App\Models\Openinghours;
 use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
 use Illuminate\Http\Request;
@@ -16,6 +16,7 @@ class OpeninghoursController extends Controller
      */
     public function __construct(OpeninghoursRepository $openinghours)
     {
+        $this->middleware('hasRoleInService');
         $this->openinghours = $openinghours;
     }
 
@@ -39,19 +40,16 @@ class OpeninghoursController extends Controller
         }
 
         $input = $request->input();
-
         $id = $this->openinghours->store($input);
 
-        $openinghours = $this->openinghours->getById($id);
-
-        if (!empty($openinghours)) {
-            return response()->json($openinghours);
+        if (!$openinghours = $this->openinghours->getById($id)) {
+            return response()->json(
+                ['message' => 'Something went wrong while storing the new openingshours, check the logs.'],
+                400
+            );
         }
 
-        return response()->json(
-            ['message' => 'Something went wrong while storing the new openingshours, check the logs.'],
-            400
-        );
+        return response()->json($openinghours);
     }
 
     /**
@@ -68,18 +66,18 @@ class OpeninghoursController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
+     * @param StoreOpeninghoursRequest $request
+     * @param Openinghours $openinghours
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreOpeninghoursRequest $request, $id)
+    public function update(StoreOpeninghoursRequest $request, Openinghours $openinghours)
     {
         // Make sure the hours don't overlap existing openinghours
         $overlap = app(ChannelRepository::class)->hasOpeninghoursForInterval(
             $request->channel_id,
             $request->start_date,
             $request->end_date,
-            $id
+            $openinghours->id
         );
 
         if ($overlap) {
@@ -88,33 +86,28 @@ class OpeninghoursController extends Controller
 
         $input = $request->input();
 
-        $success = $this->openinghours->update($id, $input);
-
-        if ($success) {
-            return response()->json($this->openinghours->getById($id));
+        if (!$openinghours->update($input)) {
+            return response()->json(
+                ['message' => 'Something went wrong while updating the openinghours, check the logs.'],
+                400
+            );
         }
 
-        return response()->json(
-            ['message' => 'Something went wrong while updating the openinghours, check the logs.'],
-            400
-        );
+        return response()->json($this->openinghours->getById($openinghours->id));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Request $request
-     * @param  int $id
+     * @param Openinghours $openinghours
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy(Openinghours $openinghours)
     {
-        $success = $this->openinghours->delete($request->openinghours);
-
-        if ($success) {
-            return response()->json(['message' => 'De openingsuren werden verwijderd']);
+        if (!$openinghours->delete()) {
+            return response()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
         }
 
-        return response()->json(['message' => 'De openingsuren werden niet verwijderd, er is iets foutgegaan.'], 400);
+        return response()->json(['message' => 'De openingsuren werden verwijderd']);
     }
 }

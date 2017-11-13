@@ -6,6 +6,7 @@ use App\Models\Channel;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Validator;
 
 class StoreOpeninghoursRequest extends FormRequest
 {
@@ -44,7 +45,7 @@ class StoreOpeninghoursRequest extends FormRequest
     {
         return [
             'label' => 'required',
-            'channel_id' => 'required|numeric',
+            'channel_id' => 'exists:channels,id|required|numeric',
         ];
     }
 
@@ -59,5 +60,26 @@ class StoreOpeninghoursRequest extends FormRequest
             'required' => 'Het veld is verplicht in te vullen.',
             'numeric' => 'Het veld moet een numerieke waarde krijgen.',
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * Check if given channel_id is parent of given id
+     *
+     * @param  Validator  $validator
+     * @return void
+     */
+    public function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            // model binding gives correct App\Models\Openinghours
+            if (!empty($this->route('openinghours'))) {
+                $openinghours = $this->route('openinghours');
+                if ($this->input('channel_id') != $openinghours->channel->id) {
+                    $validator->errors()->add('channel_id', "The given channel_id attribute is not a parent of the requested Openinghours id");
+                }
+            }
+        });
     }
 }
