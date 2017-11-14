@@ -82,7 +82,7 @@ class Handler extends ExceptionHandler
         if (method_exists($this, $method)) {
             $this->errorObj->code = $reflect->getShortName();
 
-            return $this->$method($exception);
+            return $this->$method($exception)->header('Access-Control-Allow-Origin', '*');
         }
 
         return parent::render($request, $exception);
