@@ -69,7 +69,7 @@ class UsersController extends Controller
     public function destroy(User $user)
     {
         if (\Auth::user()->id === $user->id) {
-            throw new AuthenticationException("You can't delete yourself!!!");
+            throw new AuthenticationException("You can't delete yourself!");
         }
         $user->delete();
 
@@ -101,7 +101,7 @@ class UsersController extends Controller
         ]);
 
         if (\Auth::user()->email === $request->input('email')) {
-            throw new AuthenticationException("You can't alter yourself!!!");
+            throw new AuthenticationException("You can't alter yourself!");
         }
 
         $role = Role::where('name', $request->input('role'))->first();
