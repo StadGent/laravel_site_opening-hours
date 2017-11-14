@@ -68,10 +68,10 @@ class StoreRoleRequest extends FormRequest
         $validator->after(function ($validator) {
             $user = User::find($this->input('user_id'));
             if ($this->user()->id == $user->id) {
-                $validator->errors()->add('user_id', "You can't alter yourself!!!");
+                $validator->errors()->add('user_id', "You can't alter yourself!");
             }
             if ($user->hasRole('Admin')) {
-                $validator->errors()->add('user_id', "You can't alter an Admin!!!");
+                $validator->errors()->add('user_id', "You can't alter an Admin!");
             }
         });
     }

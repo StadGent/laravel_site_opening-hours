@@ -28,8 +28,7 @@ class CalendarsController extends Controller
     public function store(StoreCalendarRequest $request)
     {
         $input = $request->input();
-
-        $id = $this->calendars->store($input);
+ 
         if (!$id = $this->calendars->store($input)) {
             return response()->json(
                 ['message' => 'Something went wrong while storing the new channel, check the logs.'],
