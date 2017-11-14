@@ -153,7 +153,8 @@ class FetchRecreatex extends Command
         $response = $this->soapClient->FindInfrastructureOpenings($parameters);
         $transformedData = json_decode(json_encode($response), true);
 
-        return $transformedData['InfrastructureOpenings']['InfrastructureOpeningHours']['InfrastructureOpeningHours']['OpenHours']['OpeningHour'];
+        $key = 'InfrastructureOpenings.InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour';
+        return array_get($transformedData, $key, 0);
     }
 
     /**
@@ -315,7 +316,7 @@ class FetchRecreatex extends Command
     {
 
         foreach ($list as $key => $dayOfWeekInfo) {
-            foreach ($dayOfWeekInfo as $dayOfWeek => $info) {
+            foreach (array_keys($dayOfWeekInfo) as $dayOfWeek) {
                 if (!isset($list[$key][$dayOfWeek]['sequences'])) {
                     $list[$key][$dayOfWeek]['sequences'] = array();
                 }
