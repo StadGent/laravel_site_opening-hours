@@ -205,7 +205,7 @@ class FetchRecreatex extends Command
 
         // Store the sequences as rules in the database
         foreach ($sequences as $index => $sequence) {
-            $this->handleSequence($calendar,$index,$sequence);
+            $this->handleSequence($calendar, $index, $sequence);
         }
     }
 
@@ -216,7 +216,7 @@ class FetchRecreatex extends Command
      * @param $index
      * @param array $sequence
      */
-    private function handleSequence(Calendar $calendar,$index, array $sequence)
+    private function handleSequence(Calendar $calendar, $index, array $sequence)
     {
         $startDate = $sequence['startDate'];
         $endDate = $sequence['endDate'];
@@ -316,7 +316,6 @@ class FetchRecreatex extends Command
 
         foreach ($list as $key => $dayOfWeekInfo) {
             foreach ($dayOfWeekInfo as $dayOfWeek => $info) {
-
                 if (!isset($list[$key][$dayOfWeek]['sequences'])) {
                     $list[$key][$dayOfWeek]['sequences'] = array();
                 }
@@ -360,7 +359,6 @@ class FetchRecreatex extends Command
         }
 
         return $date;
-
     }
 
     /**
@@ -388,6 +386,5 @@ class FetchRecreatex extends Command
         }
 
         return $date;
-
     }
 }
