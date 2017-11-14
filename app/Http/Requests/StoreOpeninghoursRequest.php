@@ -77,7 +77,10 @@ class StoreOpeninghoursRequest extends FormRequest
             if (!empty($this->route('openinghours'))) {
                 $openinghours = $this->route('openinghours');
                 if ($this->input('channel_id') != $openinghours->channel->id) {
-                    $validator->errors()->add('channel_id', "The given channel_id attribute is not a parent of the requested Openinghours id");
+                    $validator->errors()->add(
+                        'channel_id',
+                        "The given channel_id attribute is not a parent of the requested Openinghours id"
+                    );
                 }
             }
         });

@@ -59,8 +59,6 @@ class RolesController extends Controller
     public function destroy(DeleteRoleRequest $request)
     {
         $input = $request->input();
-        $user = User::find($request->input('user_id'));
-
         $success = $this->users
             ->removeRoleInService($input['user_id'], $input['service_id']);
 
