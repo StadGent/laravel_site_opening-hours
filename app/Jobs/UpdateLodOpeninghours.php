@@ -98,12 +98,10 @@ class UpdateLodOpeninghours implements ShouldQueue
         $channelId = $channel['id'];
 
         $channel = $openinghoursGraph->resource(
-            createChannelUri($channelId),
-            'cv:Channel'
+            createChannelUri($channelId)
         );
 
         $channel->addResource('cv:isOwnedBy', $service);
-        //$channel->addResource('oh:openinghours', $openinghoursGraph);
 
         if (! empty(env('DATA_REPRESENTATION_URI'))) {
             $channel->addResource('rdfs:isDefinedBy', env('DATA_REPRESENTATION_URI') . '/channel/' . $channelId);

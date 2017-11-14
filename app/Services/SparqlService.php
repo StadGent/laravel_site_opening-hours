@@ -95,6 +95,9 @@ class SparqlService
         $this->username = $username ?: env('SPARQL_WRITE_ENDPOINT_USERNAME');
         $this->password = $password ?: env('SPARQL_WRITE_ENDPOINT_PASSWORD');
         $this->defaultGraph = $defaultGraph ?: env('SPARQL_WRITE_GRAPH');
+        if (empty($this->defaultGraph)) {
+            throw new \Exception('A graph to write to must be configured.');
+        }
 
         $handler = new CurlHandler();
         $options['handler'] = HandlerStack::create($handler); // Wrap w/ middleware
@@ -186,7 +189,7 @@ class SparqlService
     public function post($query, $format = null)
     {
         $this->lastResponseCode = null;
-        $uri = '?graph-uri=' . static::transformQuery($this->defaultGraph) . '&format=' . ($format ?: 'json');
+        $uri = '?format=' . ($format ?: 'json');
         $options = ['body' => $query];
 
         $options['headers']['Content-Type'] = 'application/sparql-update';
