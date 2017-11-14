@@ -22,6 +22,9 @@ class JsonFormatter extends BaseFormatter
     public function render($data)
     {
         $this->output = array_values($data);
+        if (count($this->output) === 1) {
+            $this->output = json_encode($this->output[0]);
+        }
 
         return $this;
     }
