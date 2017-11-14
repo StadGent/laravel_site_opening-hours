@@ -62,7 +62,6 @@ class FetchRecreatex extends Command
             ->each(function (Service $service, $key) {
                 $this->handleService($service);
             });
-
     }
 
     /**
@@ -72,7 +71,6 @@ class FetchRecreatex extends Command
      */
     private function handleService(Service $service)
     {
-
         $this->info('Handling service "' . $service->label . '"');
 
         // Get all channels from the service
@@ -93,7 +91,6 @@ class FetchRecreatex extends Command
         for ($year = $this->calendarStartYear; $year <= $this->calendarEndYear; $year++) {
             $this->handleCalendarYear($channel, $year);
         }
-
     }
 
     /**
@@ -168,20 +165,16 @@ class FetchRecreatex extends Command
      */
     private function fillCalendar(Calendar $calendar, $year, $list)
     {
-
         // Make sure the list is sorted correctly, the order in which the dates are handled are important
         uasort($list, function ($eventA, $eventB) {
-            $dateA = Carbon::createFromFormat('Y - m - d\TH:i:s', $eventA['Date']);
-            $dateB = Carbon::createFromFormat('Y - m - d\TH:i:s', $eventB['Date']);
-
-            return $dateA->gt($dateB);
+            return Carbon::createFromFormat('Y - m - d\TH:i:s', $eventA['Date'])
+                ->gt(Carbon::createFromFormat('Y - m - d\TH:i:s', $eventB['Date']));
         });
 
         // Transform the recreatex list to a usable format so sequences can be detected
         $transformedList = array();
 
         foreach ($list as $eventArr) {
-
             $eventDate = Carbon::createFromFormat('Y - m - d\TH:i:s', $eventArr['Date']);
 
             // Recreatex bug : api also returns the last day of the previous year
@@ -189,9 +182,19 @@ class FetchRecreatex extends Command
                 continue;
             }
 
-            // Store all openinghours in a array so sequences can be detected, every item in the recreatex list containers to possible timespans
-            $this->storeEventInList($transformedList, $this->getStartDate($eventDate, $eventArr['From1']), $this->getEndDate($eventDate, $eventArr['To1']));
-            $this->storeEventInList($transformedList, $this->getStartDate($eventDate, $eventArr['From2']), $this->getEndDate($eventDate, $eventArr['To2']));
+            // Store all openinghours in a array so sequences can be detected,
+            // every item in the recreatex list containers to possible timespans
+            $this->storeEventInList(
+                $transformedList,
+                $this->getStartDate($eventDate, $eventArr['From1']),
+                $this->getEndDate($eventDate, $eventArr['To1'])
+            );
+
+            $this->storeEventInList(
+                $transformedList,
+                $this->getStartDate($eventDate, $eventArr['From2']),
+                $this->getEndDate($eventDate, $eventArr['To2'])
+            );
         }
 
         // When looping over the dates the last date isn't added to a sequence, this function will take care of that
@@ -202,27 +205,36 @@ class FetchRecreatex extends Command
 
         // Store the sequences as rules in the database
         foreach ($sequences as $index => $sequence) {
+            $this->handleSequence($calendar,$index,$sequence);
+        }
+    }
 
-            $startDate = $sequence['startDate'];
-            $endDate = $sequence['endDate'];
-            $untilDate = $sequence['untilDate'];
+    /**
+     * Convert the sequence array to a event and save it to the calendar
+     *
+     * @param Calendar $calendar
+     * @param $index
+     * @param array $sequence
+     */
+    private function handleSequence(Calendar $calendar,$index, array $sequence)
+    {
+        $startDate = $sequence['startDate'];
+        $endDate = $sequence['endDate'];
+        $untilDate = $sequence['untilDate'];
 
-            $event = new Event();
-            $event->start_date = $startDate->toIso8601String();
-            $event->end_date = $endDate->toIso8601String();
-            $event->label = $index + 1;
-            $event->until = $untilDate->endOfDay()->format('Y-m-d');
+        $event = new Event();
+        $event->start_date = $startDate->toIso8601String();
+        $event->end_date = $endDate->toIso8601String();
+        $event->label = $index + 1;
+        $event->until = $untilDate->endOfDay()->format('Y-m-d');
 
-            if ($endDate->dayOfYear == $untilDate->dayOfYear) {
-                $event->rrule = 'FREQ=YEARLY;BYMONTH=' . $startDate->month . ';BYMONTHDAY=' . $startDate->day;
-            } else {
-                $event->rrule = 'BYDAY=' . self::WEEKDAYS[$startDate->dayOfWeek] . ';FREQ=WEEKLY';
-            }
-
-            $calendar->events()->save($event);
-
+        if ($endDate->dayOfYear == $untilDate->dayOfYear) {
+            $event->rrule = 'FREQ=YEARLY;BYMONTH=' . $startDate->month . ';BYMONTHDAY=' . $startDate->day;
+        } else {
+            $event->rrule = 'BYDAY=' . self::WEEKDAYS[$startDate->dayOfWeek] . ';FREQ=WEEKLY';
         }
 
+        $calendar->events()->save($event);
     }
 
     /**
@@ -236,8 +248,8 @@ class FetchRecreatex extends Command
     {
         $sequences = array();
 
-        foreach ($list as $key => $infoByDay) {
-            foreach ($infoByDay as $day => $info) {
+        foreach ($list as $infoByDay) {
+            foreach ($infoByDay as $info) {
                 foreach ($info['sequences'] as $sequence) {
                     $sequences[] = $sequence;
                 }
@@ -291,7 +303,6 @@ class FetchRecreatex extends Command
         }
 
         $transformedArr[$key][$dayOfWeek]['lastWeekOfYear'] = $weekOfYear;
-
     }
 
     /**
