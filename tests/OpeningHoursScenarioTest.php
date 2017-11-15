@@ -146,7 +146,9 @@ class OpeningHoursScenarioTest extends \TestCase
                         0 => ['from' => '09:00', 'until' => '12:00'],
                         1 => ['from' => '13:00', 'until' => '17:00']],
                     ],
-                    '2017-09-09' => ['date' => '2017-09-09', 'open' => false, 'hours' => []],
+                    '2017-09-09' => ['date' => '2017-09-09', 'open' => true, 'hours' => [
+                        0 => ['from' => '10:00', 'until' => '12:00'],
+                    ]],
                     '2017-09-10' => ['date' => '2017-09-10', 'open' => false, 'hours' => []],
                 ],
             ];
