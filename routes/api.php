@@ -19,44 +19,42 @@ Route::group(['prefix' => 'v1'], function () {
     
     Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
         // calendars
-        Route::post('/calendars', 'UI\CalendarsController@store')->middleware('hasRoleInService');
-        Route::put('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
-        Route::patch('/calendars/{calendar}', 'UI\CalendarsController@update')->middleware('hasRoleInService');
-        Route::delete('/calendars/{calendar}', 'UI\CalendarsController@destroy')->middleware('hasRoleInService');
+        Route::post('/calendars', 'UI\CalendarsController@store');
+        Route::put('/calendars/{calendar}', 'UI\CalendarsController@update');
+        Route::patch('/calendars/{calendar}', 'UI\CalendarsController@update');
+        Route::delete('/calendars/{calendar}', 'UI\CalendarsController@destroy');
 
         // channels
         Route::get('/services/{service}/channels', 'UI\ChannelController@getFromService');
-        Route::post('/services/{service}/channels', 'UI\ChannelController@store')->middleware('hasRoleInService');
-        Route::delete('/services/{service}/channels/{channel}', 'UI\ChannelController@destroy')->middleware('hasRoleInService');
+        Route::post('/services/{service}/channels', 'UI\ChannelController@store');
+        Route::delete('/services/{service}/channels/{channel}', 'UI\ChannelController@destroy');
 
         // openinghours
         Route::get('/openinghours/{openinghours}', 'UI\OpeninghoursController@show');
-        Route::post('/openinghours', 'UI\OpeninghoursController@store')->middleware('hasRoleInService');
-        Route::put('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
-        Route::patch('/openinghours/{openinghours}', 'UI\OpeninghoursController@update')->middleware('hasRoleInService');
-        Route::delete('/openinghours/{openinghours}', 'UI\OpeninghoursController@destroy')->middleware('hasRoleInService');
+        Route::post('/openinghours', 'UI\OpeninghoursController@store');
+        Route::put('/openinghours/{openinghours}', 'UI\OpeninghoursController@update');
+        Route::patch('/openinghours/{openinghours}', 'UI\OpeninghoursController@update');
+        Route::delete('/openinghours/{openinghours}', 'UI\OpeninghoursController@destroy');
 
         // Presets (refactor to holidays)
         Route::get('/presets', 'UI\PresetsController@index');
 
         // roles
-        Route::patch('/roles', 'UI\RolesController@update')->middleware('isOwner');
-        // Route::post('/roles', 'UI\RolesController@store')->middleware('isOwner');
-        Route::delete('/roles', 'UI\RolesController@destroy')->middleware('isOwner');
+        Route::patch('/roles', 'UI\RolesController@update');
+        Route::delete('/roles', 'UI\RolesController@destroy');
 
         // services
         Route::get('/services', 'UI\ServicesController@index');
-        // Route::get('/services/{service}', 'UI\ServicesController@show');
-        Route::put('/services/{service}', 'UI\ServicesController@update')->middleware('isOwner');
-        Route::patch('/services/{service}', 'UI\ServicesController@update')->middleware('isOwner');
+        Route::put('/services/{service}', 'UI\ServicesController@update');
+        Route::patch('/services/{service}', 'UI\ServicesController@update');
 
         // users
-        Route::get('/users', 'UI\UsersController@index')->middleware('admin');
-        Route::get('/users/{user}', 'UI\UsersController@show')->middleware('admin');
-        Route::delete('/users/{user}', 'UI\UsersController@destroy')->middleware('admin');
+        Route::get('/users', 'UI\UsersController@index');
+        Route::get('/users/{user}', 'UI\UsersController@show');
+        Route::delete('/users/{user}', 'UI\UsersController@destroy');
         // subset
-        Route::get('/services/{service}/users', 'UI\UsersController@getFromService')->middleware('isOwner');
-        Route::post('/inviteuser', 'UI\UsersController@invite')->middleware('isOwner');
+        Route::get('/services/{service}/users', 'UI\UsersController@getFromService');
+        Route::post('/inviteuser', 'UI\UsersController@invite');
     });
 
     /****************/
@@ -92,5 +90,4 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/services/{service}/channels/{channel}/openinghours/year', 'QueryController@yearAction');
     /* Get the current status of a specific channel for a service */
     Route::get('/services/{service}/channels/{channel}/open-now', 'QueryController@nowOpenAction');
-
 });

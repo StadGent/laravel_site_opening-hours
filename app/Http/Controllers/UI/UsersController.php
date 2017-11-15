@@ -4,30 +4,34 @@ namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteUserRequest;
-use App\Mail\SendRegisterConfirmation;
 use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\ValidationException;
 
 class UsersController extends Controller
 {
-
     /**
      * @var UserRepository
      */
     protected $userRepository;
 
     /**
+     * @var UserService
+     */
+    protected $userService;
+
+    /**
      * @param UserRepository $users
      */
     public function __construct(UserRepository $userRepository)
     {
+        $this->middleware('admin')->only(['index', 'show', 'destroy']);
+        $this->middleware('isOwner')->only(['getFromService', 'invite']);
         $this->userRepository = $userRepository;
+        $this->userService = app('UserService');
     }
 
     /**
@@ -40,42 +44,6 @@ class UsersController extends Controller
         $users = $this->userRepository->getAll();
 
         return response()->json($users);
-    }
-
-    /**
-     * Upsert a user
-     *
-     * @param  \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    private function store(Request $request)
-    {
-        // Check if the user already exists
-        if (!$this->userRepository->where('email', $request->input('email'))->get()->isEmpty()) {
-            // find correct duplicate data error code
-            return response()
-                ->json(['message' => 'This User already exists in the DB.'], 400);
-        }
-
-        $input = $request->input();
-        $input['password'] = '';
-        $input['token'] = str_random(32);
-
-        if (!isset($input['name'])) {
-            $input['name'] = $input['email'];
-        }
-
-        $userId = $this->userRepository->store($input);
-        $user = $this->userRepository->getById($userId);
-        if (!$user) {
-            return response()
-                ->json(['message' => 'Something went wrong while storing the user, check the logs.'], 400);
-        }
-
-        Mail::to($user)->send(new SendRegisterConfirmation($user));
-
-        return $user;
     }
 
     /**
@@ -101,18 +69,11 @@ class UsersController extends Controller
     public function destroy(User $user)
     {
         if (\Auth::user()->id === $user->id) {
-            throw new AuthenticationException("You can't delete yourself!!!");
+            throw new AuthenticationException("You can't delete yourself!");
         }
+        $user->delete();
 
-        $success = $user->delete();
-        if ($success !== false) {
-            $users = $this->userRepository->getAll();
-
-            return response()->json($users);
-        }
-
-        return response()
-            ->json('Something went wrong while deleting the user, check the logs for more info.', 400);
+        return response()->json($this->userRepository->getAll());
     }
 
     /**
@@ -126,32 +87,30 @@ class UsersController extends Controller
     }
 
     /**
+     * Invite a user to the platform
+     *
      * @param Request $request
+     * @return User
      */
     public function invite(Request $request)
     {
-        $user = User::where('email', $request->input('email'))->first();
+        $this->validate($request, [
+            'email' => 'email|required',
+            'role' => 'exists:roles,name|required',
+            'service_id' => 'exists:services,id|required_unless:role,Admin',
+        ]);
 
-        if ($user === null) {
-            $user = $this->store($request);
+        if (\Auth::user()->email === $request->input('email')) {
+            throw new AuthenticationException("You can't alter yourself!");
         }
 
-        $role = false;
-        if ($request->input('role')) {
-            $role = Role::where('name', $request->input('role'))->first();
-        }
-        if ($request->input('role_id')) {
-            $role = Role::find($request->input('role_id'));
-        }
-        if (!isset($role->id)) {
-            throw new ValidationException(['message' => ['role' => 'Vallid role is required to invite a user']]);
+        $role = Role::where('name', $request->input('role'))->first();
+        $service = null;
+        if ($request->input('service_id')) {
+            $service = Service::find($request->input('service_id'));
         }
 
-        $this->userRepository
-            ->linkToService($user->id, $request->input('service_id'), $role->name);
-        $user->fresh();
-
-        $user->role = $role->name;
+        $user = $this->userService->setRoleToUser($request->input('email'), $role, $service);
         $user->roles = app('UserRepository')->getAllRolesForUser($user->id);
 
         return $user;
