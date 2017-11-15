@@ -334,7 +334,6 @@ class FetchRecreatex extends Command
             $transformedArr[$key][$dayOfWeek]['lastWeekOfYear'] == $weekOfYear - 1) {
             $transformedArr[$key][$dayOfWeek]['untilDate'] = clone $endDate;
         } else {
-
             if (isset($transformedArr[$key][$dayOfWeek]['lastWeekOfYear'])) {
                 $transformedArr[$key][$dayOfWeek]['sequences'][] = [
                     'startDate' => clone $transformedArr[$key][$dayOfWeek]['startDate'],
@@ -520,7 +519,7 @@ class FetchRecreatex extends Command
     private function clearChannel(Channel $channel)
     {
         $channel->openinghours
-            ->each(function (Openinghours $openinghours, $key) {
+            ->each(function (Openinghours $openinghours) {
                 $openinghours->delete();
             });
     }
@@ -533,7 +532,7 @@ class FetchRecreatex extends Command
     private function clearCalendar(Calendar $calendar)
     {
         $calendar->events()
-            ->each(function (Event $event, $key) {
+            ->each(function (Event $event) {
                 $event->delete();
             });
     }
