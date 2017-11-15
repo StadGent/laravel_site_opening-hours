@@ -6,7 +6,6 @@ use App\Models\Calendar;
 use App\Models\Channel;
 use App\Models\Event;
 use App\Models\Openinghours;
-use App\Models\Permission;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -17,15 +16,44 @@ use Illuminate\Console\Command;
  */
 class FetchRecreatex extends Command
 {
-
+    /**
+     * @var string
+     */
     protected $signature = 'openinghours:fetch-recreatex';
+
+    /**
+     * @var string
+     */
     protected $description = 'Fetch RECREATEX openinghours data';
 
+    /**
+     * @var \SoapClient
+     */
     private $soapClient;
+
+    /**
+     * @var string
+     */
     private $shopId;
+
+    /**
+     * @var Carbon
+     */
     private $calendarStartYear;
+
+    /**
+     * @var Carbon
+     */
     private $calendarEndYear;
+
+    /**
+     * @var string
+     */
     private $channelName;
+
+    /**
+     * @var string
+     */
     private $calendarName;
 
     const WEEKDAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -53,7 +81,6 @@ class FetchRecreatex extends Command
      */
     public function handle()
     {
-
         // Get all recreatex services where recreatex is the source
         // Check if the identifier is present
         // Loop over the recreatex services that pass the filter
@@ -97,6 +124,7 @@ class FetchRecreatex extends Command
         // If the list is empty all openinghours of the existing channels are removed
         if (empty($eventList)) {
             $this->clearChannel($channel);
+
             return;
         }
 
@@ -189,7 +217,6 @@ class FetchRecreatex extends Command
         $event->until = $untilDate->endOfDay()->format('Y-m-d');
         $event->rrule = $this->getCalendarRule($startDate, $endDate, $untilDate);
 
-
         $calendar->events()->save($event);
     }
 
@@ -203,7 +230,6 @@ class FetchRecreatex extends Command
      */
     private function getCalendarRule(Carbon $startDate, Carbon $endDate, Carbon $untilDate)
     {
-
         if ($endDate->dayOfYear == $untilDate->dayOfYear) {
             $rule = 'FREQ=YEARLY;BYMONTH=' . $startDate->month . ';BYMONTHDAY=' . $startDate->day;
         } else {
@@ -212,7 +238,6 @@ class FetchRecreatex extends Command
 
         return $rule;
     }
-
 
     /**
      * Get all sequences from the list and put them in a more readable array,
@@ -224,7 +249,7 @@ class FetchRecreatex extends Command
     {
         $transformedEventList = $this->transformEventList($eventList, $year);
 
-        $sequences = array();
+        $sequences = [];
 
         foreach ($transformedEventList as $infoByDay) {
             foreach ($infoByDay as $info) {
@@ -245,8 +270,7 @@ class FetchRecreatex extends Command
      */
     private function transformEventList(array $eventList, $year)
     {
-
-        $transformedList = array();
+        $transformedList = [];
 
         foreach ($eventList as $eventArr) {
             $eventDate = Carbon::createFromFormat('Y - m - d\TH:i:s', $eventArr['Date']);
@@ -284,11 +308,10 @@ class FetchRecreatex extends Command
      */
     private function completeEventList(&$list)
     {
-
         foreach ($list as $key => $dayOfWeekInfo) {
             foreach (array_keys($dayOfWeekInfo) as $dayOfWeek) {
                 if (!isset($list[$key][$dayOfWeek]['sequences'])) {
-                    $list[$key][$dayOfWeek]['sequences'] = array();
+                    $list[$key][$dayOfWeek]['sequences'] = [];
                 }
 
                 $list[$key][$dayOfWeek]['sequences'][] = [
@@ -314,7 +337,6 @@ class FetchRecreatex extends Command
      */
     private function storeEventInList(&$transformedArr, Carbon $startDate = null, Carbon $endDate = null)
     {
-
         // If the start or end date aren't given the list item is ignored
         if (is_null($startDate) || is_null($endDate)) {
             return;
@@ -359,9 +381,8 @@ class FetchRecreatex extends Command
      */
     private function getStartDate(Carbon $eventDate, $timestamp)
     {
-
         if (is_null($timestamp)) {
-            return null;
+            return;
         }
 
         $date = Carbon::createFromFormat('Y - m - d\TH:i:s', $timestamp);
@@ -386,9 +407,8 @@ class FetchRecreatex extends Command
      */
     private function getEndDate(Carbon $eventDate, $timestamp)
     {
-
         if (is_null($timestamp)) {
-            return null;
+            return;
         }
 
         $date = Carbon::createFromFormat('Y - m - d\TH:i:s', $timestamp);
@@ -415,19 +435,19 @@ class FetchRecreatex extends Command
     {
         $parameters = [
             'Context' => [
-                'ShopId' => $this->shopId
+                'ShopId' => $this->shopId,
             ],
             'InfrastructureOpeningsSearchCriteria' => [
                 'InfrastructureId' => $service->identifier,
                 'From' => $year . '-01-01T00:00:00.8115784+02:00',
                 'Until' => ++$year . '-01-01T00:00:00.8115784+02:00',
-            ]
+            ],
         ];
-
         $response = $this->soapClient->FindInfrastructureOpenings($parameters);
         $transformedData = json_decode(json_encode($response), true);
 
         $key = 'InfrastructureOpenings.InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour';
+
         return array_get($transformedData, $key, 0);
     }
 
@@ -549,5 +569,4 @@ class FetchRecreatex extends Command
                 ->gt(Carbon::createFromFormat('Y - m - d\TH:i:s', $eventB['Date']));
         });
     }
-
 }
