@@ -33,12 +33,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         /* REPOSITORIES **/
-        $this->app->bind('UserRepository', function ($app) {
-            return new \App\Repositories\UserRepository(
-                new \App\Models\User()
-            );
-        });
-
         $this->app->bind('ServicesRepository', function ($app) {
             return new \App\Repositories\ServicesRepository(
                 new \App\Models\Service()
@@ -94,6 +88,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('LocaleService', function ($app) {
             return \App\Services\LocaleService::getInstance();
+        });
+
+        $this->app->singleton('UserService', function ($app) {
+            return \App\Services\UserService::getInstance();
         });
 
         /* FORMATTERS **/

@@ -35,7 +35,7 @@ class SendRegisterConfirmation extends Mailable
     public function build()
     {
         return $this->from(env('MAIL_FROM_ADDRESS'))
-            ->subject('Voltooi uw registratie')
+            ->subject('Activeer uw gebruiker')
             ->view('auth.emails.confirm')
             ->with([
                 'actionUrl' => url('register/confirm', $this->user->token),
