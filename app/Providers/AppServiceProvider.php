@@ -74,17 +74,21 @@ class AppServiceProvider extends ServiceProvider
             return \App\Services\ChannelService::getInstance();
         });
 
-        $this->app->singleton('OpeninghoursService', function ($app) {
+        $this->app->singleton(\App\Services\OpeninghoursService::class, function ($app) {
             return \App\Services\OpeninghoursService::getInstance();
         });
+
+        $this->app->alias(\App\Services\OpeninghoursService::class, 'OpeninghoursService');
 
         $this->app->singleton('SparqlService', function ($app) {
             return \App\Services\SparqlService::getInstance();
         });
 
-        $this->app->singleton('VestaService', function ($app) {
+        $this->app->singleton(\App\Services\VestaService::class, function ($app) {
             return \App\Services\VestaService::getInstance();
         });
+
+        $this->app->alias(\App\Services\VestaService::class, 'VestaService');
 
         $this->app->singleton('LocaleService', function ($app) {
             return \App\Services\LocaleService::getInstance();

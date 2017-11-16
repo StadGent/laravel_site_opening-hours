@@ -70,8 +70,8 @@ class VestaService
             throw new \SoapFault('WSDL', ('The path or URL to the SOAP WSDL has not been set.'));
         }
 
-        if (substr($wsdl, -4) !== 'wsdl') {
-            throw new \SoapFault('WSDL', ('The path or URL to the SOAP WSDL should end with \'wsdl\'.'));
+        if (substr($wsdl, -5) !== '?wsdl') {
+            $wsdl .= '?wsdl';
         }
 
         $this->client = new \SoapClient($wsdl, [
@@ -140,7 +140,7 @@ class VestaService
         $fillHoursResult = json_decode($response->FillHoursResult);
         if ($fillHoursResult !== 1) {
             \Log::error('Something went wrong while writing the data to VESTA.', [
-                'response' => $fillHoursResult,
+                'response' => var_export($response, true),
             ]);
 
             return false;
