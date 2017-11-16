@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Formatters\Openinghours\HtmlFormatter;
 use App\Models\Service;
+use App\Services\OpeninghoursService;
+use App\Services\VestaService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,12 +29,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
     private $serviceId;
 
     /**
-     * The formatter to use for Vesta.
-     * @var HtmlFormatter
-     */
-    protected $formatter;
-
-    /**
      * Create a new job instance.
      *
      * @return void
@@ -41,7 +37,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
     {
         $this->vestaUid = $vestaUid;
         $this->serviceId = $serviceId;
-        $this->formatter = new HtmlFormatter();
     }
 
     /**
@@ -49,22 +44,23 @@ class UpdateVestaOpeninghours implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(OpeninghoursService $openinghoursService, VestaService $vestaService, HtmlFormatter $formatter)
     {
         // Call the VestaService to write the output away
         $output = '';
 
         try {
-            $openinghoursService = app('OpeninghoursService');
             $start = (new Carbon())->startOfWeek();
             $end = (new Carbon())->endOfWeek();
             $openinghoursService->collectData($start, $end, Service::find($this->serviceId));
-            $output = $this->formatter->render($openinghoursService->getData());
+            $output = $formatter
+              ->render($openinghoursService->getData())
+              ->getOutput();
         } catch (\Exception $ex) {
             \Log::warning('No output was created for VESTA for service with UID ' . $this->vestaUid);
         }
 
-        $result = app('VestaService')->updateOpeninghours($this->vestaUid, $output);
+        $result = $vestaService->updateOpeninghours($this->vestaUid, $output);
         if (!$result) {
             $this->fail(new \Exception(sprintf(
                 'The %s job failed with vesta uid %s and service id %s. Check the logs for details',
