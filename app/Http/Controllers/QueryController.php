@@ -53,7 +53,9 @@ class QueryController extends Controller
             $this->OpeninghoursService->getData()
         );
 
-        return response($output)->header('Access-Control-Allow-Origin', '*');
+        return response($output)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -76,7 +78,8 @@ class QueryController extends Controller
             $channel
         );
 
-        return response($output)->header('Access-Control-Allow-Origin', '*');
+        return response($output)->header('Access-Control-Allow-Origin', '*')
+            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -93,7 +96,8 @@ class QueryController extends Controller
         $end = $start->copy()->endOfDay();
         $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*');
+        return response($output)->header('Access-Control-Allow-Origin', '*')
+            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -112,7 +116,8 @@ class QueryController extends Controller
         $end = $date->copy()->endOfWeek();
         $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*');
+        return response($output)->header('Access-Control-Allow-Origin', '*')
+            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -130,7 +135,8 @@ class QueryController extends Controller
         $end = $date->copy()->endOfMonth();
         $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*');
+        return response($output)->header('Access-Control-Allow-Origin', '*')
+            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -148,7 +154,8 @@ class QueryController extends Controller
         $end = $date->copy()->endOfYear();
         $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*');
+        return response($output)->header('Access-Control-Allow-Origin', '*')
+            ->header('content-type', 'application/json');
     }
 
     /**

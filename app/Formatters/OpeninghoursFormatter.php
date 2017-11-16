@@ -31,6 +31,11 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
     private $request;
 
     /**
+     * @var mixed
+     */
+    private $activeFormatter = null;
+
+    /**
      * Adds format to endpointformatter
      *
      * Checksor format can be found in the correct namespace
@@ -88,11 +93,22 @@ class OpeninghoursFormatter implements EndPointFormatterInterface
                     $localeService->getDateFormat(),
                     $localeService->getTimeFormat()
                 );
+                $this->activeFormatter = $this->formatters[$format]->getSupportFormat();
 
                 return $this->formatters[$format]->render($data)->getOutput();
             }
         }
         throw new NotAcceptableHttpException();
+    }
+
+    /**
+     * getter for active format
+     *
+     * @return string
+     */
+    public function getActiveFormatter()
+    {
+        return $this->activeFormatter;
     }
 
     /**
