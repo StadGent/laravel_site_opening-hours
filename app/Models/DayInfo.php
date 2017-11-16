@@ -55,7 +55,8 @@ class DayInfo
         }
 
         if (isset($this->openNow)) {
-            $theString .= 'openNow => [status => ' . $this->openNow->status . ', label' . $this->openNow->label . '], ' . PHP_EOL;
+            $theString .= 'openNow => [status => ' . $this->openNow->status .
+            ', label' . $this->openNow->label . '], ' . PHP_EOL;
         }
 
         $theString .= ']]';

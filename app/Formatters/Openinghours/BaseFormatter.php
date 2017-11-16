@@ -91,7 +91,14 @@ abstract class BaseFormatter implements FormatterInterface
                 ) . "-" .
                 date($this->timeFormat, strtotime($hoursObj['until']));
             }
-            $text .= implode(' ' . trans('openinghourApi.AND') . ' ', array_filter(array_merge([implode(', ', array_slice($hours, 0, -1))], array_slice($hours, -1)), 'strlen'));
+
+            // implode hours[] with ', ' but make last ', '  =>  "and"
+            // to result in for example 'HH:ii-HH:ii, HH:ii-HH:ii, HH:ii-HH:ii and HH:ii-HH:ii'
+            // https://stackoverflow.com/a/8586179
+            $last = array_slice($hours, -1);
+            $first = implode(', ', array_slice($hours, 0, -1));
+            $both = array_filter(array_merge([$first], $last), 'strlen');
+            $text .= implode(' ' . trans('openinghourApi.AND') . ' ', $both);
 
             $text .= PHP_EOL;
         }
