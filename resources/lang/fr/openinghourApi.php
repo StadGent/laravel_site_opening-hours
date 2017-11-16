@@ -11,6 +11,7 @@ return [
 
     'OPEN' => 'ouvert',
     'CLOSED' => 'fermé',
+    'AND' => 'et',
 
     'FROM_HOUR' => 'de',
     'UNTIL_HOUR' => 'à',
