@@ -99,8 +99,8 @@ class Ical
      */
     protected function createIcalEventStringFromCalendar(
         Calendar $calendar,
-        Carbon $minTimestamp = null,
-        Carbon $maxTimestamp = null
+        Carbon $minTimestamp,
+        Carbon $maxTimestamp
     ) {
         $icalString = '';
 
@@ -115,46 +115,30 @@ class Ical
                 continue;
             }
 
-            if (!empty($maxTimestamp) && $until->greaterThan($maxTimestamp) && $maxTimestamp->greaterThan($startDate)) {
+            if ($until->greaterThan($maxTimestamp) && $maxTimestamp->greaterThan($startDate)) {
                 $until = $maxTimestamp;
             }
 
-            if (empty($minTimestamp) || $until->greaterThanOrEqualTo($minTimestamp)) {
-                // Performance tweak
-                if ($startDate < $minTimestamp) {
-                    $startDate->day = $minTimestamp->day;
-                    $startDate->month = $minTimestamp->month;
-                    $startDate->year = $minTimestamp->year;
-                    $startDate->subDays(2);
-                }
-
-                if ($endDate > $maxTimestamp) {
-                    $endDate->day = $maxTimestamp->day;
-                    $endDate->month = $maxTimestamp->month;
-                    $endDate->year = $maxTimestamp->year;
-                }
-
-                $status = 'OPEN';
-                if ($calendar->closinghours === 1) {
-                    $status = 'CLOSED';
-                    $startDate->hour = 0;
-                    $startDate->minute = 0;
-                    $endDate->hour = 23;
-                    $endDate->minute = 59;
-                }
-
-                $icalString .= "BEGIN:VEVENT" . PHP_EOL;
-                $icalString .= 'SUMMARY:' . $calendar->label . PHP_EOL;
-                $icalString .= 'STATUS:' . $status . PHP_EOL;
-                $icalString .= 'PRIORITY:' . ($calendar->priority + 20) . PHP_EOL;
-                $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . PHP_EOL;
-                $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . PHP_EOL;
-                $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . PHP_EOL;
-                $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . PHP_EOL;
-                $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' ;
-                $icalString .=  $calendar->id . PHP_EOL;
-                $icalString .= "END:VEVENT" . PHP_EOL;
+            $status = 'OPEN';
+            if ($calendar->closinghours === 1) {
+                $status = 'CLOSED';
+                $startDate->hour = 0;
+                $startDate->minute = 0;
+                $endDate->hour = 23;
+                $endDate->minute = 59;
             }
+
+            $icalString .= "BEGIN:VEVENT" . PHP_EOL;
+            $icalString .= 'SUMMARY:' . $calendar->label . PHP_EOL;
+            $icalString .= 'STATUS:' . $status . PHP_EOL;
+            $icalString .= 'PRIORITY:' . ($calendar->priority + 20) . PHP_EOL;
+            $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . PHP_EOL;
+            $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . PHP_EOL;
+            $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . PHP_EOL;
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . PHP_EOL;
+            $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' ;
+            $icalString .=  $calendar->id . PHP_EOL;
+            $icalString .= "END:VEVENT" . PHP_EOL;
         }
 
         return $icalString;
@@ -218,11 +202,11 @@ class Ical
             $end = $event->dtend;
             $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
             $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
-            $dayInfo = $data[$dtStart->toDateString()];
-            if ($dayInfo->open === false) {
+            if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
                 continue;
             }
 
+            $dayInfo = $data[$dtStart->toDateString()];
             $dayInfo->open = ($event->status === 'OPEN');
             if ($dayInfo->open) {
                 $dayInfo->hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
