@@ -3,6 +3,7 @@
 namespace App\Formatters\Openinghours;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Json formatter class for Openinghours
@@ -22,7 +23,7 @@ class JsonFormatter extends BaseFormatter
     public function render($data)
     {
         $this->output = array_values($data);
-        if (count($this->output) === 1) {
+        if (count($this->output) === 1 && !($this->output instanceof Collection)) {
             $this->output = json_encode($this->output[0]);
         }
 
