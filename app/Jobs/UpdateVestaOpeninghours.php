@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Formatters\Openinghours\HtmlFormatter;
-use App\Formatters\Openinghours\TextFormatter;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -29,8 +28,9 @@ class UpdateVestaOpeninghours implements ShouldQueue
 
     /**
      * The formatter to use for Vesta.
-     * @var TextFormatter
+     * @var HtmlFormatter
      */
+    protected $formatter;
 
     /**
      * Create a new job instance.
