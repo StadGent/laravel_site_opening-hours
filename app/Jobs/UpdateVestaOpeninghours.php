@@ -2,6 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Formatters\Openinghours\HtmlFormatter;
+use App\Formatters\Openinghours\TextFormatter;
+use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,6 +28,11 @@ class UpdateVestaOpeninghours implements ShouldQueue
     private $serviceId;
 
     /**
+     * The formatter to use for Vesta.
+     * @var TextFormatter
+     */
+
+    /**
      * Create a new job instance.
      *
      * @return void
@@ -32,6 +41,7 @@ class UpdateVestaOpeninghours implements ShouldQueue
     {
         $this->vestaUid = $vestaUid;
         $this->serviceId = $serviceId;
+        $this->formatter = new HtmlFormatter();
     }
 
     /**
@@ -46,8 +56,10 @@ class UpdateVestaOpeninghours implements ShouldQueue
 
         try {
             $openinghoursService = app('OpeninghoursService');
-            $openinghoursService->isOpenForFullWeek();
-            $output = $formatter->render('html', $openinghoursService->getData());
+            $start = (new Carbon())->startOfWeek();
+            $end = (new Carbon())->endOfWeek();
+            $openinghoursService->collectData($start, $end, Service::find($this->serviceId));
+            $output = $this->formatter->render($openinghoursService->getData());
         } catch (\Exception $ex) {
             \Log::warning('No output was created for VESTA for service with UID ' . $this->vestaUid);
         }
