@@ -50,8 +50,8 @@ class UpdateVestaOpeninghoursTest extends \TestCase {
       $formatter->expects($this->once())->method('render')->with($data)->willReturnSelf();
       $formatter->expects($this->once())->method('getOutput')->willReturn($output);
 
-      $vestaService->expects($this->once())->method('updateOpeninghours')->with($output)->willReturn(true);
-      
+      $vestaService->expects($this->once())->method('updateOpeninghours')->with($this->vestaUid, $output)->willReturn(true);
+
       $job->handle($openinghoursService, $vestaService, $formatter);
   }
 }
