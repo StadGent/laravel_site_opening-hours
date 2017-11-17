@@ -16,13 +16,6 @@ class VestaService
     protected $client;
 
     /**
-     * The soap wsdl.
-     *
-     * @var string
-     */
-    protected $wsdl;
-
-    /**
      * Vesta user domain.
      */
     protected $domain;
@@ -58,7 +51,6 @@ class VestaService
     {
         if (!self::$instance) {
             self::$instance = new VestaService();
-            self::$instance->setClient();
         }
 
         return self::$instance;
@@ -80,8 +72,6 @@ class VestaService
         if (substr($wsdl, -5) !== '?wsdl') {
             $wsdl .= '?wsdl';
         }
-
-        $this->wsdl = $wsdl;
 
         $this->username = $username ?: env('VESTA_USER');
         $this->password = $password ?: env('VESTA_PASSWORD');
@@ -199,7 +189,7 @@ class VestaService
      */
     protected function getClient() {
         if (!$this->client) {
-            $this->client = new \SoapClient($this->wsdl);
+            $this->setClient();
         }
 
         return $this->client;
