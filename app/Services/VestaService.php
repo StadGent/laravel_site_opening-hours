@@ -51,7 +51,6 @@ class VestaService
     {
         if (!self::$instance) {
             self::$instance = new VestaService();
-            self::$instance->setClient();
         }
 
         return self::$instance;
@@ -128,7 +127,7 @@ class VestaService
         $parameters->accountId = $guid;
         $parameters->hours = $hours;
 
-        $response = $this->client->FillHours($parameters);
+        $response = $this->getClient()->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
             \Log::error('Something went wrong in VESTA.', [
                 'response' => print_r($response, 1),
@@ -173,7 +172,7 @@ class VestaService
         $search->tableName = 'account';
         $search->filters = $filters;
 
-        $result = $this->client->SearchJSON($search);
+        $result = $this->getClient()->SearchJSON($search);
 
         if (!isset($result->SearchJSONResult)) {
             return false;
@@ -185,5 +184,18 @@ class VestaService
         }
 
         return $result->Rows[0]->ves_openingsuren;
+    }
+
+    /**
+     * Lazily initialize the soap client.
+     *
+     * @return \SoapClient
+     */
+    protected function getClient() {
+        if (!$this->client) {
+            $this->setClient();
+        }
+
+        return $this->client;
     }
 }
