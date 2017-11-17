@@ -40,7 +40,9 @@ class VestaService
     /**
      * Private contructor for Singleton pattern
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * GetInstance for Singleton pattern
@@ -50,7 +52,7 @@ class VestaService
     public static function getInstance()
     {
         if (!self::$instance) {
-            self::$instance = new VestaService();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -72,7 +74,10 @@ class VestaService
         if (substr($wsdl, -5) !== '?wsdl') {
             $wsdl .= '?wsdl';
         }
-
+        
+        $this->client = new \SoapClient($wsdl, [
+            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
+        ]);
         $this->username = $username ?: env('VESTA_USER');
         $this->password = $password ?: env('VESTA_PASSWORD');
         $this->domain = $domain ?: env('VESTA_USER_DOMAIN');
@@ -187,7 +192,8 @@ class VestaService
      *
      * @return \SoapClient
      */
-    protected function getClient() {
+    protected function getClient()
+    {
         if (!$this->client) {
             $this->setClient();
         }
