@@ -2,6 +2,11 @@
 
 namespace Tests\Controllers\UI;
 
+use App\Models\Channel;
+use App\Models\Openinghours;
+use App\Models\Service;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ServicesControllerTest extends \TestCase
@@ -69,5 +74,52 @@ class ServicesControllerTest extends \TestCase
     protected function assemblePath($params)
     {
         return $this->apiUrl . '/' . $params;
+    }
+
+    /**
+     * @test
+     */
+    public function testChildInfoIndicatorsOnServicesOutput()
+    {
+        // make some fake data to limit the collected data
+        $service = factory(Service::class)->create();
+        $user = factory(User::class)->create();
+        app('UserRepository')->linkToService($user->id, $service->id, 'Owner');
+        $this->actingAs($user, 'api');
+        
+        // check countChannels output for No channels info
+        $this->doRequest('get', $this->apiUrl, []);
+        $requestOutput = $this->decodeResponseJson();
+        $this->assertEquals(0, $requestOutput[0]['countChannels']);
+
+        // add channel check has_missing_oh for Missing calendar info
+        $channel = factory(Channel::class)->create(['service_id' => $service->id]);
+        $this->doRequest('get', $this->apiUrl, []);
+        $requestOutput = $this->decodeResponseJson();
+        $this->assertEquals(1, $requestOutput[0]['has_missing_oh']);
+        $this->assertEquals(1, $requestOutput[0]['has_inactive_oh']);
+
+        $now = new Carbon();
+        // add OH check has_inactive_oh for Missing active calendar info
+        $openinghours = factory(Openinghours::class)->create([
+            'channel_id' => $channel->id,
+            'active' => 0,
+            'start_date' => $now->copy()->addYear(),
+            'end_date' =>$now->copy()->addYear(),
+        ]);
+        $this->doRequest('get', $this->apiUrl, []);
+        $requestOutput = $this->decodeResponseJson();
+        $this->assertEquals(0, $requestOutput[0]['has_missing_oh']);
+        $this->assertEquals(1, $requestOutput[0]['has_inactive_oh']);
+
+        // make OH active check no info indicators
+        $openinghours->active = 1;
+        $openinghours->start_date = $now->copy()->subYear();
+        $openinghours->save();
+
+        $this->doRequest('get', $this->apiUrl, []);
+        $requestOutput = $this->decodeResponseJson();
+        $this->assertEquals(0, $requestOutput[0]['has_missing_oh']);
+        $this->assertEquals(0, $requestOutput[0]['has_inactive_oh']);
     }
 }
