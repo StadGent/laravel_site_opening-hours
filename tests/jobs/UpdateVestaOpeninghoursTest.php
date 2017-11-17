@@ -29,19 +29,28 @@ class UpdateVestaOpeninghoursTest extends \TestCase {
       $openinghoursService = $this->getMockBuilder(OpeninghoursService::class)->disableOriginalConstructor()->getMock();
       $vestaService = $this->getMockBuilder(VestaService::class)->disableOriginalConstructor()->getMock();
       $formatter = $this->getMockBuilder(HtmlFormatter::class)->disableOriginalConstructor()->getMock();
-      $expectedStart = (new Carbon())->startOfWeek();
-      $expectedEnd = (new Carbon())->endOfWeek();
+      $expectedStart = new Carbon();
+      $expectedStart->startOfWeek();
+      $expectedEnd = new Carbon();
+      $expectedEnd->endOfWeek();
       $data = uniqid();
       $output = uniqid();
+      $serviceId = $this->serviceId;
       $openinghoursService
           ->expects($this->once())
           ->method('collectData')
-          ->with($this->callback(function (Carbon $start, Carbon $end, Service $service, Channel $channel = null) use ($expectedStart, $expectedEnd) {
-          return $start->getTimestamp() === $expectedStart->getTimestamp()
-              && $end->getTimestamp() === $expectedEnd->getTimestamp()
-              && $service->id === 1
-              && is_null($channel);
-      }))->willReturnSelf();
+          ->with(
+              $this->callback(function (Carbon $start) use ($expectedStart) {
+                  return $start->getTimestamp() === $expectedStart->getTimestamp();
+              }),
+              $this->callback(function (Carbon $end) use ($expectedEnd) {
+                  return $end->getTimestamp() === $expectedEnd->getTimestamp();
+              }),
+              $this->callback(function (Service $service) use ($serviceId) {
+                  return $service->id === $serviceId;
+              }),
+              null
+          )->willReturnSelf();
       $openinghoursService
           ->expects($this->once())
           ->method('getData')

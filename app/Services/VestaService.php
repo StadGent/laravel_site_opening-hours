@@ -16,6 +16,13 @@ class VestaService
     protected $client;
 
     /**
+     * The soap wsdl.
+     *
+     * @var string
+     */
+    protected $wsdl;
+
+    /**
      * Vesta user domain.
      */
     protected $domain;
@@ -74,9 +81,7 @@ class VestaService
             $wsdl .= '?wsdl';
         }
 
-        $this->client = new \SoapClient($wsdl, [
-            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
-        ]);
+        $this->wsdl = $wsdl;
 
         $this->username = $username ?: env('VESTA_USER');
         $this->password = $password ?: env('VESTA_PASSWORD');
@@ -128,7 +133,7 @@ class VestaService
         $parameters->accountId = $guid;
         $parameters->hours = $hours;
 
-        $response = $this->client->FillHours($parameters);
+        $response = $this->getClient()->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
             \Log::error('Something went wrong in VESTA.', [
                 'response' => print_r($response, 1),
@@ -173,7 +178,7 @@ class VestaService
         $search->tableName = 'account';
         $search->filters = $filters;
 
-        $result = $this->client->SearchJSON($search);
+        $result = $this->getClient()->SearchJSON($search);
 
         if (!isset($result->SearchJSONResult)) {
             return false;
@@ -185,5 +190,18 @@ class VestaService
         }
 
         return $result->Rows[0]->ves_openingsuren;
+    }
+
+    /**
+     * Lazily initialize the soap client.
+     *
+     * @return \SoapClient
+     */
+    protected function getClient() {
+        if (!$this->client) {
+            $this->client = new \SoapClient($this->wsdl);
+        }
+
+        return $this->client;
     }
 }

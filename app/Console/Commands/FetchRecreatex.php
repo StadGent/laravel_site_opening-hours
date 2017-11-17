@@ -40,7 +40,6 @@ class FetchRecreatex extends Command
 
         $this->shopId = env('SHOP_ID');
         $this->channelName = env('CHANNEL_NAME');
-        $this->soapClient = new \SoapClient(env('RECREATEX_URI') . '?wsdl');
         $this->calendarStartYear = Carbon::now()->year;
         $this->calendarEndYear = Carbon::now()->addYear(3)->year;
     }
@@ -150,7 +149,7 @@ class FetchRecreatex extends Command
             ]
         ];
 
-        $response = $this->soapClient->FindInfrastructureOpenings($parameters);
+        $response = $this->getClient()->FindInfrastructureOpenings($parameters);
         $transformedData = json_decode(json_encode($response), true);
 
         $key = 'InfrastructureOpenings.InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour';
@@ -387,5 +386,18 @@ class FetchRecreatex extends Command
         }
 
         return $date;
+    }
+
+    /**
+     * Lazily initialize the soap client.
+     *
+     * @return \SoapClient
+     */
+    protected function getClient() {
+        if (!$this->soapClient) {
+            $this->soapClient = new \SoapClient(env('RECREATEX_URI') . '?wsdl');
+        }
+
+        return $this->soapClient;
     }
 }

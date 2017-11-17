@@ -50,8 +50,10 @@ class UpdateVestaOpeninghours implements ShouldQueue
         $output = '';
 
         try {
-            $start = (new Carbon())->startOfWeek();
-            $end = (new Carbon())->endOfWeek();
+            $start = new Carbon();
+            $start->startOfWeek();
+            $end = new Carbon();
+            $end->endOfWeek();
             $openinghoursService->collectData($start, $end, Service::find($this->serviceId));
             $output = $formatter
               ->render($openinghoursService->getData())
