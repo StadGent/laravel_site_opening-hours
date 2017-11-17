@@ -3,6 +3,7 @@
 namespace Tests\Controllers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Models\Service;
 
 class ServicesControllerTest extends \TestCase
 {
@@ -71,11 +72,11 @@ class ServicesControllerTest extends \TestCase
     {
         $this->doRequest('get', $this->apiUrl);
         $content = $this->decodeResponseJson();
-        $this->assertEquals(21, count($content));
+        $this->assertEquals(Service::count(), count($content));
 
         $this->doRequest('get', $this->apiUrl . '?label=uur');
         $content = $this->decodeResponseJson();
-        $this->assertEquals(3, count($content));
+        $this->assertEquals(Service::where('label', 'like', '%uur%')->count(), count($content));
         foreach ($content as $service) {
             $this->assertContains('uur', $service['label']);
         }

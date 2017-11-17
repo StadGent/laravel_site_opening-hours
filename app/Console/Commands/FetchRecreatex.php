@@ -56,6 +56,11 @@ class FetchRecreatex extends Command
      */
     private $calendarName;
 
+    /**
+     * @var App\Models\Service
+     */
+    private $activeServiceRecord;
+
     const WEEKDAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
     /**
@@ -78,36 +83,51 @@ class FetchRecreatex extends Command
     /**
      * Execute the console command.
      *
+     * Get all recreatex services where recreatex is the source
+     * oredered by last update to not always start with the same when last loop was broken
+     * Check if the identifier is present
+     * Loop over the recreatex services that pass the filter
+     *
      */
     public function handle()
     {
-        // Get all recreatex services where recreatex is the source
-        // Check if the identifier is present
-        // Loop over the recreatex services that pass the filter
-        Service::where(['source' => 'recreatex'])->get()
+        $this->comment('Init handle FetchRecreatex');
+        Service::where(['source' => 'recreatex'])->orderBy('updated_at', 'ASC')->get()
             ->filter(function (Service $service, $key) {
                 return !empty($service->identifier);
             })
             ->each(function (Service $service, $key) {
-                $this->handleService($service);
+                $this->activeServiceRecord = $service;
+                if ($this->handleService()) {
+                    $this->activeServiceRecord->updated_at = Carbon::now();
+                    $this->activeServiceRecord->save();
+                }
             });
     }
 
     /**
      * Handle a recreatex service
      *
-     * @param Service $service
+     * save updated_at of service when done to trigger the order
+     *
+     * @return bool
      */
-    private function handleService(Service $service)
+    private function handleService()
     {
-        $this->info('Handling service "' . $service->label . '"');
+        $this->comment('Handling service "' . $this->activeServiceRecord->label . '"');
 
-        $channel = $this->getChannel($service);
+        $channel = $this->getOrCreateChannel();
 
         // Loop over the predefined years and handle it in a different function
+        $succes = true;
         for ($year = $this->calendarStartYear; $year <= $this->calendarEndYear; $year++) {
-            $this->handleCalendarYear($channel, $year);
+            $succes = $succes && $this->handleCalendarYear($channel, $year);
         }
+        if (!$succes) {
+            $this->error('Not able to sync recreatex for "' . $this->activeServiceRecord->label . '"');
+        }
+
+        return $succes;
     }
 
     /**
@@ -119,18 +139,24 @@ class FetchRecreatex extends Command
     private function handleCalendarYear(Channel $channel, $year)
     {
         // Get the opening hours list from the recreatex soap service
-        $eventList = $this->getOpeninghoursList($channel->service, $year);
+        $eventList = $this->getOpeninghoursList($year);
+        if ($eventList === false) {
+            $this->error('Could not collect eventList for "' . $this->activeServiceRecord->label . '" in year ' . $year);
+
+            return false;
+        }
 
         // If the list is empty all openinghours of the existing channels are removed
         if (empty($eventList)) {
-            $this->clearChannel($channel);
+            $this->clearChannelOpeningHour($channel, $year);
 
-            return;
+            return true;
         }
 
-        $openinghours = $this->getOpeninghours($channel, $year);
-        $calendar = $this->getCalendar($openinghours);
-        $this->fillCalendar($calendar, $year, $eventList);
+        $openinghours = $this->getOrCreateOpeninghours($channel, $year);
+        $calendar = $this->getOrCreateCalendar($openinghours);
+
+        return $this->fillCalendar($calendar, $year, $eventList);
     }
 
     /**
@@ -148,15 +174,21 @@ class FetchRecreatex extends Command
 
         // If no changes where made the calendar doesn't
         if (!$this->isCalendarUpdated($calendar, $sequences)) {
-            return;
+            return true;
         }
 
+        $this->info('New data in calendar for "' . $this->activeServiceRecord->label . '" in year ' . $year);
         $this->clearCalendar($calendar);
 
         // Store the sequences as rules in the database
+        $succes = true;
         foreach ($sequences as $index => $sequence) {
-            $this->handleSequence($calendar, $index, $sequence);
+            if (!($succes = $succes && $this->handleSequence($calendar, $index, $sequence))) {
+                $this->error('Could not handle sequence ' . $calendar->label . ' -> ' . $index);
+            }
         }
+
+        return $succes;
     }
 
     /**
@@ -217,7 +249,7 @@ class FetchRecreatex extends Command
         $event->until = $untilDate->endOfDay()->format('Y-m-d');
         $event->rrule = $this->getCalendarRule($startDate, $endDate, $untilDate);
 
-        $calendar->events()->save($event);
+        return (bool) $calendar->events()->save($event);
     }
 
     /**
@@ -231,12 +263,10 @@ class FetchRecreatex extends Command
     private function getCalendarRule(Carbon $startDate, Carbon $endDate, Carbon $untilDate)
     {
         if ($endDate->dayOfYear == $untilDate->dayOfYear) {
-            $rule = 'FREQ=YEARLY;BYMONTH=' . $startDate->month . ';BYMONTHDAY=' . $startDate->day;
-        } else {
-            $rule = 'BYDAY=' . self::WEEKDAYS[$startDate->dayOfWeek] . ';FREQ=WEEKLY';
+            return 'FREQ=YEARLY;BYMONTH=' . $startDate->month . ';BYMONTHDAY=' . $startDate->day;
         }
 
-        return $rule;
+        return 'BYDAY=' . self::WEEKDAYS[$startDate->dayOfWeek] . ';FREQ=WEEKLY';
     }
 
     /**
@@ -431,20 +461,28 @@ class FetchRecreatex extends Command
      * @param $year
      * @return array
      */
-    private function getOpeninghoursList(Service $service, $year)
+    private function getOpeninghoursList($year)
     {
         $parameters = [
             'Context' => [
                 'ShopId' => $this->shopId,
             ],
             'InfrastructureOpeningsSearchCriteria' => [
-                'InfrastructureId' => $service->identifier,
+                'InfrastructureId' => $this->activeServiceRecord->identifier,
                 'From' => $year . '-01-01T00:00:00.8115784+02:00',
                 'Until' => ++$year . '-01-01T00:00:00.8115784+02:00',
             ],
         ];
-        $response = $this->soapClient->FindInfrastructureOpenings($parameters);
-        $transformedData = json_decode(json_encode($response), true);
+
+        try {
+            $response = $this->soapClient->FindInfrastructureOpenings($parameters);
+            $transformedData = json_decode(json_encode($response), true);
+        } catch (\Exception $e) {
+            $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord . ' with year ' .
+                $year . ': ' . $e->getMessage());
+
+            return false;
+        }
 
         $key = 'InfrastructureOpenings.InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour';
 
@@ -454,20 +492,19 @@ class FetchRecreatex extends Command
     /**
      * Get the recreatex channel for service
      *
-     * @param Service $service
      * @return Channel
      */
-    private function getChannel(Service $service)
+    private function getOrCreateChannel()
     {
         // Look for a channel with the predefined channel name
-        $channel = Channel::where('service_id', $service->id)
+        $channel = Channel::where('service_id', $this->activeServiceRecord->id)
             ->where('label', $this->channelName)
             ->first();
 
         // If this channel doesn't exist a new one is created
         if (is_null($channel)) {
             $channel = new Channel(['label' => $this->channelName]);
-            $service->channels()->save($channel);
+            $this->activeServiceRecord->channels()->save($channel);
         }
 
         return $channel;
@@ -480,7 +517,7 @@ class FetchRecreatex extends Command
      * @param $year
      * @return Openinghours
      */
-    private function getOpeninghours(Channel $channel, $year)
+    private function getOrCreateOpeninghours(Channel $channel, $year)
     {
         $startDate = $year . '-01-01';
         $endDate = $year . '-12-31';
@@ -511,7 +548,7 @@ class FetchRecreatex extends Command
      * @param Openinghours $openinghours
      * @return Calendar
      */
-    private function getCalendar(Openinghours $openinghours)
+    private function getOrCreateCalendar(Openinghours $openinghours)
     {
         // Check if the calendar object allready exists
         $calendar = Calendar::where('label', $this->calendarName)
@@ -536,12 +573,17 @@ class FetchRecreatex extends Command
      *
      * @param Channel $channel
      */
-    private function clearChannel(Channel $channel)
+    private function clearChannelOpeningHour(Channel $channel, $year)
     {
-        $channel->openinghours
-            ->each(function (Openinghours $openinghours) {
-                $openinghours->delete();
-            });
+        $openinghours = Openinghours::where('channel_id', $channel->id)
+            ->where('start_date', $year . '-01-01')
+            ->where('end_date', $year . '-12-31')
+            ->first();
+        if (isset($openinghours->id)) {
+            $openinghours->delete();
+            $this->info('Child data removed from channel ' . $channel->id . ' for year ' . $year .
+                'in  "' . $this->activeServiceRecord->label . '"');
+        }
     }
 
     /**
@@ -568,5 +610,35 @@ class FetchRecreatex extends Command
             return Carbon::createFromFormat('Y - m - d\TH:i:s', $eventA['Date'])
                 ->gt(Carbon::createFromFormat('Y - m - d\TH:i:s', $eventB['Date']));
         });
+    }
+
+    /**
+     * Write a string as error output.
+     *
+     * overwrite parent to make sure errors go to log
+     *
+     * @param  string  $string
+     * @param  null|int|string  $verbosity
+     * @return void
+     */
+    public function error($string, $verbosity = null)
+    {
+        \Log::error($string);
+        parent::error($string, $verbosity);
+    }
+
+    /**
+     * Write a string as info output.
+     *
+     * overwrite parent to make info go to log
+     *
+     * @param  string  $string
+     * @param  null|int|string  $verbosity
+     * @return void
+     */
+    public function info($string, $verbosity = null)
+    {
+        \Log::info($string);
+        parent::error($string, $verbosity);
     }
 }
