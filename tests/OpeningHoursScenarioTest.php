@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use App\Models\Channel;
+
 class OpeningHoursScenarioTest extends \TestCase
 {
     /**
@@ -164,12 +166,15 @@ class OpeningHoursScenarioTest extends \TestCase
      **/
     public function testOpeninghoursWeekFirstDayOfWeekByLocale()
     {
+        $channel = Channel::find(1);
         $this->doRequest('GET', $this->apiUrl . '/1/channels/1/openinghours/week?date=2017-09-05', ['format' => 'text', 'lang' => 'nl']);
         $this->seeStatusCode(200);
         $output = $this->response->getContent();
-        $content = str_replace(PHP_EOL, '', $output);
-        $expected = "Balie:" .
-            "======" .
+        // remove all EOL's
+        $removedEOL = str_replace(PHP_EOL, '', $output);
+        // remove fancy double lines under channel names
+        $cleanedoutput = str_replace('=', '', $removedEOL);
+        $expected = $channel->label . ":" .
             "maandag 04/09: gesloten" .
             "dinsdag 05/09: 09:00-12:00 en 13:00-17:00" .
             "woensdag 06/09: 09:00-12:00 en 13:00-17:00" .
@@ -177,16 +182,18 @@ class OpeningHoursScenarioTest extends \TestCase
             "vrijdag 08/09: 09:00-12:00 en 13:00-17:00" .
             "zaterdag 09/09: 10:00-12:00" .
             "zondag 10/09: gesloten";
-        $this->assertEquals($expected, $content);
+        $this->assertEquals($expected, $cleanedoutput);
 
         /* test on en-US => notice the week starts on Sunday */
         $this->doRequest('GET', $this->apiUrl . '/1/channels/1/openinghours/week?date=2017-09-05', ['format' => 'text', 'lang' => 'en-US']);
         $this->seeStatusCode(200);
         $output = $this->response->getContent();
-        $content = str_replace(PHP_EOL, '', $output);
+        // remove all EOL's
+        $removedEOL = str_replace(PHP_EOL, '', $output);
+        // remove fancy double lines under channel names
+        $cleanedoutput = str_replace('=', '', $removedEOL);
 
-        $expected = "Balie:" .
-            "======" .
+        $expected = $channel->label . ":" .
             "Sunday 09-03: closed" .
             "Monday 09-04: closed" .
             "Tuesday 09-05: 09:00 AM-12:00 PM and 01:00 PM-05:00 PM" .
@@ -194,7 +201,7 @@ class OpeningHoursScenarioTest extends \TestCase
             "Thursday 09-07: 09:00 AM-12:00 PM and 01:00 PM-05:00 PM" .
             "Friday 09-08: 09:00 AM-12:00 PM and 01:00 PM-05:00 PM" .
             "Saterday 09-09: 10:00 AM-12:00 PM";
-        $this->assertEquals($expected, $content);
+        $this->assertEquals($expected, $cleanedoutput);
     }
 
     /**
