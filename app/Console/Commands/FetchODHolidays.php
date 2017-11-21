@@ -30,13 +30,6 @@ class FetchODHolidays extends Command
     protected $description = 'Fetch Open Data holidays data';
 
     /**
-     * Languages that will be searched
-     *
-     * @var array
-     */
-    private $supportedLangs = [];
-
-    /**
      * @var array
      */
     private $supportedCalendars = [];
@@ -129,8 +122,8 @@ class FetchODHolidays extends Command
         $eventProps = explode(PHP_EOL, $eventString);
 
         $rrule = '';
-        $start_date = '';
-        $end_date = '';
+        $startDate = '';
+        $endDate = '';
         $label = '';
 
         foreach ($eventProps as $propline) {
@@ -139,13 +132,13 @@ class FetchODHolidays extends Command
             }
             list($prop, $value) = explode(':', $propline);
             $value = trim($value);
-
+            // use strlen of SUMMARY without the locale
             switch (substr($prop, 0, strlen('SUMMARY;LANGUAGE='))) {
                 case 'DTEND;VALUE=DATE':
-                    $end_date = date('Y-m-d 23:59:59', strtotime($value));
+                    $endDate = date('Y-m-d 23:59:59', strtotime($value));
                     break;
                 case 'DTSTART;VALUE=DAT':
-                    $start_date = date('Y-m-d 00:00:00', strtotime($value));
+                    $startDate = date('Y-m-d 00:00:00', strtotime($value));
                     break;
                 case 'RRULE':
                     $rrule = $value;
@@ -156,24 +149,24 @@ class FetchODHolidays extends Command
             }
         }
 
-        if (empty($rrule) && empty($end_date)) {
-            $end_date = substr($start_date, 0, -9) . ' 23:59:59';
+        if (empty($rrule) && empty($endDate)) {
+            $endDate = substr($startDate, 0, -9) . ' 23:59:59';
         }
 
         $event = $calendar->events()
             ->where('label', $label)
             ->where('rrule', $rrule)
-            ->where('start_date', $start_date)
-            ->where('end_date', $end_date)
+            ->where('start_date', $startDate)
+            ->where('end_date', $endDate)
             ->where('calendar_id', $calendar->id)
             ->first();
 
         if (!isset($event->id)) {
-            $this->info('New event ' . $label . ' ' . $start_date . ' for ' . $calendar->label);
+            $this->info('New event ' . $label . ' ' . $startDate . ' for ' . $calendar->label);
             $event = DefaultEvent::create([
                 'rrule' => $rrule,
-                'start_date' => $start_date,
-                'end_date' => $end_date,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
                 'calendar_id' => $calendar->id,
                 'label' => $label,
 
@@ -195,12 +188,12 @@ class FetchODHolidays extends Command
      */
     private function cleanupCalendarEvents(DefaultCalendar $calendar, $touchedEvents)
     {
-        $notUsedEventsCollection = $calendar->events()->whereNotIn('id', $touchedEvents);
-        $notUsedEventsCollection->each(function (DefaultEvent $event) {
+        $notUsedEvents = $calendar->events()->whereNotIn('id', $touchedEvents);
+        $notUsedEvents->each(function (DefaultEvent $event) {
             $msg = 'Event removed' . $event->label . ' ' . $event->start_date . ' from ' . $event->calendar->label;
             $this->info($msg);
         });
-        $notUsedEventsCollection->delete();
+        $notUsedEvents->delete();
     }
 
     /**
