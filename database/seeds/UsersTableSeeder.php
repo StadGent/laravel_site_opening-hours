@@ -15,45 +15,34 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        $roles = Role::all();
-
-        foreach ($roles as $roleConfig) {
-            $name = strtolower($roleConfig['name']);
-            $password = 'opening' . $name;
-
-            $user = User::create([
-                'name' => $name . 'user',
-                'email' => $name . '@foo.bar',
+        $admin = User::where('email', 'admin@foo.bar')->first();
+        if (empty($admin)) {
+            $password = str_random();
+            $admin = User::create([
+                'name' => 'admin',
+                'email' => 'admin@foo.bar',
                 'password' => bcrypt($password),
             ]);
-
-            $user->save();
-            
-            if ($name === 'admin') {
-                $user->attachRole($roleConfig);
-            } else {
-                \DB::insert(
-                    'INSERT INTO user_service_role (user_id, role_id, service_id) VALUES (?, ?, ?)',
-                    [$user->id, $roleConfig->id, 1]
-                );
-            }
-
-            $this->command->info("* The '" . $name . "' user has been created, \r");
-            $this->command->info("  his stupid password is: '" . $password . "'\r\n");
+            $admin->save();
+            $admin->attachRole(Role::where('name', 'Admin')->first());
+            $this->setFooter($password);
         }
-        $this->setFooter();
     }
 
     /**
      * Some nice candy for the eye footer
      * With a WARNING !!!
      */
-    private function setFooter()
+    private function setFooter($password)
     {
-        $this->command->info("----------------------------------------------------------------\r");
-        $this->command->info("| These STUPID and UNSAVE users are for testing purpusses only |\r");
-        $this->command->info("|           NEVER EVER use this seed in production !!!         |\r");
-        $this->command->info("----------------------------------------------------------------\r");
+        $this->command->info("-------------------------------------------------------------------\r");
+        $this->command->info("|                        !!! IMPORTANT !!!                        |\r");
+        $this->command->info("-------------------------------------------------------------------\r");
+        $this->command->info(" The admin has been create, the random password is: " . $password . "\r");
+        $this->command->info(" Copy this into your password manager, this will not be shown again. \r");
+        $this->command->info("-------------------------------------------------------------------\r");
+        $this->command->info("|                        !!! IMPORTANT !!!                        |\r");
+        $this->command->info("-------------------------------------------------------------------\r");
         $this->command->info(self::class . " seeded \r");
     }
 }

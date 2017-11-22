@@ -17,21 +17,31 @@ class QueryController extends Controller
     /**
      * @var App\Services\OpeninghoursService
      */
-    private $OpeninghoursService;
+    private $openinghoursService;
 
     /**
      * @var App\Formatters\OpeninghoursFormatter
      */
-    private $OpeninghoursFormatter;
+    private $openinghoursFormatter;
 
     /**
-     * @param OpeninghoursService $ohService
-     * @param OpeninghoursFormatter $ohFormatter
+     * @var App\Service\LocaleService
+     */
+    private $localeService;
+
+    /**
+     * constructor
+     *
+     * init OpeninghoursService
+     * init OpeninghoursFormatter
+     * init localeService
+     *
+     * @return void
      */
     public function __construct()
     {
-        $this->OpeninghoursService = app('OpeninghoursService');
-        $this->OpeninghoursFormatter = app('OpeninghoursFormatter');
+        $this->openinghoursService = app('OpeninghoursService');
+        $this->openinghoursFormatter = app('OpeninghoursFormatter');
         $this->localeService = app('LocaleService');
     }
 
@@ -46,16 +56,16 @@ class QueryController extends Controller
     public function nowOpenAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $this->localeService->setRequest($request);
-        $this->OpeninghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
+        $this->openinghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
         // output format with json as default
-        $this->OpeninghoursFormatter->setRequest($request);
-        $output = $this->OpeninghoursFormatter->render(
-            $this->OpeninghoursService->getData()
+        $this->openinghoursFormatter->setRequest($request);
+        $output = $this->openinghoursFormatter->render(
+            $this->openinghoursService->getData()
         );
 
         return response($output)
             ->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
+            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -79,7 +89,7 @@ class QueryController extends Controller
         );
 
         return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
+            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -97,7 +107,7 @@ class QueryController extends Controller
         $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
         return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
+            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -112,12 +122,17 @@ class QueryController extends Controller
     public function weekAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
+
+        $this->localeService->setRequest($request);
+        $date->setWeekStartsAt($this->localeService->getWeekStartDay());
+        $date->setWeekEndsAt($this->localeService->getWeekEndDay());
+
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
         $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
         return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
+            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -136,7 +151,7 @@ class QueryController extends Controller
         $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
         return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->OpeninghoursFormatter->getActiveFormatter());
+            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
     }
 
     /**
@@ -176,11 +191,11 @@ class QueryController extends Controller
         Channel $channel
     ) {
         $this->localeService->setRequest($request);
-        $this->OpeninghoursService->collectData($start, $end, $service, $channel);
-        $this->OpeninghoursFormatter->setRequest($request);
+        $this->openinghoursService->collectData($start, $end, $service, $channel);
+        $this->openinghoursFormatter->setRequest($request);
 
-        return $this->OpeninghoursFormatter->render(
-            $this->OpeninghoursService->getData()
+        return $this->openinghoursFormatter->render(
+            $this->openinghoursService->getData()
         );
     }
 }
