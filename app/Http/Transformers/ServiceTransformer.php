@@ -29,7 +29,8 @@ class ServiceTransformer implements TransformerInterface
      * @param Model $service
      * @return array
      */
-    public function getItemData(Model $service){
+    public function getItemData(Model $service)
+    {
         return [
             'id' => $service->id,
             'uri' => $service->uri,

@@ -20,7 +20,8 @@ class SerializerServiceProvider extends ServiceProvider
     {
         $serializer = $this->app->make('SerializerService');
 
-        response()->macro('item',
+        response()->macro(
+            'item',
             function (
                 TransformerInterface $transformer,
                 $item,
@@ -41,7 +42,8 @@ class SerializerServiceProvider extends ServiceProvider
             }
         );
 
-        response()->macro('collection',
+        response()->macro(
+            'collection',
             function (
                 TransformerInterface $transformer,
                 $collection,
@@ -59,7 +61,6 @@ class SerializerServiceProvider extends ServiceProvider
                     $headers
                 )->header('Access-Control-Allow-Origin', '*')
                     ->header('content-type', $serializer->getBestSupportedMimeType());
-
             }
         );
     }
