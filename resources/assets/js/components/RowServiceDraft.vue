@@ -1,14 +1,15 @@
 <template>
-  <tbody>
+
     <tr>
       <td class="td-btn" @click="activate(s)">
         <button class="btn btn-default btn-icon">
-          <i class="glyphicon glyphicon-ok"></i>
+         Activeer
         </button>
       </td>
-      <td>{{ s.label }}</td>
+      <td class="td-sortable">{{ s.label }}</td>
+
     </tr>
-  </tbody>
+
 </template>
 
 <script>

@@ -26,21 +26,21 @@ class LodServicesRepository
 
         $fetchFunction = 'get' . ucfirst($type) . 'ServicesQuery';
 
-        $semanticResults = $this->makeSparqlService()->performSparqlQuery($this->$fetchFunction($limit, 0), 'GET', 'json');
+        $semanticResults = $this->makeSparqlService()->performSparqlQuery(static::$fetchFunction(), 'GET', 'json');
 
         // Transform the data in a compatible format
         $transformedData = $this->transform($semanticResults);
 
         $data = array_merge($data, array_values($transformedData));
 
-        while (! empty($transformedData)) {
+        while (!empty($transformedData)) {
             $page++;
-            $semanticResults = $this->makeSparqlService()->performSparqlQuery($this->$fetchFunction($limit, ($limit * $page)), 'GET', 'json');
+            $semanticResults = $this->makeSparqlService()->performSparqlQuery(static::$fetchFunction($limit, ($limit * $page)), 'GET', 'json');
 
             // Transform the data in a compatible format
             $transformedData = $this->transform($semanticResults);
 
-            if (! empty($transformedData)) {
+            if (!empty($transformedData)) {
                 $data = array_merge($data, array_values($transformedData));
             }
         }
@@ -55,11 +55,7 @@ class LodServicesRepository
      */
     private function makeSparqlService()
     {
-        return new SparqlService(
-            env('SPARQL_ENDPOINT'),
-            env('SPARQL_ENDPOINT_USERNAME'),
-            env('SPARQL_ENDPOINT_PASSWORD')
-        );
+        return app('SparqlService');
     }
 
     /**
@@ -82,11 +78,11 @@ class LodServicesRepository
         collect($data)->each(function ($agent) use (&$services) {
             $identifier = array_get($agent, 'identifier.value', '');
 
-            if (! empty($identifier)) {
+            if (!empty($identifier)) {
                 $services[] = [
                     'label' => array_get($agent, 'name.value', ''),
                     'uri' => array_get($agent, 'agent.value', ''),
-                    'identifier' => $identifier
+                    'identifier' => $identifier,
                 ];
             }
         });
@@ -102,9 +98,10 @@ class LodServicesRepository
      * @param  int    $offset
      * @return string
      */
-    private function getVestaServicesQuery($limit, $offset)
+    public static function getVestaServicesQuery($limit = 100, $offset = 0)
     {
-        return 'SELECT ?agent ?identifier ?name
+        $query = 'SELECT DISTINCT ?agent ?identifier ?name
+                FROM <http://stad.gent/agents/>
                 WHERE {
                 {
                     ?agent a foaf:Agent;
@@ -131,7 +128,13 @@ class LodServicesRepository
                     <http://purl.org/dc/terms/identifier> ?identifier;
                     foaf:name ?name.
                 }
-                } ' . " LIMIT $limit OFFSET $offset";
+                }  ORDER BY ?name ';
+
+        if ($limit) {
+            $query .= " LIMIT $limit OFFSET $offset";
+        }
+
+        return $query;
     }
 
     /**
@@ -142,15 +145,22 @@ class LodServicesRepository
      * @param  int    $offset
      * @return string
      */
-    private function getRecreatexServicesQuery($limit, $offset)
+    public static function getRecreatexServicesQuery($limit = 100, $offset = 0)
     {
-        return 'SELECT ?agent ?identifier ?name
+        $query = 'SELECT ?agent ?identifier ?name
+                FROM <http://stad.gent/agents/>
                 WHERE
                 {
                     ?agent a foaf:Agent;
                     <http://purl.org/dc/terms/source> "RECREATEX"^^xsd:string ;
                     <http://purl.org/dc/terms/identifier> ?identifier.
                     ?agent foaf:name ?name.
-                } ' . " LIMIT $limit OFFSET $offset";
+                } ';
+
+        if ($limit) {
+            $query .= " LIMIT $limit OFFSET $offset";
+        }
+
+        return $query;
     }
 }

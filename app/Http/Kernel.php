@@ -2,6 +2,9 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\HasRoleInService;
+use App\Http\Middleware\IsOwner;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -30,6 +33,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
         ],
 
         'api' => [
@@ -55,5 +59,8 @@ class Kernel extends HttpKernel
         'role' => \Laratrust\Middleware\LaratrustRole::class,
         'permission' => \Laratrust\Middleware\LaratrustPermission::class,
         'ability' => \Laratrust\Middleware\LaratrustAbility::class,
+        'admin' => IsAdmin::class,
+        'hasRoleInService' => HasRoleInService::class,
+        'isOwner' => IsOwner::class,
     ];
 }

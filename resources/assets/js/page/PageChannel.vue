@@ -10,7 +10,7 @@
         <button class="btn btn-primary btn-lg" @click="newVersion" :disabled="$root.isRecreatex">Voeg een eerste versie toe</button>
       </p>
     </div>
-    <div v-else class="row">
+    <div v-else>
       <table class="table table-hover">
         <thead>
           <tr>
@@ -66,7 +66,6 @@ export default {
     channel () {
       return this.$root.routeChannel || {}
     },
-
     versions () {
       return this.$root.routeChannel.openinghours || []
     },

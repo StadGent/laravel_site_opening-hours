@@ -64,7 +64,16 @@ class UpdateLodOpeninghours implements ShouldQueue
         // Add the service and the openinghours' channel to the graph
         $graph = $this->createServiceResource($service, $channel, $openinghoursGraph);
 
-        app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph);
+        $result = app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph);
+        if (!$result) {
+            $this->fail(new \Exception(sprintf(
+                'The %s job failed with service id %s channel id %s, and opening hours id %s. Check the logs for details',
+                static::class,
+                $this->serviceId,
+                $this->channelId,
+                $this->openinghoursId
+            )));
+        }
     }
 
     /**
@@ -89,12 +98,10 @@ class UpdateLodOpeninghours implements ShouldQueue
         $channelId = $channel['id'];
 
         $channel = $openinghoursGraph->resource(
-            createChannelUri($channelId),
-            'cv:Channel'
+            createChannelUri($channelId)
         );
 
         $channel->addResource('cv:isOwnedBy', $service);
-        //$channel->addResource('oh:openinghours', $openinghoursGraph);
 
         if (! empty(env('DATA_REPRESENTATION_URI'))) {
             $channel->addResource('rdfs:isDefinedBy', env('DATA_REPRESENTATION_URI') . '/channel/' . $channelId);

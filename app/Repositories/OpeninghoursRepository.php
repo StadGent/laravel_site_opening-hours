@@ -107,94 +107,6 @@ class OpeninghoursRepository extends EloquentRepository
     }
 
     /**
-     * Create a semantic data structure representing the openinghours
-     * containing calendar and event data
-     *
-     * @param  integer        $openinghoursId
-     * @return \EasyRdf_Graph
-     */
-    public function getOpeninghoursGraph($openinghoursId)
-    {
-        $openinghours = $this->model->find($openinghoursId);
-
-        $calendars = $openinghours->calendars();
-        $calendars = $calendars->with('events')->get()->toArray();
-
-        $channel = $openinghours->channel->toArray();
-
-        $openinghoursGraph = new Graph();
-
-        \EasyRdf_Namespace::set('oh', 'http://semweb.datasciencelab.be/ns/oh#');
-        \EasyRdf_Namespace::set('ical', 'http://www.w3.org/2002/12/cal/ical#');
-
-        if (! empty($openinghours)) {
-            $openinghoursResource = $openinghoursGraph->resource(
-                env('BASE_URI') . '/openinghours/' . $openinghoursId,
-                'oh:OpeningHours'
-            );
-
-            // Add the calendars taken into account the priority of the calendar
-            // Sort the calendars first
-            $calendars = array_sort($calendars, function ($calendar) {
-                return $calendar['priority'];
-            });
-
-            $calendarList = $openinghoursGraph->newBNode('rdf:List');
-
-            // Add the List to the openinghours object
-            $openinghoursResource->addResource('oh:calendar', $calendarList);
-
-            foreach ($calendars as $calendar) {
-                $calendarResource = $openinghoursGraph->newBNode('oh:Calendar');
-                $calendarList->addResource('rdf:first', $calendarResource);
-
-                // Make a calendar Resource
-                $rdfCalendarResource = $openinghoursGraph->newBNode('ical:Vcalendar');
-
-                if ($calendar['closinghours']) {
-                    $rdfCalendarResource->addLiteral('oh:closinghours', $this->createLiteral('boolean', true));
-                } else {
-                    $rdfCalendarResource->addLiteral('oh:closinghours', $this->createLiteral('boolean', false));
-                }
-
-                foreach ($calendar['events'] as $event) {
-                    $eventResource = $openinghoursGraph->newBNode('ical:Vevent');
-                    $eventResource->addLiteral('ical:dtend', $event['end_date']);
-                    $eventResource->addLiteral('ical:dtstart', $event['start_date']);
-
-                    $rruleResource = $openinghoursGraph->newBNode();
-                    $eventResource->addResource('ical:rrule', $rruleResource);
-
-                    // Add the rrule properties
-                    $pieces = explode(';', $event['rrule']);
-
-                    foreach ($pieces as $rrulePiece) {
-                        $parts = explode('=', $rrulePiece);
-
-                        $rruleResource->addLiteral('ical:' . strtolower($parts[0]), $parts[1]);
-                    }
-
-                    // Add the event resource to the calendar
-                    $rdfCalendarResource->addResource('ical:Vcomponent', $eventResource);
-                }
-
-                $calendarResource->addResource('oh:rdfcal', $rdfCalendarResource);
-
-                // Add a new list as the 'rest' of the existing list
-                $calendarListRest = $openinghoursGraph->newBNode('rdf:List');
-                $calendarList->addResource('rdf:rest', $calendarListRest);
-
-                // Move the current list to the new list (= rdf:rest)
-                $calendarList = $calendarListRest;
-            }
-
-            return $openinghoursResource;
-        }
-
-        return null;
-    }
-
-    /**
      * Create a semantic data structure containing all openinghours for the channel
      *
      * @param  integer        $channelId
@@ -202,119 +114,16 @@ class OpeninghoursRepository extends EloquentRepository
      */
     public function getOpeninghoursGraphForChannel($channelId)
     {
-        $channel = app('ChannelRepository')->getByIdWithOpeninghours($channelId);
-
         $openinghoursGraph = new Graph();
-
-        $channelResource = $openinghoursGraph->resource(
+        $channelModel = \App\Models\Channel::query()->find($channelId);
+        $channel = $openinghoursGraph->resource(
             createChannelUri($channelId),
             'cv:Channel'
         );
 
-        if (empty($channel->openinghours)) {
-            return $openinghoursGraph;
-        }
-
-        foreach ($channel->openinghours as $openinghours) {
-            $calendars = $openinghours->calendars();
-            $calendars = $calendars->with('events')->get()->toArray();
-
-            $channel = $openinghours->channel->toArray();
-
-            \EasyRdf_Namespace::set('oh', 'http://semweb.datasciencelab.be/ns/oh#');
-            \EasyRdf_Namespace::set('ical', 'http://www.w3.org/2002/12/cal/ical#');
-
-            if (! empty($openinghours)) {
-                $openinghoursResource = $openinghoursGraph->resource(
-                    createOpeninghoursUri($openinghours->id),
-                    'oh:OpeningHours'
-                    );
-
-                $channelResource->addResource('oh:openinghours', $openinghoursResource);
-
-                // Add the calendars taken into account the priority of the calendar
-                // Sort the calendars first
-                $calendars = array_sort($calendars, function ($calendar) {
-                    return $calendar['priority'];
-                });
-
-                $calendarList = $openinghoursGraph->newBNode('rdf:List');
-
-                // Add the List to the openinghours object
-                $openinghoursResource->addResource('oh:calendar', $calendarList);
-
-                foreach ($calendars as $calendar) {
-                    $calendarResource = $openinghoursGraph->newBNode('oh:Calendar');
-                    $calendarList->addResource('rdf:first', $calendarResource);
-
-                    // Make a calendar Resource
-                    $rdfCalendarResource = $openinghoursGraph->newBNode('ical:Vcalendar');
-
-                    if ($calendar['closinghours']) {
-                        $rdfCalendarResource->addLiteral('oh:closinghours', $this->createLiteral('boolean', true));
-                    } else {
-                        $rdfCalendarResource->addLiteral('oh:closinghours', $this->createLiteral('boolean', false));
-                    }
-
-                    foreach ($calendar['events'] as $event) {
-                        $eventResource = $openinghoursGraph->newBNode('ical:Vevent');
-                        $eventResource->addLiteral('ical:dtend', $event['end_date']);
-                        $eventResource->addLiteral('ical:dtstart', $event['start_date']);
-
-                        $rruleResource = $openinghoursGraph->newBNode();
-                        $eventResource->addResource('ical:rrule', $rruleResource);
-
-                        // Add the rrule properties
-                        $pieces = explode(';', $event['rrule']);
-
-                        foreach ($pieces as $rrulePiece) {
-                            $parts = explode('=', $rrulePiece);
-
-                            $rruleResource->addLiteral('ical:' . strtolower($parts[0]), $parts[1]);
-                        }
-
-                        // Add the event resource to the calendar
-                        $rdfCalendarResource->addResource('ical:Vcomponent', $eventResource);
-                    }
-
-                    $calendarResource->addResource('oh:rdfcal', $rdfCalendarResource);
-
-                    // Add a new list as the 'rest' of the existing list
-                    $calendarListRest = $openinghoursGraph->newBNode('rdf:List');
-                    $calendarList->addResource('rdf:rest', $calendarListRest);
-
-                    // Move the current list to the new list (= rdf:rest)
-                    $calendarList = $calendarListRest;
-                }
-            }
-        }
+        $channel->set('http://www.w3.org/2004/02/skos/core#prefLabel', $channelModel->label);
 
         return $openinghoursGraph;
-    }
-
-    /**
-     * Create a new literal
-     *
-     * @param  string     $type
-     * @param  mixed      $value
-     * @return Literal
-     * @throws \Exception
-     */
-    private function createLiteral($type, $value)
-    {
-        switch ($type) {
-            case 'integer':
-                return new IntegerLiteral($value, '', 'xsd:integer');
-                break;
-            case 'boolean':
-                return new BooleanLiteral($value, '', 'xsd:boolean');
-                break;
-            case 'datetime':
-                return new DateTimeLiteral($value, '', 'xsd:datetime');
-                break;
-        }
-
-        throw new \Exception('Literal type ' . $type . ' is not supported');
     }
 
     /**

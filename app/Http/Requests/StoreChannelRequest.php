@@ -11,13 +11,14 @@ class StoreChannelRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param UserRepository $users
+     * @param Request $request
+     *
      * @return bool
      */
-    public function authorize(UserRepository $users, Request $request)
+    public function authorize(Request $request)
     {
-        return $this->user()->hasRole('Admin')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner')
-        || $users->hasRoleInService($this->user()->id, $request->service_id, 'Member');
+        return true;
     }
 
     /**
@@ -28,14 +29,19 @@ class StoreChannelRequest extends FormRequest
     public function rules()
     {
         return [
-            'label' => 'required|min:1'
+            'label' => 'required|min:1',
         ];
     }
 
+    /**
+     * Get the messages
+     *
+     * @return array
+     */
     public function messages()
     {
-        return $messages = [
-            'required' => 'Het veld is verplicht in te vullen.'
+        return [
+            'required' => 'Het veld is verplicht in te vullen.',
         ];
     }
 }

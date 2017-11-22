@@ -21,12 +21,15 @@
       Service role is: {{ isOwner ? 'owner' : 'member' }}
       <!-- <pre v-text="route"></pre> -->
     </div>
+    <status></status>
   </div>
+
 </template>
 
 <script>
 import TopBreadcrumb from './components/TopBreadcrumb.vue'
 import TopNav from './components/TopNav.vue'
+import Status from './components/Status.vue'
 
 import PageChannel from './page/PageChannel.vue'
 import PageHome from './page/PageHome.vue'
@@ -35,6 +38,7 @@ import PageUser from './page/PageUser.vue'
 import PageVersion from './page/PageVersion.vue'
 
 import ModalText from './modal/ModalText.vue'
+
 
 export default {
   name: 'app',
@@ -46,7 +50,8 @@ export default {
     PageUser,
     PageVersion,
     TopBreadcrumb,
-    TopNav
+    TopNav,
+    Status,
   }
 }
 </script>

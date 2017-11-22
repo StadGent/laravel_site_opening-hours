@@ -1,97 +1,79 @@
+import {hasActiveOh, hasOh} from "../lib";
 import {
-  hasActiveOh,
-  hasOh,
-  hasCal,
-  hasChannels,
-  toChannelAlert,
-  toChannelStatus
-} from '../lib.js'
-
-var exampleChannel = {
-  "@type": "Channel",
-  "label": "Loket",
-  "oh": [{
-    "@type": "oh:OpeningHours",
-    "active": true,
-    "calendar": [{
-      "@type": "oh:Calendar",
-      "label": "Super uitzonderingen",
-      "rdfcal": [{}]
-    }, {
-      "@type": "oh:Calendar",
-      "label": "Nationale feestdagen",
-      "rdfcal": [{}]
-    }, {
-      "@type": "oh:Calendar",
-      "label": "Normale uren",
-      "rdfcal": [{}]
-    }]
-  }]
-}
+    SERVICE_COMPLETE, SERVICE_COMPLETE_TOOLTIP, SERVICE_INACTIVE_OH, SERVICE_INACTIVE_OH_TOOLTIP, SERVICE_MISSING_OH,
+    SERVICE_MISSING_OH_TOOLTIP, SERVICE_NO_CH, SERVICE_NO_CH_TOOLTIP,
+    TEST
+} from "../constants";
 
 export default {
-  props: ['s'],
-  computed: {
-    rowspan() {
-      var s = this.s
-      return 1 + (this.countChannels || 1)
-    },
-    hasChannels() {
-      return hasChannels(this.s)
-    },
-    countChannels() {
-      return this.hasChannels.length
-    },
-    countCals(h) {
-      var s = this.s
-      return hasChannels(this.s).map(v => hasCal(v).length).reduce((a, b) => a + b, 0)
-    },
-    old() {
-      return this.s.updated_at ? (Date.now() - new Date(this.s.updated_at)) / 1000 / 3600 / 24 : 0
-    },
-    statusClass() {
-      return {
-        'text-success': this.statusMessage === '✓ Volledig',
-        'warning': this.statusMessage !== '✓ Volledig'
-      }
-    },
-    statusMessage() {
-      // Service without channels
-      if (!this.countChannels) {
-        return 'Geen kanalen'
-      }
+    props: ['s'],
+    computed: {
+        old() {
+            return this.s.updated_at ? (Date.now() - new Date(this.s.updated_at)) / 1000 / 3600 / 24 : 0
+        },
+        statusClass() {
+            return {
+                'text-success': this.statusMessage === SERVICE_COMPLETE,
+                'warning': this.statusMessage !== SERVICE_COMPLETE
+            }
+        },
+        statusMessage: function () {
 
-      // Not every channel of the service has at least 1 version
-      if (this.hasChannels.filter(ch => !hasOh(ch).length).length) {
-        return 'Ontbrekende kalender(s)'
-      }
+            if (!this.s.channels) {
+                if (this.s.countChannels === 0) {
+                    return SERVICE_NO_CH;
+                }
 
-      // Not every channel of the service has at least 1 active version
-      if (this.hasChannels.filter(ch => !hasActiveOh(ch).length).length) {
-        return 'Ontbrekende actieve kalender(s)'
-      }
+                if (this.s.has_missing_oh === 1 || this.s.has_missing_oh === true) {
+                    return SERVICE_MISSING_OH;
+                }
 
-      return '✓ Volledig'
+                if (this.s.has_inactive_oh === 1 || this.s.has_inactive_oh === true) {
+                    return SERVICE_INACTIVE_OH;
+                }
+            }
+            else {
+
+                if (this.s.channels.length === 0) {
+                    return SERVICE_NO_CH;
+                }
+
+                // Not every channel of the service has at least 1 version
+                if (this.s.channels.filter(ch => !hasOh(ch).length).length) {
+                    return SERVICE_MISSING_OH;
+                }
+
+                // Not every channel of the service has at least 1 active version
+                if (this.s.channels.filter(ch => !hasActiveOh(ch).length).length) {
+                    return SERVICE_INACTIVE_OH;
+                }
+            }
+
+            return SERVICE_COMPLETE;
+        },
+
+        // TODO: refactor into structured set of messages
+        statusTooltip() {
+            switch (this.statusMessage) {
+                case SERVICE_NO_CH:
+                    return SERVICE_NO_CH_TOOLTIP;
+                case SERVICE_MISSING_OH:
+                    return SERVICE_MISSING_OH_TOOLTIP;
+                case SERVICE_INACTIVE_OH:
+                    return SERVICE_INACTIVE_OH_TOOLTIP;
+                case SERVICE_COMPLETE:
+                    return SERVICE_COMPLETE_TOOLTIP;
+            }
+        }
     },
-
-    // TODO: refactor into structured set of messages
-    statusTooltip() {
-      switch (this.statusMessage) {
-        case 'Geen kanalen': return 'Deze dienst heeft geen kanalen.'
-        case 'Ontbrekende kalender(s)': return 'Minstens 1 van de kanalen van deze dienst heeft geen versie.'
-        case 'Ontbrekende actieve kalender(s)': return 'Alle kanalen hebben een versie maar minstens 1 kanaal heeft geen versie die nu geldt. Een versie geldt niet als deze verlopen is of pas in de toekomst actief wordt.'
-        case '✓ Volledig': return 'Alle kanalen hebben minstens een kalenderversie die nu geldig is.'
-      }
+    methods: {
+        newRoleFromOverview() {
+            this.newRole(this.s);
+            this.href('#!service/' + this.s.id);
+            this.route.tab2 = 'users'
+        }
+    },
+    mounted() {
+        $('[data-toggle="tooltip"]').tooltip();
     }
-  },
-  methods: {
-    newRoleFromOverview () {
-      this.newRole(this.s)
-      this.href('#!service/' + this.s.id)
-      this.route.tab2 = 'users'
-    }
-  },
-  mounted () {
-    $('[data-toggle="tooltip"]').tooltip()
-  }
 }
