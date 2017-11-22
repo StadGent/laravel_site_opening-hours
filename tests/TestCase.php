@@ -125,6 +125,9 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
 
         $path = $this->assemblePath($pathArg);
         $this->doRequest($verb, $path, $data);
+        if($this->response->getStatusCode() !== $statusCode ) {
+            \Log::debug($this->decodeResponseJson());
+        }
         $this->seeStatusCode($statusCode);
     }
 }
