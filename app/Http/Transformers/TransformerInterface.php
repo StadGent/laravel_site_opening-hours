@@ -6,5 +6,4 @@ interface TransformerInterface
 {
 
     public static function getSupportedFormats();
-
 }
