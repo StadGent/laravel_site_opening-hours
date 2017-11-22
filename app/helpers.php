@@ -3,7 +3,7 @@
 /**
  * Return the english abbreviation of a day passed in dutch
  * If no abbreviation is found, return the original day
- *
+ * @deprecated
  * @param  string $day
  * @return string
  */
@@ -28,6 +28,11 @@ function codeForDay($day)
     return $code;
 }
 
+/**
+ * @deprecated
+ * @param [type] $datetime
+ * @return [type]
+ */
 function carbonize($datetime = null)
 {
     if (empty($datetime)) {
@@ -37,21 +42,42 @@ function carbonize($datetime = null)
     return \Carbon\Carbon::createFromFormat('Y-m-d', $datetime);
 }
 
+/**
+ * @deprecated
+ * @param [type] $openinghoursId
+ * @return [type]
+ */
 function createOpeninghoursUri($openinghoursId)
 {
     return env('BASE_URI') . '/openinghours/' . $openinghoursId;
 }
 
+/**
+ * @deprecated
+ * @param [type] $openinghoursId
+ * @param [type] $calendarId
+ * @return [type]
+ */
 function createCalendarUri($openinghoursId, $calendarId)
 {
     return env('BASE_URI') . '/openinghours/' . $openinghoursId . '/calendar/' . $calendarId;
 }
 
+/**
+ * @deprecated
+ * @param [type] $channelId
+ * @return [type]
+ */
 function createChannelUri($channelId)
 {
     return env('BASE_URI') . '/channel/' . $channelId;
 }
 
+/**
+ * @deprecated
+ * @param [type] $serviceId
+ * @return [type]
+ */
 function createServiceUri($serviceId)
 {
     $service = app('ServicesRepository')->getById($serviceId);
@@ -63,6 +89,11 @@ function createServiceUri($serviceId)
     return $service['uri'];
 }
 
+/**
+ * @deprecated
+ * @param [type] $path
+ * @return [type]
+ */
 function version($path)
 {
     try {
@@ -73,7 +104,14 @@ function version($path)
     }
 }
 
-function normalizeSimpleXML($obj, &$result) {
+/**
+ * @deprecated
+ * @param [type] $obj
+ * @param [type] &$result
+ * @return [type]
+ */
+function normalizeSimpleXML($obj, &$result)
+{
     $data = $obj;
 
     if (is_object($data)) {

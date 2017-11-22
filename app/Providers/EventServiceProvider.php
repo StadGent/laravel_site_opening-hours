@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -12,23 +12,7 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $listen = [
-        'App\Events\OpeninghoursCreated' => [
-            'App\Listeners\HandleNewOpeninghours',
-        ],
-        'App\Events\OpeninghoursUpdated' => [
-            'App\Listeners\HandleUpdatedOpeninghours',
-        ],
-        'App\Events\CalendarUpdated' => [
-            'App\Listeners\HandleUpdatedCalendar',
-        ],
-        'App\Events\OpeninghoursDeleted' => [
-            'App\Listeners\HandleDeletedOpeninghours'
-        ],
-        'App\Events\ChannelDeleted' => [
-            'App\Listeners\HandleDeletedChannel'
-        ]
-    ];
+    protected $listen = [];
 
     /**
      * Register any events for your application.
