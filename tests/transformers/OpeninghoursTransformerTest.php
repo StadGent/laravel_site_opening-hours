@@ -86,7 +86,7 @@ class OpeninghoursTransformerTest extends \TestCase
         $expected = '';
         foreach ($service->channels as $channel) {
             $expected .= $channel->label . ":";
-            $expected .= "15-09-2017:    van 09:00  tot 12:00   van 13:00  tot 17:00";
+            $expected .= "vrijdag 15-09-2017: 09:00-12:00 en 13:00-17:00";
         }
 
         $this->assertEquals($expected, $actual);
