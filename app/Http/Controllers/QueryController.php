@@ -164,5 +164,4 @@ class QueryController extends Controller
 
         return response()->collection($transformer, $channels);
     }
-
 }

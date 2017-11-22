@@ -99,7 +99,7 @@ class LocaleService
      * Default no locale is given as argument
      * and the locale will be taken from the HTTP accept language
      *
-     * @param string/null $locale
+     * @param string /null $locale
      * @return string dateTime format
      */
     public function getDateFormat($locale = null)
@@ -117,7 +117,7 @@ class LocaleService
      * Default no locale is given as argument
      * and the locale will be taken from the HTTP accept language
      *
-     * @param string/null $locale
+     * @param string /null $locale
      * @return string dateTime format
      */
     public function getTimeFormat($locale = null)
@@ -182,11 +182,13 @@ class LocaleService
         return $formats[$locale];
     }
 
-    public function setTimeFormat($timeFormat){
+    public function setTimeFormat($timeFormat)
+    {
         $this->format['time'] = $timeFormat;
     }
 
-    public function setDateFormat($dateFormat){
+    public function setDateFormat($dateFormat)
+    {
         $this->format['date'] = $dateFormat;
     }
 }

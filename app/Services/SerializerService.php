@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Services;
-
 
 use App\Http\Transformers\TransformerInterface;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,7 +20,7 @@ class SerializerService
     private static $instance;
     const MIME_TYPES = ['application/json', 'text/html', 'application/ld+json', 'text/plain'];
 
-    public function setRequest(Request $request)
+    public function setRequest()
     {
         $this->request = app(Request::class);
     }

@@ -19,7 +19,7 @@ class ChannelController extends Controller
      * @param Channel $channel
      * @return Response
      */
-    public function show(Request $request,Service $service, Channel $channel)
+    public function show(Service $service, Channel $channel)
     {
         if (!$service->channels->find($channel)) {
             $message = "The requested channel is not a child of the service in the path";
