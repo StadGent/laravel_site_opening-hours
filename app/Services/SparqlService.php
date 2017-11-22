@@ -53,14 +53,12 @@ class SparqlService
 
     /**
      *
-     * Private contructor for Singleton pattern
-     * force set client with default values from .env file
+     * Private contructor for Singleton pattern.
      *
      * @return SparqlService
      */
     private function __construct()
     {
-        $this->setClient();
     }
 
     /**
@@ -247,7 +245,7 @@ class SparqlService
     private function executeQuery($verb, $query, $options = [])
     {
         $options['auth'] = [$this->username, $this->password, 'digest'];
-        $response = $this->guzzleClient->request($verb, $query, $options);
+        $response = $this->getClient()->request($verb, $query, $options);
 
         return $this->handleResponse($response);
     }
@@ -293,4 +291,18 @@ class SparqlService
 
         return $response->getBody();
     }
+
+    /**
+     * Lazily initialize the guzzle client.
+     *
+     * @return Client
+     */
+    protected function getClient() {
+        if (!$this->guzzleClient) {
+            $this->setClient();
+        }
+
+        return $this->guzzleClient;
+    }
+
 }

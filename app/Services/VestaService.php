@@ -40,7 +40,9 @@ class VestaService
     /**
      * Private contructor for Singleton pattern
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * GetInstance for Singleton pattern
@@ -50,8 +52,7 @@ class VestaService
     public static function getInstance()
     {
         if (!self::$instance) {
-            self::$instance = new VestaService();
-            self::$instance->setClient();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -70,14 +71,13 @@ class VestaService
             throw new \SoapFault('WSDL', ('The path or URL to the SOAP WSDL has not been set.'));
         }
 
-        if (substr($wsdl, -4) !== 'wsdl') {
-            throw new \SoapFault('WSDL', ('The path or URL to the SOAP WSDL should end with \'wsdl\'.'));
+        if (substr($wsdl, -5) !== '?wsdl') {
+            $wsdl .= '?wsdl';
         }
-
+        
         $this->client = new \SoapClient($wsdl, [
             'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
         ]);
-
         $this->username = $username ?: env('VESTA_USER');
         $this->password = $password ?: env('VESTA_PASSWORD');
         $this->domain = $domain ?: env('VESTA_USER_DOMAIN');
@@ -128,7 +128,7 @@ class VestaService
         $parameters->accountId = $guid;
         $parameters->hours = $hours;
 
-        $response = $this->client->FillHours($parameters);
+        $response = $this->getClient()->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
             \Log::error('Something went wrong in VESTA.', [
                 'response' => print_r($response, 1),
@@ -140,7 +140,7 @@ class VestaService
         $fillHoursResult = json_decode($response->FillHoursResult);
         if ($fillHoursResult !== 1) {
             \Log::error('Something went wrong while writing the data to VESTA.', [
-                'response' => $fillHoursResult,
+                'response' => var_export($response, true),
             ]);
 
             return false;
@@ -173,7 +173,7 @@ class VestaService
         $search->tableName = 'account';
         $search->filters = $filters;
 
-        $result = $this->client->SearchJSON($search);
+        $result = $this->getClient()->SearchJSON($search);
 
         if (!isset($result->SearchJSONResult)) {
             return false;
@@ -185,5 +185,19 @@ class VestaService
         }
 
         return $result->Rows[0]->ves_openingsuren;
+    }
+
+    /**
+     * Lazily initialize the soap client.
+     *
+     * @return \SoapClient
+     */
+    protected function getClient()
+    {
+        if (!$this->client) {
+            $this->setClient();
+        }
+
+        return $this->client;
     }
 }

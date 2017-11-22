@@ -75,7 +75,6 @@ class FetchRecreatex extends Command
         $this->shopId = env('SHOP_ID');
         $this->channelName = env('CHANNEL_NAME');
         $this->calendarName = env('CALENDAR_NAME');
-        $this->soapClient = new \SoapClient(env('RECREATEX_URI') . '?wsdl');
         $this->calendarStartYear = Carbon::now()->year;
         $this->calendarEndYear = Carbon::now()->addYear(3)->year;
     }
@@ -249,7 +248,7 @@ class FetchRecreatex extends Command
         $event->until = $untilDate->endOfDay()->format('Y-m-d');
         $event->rrule = $this->getCalendarRule($startDate, $endDate, $untilDate);
 
-        return (bool) $calendar->events()->save($event);
+        return (bool)$calendar->events()->save($event);
     }
 
     /**
@@ -475,7 +474,7 @@ class FetchRecreatex extends Command
         ];
 
         try {
-            $response = $this->soapClient->FindInfrastructureOpenings($parameters);
+            $response = $this->getClient()->FindInfrastructureOpenings($parameters);
             $transformedData = json_decode(json_encode($response), true);
         } catch (\Exception $e) {
             $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord . ' with year ' .
@@ -617,8 +616,8 @@ class FetchRecreatex extends Command
      *
      * overwrite parent to make sure errors go to log
      *
-     * @param  string  $string
-     * @param  null|int|string  $verbosity
+     * @param  string $string
+     * @param  null|int|string $verbosity
      * @return void
      */
     public function error($string, $verbosity = null)
@@ -632,13 +631,25 @@ class FetchRecreatex extends Command
      *
      * overwrite parent to make info go to log
      *
-     * @param  string  $string
-     * @param  null|int|string  $verbosity
+     * @param  string $string
+     * @param  null|int|string $verbosity
      * @return void
      */
     public function info($string, $verbosity = null)
     {
         \Log::info($string);
         parent::error($string, $verbosity);
+    }
+
+    /**
+     * @return \SoapClient
+     */
+    protected function getClient()
+    {
+        if (!$this->soapClient) {
+            $this->soapClient = new \SoapClient(env('RECREATEX_URI') . '?wsdl');
+        }
+
+        return $this->soapClient;
     }
 }

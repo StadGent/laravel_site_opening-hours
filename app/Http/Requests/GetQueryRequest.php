@@ -36,8 +36,8 @@ class GetQueryRequest extends FormRequest
     public function rules()
     {
         return [
-            'service' => 'exists:services|id',
-            'channel' => 'exists:channels|id',
+            'service' => 'exists:services',
+            'channel' => 'exists:channels',
             'date' => 'date',
             'from' => 'date',
             'until' => 'date|after:from',

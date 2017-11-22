@@ -21,15 +21,24 @@ class DatabaseSeeder extends Seeder
     ];
 
     /**
-     * List of TableSeeder classes
+     * List of TableSeeder classes for testData
      * @var array
      */
-    protected $seeders = [
+    protected $testDataSeeders = [
         \Database\Seeds\ServicesTableSeeder::class,
         \Database\Seeds\ChannelsTableSeeder::class,
         \Database\Seeds\OpeninghoursTableSeeder::class,
         \Database\Seeds\CalendarsTableSeeder::class,
         \Database\Seeds\EventsTableSeeder::class,
+        \Database\Seeds\RolesTableSeeder::class,
+        \Database\Seeds\DummyUsersTableSeeder::class,
+    ];
+
+    /**
+     * List of TableSeeder classes for production
+     * @var array
+     */
+    protected $productionDataSeeders = [
         \Database\Seeds\RolesTableSeeder::class,
         \Database\Seeds\UsersTableSeeder::class,
     ];
@@ -48,7 +57,13 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info("Start Seeding \r");
         $this->command->info("------------- \r");
-        foreach ($this->seeders as $seedClass) {
+
+        $seeders = $this->testDataSeeders;
+        if (env('APP_ENV') === 'production') {
+            $seeders = $this->productionDataSeeders;
+        }
+
+        foreach ($seeders as $seedClass) {
             $this->call($seedClass);
         }
     }

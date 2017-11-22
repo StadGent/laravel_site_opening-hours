@@ -115,6 +115,35 @@ class QueryControllerTest extends \TestCase
     /**
      * @test
      * @group validation
+     * @dataProvider requestTypeProvider
+     */
+    public function testValidateServiceWithNotCoupledChannelIsAModelNotFoundException($typeParams)
+    {
+        $this->serviceId = 2;
+        $this->channelKeys = 1;
+        $typeParams['format'] = 'json';
+        $path = $this->assemblePath($typeParams);
+
+        $call = $this->doRequest('GET', $path);
+        $call->seeJsonEquals([
+            'error' => [
+                'code' => 'ValidationException',
+                'message' => 'Paramters did not pass validation',
+                'target' => 'parameters',
+                'details' => [
+                    0 => [
+                        'code' => 'ParentChildMismatch',
+                        'message' => 'The requested service did not find a match for the given channel identifier',
+                        'target' => 'Channel',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     * @group validation
      */
     public function testValidateServiceWithoutChannelsReturnsValidationException()
     {

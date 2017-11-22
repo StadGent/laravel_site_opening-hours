@@ -2,6 +2,7 @@
 
 namespace Tests\Controllers\UI;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class RolesControllerTest extends \TestCase
@@ -23,12 +24,12 @@ class RolesControllerTest extends \TestCase
     public function requestTypeProvider()
     {
         $data = [
-            'user_id' => '2',
+            'user_id' => '3',
             'service_id' => '1',
             'role' => 'Member',
         ];
         $dataRemove = [
-            'user_id' => '2',
+            'user_id' => '3',
             'service_id' => '1',
         ];
 
@@ -46,14 +47,38 @@ class RolesControllerTest extends \TestCase
             ['admin', 'get', '1', [], '404'], // show
             ['admin', 'put', '', $data, '405'], // update (full)
             ['admin', 'patch', '', $data, '200'], // update (partial)
+            [
+                'admin', 'patch', '',
+                ['user_id' => '1', 'service_id' => '1', 'role' => 'Owner'], '400',
+            ], // cannot assign himself
             ['admin', 'delete', '', $dataRemove, '200'], // destroy
+            ['admin', 'delete', '', ['user_id' => '1', 'service_id' => '1'], '400'], // cannot remove himself
             // owner user
             ['owner', 'get', '', [], '405'], // index
             ['owner', 'post', '', $data, '405'], // store
             ['owner', 'get', '1', [], '404'], // show
             ['owner', 'put', '', $data, '405'], // update (full)
             ['owner', 'patch', '', $data, '200'], // update (partial)
+            [
+                'owner', 'patch', '',
+                ['user_id' => '1', 'service_id' => '1', 'role' => 'Owner'], '400',
+            ], // cannot alter admin
+            [
+                'owner', 'patch', '',
+                ['user_id' => '2', 'service_id' => '1', 'role' => 'Member'], '400',
+            ], // cannot alter himself
+            [
+                'owner', 'patch', '',
+                ['user_id' => '2', 'service_id' => '2', 'role' => 'Member'], '401',
+            ], // cannot assign himself to not owned service
+            [
+                'owner', 'patch', '',
+                ['user_id' => '3', 'service_id' => '2', 'role' => 'Member'], '401',
+            ], // cannot assign someone else to not owned service
             ['owner', 'delete', '', $dataRemove, '200'], // destroy
+            ['owner', 'delete', '', ['user_id' => '1', 'service_id' => '1'], '400'], // cannot remove admin
+            ['owner', 'delete', '', ['user_id' => '2', 'service_id' => '1'], '400'], // cannot remove himself
+
             // member user
             ['member', 'get', '', [], '405'], // index
             ['member', 'post', '', $data, '405'], // store
@@ -66,6 +91,7 @@ class RolesControllerTest extends \TestCase
 
     /**
      * @test
+     * @group validation
      * @dataProvider requestTypeProvider
      */
     public function testUIRoleRequests($userRole, $verb, $pathArg, $data, $statusCode)
