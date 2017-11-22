@@ -126,5 +126,4 @@ class SerializerService
 
         return;
     }
-
 }

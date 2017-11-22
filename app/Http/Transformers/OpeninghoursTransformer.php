@@ -296,10 +296,11 @@ class OpeninghoursTransformer implements TransformerInterface
             }
 
             foreach ($channelArr['openinghours'] as $ohObj) {
-                $formattedSchedule .= '<div property="openingHoursSpecification" typeof="OpeningHoursSpecification">' .
-                    '<time property="validFrom validThrough" datetime="' . date('Y-m-d',
-                        strtotime($ohObj->date)) . '">' .
-                    date($this->localeService->getDateFormat(), strtotime($ohObj->date)) . '</time>: ';
+                $formattedSchedule .= '<div property="openingHoursSpecification" typeof="OpeningHoursSpecification">';
+                $formattedSchedule .= '<time property="validFrom validThrough" datetime="';
+                $formattedSchedule .= date('Y-m-d', strtotime($ohObj->date)) . '">';
+                $formattedSchedule .= date($this->localeService->getDateFormat(), strtotime($ohObj->date));
+                $formattedSchedule .= '</time>: ';
                 if (!$ohObj->open) {
                     $formattedSchedule .= '<time property="closes" datetime="' .
                         date('Y-m-d', strtotime($ohObj->date)) . '">' .
