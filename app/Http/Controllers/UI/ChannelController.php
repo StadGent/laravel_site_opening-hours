@@ -18,6 +18,7 @@ class ChannelController extends Controller
      */
     public function __construct(ChannelRepository $channels)
     {
+        $this->middleware('hasRoleInService');
         $this->channels = $channels;
     }
 
@@ -30,19 +31,16 @@ class ChannelController extends Controller
     public function store(StoreChannelRequest $request)
     {
         $input = $request->input();
-
         $id = $this->channels->store($input);
-
         $channel = $this->channels->getById($id);
-
-        if (!empty($channel)) {
-            return response()->json($channel);
+        if (empty($channel)) {
+            return response()->json(
+                ['message' => 'Something went wrong while storing the new channel, check the logs.'],
+                400
+            );
         }
 
-        return response()->json(
-            ['message' => 'Something went wrong while storing the new channel, check the logs.'],
-            400
-        );
+        return response()->json($channel);
     }
 
     /**

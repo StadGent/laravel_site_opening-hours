@@ -23,6 +23,7 @@ class ServicesController extends Controller
      */
     public function __construct(ServicesRepository $servicesRepository)
     {
+        $this->middleware('admin')->except('index');
         $this->servicesRepository = $servicesRepository;
     }
 
@@ -40,18 +41,6 @@ class ServicesController extends Controller
         }
 
         return $this->servicesRepository->getExpandedServiceForUser($request->user('api')->id);
-    }
-
-    /**
-     * Get with id
-     *
-     * Base get and return the service
-     *
-     * @return Service
-     */
-    public function show(Service $service)
-    {
-        return $service;
     }
 
     /**

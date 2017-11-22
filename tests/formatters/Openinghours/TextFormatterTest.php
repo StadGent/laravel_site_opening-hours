@@ -16,6 +16,11 @@ class TextFormatterTest extends \TestCase
     private $formatter;
 
     /**
+     * @var App\Services\LocaleService
+     */
+    private $localeService;
+
+    /**
      * @var array
      */
     private $data = [];
@@ -25,6 +30,7 @@ class TextFormatterTest extends \TestCase
         parent::setup();
 
         $this->formatter = app('OHTextFormatter');
+        $this->localeService = app('LocaleService');
 
         $this->service = \App\Models\Service::first();
         foreach ($this->service->channels as $channel) {
@@ -48,7 +54,6 @@ class TextFormatterTest extends \TestCase
                 ],
             ];
         }
-        $this->formatter->setDateTimeFormats('d-m-Y', 'H:i');
     }
 
     /**
@@ -58,18 +63,46 @@ class TextFormatterTest extends \TestCase
      */
     public function testFormatTextGivesAString()
     {
+        $this->localeService->setLocale('nl-BE');
+        $this->formatter->setDateTimeFormats($this->localeService->getDateFormat(), $this->localeService->getTimeFormat());
+
         $this->formatter->render($this->data);
         $output = $this->formatter->getOutput();
-        $result = '';
+        $expect = '';
         foreach ($this->service->channels as $channel) {
-            $result .= $channel->label . ":";
-            $result .= "15-09-2017:    van 09:00  tot 12:00   van 13:00  tot 17:00";
+            $expect .= $channel->label . ":";
+            $expect .= "vrijdag 15/09: 09:00-12:00 en 13:00-17:00";
         }
         // remove all EOL's
         $removedEOL = str_replace(PHP_EOL, '', $output);
         // remove fancy double lines under channel names
         $cleanedoutput = str_replace('=', '', $removedEOL);
 
-        $this->assertEquals($result, $cleanedoutput);
+        $this->assertEquals($expect, $cleanedoutput);
+    }
+
+    /**
+     * @test
+     * @group content
+     * @todo check content when structure is known
+     */
+    public function testFormatTextGivesAStringInEnUsFormat()
+    {
+        $this->localeService->setLocale('en-US');
+        $this->formatter->setDateTimeFormats($this->localeService->getDateFormat(), $this->localeService->getTimeFormat());
+
+        $this->formatter->render($this->data);
+        $output = $this->formatter->getOutput();
+        $expect = '';
+        foreach ($this->service->channels as $channel) {
+            $expect .= $channel->label . ":";
+            $expect .= "Friday 09-15: 09:00 AM-12:00 PM and 01:00 PM-05:00 PM";
+        }
+        // remove all EOL's
+        $removedEOL = str_replace(PHP_EOL, '', $output);
+        // remove fancy double lines under channel names
+        $cleanedoutput = str_replace('=', '', $removedEOL);
+
+        $this->assertEquals($expect, $cleanedoutput);
     }
 }

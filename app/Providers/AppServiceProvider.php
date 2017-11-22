@@ -33,12 +33,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         /* REPOSITORIES **/
-        $this->app->bind('UserRepository', function ($app) {
-            return new \App\Repositories\UserRepository(
-                new \App\Models\User()
-            );
-        });
-
         $this->app->bind('ServicesRepository', function ($app) {
             return new \App\Repositories\ServicesRepository(
                 new \App\Models\Service()
@@ -80,21 +74,35 @@ class AppServiceProvider extends ServiceProvider
             return \App\Services\ChannelService::getInstance();
         });
 
-        $this->app->singleton('OpeninghoursService', function ($app) {
+        $this->app->singleton(\App\Services\OpeninghoursService::class, function ($app) {
             return \App\Services\OpeninghoursService::getInstance();
         });
 
-        $this->app->singleton('SparqlService', function ($app) {
+        $this->app->alias(\App\Services\OpeninghoursService::class, 'OpeninghoursService');
+
+        $this->app->singleton(\App\Services\SparqlService::class, function ($app) {
             return \App\Services\SparqlService::getInstance();
         });
 
-        $this->app->singleton('VestaService', function ($app) {
+        $this->app->alias(\App\Services\SparqlService::class, 'SparqlService');
+
+        $this->app->singleton(\App\Services\VestaService::class, function ($app) {
             return \App\Services\VestaService::getInstance();
         });
 
-        $this->app->singleton('LocaleService', function ($app) {
+        $this->app->alias(\App\Services\VestaService::class, 'VestaService');
+
+        $this->app->singleton(\App\Services\LocaleService::class, function ($app) {
             return \App\Services\LocaleService::getInstance();
         });
+
+        $this->app->alias(\App\Services\LocaleService::class, 'LocaleService');
+
+        $this->app->singleton(\App\Services\UserService::class, function ($app) {
+            return \App\Services\UserService::getInstance();
+        });
+
+        $this->app->alias(\App\Services\UserService::class, 'UserService');
 
         /* FORMATTERS **/
         $this->app->bind('OHJsonFormatter', function () {
