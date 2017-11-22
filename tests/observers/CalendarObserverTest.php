@@ -14,8 +14,8 @@ class CalendarObserverTest extends \TestCase
      */
     public function testItTriggersMakeSyncJobsForExternalServicesWhenCalendarsAreSaved()
     {
-        $this->app->singleton('OpeninghoursService', function () {
-            $mock = $this->createMock(\App\Services\OpeninghoursService::class, ['makeSyncJobsForExternalServices']);
+        $this->app->singleton('VestaService', function () {
+            $mock = $this->createMock(\App\Services\VestaService::class, ['makeSyncJobsForExternalServices']);
             $mock->expects($this->once())
                 ->method('makeSyncJobsForExternalServices');
 

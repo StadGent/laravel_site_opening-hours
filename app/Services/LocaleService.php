@@ -30,7 +30,7 @@ class LocaleService
      *
      * @var array
      */
-    private $format = '';
+    private $format = [];
 
     /**
      * @param Request $request
@@ -121,5 +121,13 @@ class LocaleService
         }
 
         return $formats[$locale];
+    }
+
+    public function setTimeFormat($timeFormat){
+        $this->format['time'] = $timeFormat;
+    }
+
+    public function setDateFormat($dateFormat){
+        $this->format['date'] = $dateFormat;
     }
 }

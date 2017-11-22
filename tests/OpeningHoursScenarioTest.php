@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use App\Models\Service;
+
 class OpeningHoursScenarioTest extends \TestCase
 {
 
@@ -13,7 +15,7 @@ class OpeningHoursScenarioTest extends \TestCase
     public function setup()
     {
         parent::setUp();
-        $service = \App\Models\Service::first();
+        $service = Service::first();
         $this->serviceId = $service->id;
         $this->channels = $service->channels;
     }
@@ -28,10 +30,13 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested();
         $expected = [];
         foreach ($this->channels as $channel) {
-            $expected[] = ['channel' => $channel->label, 'channelId' => $channel->id,
+            $expected[] = [
+                'channel' => $channel->label,
+                'channelId' => $channel->id,
                 'openNow' => ['status' => true, 'label' => 'open'],
             ];
         }
+
         $this->assertEquals($expected, $content);
     }
 
@@ -45,7 +50,9 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested();
         $expected = [];
         foreach ($this->channels as $channel) {
-            $expected[] = ['channel' => $channel->label, 'channelId' => $channel->id,
+            $expected[] = [
+                'channel' => $channel->label,
+                'channelId' => $channel->id,
                 'openNow' => ['status' => false, 'label' => 'gesloten'],
             ];
         }
@@ -63,16 +70,29 @@ class OpeningHoursScenarioTest extends \TestCase
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = [
-                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
-                    '2017-09-03' => ['date' => '2017-09-03', 'open' => false, 'hours' => []],
-                    '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []],
-                    '2017-09-05' => ['date' => '2017-09-05', 'open' => true, 'hours' => [
-                        0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']],
+                'channel' => $channel->label,
+                'channelId' => $channel->id,
+                'openinghours' => [
+                    ['date' => '2017-09-03', 'open' => false, 'hours' => []],
+                    ['date' => '2017-09-04', 'open' => false, 'hours' => []],
+                    [
+                        'date' => '2017-09-05',
+                        'open' => true,
+                        'hours' => [
+                            0 => ['from' => '09:00', 'until' => '12:00'],
+                            1 => ['from' => '13:00', 'until' => '17:00']
+                        ],
                     ],
-                    '2017-09-06' => ['date' => '2017-09-06', 'open' => true, 'hours' => [
-                        0 => ['from' => '09:00', 'until' => '12:00'], 1 => ['from' => '13:00', 'until' => '17:00']],
+                    [
+                        'date' => '2017-09-06',
+                        'open' => true,
+                        'hours' => [
+                            0 => ['from' => '09:00', 'until' => '12:00'],
+                            1 => ['from' => '13:00', 'until' => '17:00']
+                        ],
                     ],
-                ]];
+                ]
+            ];
         }
         $this->assertEquals($expected, $content);
     }
@@ -88,11 +108,16 @@ class OpeningHoursScenarioTest extends \TestCase
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = [
-                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
-                    '2017-09-05' => ['date' => '2017-09-05', 'open' => true,
+                'channel' => $channel->label,
+                'channelId' => $channel->id,
+                'openinghours' => [
+                    [
+                        'date' => '2017-09-05',
+                        'open' => true,
                         'hours' => [
                             0 => ['from' => '09:00', 'until' => '12:00'],
-                            1 => ['from' => '13:00', 'until' => '17:00']],
+                            1 => ['from' => '13:00', 'until' => '17:00']
+                        ],
                     ],
                 ],
             ];
@@ -111,8 +136,11 @@ class OpeningHoursScenarioTest extends \TestCase
         $expected = [];
         foreach ($this->channels as $channel) {
             $expected[] = [
-                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
-                    '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []]],
+                'channel' => $channel->label,
+                'channelId' => $channel->id,
+                'openinghours' => [
+                    ['date' => '2017-09-04', 'open' => false, 'hours' => []]
+                ],
             ];
         }
         $this->assertEquals($expected, $content);
@@ -128,28 +156,50 @@ class OpeningHoursScenarioTest extends \TestCase
         $content = $this->getContentStructureTested();
         foreach ($this->channels as $channel) {
             $expected[] = [
-                'channel' => $channel->label, 'channelId' => $channel->id, 'openinghours' => [
-                    '2017-09-04' => ['date' => '2017-09-04', 'open' => false, 'hours' => []],
-                    '2017-09-05' => ['date' => '2017-09-05', 'open' => true, 'hours' => [
-                        0 => ['from' => '09:00', 'until' => '12:00'],
-                        1 => ['from' => '13:00', 'until' => '17:00']],
+                'channel' => $channel->label,
+                'channelId' => $channel->id,
+                'openinghours' => [
+                    ['date' => '2017-09-04', 'open' => false, 'hours' => []],
+                    [
+                        'date' => '2017-09-05',
+                        'open' => true,
+                        'hours' => [
+                            0 => ['from' => '09:00', 'until' => '12:00'],
+                            1 => ['from' => '13:00', 'until' => '17:00']
+                        ],
                     ],
-                    '2017-09-06' => ['date' => '2017-09-06', 'open' => true, 'hours' => [
-                        0 => ['from' => '09:00', 'until' => '12:00'],
-                        1 => ['from' => '13:00', 'until' => '17:00']],
+                    [
+                        'date' => '2017-09-06',
+                        'open' => true,
+                        'hours' => [
+                            0 => ['from' => '09:00', 'until' => '12:00'],
+                            1 => ['from' => '13:00', 'until' => '17:00']
+                        ],
                     ],
-                    '2017-09-07' => ['date' => '2017-09-07', 'open' => true, 'hours' => [
-                        0 => ['from' => '09:00', 'until' => '12:00'],
-                        1 => ['from' => '13:00', 'until' => '17:00']],
+                    [
+                        'date' => '2017-09-07',
+                        'open' => true,
+                        'hours' => [
+                            0 => ['from' => '09:00', 'until' => '12:00'],
+                            1 => ['from' => '13:00', 'until' => '17:00']
+                        ],
                     ],
-                    '2017-09-08' => ['date' => '2017-09-08', 'open' => true, 'hours' => [
-                        0 => ['from' => '09:00', 'until' => '12:00'],
-                        1 => ['from' => '13:00', 'until' => '17:00']],
+                    [
+                        'date' => '2017-09-08',
+                        'open' => true,
+                        'hours' => [
+                            0 => ['from' => '09:00', 'until' => '12:00'],
+                            1 => ['from' => '13:00', 'until' => '17:00']
+                        ],
                     ],
-                    '2017-09-09' => ['date' => '2017-09-09', 'open' => true, 'hours' => [
-                        0 => ['from' => '10:00', 'until' => '12:00'],
-                    ]],
-                    '2017-09-10' => ['date' => '2017-09-10', 'open' => false, 'hours' => []],
+                    [
+                        'date' => '2017-09-09',
+                        'open' => true,
+                        'hours' => [
+                            0 => ['from' => '10:00', 'until' => '12:00'],
+                        ]
+                    ],
+                    ['date' => '2017-09-10', 'open' => false, 'hours' => []],
                 ],
             ];
         }
