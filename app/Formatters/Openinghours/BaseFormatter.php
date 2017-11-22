@@ -76,20 +76,30 @@ abstract class BaseFormatter implements FormatterInterface
     {
         $text = '';
         foreach ($openinghours as $ohObj) {
+            $text .= trans('openinghourApi.day_' . date('w', strtotime($ohObj->date))) . ' ';
             $text .= date($this->dateFormat, strtotime($ohObj->date)) . ': ';
             if (!$ohObj->open) {
-                $text .= '   ' . trans('openinghourApi.CLOSED');
+                $text .= trans('openinghourApi.CLOSED');
                 $text .= PHP_EOL;
                 continue;
             }
-
+            $hours = [];
             foreach ($ohObj->hours as $hoursObj) {
-                $text .= '   ' . trans('openinghourApi.FROM_HOUR') . ' ' . date(
+                $hours[] = date(
                     $this->timeFormat,
-                 strtotime($hoursObj['from'])
-                ) . "  " . trans('openinghourApi.UNTIL_HOUR') . " " .
+                    strtotime($hoursObj['from'])
+                ) . "-" .
                 date($this->timeFormat, strtotime($hoursObj['until']));
             }
+
+            // implode hours[] with ', ' but make last ', '  =>  "and"
+            // to result in for example 'HH:ii-HH:ii, HH:ii-HH:ii, HH:ii-HH:ii and HH:ii-HH:ii'
+            // https://stackoverflow.com/a/8586179
+            $last = array_slice($hours, -1);
+            $first = implode(', ', array_slice($hours, 0, -1));
+            $both = array_filter(array_merge([$first], $last), 'strlen');
+            $text .= implode(' ' . trans('openinghourApi.AND') . ' ', $both);
+
             $text .= PHP_EOL;
         }
         $text .= PHP_EOL;
