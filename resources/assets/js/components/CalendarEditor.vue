@@ -122,12 +122,30 @@
                 calLabel: '',
                 days: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'],
                 fullDays,
-                presets: [],
                 presetSelection: [],
                 showPresets: false,
+                storedPresets: null,
             }
         },
         computed: {
+            presets() {
+                if (!this.storedPresets) {
+                    Services.methods.fetchPresets(this.$root.routeVersion.start_date, this.$root.routeVersion.end_date,
+                        data => {
+                            data.sort((a, b) => a.start_date > b.start_date ? 1 : -1);
+
+                            for (let i = data.length - 2; i >= 0; i--) {
+                                const year = (data[i + 1].start_date || '').slice(0, 4);
+                                if (year !== (data[i].start_date || '').slice(0, 4)) {
+                                    data[i + 1].group = year;
+                                }
+                            }
+
+                            this.storedPresets = data;
+                        })
+                }
+                return this.storedPresets;
+            },
             events() {
                 return this.cal.events
             },
@@ -224,22 +242,6 @@
         },
         created() {
             this.RRule = RRule || {};
-
-            //fetch presets from services.js
-            //set this.presets last to update bindings
-            Services.methods.fetchPresets((data) => {
-
-                data.sort((a, b) => a.start_date > b.start_date ? 1 : -1);
-
-                for (let i = data.length - 2; i >= 0; i--) {
-                    const year = (data[i + 1].start_date || '').slice(0, 4);
-                    if (year !== (data[i].start_date || '').slice(0, 4)) {
-                        data[i + 1].group = year;
-                    }
-                }
-
-                this.presets = data;
-            })
         },
         mounted() {
             this.$set(this.cal, 'closinghours', !!this.cal.closinghours)
