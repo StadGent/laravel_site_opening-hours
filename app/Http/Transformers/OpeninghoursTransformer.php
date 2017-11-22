@@ -177,20 +177,27 @@ class OpeninghoursTransformer implements TransformerInterface
     {
         $text = '';
         foreach ($openinghours as $openinghoursObj) {
+            $text .= trans('openinghourApi.day_' . date('w', strtotime($openinghoursObj->date))) . ' ';
             $text .= date($this->localeService->getDateFormat(), strtotime($openinghoursObj->date)) . ': ';
             if (!$openinghoursObj->open) {
-                $text .= '   ' . trans('openinghourApi.CLOSED');
+                $text .= trans('openinghourApi.CLOSED');
                 $text .= PHP_EOL;
                 continue;
             }
 
+            $hours = [];
             foreach ($openinghoursObj->hours as $hoursArr) {
-                $text .= '   ' . trans('openinghourApi.FROM_HOUR') . ' ' . date(
-                        $this->localeService->getTimeFormat(),
-                        strtotime($hoursArr['from'])
-                    ) . "  " . trans('openinghourApi.UNTIL_HOUR') . " " .
+                $hours[] = date($this->localeService->getTimeFormat(), strtotime($hoursArr['from'])) . "-" .
                     date($this->localeService->getTimeFormat(), strtotime($hoursArr['until']));
             }
+
+            // implode hours[] with ', ' but make last ', '  =>  "and"
+            // to result in for example 'HH:ii-HH:ii, HH:ii-HH:ii, HH:ii-HH:ii and HH:ii-HH:ii'
+            // https://stackoverflow.com/a/8586179
+            $last = array_slice($hours, -1);
+            $first = implode(', ', array_slice($hours, 0, -1));
+            $both = array_filter(array_merge([$first], $last), 'strlen');
+            $text .= implode(' ' . trans('openinghourApi.AND') . ' ', $both);
             $text .= PHP_EOL;
         }
         $text .= PHP_EOL;

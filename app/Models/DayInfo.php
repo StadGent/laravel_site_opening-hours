@@ -33,18 +33,30 @@ class DayInfo
     }
 
     /**
+     * pretty print DayInfo Obj
+     *
      * @return string
      */
     public function __toString()
     {
-        $theString = '[' . $this->date . ' => [' .
+        $theString = '[' . $this->date . ' => [' . PHP_EOL .
         'open => ' . (int) $this->open . ', ' .
             'hours => [';
         foreach ($this->hours as $hours) {
-            $theString .= '[from => ' . $hours->from . ', until' . $hours->until . '], ';
+            $theString .= PHP_EOL . '[from => ';
+            if (isset($hours['from'])) {
+                $theString .= $hours['from'];
+            }
+            $theString .= ', until => ';
+            if (isset($hours['until'])) {
+                $theString .= $hours['until'];
+            }
+            $theString .= '], ' . PHP_EOL;
         }
+
         if (isset($this->openNow)) {
-            $theString .= 'openNow => [status => ' . $this->openNow->status . ', label' . $this->openNow->label . '], ';
+            $theString .= 'openNow => [status => ' . $this->openNow->status .
+            ', label' . $this->openNow->label . '], ' . PHP_EOL;
         }
 
         $theString .= ']]';
