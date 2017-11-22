@@ -26,22 +26,19 @@
         <button class="btn btn-lg btn-default" @click="newRoleForUser(usr)">Nodig uit voor een dienst</button>
       </p>
     </div>
-    <div v-else-if="!filteredServices.length" class="table-message">
-      <h1>Deze zoekopdracht leverde geen resultaten op</h1>
-    </div>
-    <div v-else-if="isAdmin" class="row">
+    <div v-else-if="isAdmin">
       <table class="table table-hover table-service-admin">
         <thead>
           <tr>
-            <th-sort by="label">Dienst</th-sort>
+            <th-sort by="service_id">Dienst</th-sort>
             <th>Rol</th>
             <th class="text-right">Beheer gebruikers</th>
           </tr>
         </thead>
-        <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s" :role-of="usr"></tbody>
+        <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s"></tbody>
       </table>
     </div>
-    <div v-else class="row">
+    <div v-else>
       <table class="table table-hover table-service">
         <thead>
           <tr>
@@ -49,7 +46,7 @@
             <th>Rol</th>
           </tr>
         </thead>
-        <tbody is="row-user-service" v-for="s in sortedServices" :s="s" :role-of="usr"></tbody>
+        <tbody is="row-user-service" v-for="s in sortedServices" :s="s"></tbody>
       </table>
     </div>
   </div>
@@ -59,8 +56,6 @@
 import RowUserService from '../components/RowUserService.vue'
 import RowUserServiceAdmin from '../components/RowUserServiceAdmin.vue'
 import ThSort from '../components/ThSort.vue'
-
-import { expandUser } from '../mixins/users.js'
 
 import { orderBy } from '../lib.js'
 
@@ -80,7 +75,7 @@ export default {
       return this.$root.users || []
     },
     usr () {
-      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || this.fetchedUser || this.fetchUser(this.route.id) || {}
+      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || {}
     },
 
     // Services
@@ -88,33 +83,26 @@ export default {
       return this.$root.services || []
     },
     userServices () {
-      return this.services.filter(s => s.users.find(u => u.id == this.route.id))
+
+        return this.usr.roles || {};
+//      return this.services.filter(s => s.users.find(u => u.id == this.route.id))
     },
     filteredServices () {
-      return this.query ? this.userServices.filter(s => (s.label || '').indexOf(this.query) !== -1) : this.userServices
+
+        return this.userServices ;
+      //return this.query ? this.userServices.filter(s => (s.label || '').indexOf(this.query) !== -1) : this.userServices
     },
     sortedServices () {
-      const services = this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices
-      if (this.isAdmin) {
+      const services = this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices;
 
-        // TODO: do this enriching onload, like is done with users
-        services.forEach(s => {
-          Object.assign(s, {
-            activeUsers: s.users.filter(u => u.verified),
-            ghostUsers: s.users.filter(u => !u.verified)
-          })
-        })
-      }
+      services.forEach(s => {
+         s.label = this.$root.serviceById(s.service_id).label
+      });
+
       return services
     }
   },
   methods: {
-    fetchUser (id) {
-      this.$http.get('/api/users/' + id)
-        .then(({ data }) => {
-          this.fetchedUser = expandUser(data)
-        })
-    }
   },
   components: {
     RowUserService,

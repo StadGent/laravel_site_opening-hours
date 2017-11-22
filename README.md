@@ -11,7 +11,7 @@ Copy the .env.example to .env and
 - Fill in the base URI that is used to link to a data representation of something (=DATA_REPRESENTATION_URI)
 - Fill in the SPARQL configuration to read data from
 - Fill in the SPARQL configuration to write data to, don't forget the name of the graph and the specific endpoint of the sparql-graph-crud-auth, which is used to write (possibly) larger amounts of triples to.
-- Mails are sent through sendgrid, if available use an API key, if not implement a version of AppMailer and create a binding in the IoC
+- Mails are sent through SMTP
 - Set session driver to database (anything but file)
 - Set 1 worker in supervisor (https://laravel.com/docs/5.4/queues#supervisor-configuration) to handle the writes to the different systems (VESTA, LOD)
     Only using 1 will make sure no dirty read/writes will happen to the SPARQL endpoint, you can use supervisor or a custom system that keeps a Laravel worker up and running. Make sure that the worker is restarted after an update on the software. (php artisan queue:restart)
@@ -60,8 +60,7 @@ Note: this will import openinghours from 2017 up until 2020, make sure you refre
 
 ## Email
 
-Email is now done through SendGrid, simply add an API key to the .env variable.
-
+Email is now done through SMTP
 ## VESTA
 
 Output can be written to VESTA on a weekly basis by using a predefined command. This will write a weekschedule to VESTA

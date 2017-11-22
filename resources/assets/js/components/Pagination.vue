@@ -1,7 +1,6 @@
 <template>
   <transition name="slideup">
-    <div class="pagination-wrapper" v-if="lastPage">
-      <div class="container">
+    <div class="pagination-wrapper container" v-if="lastPage">
         <ul class="pagination pull-right">
           <li :class="{disabled:!currentPage}"><a href="#" @click.prevent="fetch(0)">Eerste</a></li>
           <li :class="{disabled:!currentPage}"><a href="#" @click.prevent="fetch(currentPage - 1)">Vorige</a></li>
@@ -22,12 +21,11 @@
           <li :class="{disabled:currentPage == lastPage}"><a href="#" @click.prevent="fetch(lastPage)">Laatste</a></li>
         </ul>
       </div>
-    </div>
   </transition>
 </template>
 
 <script>
-export const pageSize = 20
+export const pageSize = 20;
 
 export default {
   name: 'pagination',

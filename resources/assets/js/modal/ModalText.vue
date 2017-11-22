@@ -31,7 +31,6 @@
               <label for="recipient-name" class="control-label">Naam van de versie</label>
               <input type="text" class="form-control" v-model="modal.label" :placeholder="nextVersionLabel">
             </div>
-
             <div class="row form-group">
               <div class="col-sm-6">
                 <label for="start_date" class="control-label">Geldig van</label>
@@ -41,6 +40,10 @@
                 <label for="end_date" class="control-label">Verloopt op</label>
                 <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="pikadayEnd" />
               </div>
+            </div>
+            <div v-if="modal.id" class="alert alert-warning">
+              <strong>Opgelet!</strong> <br>
+              Wanneer je de einddatum wijzigt heeft dit geen effect op de einddatum van de bestaande uitzonderingen.
             </div>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
@@ -52,18 +55,17 @@
               <b>Pas op!</b> Het is de bedoeling dat je alleen mensen uitnodigt van Mijn Gent.
             </div>
           </div>
-
           <div v-if="modal.text == 'newUser' || modal.text == 'newRoleForUser'">
             <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
               <label for="recipient-name" class="control-label">Rol</label>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> Lid
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> {{$root.translateRole("Member")}}
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> Beheerder
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner">  {{$root.translateRole("Owner")}}
                 </label>
               </div>
             </div>
@@ -74,22 +76,23 @@
               </select>
             </div>
           </div>
+          <div v-if="this.modal.error" class="alert alert-danger" v-html="modal.error"></div>
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
-            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex">Voeg toe</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
+            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex || modal.wait">Voeg toe</button>
+            <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
-            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
+            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex || modal.wait">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+            <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">
-            <button type="submit" class="btn btn-primary" @click="createRole">Uitnodigen</button>
-            <button type="button" class="btn btn-default" @click="modalClose">Annuleer</button>
+            <button type="submit" class="btn btn-primary" @click="createRole" :disabled="modal.wait">Uitnodigen</button>
+            <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else>
-            <button type="submit" class="btn btn-primary" @click="modalClose">OK</button>
+            <button type="submit" class="btn btn-primary" @click="modalClose" :disabled="modal.wait">OK</button>
           </div>
         </div>
       </form>
@@ -100,8 +103,10 @@
 <script>
 import InputChannel from '../components/InputChannel.vue'
 import Pikaday from '../components/Pikaday.vue'
+import Status from '../components/Status.vue'
 
 import { Hub, toDatetime } from '../lib.js'
+import {CHOOSE_SERVICE, NO_VALID_EMAIL, OH_INVALID_RANGE} from "../constants";
 
 export default {
   computed: {
@@ -136,45 +141,53 @@ export default {
   },
   methods: {
     createChannel () {
+
+      this.modalWait();
+
       if (!this.modal.label) {
         this.modal.label = 'Algemeen'
       }
       Hub.$emit('createChannel', this.modal)
     },
     createVersion () {
+
+      this.modalWait();
+
       if (!this.modal.label) {
         this.modal.label = this.nextVersionLabel
       }
 
       // Align events with start_date and end_date
       if (this.modal.id && this.modal.calendars) {
-        const version = this.modal
+        const version = this.modal;
 
         // Look for events that pose problems
-        let invalid = false
+        let invalid = false;
         this.modal.calendars.forEach(cal => {
           cal.events.forEach(event => {
             if (cal.layer && (event.start_date < version.start_date || event.until > version.end_date)) {
               invalid = true
             }
           })
-        })
+        });
 
         if (invalid) {
-          return alert('Er mogen geen uitzonderingen beginnen voor de start of eindigen na het einde, van de de nieuwe begin/einddatum van de openingsurenversie.\n\nDe wijziging werd niet doorgevoerd, controleer of er uitzonderingen vroeger of later vallen dan de nieuwe gekozen tijdsperiode.')
+          this.modalResume();
+          this.modalError(OH_INVALID_RANGE);
+          return;
         }
 
         // Update the event until date
         this.modal.calendars.forEach(cal => {
-          let changed = false
+          let changed = false;
           cal.events.forEach(event => {
             if (!cal.layer) {
-              event.start_date = version.start_date + event.start_date.slice(10)
-              event.end_date = version.start_date + event.end_date.slice(10)
-              event.until = version.end_date
+              event.start_date = version.start_date + event.start_date.slice(10);
+              event.end_date = version.start_date + event.end_date.slice(10);
+              event.until = version.end_date;
               changed = true
             }
-          })
+          });
           if (changed) {
             Hub.$emit('createCalendar', cal)
           }
@@ -183,26 +196,41 @@ export default {
       Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },
     createRole () {
-      this.modal.strict = true
+
+      this.modalWait();
+
+      this.modal.strict = true;
+
+      if (!this.modal.usr && !this.validEmail) {
+        this.modalResume();
+        this.modalError(NO_VALID_EMAIL);
+        return;
+      }
       if (this.modal.usr) {
-        this.modal.user_id = this.modal.usr.id
+        this.modal.user_id = this.modal.usr.id;
+        this.modal.email = this.modal.usr.email;
       }
       if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
-        return
+        this.modalResume();
+        return;
       }
       if (!this.modal.service_id && !this.modal.srv) {
-        return alert('Kies een dienst')
+        this.modalResume();
+        this.modalError(CHOOSE_SERVICE);
+        return;
       }
-      Hub.$emit('createRole', this.modal)
+
+      Hub.$emit('inviteUser', this.modal)
     }
   },
   updated () {
-    const inp = this.$el.querySelector('input')
+    const inp = this.$el.querySelector('input');
     inp && inp.focus()
   },
   components: {
     InputChannel,
-    Pikaday
+    Pikaday,
+    Status,
   }
 }
 </script>

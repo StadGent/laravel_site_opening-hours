@@ -1,31 +1,29 @@
 <template>
-  <tbody>
     <tr :class="{'warning':!u.verified}" @click="href('#!user/'+u.id)">
-      <td>
-        {{ u.name }}
+      <td class="td-sortable">
+        <a v-if="this.$root.isAdmin" :href="'#!user/'+u.id">{{ u.name }}</a>
       </td>
-      <td>
+      <td class="td-sortable">
         {{ u.email }}
       </td>
-      <td @click.stop class="td-clickstop">
+      <td @click.stop class="td-clickstop td-sortable">
         <div v-if="! u.roles.length">-</div>
         <div>
           <div v-for="r in u.roles">
-            {{ r.role === 'Owner' ? 'Eigenaar' : 'Lid' }}
+            {{$root.translateRole(r.role)}}
             &nbsp;
             <a :href="'#!service/' + r.service_id">{{ $root.serviceById(r.service_id).label }}</a>
           </div>
         </div>
       </td>
-      <td v-if="u.verified" class="text-success">&checkmark;</td>
-      <td v-else class="text-warning">&cross;</td>
+      <td v-if="u.verified" class="text-success td-sortable">&checkmark;</td>
+      <td v-else class="text-warning td-sortable">&cross;</td>
       <td class="td-btn text-right" @click.stop>
         <button @click="rm" class="btn btn-default btn-icon">
           <i class="glyphicon glyphicon-trash"></i>
         </button>
       </td>
     </tr>
-  </tbody>
 </template>
 
 <script>
@@ -51,9 +49,6 @@ export default {
     }
   },
   methods: {
-    invite () {
-      Hub.$emit('inviteUser', this.u)
-    },
     rm () {
       Hub.$emit('deleteUser', this.u)
     }

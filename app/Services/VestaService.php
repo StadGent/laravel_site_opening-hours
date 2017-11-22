@@ -9,83 +9,195 @@ namespace App\Services;
 class VestaService
 {
     /**
-     * Update the opening hours output that was created for a
-     * certain service to the correct VESTA resource based on the VESTA UID
+     * SOAP client instance.
      *
-     * @param  string $vestaUid The UID of the service in VESTA
-     * @param  string $output   The openinghours output
-     * @return void
+     * @var SoapClient
      */
-    public function updateOpeninghours($vestaUid, $output)
+    protected $client;
+
+    /**
+     * Vesta user domain.
+     */
+    protected $domain;
+
+    /**
+     * Vesta username.
+     */
+    protected $username;
+
+    /**
+     * Vesta user password.
+     */
+    protected $password;
+
+    /**
+     * Singleton class instance.
+     *
+     * @var VestaService
+     */
+    private static $instance;
+
+    /**
+     * Private contructor for Singleton pattern
+     */
+    private function __construct()
     {
-        // Write the weekschedule to VESTA using a SOAP call
-        $userName = base64_encode(env('VESTA_USER', ''));
-        $password = base64_encode(env('VESTA_PASSWORD', ''));
-        $soapUrl = env('VESTA_ENDPOINT');
-
-        $soapBody = $this->makeSoapBody($vestaUid, $output, $userName, $password);
-
-        $headers = [
-            'Content-type: text/xml;charset="utf-8"',
-            'Accept: text/xml',
-            'Cache-Control: no-cache',
-            'Pragma: no-cache',
-            'SOAPAction:  http://tempuri.org/IVestaMaster/FillHours',
-            'Content-length: ' . strlen($soapBody),
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_URL, $soapUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERPWD, $userName . ':' . $password);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $soapBody);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        // Get the response in the most easiest way
-        preg_match('#.*<FillHoursResult>(.*?)</FillHoursResult>.*#', $response, $results);
-
-        if (! empty($results[1])) {
-            if ($results[1] == 'true') {
-                return true;
-            } else {
-                \Log::error('Something went wrong while writing the information to VESTA.', [
-                    'response' => $response
-                ]);
-            }
-        } else {
-            \Log::error('Something went wrong while writing the information to VESTA.', [
-                'response' => $response
-            ]);
-        }
-
-        return false;
     }
 
-    private function makeSoapBody($vestaUid, $output, $userName, $password)
+    /**
+     * GetInstance for Singleton pattern
+     *
+     * @return VestaService
+     */
+    public static function getInstance()
     {
-        return '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/" xmlns:ves="http://schemas.datacontract.org/2004/07/VestaDataMaster.Models">
-                    <soapenv:Header/>
-                    <soapenv:Body>
-                    <tem:FillHours>
-                    <tem:cred>
-                    <!--GENTGRP in base64-->
-                    <ves:Domain>R0VOVEdSUA==</ves:Domain>
-                    <!--password in base 64-->
-                    <ves:Password>' . $password . '</ves:Password>
-                    <!--sys_a_wsvesta_opuren in base64-->
-                    <ves:Username>' . $userName . '</ves:Username>
-                </tem:cred>
-                <tem:accountId>' . $vestaUid . '</tem:accountId>
-                <tem:hours><![CDATA[' . $output . ']]></tem:hours>
-            </tem:FillHours>
-            </soapenv:Body>
-            </soapenv:Envelope>';
+        if (!self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * @param null $wsdl
+     * @param null $username
+     * @param null $password
+     * @param null $domain
+     */
+    public function setClient($wsdl = null, $username = null, $password = null, $domain = null)
+    {
+        $wsdl = $wsdl ?: env('VESTA_ENDPOINT');
+        if (!$wsdl) {
+            throw new \SoapFault('WSDL', ('The path or URL to the SOAP WSDL has not been set.'));
+        }
+
+        if (substr($wsdl, -5) !== '?wsdl') {
+            $wsdl .= '?wsdl';
+        }
+        
+        $this->client = new \SoapClient($wsdl, [
+            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
+        ]);
+        $this->username = $username ?: env('VESTA_USER');
+        $this->password = $password ?: env('VESTA_PASSWORD');
+        $this->domain = $domain ?: env('VESTA_USER_DOMAIN');
+    }
+
+    /**
+     * Get the security object needed to create a Vesta connection
+     * @return stdClass with correct cred format
+     */
+    protected function getSecurity()
+    {
+        $security = new \stdClass();
+        $security->Domain = base64_encode($this->domain);
+        $security->Username = base64_encode($this->username);
+        $security->Password = base64_encode($this->password);
+
+        return $security;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getActionParams()
+    {
+        $parameters = new \stdClass();
+        $parameters->cred = $this->getSecurity();
+
+        return $parameters;
+    }
+
+    /**
+     * Update Openinghours in VESTA
+     *
+     * Assemble Soap call FillHours
+     * Check response for failing
+     * Return boolean for success
+     *
+     * @param  string $vestaUid
+     * @param  string $output
+     * @return boolean
+     */
+    public function updateOpeninghours($guid, $hours = '')
+    {
+        if (!$guid) {
+            throw new \Exception('A guid is required to update the data in VESTA');
+        }
+        $parameters = $this->getActionParams();
+        $parameters->accountId = $guid;
+        $parameters->hours = $hours;
+
+        $response = $this->getClient()->FillHours($parameters);
+        if (!isset($response->FillHoursResult)) {
+            \Log::error('Something went wrong in VESTA.', [
+                'response' => print_r($response, 1),
+            ]);
+
+            return false;
+        }
+
+        $fillHoursResult = json_decode($response->FillHoursResult);
+        if ($fillHoursResult !== 1) {
+            \Log::error('Something went wrong while writing the data to VESTA.', [
+                'response' => var_export($response, true),
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the data out of VESTA
+     * Only usefull as doublec heck
+     * returns the ves_openingsuren of the
+     *
+     * @param $guid
+     * @return mixed
+     */
+    public function getOpeningshoursByGuid($guid)
+    {
+        if (!$guid) {
+            throw new \Exception('A guid is required to request the data from VESTA');
+        }
+        $filterRule = new \stdClass();
+        $filterRule->Data = $guid;
+        $filterRule->Field = 'accountid';
+
+        $filters = new \stdClass();
+        $filters->Rules[] = $filterRule;
+
+        $search = $this->getActionParams();
+        $search->tableName = 'account';
+        $search->filters = $filters;
+
+        $result = $this->getClient()->SearchJSON($search);
+
+        if (!isset($result->SearchJSONResult)) {
+            return false;
+        }
+        $result = json_decode($result->SearchJSONResult);
+
+        if ($result->Total !== 1) {
+            return false;
+        }
+
+        return $result->Rows[0]->ves_openingsuren;
+    }
+
+    /**
+     * Lazily initialize the soap client.
+     *
+     * @return \SoapClient
+     */
+    protected function getClient()
+    {
+        if (!$this->client) {
+            $this->setClient();
+        }
+
+        return $this->client;
     }
 }
