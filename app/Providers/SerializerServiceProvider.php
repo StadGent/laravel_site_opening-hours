@@ -76,5 +76,4 @@ class SerializerServiceProvider extends ServiceProvider
             return \App\Services\SerializerService::getInstance();
         });
     }
-
 }
