@@ -1,6 +1,6 @@
 [
   {
-    "channel": "Tele-service",
+    "channel": "Web-service",
     "channelId": 1,
     "openinghours": [
       {
@@ -22,6 +22,26 @@
   {
     "channel": "Technical staff",
     "channelId": 2,
+    "openinghours": [
+      {
+        "date": "2017-09-15",
+        "open": true,
+        "hours": [
+          {
+            "from": "09:00",
+            "until": "12:00"
+          },
+          {
+            "from": "13:00",
+            "until": "17:00"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "channel": "Tele-service",
+    "channelId": 3,
     "openinghours": [
       {
         "date": "2017-09-15",
