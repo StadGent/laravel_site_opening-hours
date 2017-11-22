@@ -4,6 +4,7 @@ namespace Tests\Controllers\UI;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Mail;
 
 class RolesControllerTest extends \TestCase
 {
@@ -96,6 +97,7 @@ class RolesControllerTest extends \TestCase
      */
     public function testUIRoleRequests($userRole, $verb, $pathArg, $data, $statusCode)
     {
+        Mail::fake();
         $this->requestsByUserWithRoleAndCheckStatusCode($userRole, $verb, $pathArg, $data, $statusCode);
     }
 
