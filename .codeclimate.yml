@@ -31,3 +31,5 @@ exclude_paths:
 - resources/assets/sass/vendor/*
 - yarn.lock
 - gulpfile.js
+- tests/*
+

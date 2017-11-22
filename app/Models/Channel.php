@@ -12,14 +12,24 @@ class Channel extends Model
      * @var array
      */
     protected $fillable = [
-        'label', 'service_id'
+        'label', 'service_id',
     ];
 
+    /**
+     * Child Objects Openinghours
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function openinghours()
     {
         return $this->hasMany('App\Models\Openinghours');
     }
 
+    /**
+     * Parent Object Service
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function service()
     {
         return $this->belongsTo('App\Models\Service');

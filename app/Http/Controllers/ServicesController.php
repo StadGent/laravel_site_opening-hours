@@ -2,103 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use Illuminate\Http\Request;
-use App\Repositories\ServicesRepository;
 
 class ServicesController extends Controller
 {
-    public function __construct(ServicesRepository $services)
-    {
-        $this->middleware('auth');
-
-        $this->services = $services;
-    }
-
     /**
+     * Get all entities
+     *
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Illuminate\Database\Eloquent\Collection
      */
     public function index(Request $request)
     {
-        // An admin has access to all of the roles
-        if ($request->user()->hasRole('Admin')) {
-            return response()->json($this->services->get());
+        $label = $request->get('label', '');
+        $uri = $request->get('uri', '');
+
+        $services = Service::where('label', 'like', '%' . $label . '%');
+
+        if (!empty($uri)) {
+            $services->where('uri', $uri);
         }
 
-        return response()->json($this->services->getForUser($request->user()->id));
+        return $services->get();
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get with id
      *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Base get and return the service
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \App\Models\Service
      */
-    public function store(Request $request)
+    public function show(Service $service)
     {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        // The only field we allow to be updated is the draft flag
-        $draft = $request->input('draft', null);
-
-        if (! is_null($draft)) {
-            $this->services->update($id, ['draft' => $draft]);
-        }
-
-        return response()->json($this->services->getById($id));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int                       $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        throw new Exception('Not yet implemented');
+        return $service;
     }
 }

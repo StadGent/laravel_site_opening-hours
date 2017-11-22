@@ -44,6 +44,9 @@ class DeleteLodOpeninghours implements ShouldQueue
      */
     public function handle()
     {
-        app(LodOpeninghoursRepository::class)->deleteOpeninghours($this->openinghoursId);
+        $result = app(LodOpeninghoursRepository::class)->deleteOpeninghours($this->openinghoursId);
+        if (!$result) {
+            $this->fail(new \Exception(sprintf('The %s job failed with service id %s and opening hours id %s. Check the logs for details', static::class, $this->serviceId, $this->openinghoursId)));
+        }
     }
 }
