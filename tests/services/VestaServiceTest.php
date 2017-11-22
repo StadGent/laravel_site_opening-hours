@@ -31,19 +31,6 @@ class VestaServiceTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testItThrowsAnErrorWhenInvallidWSDLEndpoint()
-    {
-        if (env('APP_SKIP_TRAVIS_TEST')) {
-            return;
-        }
-        $this->setExpectedException('SoapFault', "The path or URL to the SOAP WSDL should end with 'wsdl'.");
-        $this->vestaService->setClient('notAWSDLEndpoint');
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
     public function testItThrowsAnErrorWhenNoGuidInUpdateRequest()
     {
         if (env('APP_SKIP_TRAVIS_TEST')) {
