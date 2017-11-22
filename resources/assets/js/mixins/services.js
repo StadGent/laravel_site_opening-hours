@@ -141,8 +141,9 @@ export default {
             return this.services.find(s => s.id === id) || {};
         },
         fetchPresets(next) {
-            //todo save these
-            Vue.http.get(API_PREFIX + '/presets')
+            //todo get presets with start_date and end_date
+            Vue.http.get(API_PREFIX + '/presets?start_date=2017-01-01&end_date=2020-12-31')
+            //Vue.http.get(API_PREFIX + '/presets')
                 .then(({data}) => {
                     next(data);
                 }).catch(fetchError);
