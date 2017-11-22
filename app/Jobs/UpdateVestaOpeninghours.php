@@ -41,13 +41,10 @@ class UpdateVestaOpeninghours implements ShouldQueue
      */
     public function handle()
     {
-        // Call the VestaService to write the output away
-        $output = '';
 
         try {
-            $openinghoursService = app('OpeninghoursService');
-            $openinghoursService->isOpenForFullWeek();
-            $output = $formatter->render('html', $openinghoursService->getData());
+            // TODO : generate html output for full week
+            $output = '';
         } catch (\Exception $ex) {
             \Log::warning('No output was created for VESTA for service with UID ' . $this->vestaUid);
         }

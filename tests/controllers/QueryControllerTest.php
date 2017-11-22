@@ -416,7 +416,7 @@ class QueryControllerTest extends \TestCase
 
         foreach ($content as $channelBlock) {
             // first 0 key is monday
-            $this->assertFalse($channelBlock['openinghours']['2017-09-04']['open']);
+            $this->assertFalse($channelBlock['openinghours'][0]['open']);
         }
     }
 

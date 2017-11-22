@@ -44,9 +44,9 @@ class UpdateSchedulesInVesta extends Command
 
         foreach ($vestaServices as $vestaService) {
             try {
-                $openinghoursService = app('OpeninghoursService');
-                $openinghoursService->isOpenForFullWeek();
-                $output = app('OpeninghoursFormatter')->render('html', $openinghoursService->getData());
+                // TODO : generate html output for this week and update vesta
+                $output = '';
+
                 app('VestaService')->updateOpeninghours($vestaService->identifier, $output);
                 $this->info('Openingsuren voor dienst ' . $vestaService->label . ' met UID ' . $vestaService->identifier . ' werden geupdatet.');
             } catch (\Exception $ex) {
