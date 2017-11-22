@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Http\Transformers;
-
 
 use App\Models\Channel;
 use App\Models\DayInfo;
@@ -91,7 +89,6 @@ class OpeninghoursTransformer implements TransformerInterface
         $dataCollection = [];
 
         foreach ($channels as $channel) {
-
             if (!isset($dataCollection[$channel->id])) {
                 $dataCollection[$channel->id] = [
                     'channel' => $channel->label,
@@ -114,8 +111,6 @@ class OpeninghoursTransformer implements TransformerInterface
                     $dataCollection[$channel->id]['openinghours'][] = new DayInfo($day);
                 }
             }
-
-
         }
 
         return array_values($dataCollection);
@@ -162,11 +157,11 @@ class OpeninghoursTransformer implements TransformerInterface
 
             if ($this->includeIsOpenNow) {
                 $open = $ical->getOpenAt($this->start);
-                $dataCollection[$channel->id]['openNow']['label'] = $open ? trans('openinghourApi.OPEN') : trans('openinghourApi.CLOSED');
+                $label = $open ? trans('openinghourApi.OPEN') : trans('openinghourApi.CLOSED');
+                $dataCollection[$channel->id]['openNow']['label'] = $label;
                 $dataCollection[$channel->id]['openNow']['status'] = $open ? true : false;
             }
         }
-
     }
 
     /**
@@ -239,14 +234,14 @@ class OpeninghoursTransformer implements TransformerInterface
         foreach ($data as $channelArr) {
             $channelSpecification = $graph->resource(createChannelUri($channelArr['channelId']), 'cv:Channel');
             $channelSpecification->addLiteral('schema:label', $channelArr['channel']);
-            if (isset($channelObj['openNow'])) {
+            if (isset($channelArr['openNow'])) {
                 $channelSpecification->addLiteral(
                     'schema:isOpenNow',
                     ($channelArr['openNow']['status']) ? 'true' : 'false'
                 );
             } else {
-                $channelSpecification->addLiteral('schema:openingHours',
-                    $this->makeTextForDayInfo($channelArr['openinghours']));
+                $textDayInfo = $this->makeTextForDayInfo($channelArr['openinghours']);
+                $channelSpecification->addLiteral('schema:openingHours', $textDayInfo);
             }
             $channelSpecification->addResource('cv:isOwnedBy', $service);
         }
@@ -330,5 +325,4 @@ class OpeninghoursTransformer implements TransformerInterface
 
         return $formattedSchedule;
     }
-
 }

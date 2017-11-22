@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Http\Transformers;
-
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -68,5 +66,4 @@ class ServiceTransformer implements TransformerInterface
 
         return json_encode($dataCollection);
     }
-
 }

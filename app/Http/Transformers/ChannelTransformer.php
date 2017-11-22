@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Http\Transformers;
-
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -31,13 +29,14 @@ class ChannelTransformer implements TransformerInterface
      * @param Model $channel
      * @return array
      */
-    private function getItemData(Model $channel){
+    private function getItemData(Model $channel)
+    {
         return [
             'id' => $channel->id,
             'label' => $channel->label,
             'serviceId' => $channel->service_id,
-            'createdAt' =>  $channel->created_at->format( 'Y-m-d\TH:i:s\Z'),
-            'updatedAt' => $channel->created_at->format( 'Y-m-d\TH:i:s\Z'),
+            'createdAt' => $channel->created_at->format('Y-m-d\TH:i:s\Z'),
+            'updatedAt' => $channel->created_at->format('Y-m-d\TH:i:s\Z'),
         ];
     }
 
@@ -64,5 +63,4 @@ class ChannelTransformer implements TransformerInterface
 
         return json_encode($dataCollection);
     }
-
 }
