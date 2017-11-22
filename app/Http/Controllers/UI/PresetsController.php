@@ -63,7 +63,6 @@ class PresetsController extends Controller
         DefaultEvent::where('rrule', 'FREQ=YEARLY')->get()
             ->each(function ($event) use ($startPeriode) {
                 $obj = new \stdClass();
-                $tmpEnd = new Carbon($event->end_date);
                 // set start from FREQ not too far from start periode
                 $tmpStart = new Carbon($event->start_date);
                 if ($tmpStart->year < $startPeriode->year) {
