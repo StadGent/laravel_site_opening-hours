@@ -115,7 +115,12 @@ return [
         'en_US' => ['date' => 'm-d', 'time' => 'h:i A'],
         'de_DE' => ['date' => 'd.m', 'time' => 'H:i'],
         'es_ES' => ['date' => 'd-m', 'time' => 'H:i'],
+    ],
 
+    'supported_exception_callendars' => [
+        'feestdagen' => 'https://data.stad.gent/sites/default/files/feestdagen-nl-BE.ical',
+        'schoolvakanties' => 'https://data.stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
+        'gentsefeesten' => 'https://data.stad.gent/sites/default/files/gentsefeesten-nl-BE.ical',
     ],
 
     /*
