@@ -176,7 +176,7 @@
                 }
 
                 // Cannot save a calendar with no events
-                if (this.events.length === 0) {
+                if (!this.showPresets && this.events.length === 0) {
                     return true;
                 }
 
@@ -241,7 +241,8 @@
                 if (!this.calLabel || this.calLabel === 'Uitzondering') {
                     return console.warn('Expected calendar name')
                 }
-                this.cal.label = this.calLabel
+                this.showPresets = false;
+                this.cal.label = this.calLabel;
                 Hub.$emit('createCalendar', this.cal)
             },
             rmCalendar() {
