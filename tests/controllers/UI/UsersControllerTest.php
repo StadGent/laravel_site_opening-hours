@@ -107,6 +107,7 @@ class UsersControllerTest extends \TestCase
      */
     public function testWhenAdminIsMadeOwnerHeIsRemovedFromTheGlobalAdminRole()
     {
+        Mail::fake();
         $adminUser = \App\Models\User::where('name', 'adminuser')->first();
         $this->actingAs($adminUser, 'api');
 
