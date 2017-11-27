@@ -178,20 +178,16 @@
 
                 const maxLayer = Math.max.apply(0, this.calendars.map(c => parseInt(c.layer)));
 
-                const newCal = this.calendars.length ? createCalendar(maxLayer + 1, {
-                    start_date: toDatetime(this.version.start_date)
-                }) : createFirstCalendar(this.version);
+                const newCal = this.calendars.length ? createCalendar(maxLayer + 1) : createFirstCalendar(this.version);
 
                 Hub.$emit('createCalendar', newCal);
             },
             formatDate(string) {
-                let date = new Date(string).toLocaleDateString();
-                if (date !== 'Invalid date') {
-                    return date;
+
+                if(!string) {
+                    return 'DD-MM-YYYY';
                 }
-                else {
-                    return '';
-                }
+                return string.slice(8,10) + '-' + string.slice(5,7) + '-' + string.slice(0,4);
             }
         },
         components: {

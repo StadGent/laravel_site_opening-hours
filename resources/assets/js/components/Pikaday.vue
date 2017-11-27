@@ -22,11 +22,11 @@ export default {
     opts () {
       return Object.assign({
         firstDay: 1,
-        format: 'DD-MM-YYYY',
+        format: 'YYYY-MM-DD',
         onSelect: (date) => {
           // Correct for timezone
-          date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
-          this.$emit('input', date.toJSON().slice(0, 10))
+          date.setTime(date.getTime() - (date.getTimezoneOffset() * 60000));
+          this.$emit('input', moment.utc(date).format('YYYY-MM-DD'));
         }
       },
       pikadayOptions,

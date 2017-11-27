@@ -23,9 +23,9 @@ export function createFirstEvent(version) {
 export function createEvent({ label, start_date, end_date, rrule, until }) {
 
   return {
-    start_date: (start_date || new Date()).toJSON().slice(0, 11) + '09:00:00',
-    end_date: (start_date || new Date()).toJSON().slice(0, 11) + '17:00:00',
-    until: (until || new Date(start_date.valueOf() + 36e5 * 24)).toJSON().slice(0, 11) + '00:00:00',
+    start_date: (start_date || new Date()).toJSON().slice(0, 11) + '09:00:00Z',
+    end_date: (start_date || new Date()).toJSON().slice(0, 11) + '17:00:00Z',
+    until: (until || new Date(start_date.valueOf() + 36e5 * 24)).toJSON().slice(0, 11) + '00:00:00Z',
     rrule: rrule || 'FREQ=DAILY',
     label: (label || '1').toString()
   }
@@ -41,16 +41,13 @@ export function createFirstCalendar(version) {
   }
 }
 
-export function createCalendar(layer, { start_date }) {
+export function createCalendar(layer) {
   return {
     closinghours: true,
     layer: layer,
     label: 'Uitzondering',
     priority: -layer,
-    events: [createEvent({
-      start_date,
-      label: '1'
-    })]
+    events: []
   }
 }
 

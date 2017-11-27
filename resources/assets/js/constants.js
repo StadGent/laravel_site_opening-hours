@@ -25,3 +25,5 @@ export const UNKNOWN_ERROR = 'Er is een onbekende fout opgetreden.';
 export const VAGUE_ERROR = 'Neem een print screen en neem contact op met de servicedesk.';
 export const ID_MISSING = 'ID ontbreekt';
 export const COULD_NOT_DENY_ACCESS = 'Toegang kon niet ontzegd worden.';
+export const EVENT_INVALID_RANGE = 'Een event mag niet starten of eindigen buiten de periode van de kalender.';
+export const IS_RECREATEX = 'Recreatex data kan hier niet gewijzigd worden.';
