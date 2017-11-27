@@ -77,7 +77,6 @@ export function expiresOn(ohs) {
     let end_date = today;
     let count = ohs.length;
 
-    //
     for (let i = 0; i < count; i++) {
         let nextIndex = ohs.findIndex(oh => isInUseOn(oh, end_date));
         let nextOh = ohs.splice(nextIndex, 1).pop();
@@ -95,7 +94,7 @@ export function expiresOn(ohs) {
 /** Date functions **/
 
 export function nextDateString(dateString) {
-    return new Date(Date.parse(dateString) + DAY_IN_MS).toJSON().slice(0, 10);
+    return toDatetime(moment(dateString).add(1, 'days')).format();
 }
 
 export function toTime(d) {
