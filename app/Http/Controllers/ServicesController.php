@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Transformers\ServiceTransformer;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ServicesController extends Controller
 {
@@ -26,6 +28,8 @@ class ServicesController extends Controller
             $services->where('uri', $uri);
         }
 
+        $services->where('draft', false);
+
         return response()->collection(new ServiceTransformer(), $services->get());
     }
 
@@ -37,6 +41,12 @@ class ServicesController extends Controller
      */
     public function show(Service $service)
     {
+        if($service->draft){
+            $exception = new ModelNotFoundException();
+            $exception->setModel(Service::class);
+            throw $exception;
+        }
+
         return response()->item(new ServiceTransformer(), $service);
     }
 }

@@ -21,6 +21,12 @@ class ChannelController extends Controller
      */
     public function show(Service $service, Channel $channel)
     {
+        if($service->draft){
+            $exception = new ModelNotFoundException();
+            $exception->setModel(Service::class);
+            throw $exception;
+        }
+
         if (!$service->channels->find($channel)) {
             $message = "The requested channel is not a child of the service in the path";
             $exception = new ModelNotFoundException($message);
@@ -40,6 +46,12 @@ class ChannelController extends Controller
      */
     public function getFromService(Service $service)
     {
+        if($service->draft){
+            $exception = new ModelNotFoundException();
+            $exception->setModel(Service::class);
+            throw $exception;
+        }
+
         return response()->collection(new ChannelTransformer(), $service->channels);
     }
 }
