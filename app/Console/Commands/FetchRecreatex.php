@@ -460,7 +460,7 @@ class FetchRecreatex extends Command
      * @param $year
      * @return array
      */
-    private function getOpeninghoursList($year)
+    protected function getOpeninghoursList($year)
     {
         $parameters = [
             'Context' => [
@@ -651,5 +651,19 @@ class FetchRecreatex extends Command
         }
 
         return $this->soapClient;
+    }
+
+    /**
+     * @param $year
+     */
+    public function setCalendarStartYear($year){
+        $this->calendarStartYear = $year;
+    }
+
+    /**
+     * @param $year
+     */
+    public function setCalendarEndYear($year){
+        $this->calendarEndYear = $year;
     }
 }
