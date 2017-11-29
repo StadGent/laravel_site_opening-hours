@@ -69,7 +69,6 @@ class FetchRecreatexTest extends \TestCase
         // Now we check if the values are inserted into the database as expected
         $this->assertEquals(1, $service->channels->count());
         $channel = $service->channels->first();
-        $this->assertEquals('Infrastructuur', $channel->label);
         $this->assertEquals(1, $channel->openinghours->count());
         $openinghours = $channel->openinghours->first();
         $this->assertEquals($openinghours->label, 'Geïmporteerde kalender2017-01-01 -2017-12-31');
@@ -77,7 +76,6 @@ class FetchRecreatexTest extends \TestCase
         $this->assertEquals($openinghours->end_date, '2017-12-31');
         $this->assertCount(1, $openinghours->calendars);
         $calendar = $openinghours->calendars->first();
-        $this->assertEquals('Openingsuren', $calendar->label);
         $this->assertEquals(75, $calendar->events->count());
 
         foreach ($this->getEventListCriteria() as $criteria){
