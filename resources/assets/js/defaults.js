@@ -1,14 +1,10 @@
-export const VERSION_YEARS = 2
+export const VERSION_YEARS = 2;
 
-const startYear = new Date().getFullYear()
-const untilYear = startYear + VERSION_YEARS
+const startYear = moment().year();
+const untilYear = moment().add(VERSION_YEARS, 'years').year();
 
-const defaultStart = startYear + '-01-01T00:00:00'
-const defaultEnd = startYear + '-01-02T00:00:00'
-const defaultUntil = (untilYear - 1) + '-12-31'
-
-const firstEventStart = startYear + '-01-01T09:00:00'
-const firstEventEnd = startYear + '-01-01T17:00:00'
+const defaultStart = moment().format('YYYY-MM-DD') + 'T00:00:00';
+const defaultUntil = moment().add(1, 'years').month(11).date(31).format('YYYY-MM-DD') + 'T00:00:00';
 
 export function createFirstEvent(version) {
   return {

@@ -85,15 +85,11 @@
                 <button type="submit" class="btn btn-primary" @click.prevent="showPresets = true"
                         v-if="cal.label == 'Uitzondering' && !showPresets">Volgende
                 </button>
-                <button type="button"
-                        class="btn btn-primary"
-                        @click="save"
-                        v-else
-                        :disabled="disabled">Bewaar</button>
-
-            </div>
-            <div class="alert alert-danger" v-if="disabled && disabled !== true">
-                {{ disabled }}
+                <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
+                <button type="submit" class="btn btn-primary" @click="saveLabel"
+                        v-else-if="cal.label == 'Uitzondering'">Bewaar
+                </button>
+                <button type="button" class="btn btn-primary" @click="save" v-else>Bewaar</button>
             </div>
         </div>
     </form>
@@ -179,6 +175,11 @@
                     return true
                 }
 
+                // Cannot save a calendar with no events
+                if (!this.showPresets && this.events.length === 0) {
+                    return true;
+                }
+
                 return false;
             },
             versionStartDate() {
@@ -240,7 +241,8 @@
                 if (!this.calLabel || this.calLabel === 'Uitzondering') {
                     return console.warn('Expected calendar name')
                 }
-                this.cal.label = this.calLabel
+                this.showPresets = false;
+                this.cal.label = this.calLabel;
                 Hub.$emit('createCalendar', this.cal)
             },
             rmCalendar() {

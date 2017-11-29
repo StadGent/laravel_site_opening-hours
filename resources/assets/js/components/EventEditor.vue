@@ -16,7 +16,7 @@
         </div>
         <div v-if="event.rrule">
             <!-- Choose the period -->
-            <div class="form-group" v-if="!prevEventSameLabel && $parent.cal.layer">
+            <div class="form-group" v-if="$parent.cal.layer">
                 <div class="col-xs-5">
                     <label>Regelmaat</label>
                     <select v-model="optionFreq" class="form-control" aria-label="Regelmaat">
@@ -233,10 +233,6 @@
         computed: {
             closinghours() {
                 return this.$parent.cal.closinghours
-            },
-            // If the label of the previous event is the same, you can not choose the period
-            prevEventSameLabel() {
-                return this.event.label && (this.parent[this.prop - 1] || {}).label == this.event.label;
             },
             // The current event being edited
             event() {
