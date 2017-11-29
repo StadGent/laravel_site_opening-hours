@@ -2,6 +2,11 @@
 
 namespace App\Services;
 
+use App\Jobs\DeleteLodOpeninghours;
+use App\Jobs\UpdateLodOpeninghours;
+use App\Jobs\UpdateVestaOpeninghours;
+use App\Models\Openinghours;
+
 /**
  * This class writes text to the VESTA application based on a certain VESTA UID
  * Kudos to stackoverflow so that ancient protocols can still be used: http://stackoverflow.com/questions/14770898/soapenvelope-soap-envenvelope-php
@@ -199,5 +204,40 @@ class VestaService
         }
 
         return $this->client;
+    }
+
+    /**
+     * Creat Jobs to sync data to external services
+     *
+     * Make job for VESTA update when given openinghours is active
+     * and hase vesta source.
+     * Make job update LOD or delete LOD
+     *
+     * @param  Openinghours $openinghours
+     * @param  string       $type
+     */
+    public function makeSyncJobsForExternalServices(Openinghours $openinghours, $type)
+    {
+        if (!in_array($type, ['update', 'delete'])) {
+            throw new \Exception('Define correct type of sync to external services', 1);
+        }
+
+        $channel = $openinghours->channel;
+        $service = $channel->service;
+
+        if ($openinghours->active) {
+            if (!empty($service) && $service->source == 'vesta') {
+                dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
+            }
+        }
+
+        switch ($type) {
+            case 'update':
+                dispatch(new UpdateLodOpeninghours($service->id, $openinghours->id, $channel->id));
+                break;
+            case 'delete':
+                dispatch(new DeleteLodOpeninghours($service->id, $openinghours->id));
+                break;
+        }
     }
 }

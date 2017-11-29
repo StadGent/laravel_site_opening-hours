@@ -140,11 +140,12 @@ export default {
         serviceById(id) {
             return this.services.find(s => s.id === id) || {};
         },
-        fetchPresets(next) {
-            //todo save these
-            Vue.http.get(API_PREFIX + '/presets')
+        fetchPresets(start, end, next) {
+            Vue.http.get(API_PREFIX + '/presets?start_date='+ start + '&end_date=' + end)
                 .then(({data}) => {
-                    next(data);
+                    if (next) {
+                        next(data);
+                    }
                 }).catch(fetchError);
         },
         patchServiceStatus(service, activate) {

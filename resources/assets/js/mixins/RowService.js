@@ -1,9 +1,7 @@
 import {hasActiveOh, hasOh} from "../lib";
 import {
     SERVICE_COMPLETE, SERVICE_COMPLETE_TOOLTIP, SERVICE_INACTIVE_OH, SERVICE_INACTIVE_OH_TOOLTIP, SERVICE_MISSING_OH,
-    SERVICE_MISSING_OH_TOOLTIP, SERVICE_NO_CH, SERVICE_NO_CH_TOOLTIP,
-    TEST
-} from "../constants";
+    SERVICE_MISSING_OH_TOOLTIP, SERVICE_NO_CH, SERVICE_NO_CH_TOOLTIP} from "../constants";
 
 export default {
     props: ['s'],
