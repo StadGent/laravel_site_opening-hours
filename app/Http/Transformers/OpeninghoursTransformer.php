@@ -32,6 +32,8 @@ class OpeninghoursTransformer implements TransformerInterface
 
     private $includeIsOpenNow;
 
+    private $hasOneChannel;
+
     /**
      * @return array
      */
@@ -78,6 +80,13 @@ class OpeninghoursTransformer implements TransformerInterface
     public function setIncludeIsOpenNow($includeIsOpenNow)
     {
         $this->includeIsOpenNow = $includeIsOpenNow;
+    }
+
+    /**
+     * @param $hasOneChannel
+     */
+    public function setHasOneChannel($hasOneChannel){
+        $this->hasOneChannel = $hasOneChannel;
     }
 
     /**
@@ -207,6 +216,9 @@ class OpeninghoursTransformer implements TransformerInterface
     public function transformJsonCollection(Collection $channels)
     {
         $data = $this->getCollectionData($channels);
+        if($this->hasOneChannel){
+            $data = array_first($data);
+        }
         return json_encode($data);
     }
 
