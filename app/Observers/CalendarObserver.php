@@ -23,6 +23,6 @@ class CalendarObserver
      */
     public function saved(Calendar $calendar)
     {
-        app('OpeninghoursService')->makeSyncJobsForExternalServices($calendar->openinghours, 'update');
+        app('VestaService')->makeSyncJobsForExternalServices($calendar->openinghours, 'update');
     }
 }

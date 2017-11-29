@@ -16,7 +16,7 @@
         </div>
         <div v-if="event.rrule">
             <!-- Choose the period -->
-            <div class="form-group" v-if="!prevEventSameLabel && $parent.cal.layer">
+            <div class="form-group" v-if="$parent.cal.layer">
                 <div class="col-xs-5">
                     <label>Regelmaat</label>
                     <select v-model="optionFreq" class="form-control" aria-label="Regelmaat">
@@ -180,7 +180,7 @@
                            placeholder="_ _ : _ _">
                 </div>
                 <div class="col-xs-3">
-                    <label >tot</label>
+                    <label>tot</label>
                     <input type="text" class="form-control control-time inp-endTime"
                            aria-label="tot"
                            v-model.lazy="eventEndTime"
@@ -234,10 +234,6 @@
             closinghours() {
                 return this.$parent.cal.closinghours
             },
-            // If the label of the previous event is the same, you can not choose the period
-            prevEventSameLabel() {
-                return this.event.label && (this.parent[this.prop - 1] || {}).label == this.event.label;
-            },
             // The current event being edited
             event() {
                 const event = this.parent[this.prop] || {};
@@ -253,22 +249,26 @@
             },
             eventStartDate: {
                 get() {
-                    return (this.event.start_date || '').slice(0, 10)
+                    if (this.event.start_date) {
+                        return moment.utc(this.event.start_date).format('YYYY-MM-DD');
+                    }
+                    else {
+                        return '';
+                    }
                 },
                 set(v) {
                     const endDate = toDatetime(this.event.end_date);
                     const startDate = toDatetime(this.event.start_date);
                     const duration = endDate - startDate;
-                    // console.debug('duration', duration)
 
                     // Keep duration the same if it's shorter than 2 days
                     if (!v) {
                         return console.warn('did not select date');
                     }
-                    this.event.start_date = v + ((this.event.start_date || '').slice(10, 19) || 'T00:00:00');
+                    this.event.start_date = v + ((this.event.start_date || '').slice(10, 20) || 'T00:00:00Z');
                     if (duration < 36e5 * 48) {
                         // Force end_date to be on same date as start_date
-                        this.event.end_date = this.event.start_date.slice(0, 11) + this.event.end_date.slice(11, 19);
+                        this.event.end_date = this.event.start_date.slice(0, 11) + this.event.end_date.slice(11, 20);
                     }
 
                     if (this.options.bymonthday) {
@@ -286,7 +286,7 @@
                 },
                 set() {
                     // Force end_date to be on same date as start_date
-                    this.event.end_date = v + ((this.event.start_date || '').slice(10, 19) || 'T00:00:00');
+                    this.event.end_date = v + ((this.event.start_date || '').slice(10, 20) || 'T00:00:00Z');
                 }
             },
             eventStartTime: {
@@ -331,7 +331,7 @@
             },
             eventUntil: {
                 get() {
-                    return toDatetime(this.event.until || this.versionEndDate).toJSON().slice(0, 10);
+                    return moment.utc(this.event.until || this.versionEndDate).format('YYYY-MM-DD');
                 },
                 set(v) {
                     this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 10);

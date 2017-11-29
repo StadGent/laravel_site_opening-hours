@@ -14,14 +14,14 @@ class LocaleService
     /**
      * Singleton class instance.
      *
-     * @var ChannelService
+     * @var LocaleService
      */
     private static $instance;
 
     /**
-     * @var string
+     * @var string|bool
      */
-    private $requestLocale = false;
+    private $activeLocale = false;
 
     /**
      * format from config locale_date_time_formats
@@ -30,7 +30,7 @@ class LocaleService
      *
      * @var array
      */
-    private $format = '';
+    private $format = [];
 
     /**
      * @param Request $request
@@ -38,20 +38,40 @@ class LocaleService
     public function setRequest(Request $request)
     {
         $httpAcceptLang = $request->server('HTTP_ACCEPT_LANGUAGE');
-        $this->requestLocale = $this->validateRequestLocale($httpAcceptLang);
-        \App::setLocale(substr($this->requestLocale, 0, 2));
-        $this->format = $this->fetchTheFormat($this->requestLocale);
+        $requestLocale = \Locale::acceptFromHttp($httpAcceptLang);
+        $this->setLocale($requestLocale);
     }
 
     /**
+     * Set locale for service and App
+     *
+     * input will be validated
+     * will be set for app
+     * will trigger the fetchTheFormat
+     *
+     * @param $locale
+     */
+    public function setLocale($locale)
+    {
+        $locale = str_replace('-', '_', $locale);
+        $this->activeLocale = $this->validateLocale($locale);
+        \App::setLocale(substr($this->activeLocale, 0, 2));
+        $this->format = $this->fetchTheFormat($this->activeLocale);
+    }
+
+    /**
+     * Validate suggested locale and returns format to be set in $this->activeLocale
+     *
+     * accept formats xx  or xx_XX
+     * example nl or nl_BE
+     *
      * @return string locale
      */
-    public function validateRequestLocale($httpAcceptLang)
+    public function validateLocale($suggestLocale)
     {
-        $requestLocale = \Locale::acceptFromHttp($httpAcceptLang);
         $localeLocations = array_keys(config('app.locale_date_time_formats'));
         foreach ($localeLocations as $locale) {
-            if ($locale === $requestLocale || substr($locale, 0, 2) === $requestLocale) {
+            if ($locale === $suggestLocale || substr($locale, 0, 2) === $suggestLocale) {
                 return $locale;
             }
         }
@@ -79,7 +99,7 @@ class LocaleService
      * Default no locale is given as argument
      * and the locale will be taken from the HTTP accept language
      *
-     * @param string/null $locale
+     * @param string /null $locale
      * @return string dateTime format
      */
     public function getDateFormat($locale = null)
@@ -97,7 +117,7 @@ class LocaleService
      * Default no locale is given as argument
      * and the locale will be taken from the HTTP accept language
      *
-     * @param string/null $locale
+     * @param string /null $locale
      * @return string dateTime format
      */
     public function getTimeFormat($locale = null)
@@ -110,6 +130,45 @@ class LocaleService
     }
 
     /**
+     * Get week start day based on the locale
+     *
+     * When no locale is given, the active locale is used
+     * IntlCalendar->getFirstDayOfWeek() -1 will be returned as value
+     *
+     * @param $locale
+     * @return integer
+     */
+    public function getWeekStartDay($locale = null)
+    {
+        $formats = config('app.locale_date_time_formats');
+        if (!$locale || !array_key_exists($locale, $formats)) {
+            $locale = $this->activeLocale;
+        }
+        $cal = \IntlCalendar::createInstance(null, $locale);
+
+        return ($cal->getFirstDayOfWeek() - 1);
+    }
+
+    /**
+     * Get week end day based on the locale
+     *
+     * Collect the $this->getWeekStartDay value
+     * add 6 day to get to the end of the week
+     * when result > 6 remove 7 days to get to correct CARBON::"day" value
+     *
+     * @param $locale
+     * @return integer
+     */
+    public function getWeekEndDay($locale = null)
+    {
+        $result = $this->getWeekStartDay($locale) + 6;
+
+        return ($result <= 6 ? $result : $result - 7);
+    }
+
+    /**
+     * Set the formats based on the locale
+     *
      * @param $locale
      * @return array
      */
@@ -117,9 +176,19 @@ class LocaleService
     {
         $formats = config('app.locale_date_time_formats');
         if (!$locale || !array_key_exists($locale, $formats)) {
-            $locale = $this->requestLocale;
+            $locale = $this->activeLocale;
         }
 
         return $formats[$locale];
+    }
+
+    public function setTimeFormat($timeFormat)
+    {
+        $this->format['time'] = $timeFormat;
+    }
+
+    public function setDateFormat($dateFormat)
+    {
+        $this->format['date'] = $dateFormat;
     }
 }
