@@ -21,6 +21,8 @@ class ChannelTransformerTest extends \TestCase
      */
     private $channel;
 
+    const DATETIME_REPLACEMENT = "/[0-9]{4}(-[0-9]{2}){2}T[0-9]{2}(:[0-9]{2}){2}\+[0-9]{2}:[0-9]{2}/";
+
     public function setup()
     {
         parent::setup();
@@ -38,8 +40,8 @@ class ChannelTransformerTest extends \TestCase
         $actual = $this->transformer->transformJsonItem($this->channel);
         $content = file_get_contents(__DIR__ . '/../data/transformers/channel/transformJsonItem.json');
         $expected = json_encode(json_decode($content,true));
-        $actual = preg_replace("/[0-9]{4}(-[0-9]{2}){2}T[0-9]{2}(:[0-9]{2}){2}Z/", "", $actual);
-        $actual = preg_replace("/[0-9]{4}(-[0-9]{2}){2}T[0-9]{2}(:[0-9]{2}){2}Z/", "", $actual);
+        $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
+        $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
         $this->assertEquals($expected, $actual);
     }
 
@@ -52,8 +54,8 @@ class ChannelTransformerTest extends \TestCase
         $actual = $this->transformer->transformJsonCollection((new Collection())->add($this->channel));
         $content = file_get_contents(__DIR__ . '/../data/transformers/channel/transformJsonCollection.json');
         $expected = json_encode(json_decode($content,true));
-        $actual = preg_replace("/[0-9]{4}(-[0-9]{2}){2}T[0-9]{2}(:[0-9]{2}){2}Z/", "", $actual);
-        $actual = preg_replace("/[0-9]{4}(-[0-9]{2}){2}T[0-9]{2}(:[0-9]{2}){2}Z/", "", $actual);
+        $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
+        $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
         $this->assertEquals($expected, $actual);
     }
 }

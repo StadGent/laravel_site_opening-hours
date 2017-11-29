@@ -35,8 +35,8 @@ class ChannelTransformer implements TransformerInterface
             'id' => $channel->id,
             'label' => $channel->label,
             'serviceId' => $channel->service_id,
-            'createdAt' => $channel->created_at->format('Y-m-d\TH:i:s\Z'),
-            'updatedAt' => $channel->created_at->format('Y-m-d\TH:i:s\Z'),
+            'createdAt' => $channel->created_at->format(DATE_ATOM),
+            'updatedAt' => $channel->created_at->format(DATE_ATOM),
         ];
     }
 
