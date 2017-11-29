@@ -2,47 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Formatters\OpeninghoursFormatter;
 use App\Http\Requests\GetQueryRequest;
+use App\Http\Transformers\OpeninghoursTransformer;
 use App\Models\Channel;
 use App\Models\Service;
-use App\Services\OpeninghoursService;
+use App\Services\LocaleService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Response;
 
 /**
  * Controller for query request
  */
 class QueryController extends Controller
 {
-    /**
-     * @var App\Services\OpeninghoursService
-     */
-    private $openinghoursService;
 
-    /**
-     * @var App\Formatters\OpeninghoursFormatter
-     */
-    private $openinghoursFormatter;
-
-    /**
-     * @var App\Service\LocaleService
-     */
     private $localeService;
 
-    /**
-     * constructor
-     *
-     * init OpeninghoursService
-     * init OpeninghoursFormatter
-     * init localeService
-     *
-     * @return void
-     */
     public function __construct()
     {
-        $this->openinghoursService = app('OpeninghoursService');
-        $this->openinghoursFormatter = app('OpeninghoursFormatter');
-        $this->localeService = app('LocaleService');
+        $this->localeService = app(LocaleService::class);
     }
 
     /**
@@ -51,21 +30,19 @@ class QueryController extends Controller
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function nowOpenAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
-        $this->localeService->setRequest($request);
-        $this->openinghoursService->isOpenNow($service, $channel, $request->input('testDateTime'));
-        // output format with json as default
-        $this->openinghoursFormatter->setRequest($request);
-        $output = $this->openinghoursFormatter->render(
-            $this->openinghoursService->getData()
-        );
+        $start = Carbon::now();
+        $end = $start->copy()->addMinute();
+        $testDateTime = $request->input('testDateTime');
 
-        return response($output)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
+        if (!is_null($testDateTime)) {
+            $start = new Carbon($testDateTime);
+        }
+
+        return $this->getResponse($request, $start, $end, $service, $channel, true);
     }
 
     /**
@@ -74,22 +51,14 @@ class QueryController extends Controller
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function fromTillAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $start = new Carbon($request['from']);
         $end = new Carbon($request['until']);
-        $output = $this->generateOutput(
-            $start->startOfDay(),
-            $end->endOfDay(),
-            $request,
-            $service,
-            $channel
-        );
 
-        return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
+        return $this->getResponse($request, $start, $end, $service, $channel);
     }
 
     /**
@@ -98,41 +67,35 @@ class QueryController extends Controller
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function dayAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $start = new Carbon($request['date']);
         $end = $start->copy()->endOfDay();
-        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
+        return $this->getResponse($request, $start, $end, $service, $channel);
     }
 
     /**
      * Collection of openinghours for one week
      *
-     * @todo  find week based on given locale
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function weekAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
-
         $this->localeService->setRequest($request);
         $date->setWeekStartsAt($this->localeService->getWeekStartDay());
         $date->setWeekEndsAt($this->localeService->getWeekEndDay());
 
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
-        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
+        return $this->getResponse($request, $start, $end, $service, $channel);
     }
 
     /**
@@ -141,17 +104,15 @@ class QueryController extends Controller
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function monthAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfMonth();
         $end = $date->copy()->endOfMonth();
-        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', $this->openinghoursFormatter->getActiveFormatter());
+        return $this->getResponse($request, $start, $end, $service, $channel);
     }
 
     /**
@@ -160,42 +121,47 @@ class QueryController extends Controller
      * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function yearAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
-        $output = $this->generateOutput($start, $end, $request, $service, $channel);
 
-        return response($output)->header('Access-Control-Allow-Origin', '*')
-            ->header('content-type', 'application/json');
+        return $this->getResponse($request, $start, $end, $service, $channel);
     }
 
     /**
-     * Get the data from the service
+     * Generate a response based on predefined parameters
      *
+     * @param GetQueryRequest $request
      * @param Carbon $start
      * @param Carbon $end
-     * @param GetQueryRequest $request
      * @param Service $service
      * @param Channel $channel
-     * @return mixed
+     * @param bool $includeIsOpenNow
+     * @return Response
      */
-    private function generateOutput(
+    public function getResponse(
+        GetQueryRequest $request,
         Carbon $start,
         Carbon $end,
-        GetQueryRequest $request,
         Service $service,
-        Channel $channel
+        Channel $channel,
+        $includeIsOpenNow = false
     ) {
         $this->localeService->setRequest($request);
-        $this->openinghoursService->collectData($start, $end, $service, $channel);
-        $this->openinghoursFormatter->setRequest($request);
 
-        return $this->openinghoursFormatter->render(
-            $this->openinghoursService->getData()
-        );
+        $transformer = new OpeninghoursTransformer();
+        $transformer->setStart($start);
+        $transformer->setEnd($end);
+        $transformer->setService($service);
+        $transformer->setLocaleService($this->localeService);
+        $transformer->setIncludeIsOpenNow($includeIsOpenNow);
+
+        $channels = isset($channel->id) ? (new Collection())->add($channel) : $service->channels;
+
+        return response()->collection($transformer, $channels);
     }
 }

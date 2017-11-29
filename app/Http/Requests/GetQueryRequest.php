@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Formatters\OpeninghoursFormatter;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -49,7 +48,6 @@ class GetQueryRequest extends FormRequest
      *
      * Validate and sanitize all inputs and combinations.
      * - chech if required parameters are given for the correct types
-     * - check if format is conform with OpeninghoursFormatter::OUTPUT_MAPPER
      * - check if requested serivce has children
      * - check if (when) requested channel is child of requested service
      *

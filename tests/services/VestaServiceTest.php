@@ -2,6 +2,11 @@
 
 namespace Tests\Services;
 
+
+use App\Jobs\DeleteLodOpeninghours;
+use App\Jobs\UpdateLodOpeninghours;
+use App\Jobs\UpdateVestaOpeninghours;
+
 class VestaServiceTest extends \TestCase
 {
     /**
@@ -82,5 +87,57 @@ class VestaServiceTest extends \TestCase
 
         $resultRead = $this->vestaService->getOpeningshoursByGuid($this->testGuid);
         $this->assertEquals($testData, $resultRead);
+    }
+
+    /**
+     * @test
+     * @group functionality
+     */
+    public function testMakeSyncJobsForExternalServicesWithWrongTypeFails()
+    {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
+
+        $this->setExpectedException('Exception');
+        $openinghours = \App\Models\Openinghours::first();
+        $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'thisIsNotAType');
+    }
+
+    /**
+     * @test
+     * @group jobs
+     */
+    public function testItTriggersSyncUpdateJobsWhenOpeninghoursAreSaved()
+    {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
+
+        $this->expectsJobs(UpdateVestaOpeninghours::class);
+        $this->expectsJobs(UpdateLodOpeninghours::class);
+
+        $openinghours = \App\Models\Openinghours::first();
+        $openinghours->channel->service->source = 'vesta';
+        $openinghours->label = 'testLabel';
+        $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'update');
+    }
+
+    /**
+     * @test
+     * @group jobs
+     */
+    public function testItTriggersSyncDeleteJobsWhenOpeninghoursAreDeleted()
+    {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
+
+        $this->expectsJobs(UpdateVestaOpeninghours::class);
+        $this->expectsJobs(DeleteLodOpeninghours::class);
+
+        $openinghours = \App\Models\Openinghours::first();
+        $openinghours->channel->service->source = 'vesta';
+        $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'delete');
     }
 }

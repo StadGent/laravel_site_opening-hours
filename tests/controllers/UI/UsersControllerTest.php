@@ -63,6 +63,7 @@ class UsersControllerTest extends \TestCase
      */
     public function testInviteNewUserValidation($userRole, $email, $role, $serviceId, $statusCode)
     {
+        Mail::fake();
         $authUser = \App\Models\User::where('name', $userRole . 'user')->first();
         $this->actingAs($authUser, 'api');
 
