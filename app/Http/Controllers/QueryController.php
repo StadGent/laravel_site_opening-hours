@@ -152,6 +152,7 @@ class QueryController extends Controller
         $includeIsOpenNow = false
     ) {
         $this->localeService->setRequest($request);
+        $hasOneChannel =  isset($channel->id);
 
         $transformer = new OpeninghoursTransformer();
         $transformer->setStart($start);
@@ -159,6 +160,7 @@ class QueryController extends Controller
         $transformer->setService($service);
         $transformer->setLocaleService($this->localeService);
         $transformer->setIncludeIsOpenNow($includeIsOpenNow);
+        $transformer->setHasOneChannel($hasOneChannel);
 
         $channels = isset($channel->id) ? (new Collection())->add($channel) : $service->channels;
 
