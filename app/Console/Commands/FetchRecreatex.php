@@ -8,13 +8,12 @@ use App\Models\Event;
 use App\Models\Openinghours;
 use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
 
 /**
  * Class FetchRecreatex
  * @package App\Console\Commands
  */
-class FetchRecreatex extends Command
+class FetchRecreatex extends BaseCommand
 {
     /**
      * @var string

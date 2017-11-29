@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Jobs\FetchServices as FetchServicesJob;
 
-class FetchServices extends Command
+class FetchServices extends BaseCommand
 {
     /**
      * The name and signature of the console command.
