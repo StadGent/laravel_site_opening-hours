@@ -102,6 +102,7 @@
     import {MONTHS} from '../mixins/filters.js'
     import {rruleToStarts, keepRuleWithin} from '../util/rrule-helpers.js'
     import Services from '../mixins/services.js'
+    import {EVENT_INVALID_RANGE, IS_RECREATEX} from "../constants";
 
     const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
 
@@ -122,18 +123,36 @@
                 calLabel: '',
                 days: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'],
                 fullDays,
-                presets: [],
                 presetSelection: [],
                 showPresets: false,
+                storedPresets: null,
             }
         },
         computed: {
+            presets() {
+                if (!this.storedPresets) {
+                    Services.methods.fetchPresets(this.$root.routeVersion.start_date, this.$root.routeVersion.end_date,
+                        data => {
+                            data.sort((a, b) => a.start_date > b.start_date ? 1 : -1);
+
+                            for (let i = data.length - 2; i >= 0; i--) {
+                                const year = (data[i + 1].start_date || '').slice(0, 4);
+                                if (year !== (data[i].start_date || '').slice(0, 4)) {
+                                    data[i + 1].group = year;
+                                }
+                            }
+
+                            this.storedPresets = data;
+                        })
+                }
+                return this.storedPresets;
+            },
             events() {
                 return this.cal.events
             },
             disabled() {
                 if (this.$root.isRecreatex) {
-                    return true
+                    return IS_RECREATEX
                 }
 
                 // Start before end
@@ -146,15 +165,22 @@
                     return true
                 }
 
-                // Start before versionStart or end before versionEnd
+                // Start before versionStart or end after versionEnd
                 if (this.events.filter(e => e.start_date.slice(0, 10) < this.versionStartDate || e.until.slice(0, 10) > this.versionEndDate).length) {
-                    return true
+                    return EVENT_INVALID_RANGE
                 }
 
                 // Name cannot be 'Uitzondering'
                 if (this.cal.label === 'Uitzondering' && (!this.calLabel || this.calLabel === 'Uitzondering')) {
                     return true
                 }
+
+                // Cannot save a calendar with no events
+                if (!this.showPresets && this.events.length === 0) {
+                    return true;
+                }
+
+                return false;
             },
             versionStartDate() {
                 return toDateString(this.$parent.version.start_date)
@@ -168,7 +194,7 @@
                 this.$set(this.cal, 'closinghours', !this.cal.closinghours)
             },
             pushEvent() {
-                const start_date = toDatetime(this.$parent.version.start_date)
+                const start_date = toDatetime(this.$parent.version.start_date);
                 this.cal.events.push(createEvent({
                     start_date,
                     label: this.cal.events.length + 1
@@ -178,7 +204,7 @@
                 this.cal.events.push(createFirstEvent(this.$parent.version))
             },
             addEvent(index, event) {
-                event = Object.assign({}, event, {id: null})
+                event = Object.assign({}, event, {id: null});
                 this.cal.events.splice(index, 0, event)
             },
             rmEvent(index) {
@@ -188,22 +214,22 @@
                 if (this.cal.label === 'Uitzondering') {
                     return this.rmCalendar()
                 }
-                this.toVersion()
+                this.toVersion();
                 this.$root.fetchVersion(true)
             },
             save() {
                 // Set start_date to first occurrence of rrule
                 this.cal.events.forEach(e => {
-                    const limitedRule = keepRuleWithin(e)
-                    const date = rruleToStarts(limitedRule + ';COUNT=1')[0]
+                    const limitedRule = keepRuleWithin(e);
+                    const date = rruleToStarts(limitedRule + ';COUNT=1')[0];
                     if (date) {
-                        date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+                        date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
                         if (e.start_date.slice(0, 10) !== date.toJSON().slice(0, 10)) {
-                            e.start_date = date.toJSON().slice(0, 10) + e.start_date.slice(10)
+                            e.start_date = date.toJSON().slice(0, 10) + e.start_date.slice(10);
                             e.end_date = date.toJSON().slice(0, 10) + e.end_date.slice(10)
                         }
                     }
-                })
+                });
 
                 if (this.disabled) {
                     return console.warn('Expected valid calendar')
@@ -215,7 +241,8 @@
                 if (!this.calLabel || this.calLabel === 'Uitzondering') {
                     return console.warn('Expected calendar name')
                 }
-                this.cal.label = this.calLabel
+                this.showPresets = false;
+                this.cal.label = this.calLabel;
                 Hub.$emit('createCalendar', this.cal)
             },
             rmCalendar() {
@@ -224,22 +251,6 @@
         },
         created() {
             this.RRule = RRule || {};
-
-            //fetch presets from services.js
-            //set this.presets last to update bindings
-            Services.methods.fetchPresets((data) => {
-
-                data.sort((a, b) => a.start_date > b.start_date ? 1 : -1);
-
-                for (let i = data.length - 2; i >= 0; i--) {
-                    const year = (data[i + 1].start_date || '').slice(0, 4);
-                    if (year !== (data[i].start_date || '').slice(0, 4)) {
-                        data[i + 1].group = year;
-                    }
-                }
-
-                this.presets = data;
-            })
         },
         mounted() {
             this.$set(this.cal, 'closinghours', !!this.cal.closinghours)

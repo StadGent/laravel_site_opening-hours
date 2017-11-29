@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Transformers\ChannelTransformer;
 use App\Models\Channel;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ChannelController extends Controller
 {
     /**
      * Get with id
-     *
      * Base get and return the Channel
      *
-     * @return \App\Models\Channel
+     * @param Service $service
+     * @param Channel $channel
+     * @return Response
      */
     public function show(Service $service, Channel $channel)
     {
@@ -25,17 +29,17 @@ class ChannelController extends Controller
             throw $exception;
         }
 
-        return $channel;
+        return response()->item(new ChannelTransformer(), $channel);
     }
 
     /**
      * Get Subset of channels from Service
      *
      * @param Service $service
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return Response
      */
     public function getFromService(Service $service)
     {
-        return $service->channels;
+        return response()->collection(new ChannelTransformer(), $service->channels);
     }
 }

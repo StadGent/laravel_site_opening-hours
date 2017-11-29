@@ -77,7 +77,6 @@ export function expiresOn(ohs) {
     let end_date = today;
     let count = ohs.length;
 
-    //
     for (let i = 0; i < count; i++) {
         let nextIndex = ohs.findIndex(oh => isInUseOn(oh, end_date));
         let nextOh = ohs.splice(nextIndex, 1).pop();
@@ -95,7 +94,7 @@ export function expiresOn(ohs) {
 /** Date functions **/
 
 export function nextDateString(dateString) {
-    return new Date(Date.parse(dateString) + DAY_IN_MS).toJSON().slice(0, 10);
+    return toDatetime(moment(dateString).add(1, 'days')).format();
 }
 
 export function toTime(d) {
@@ -120,7 +119,15 @@ export function toDatetime(str) {
         console.warn('Unexpected type in toDatetime', typeof str);
         return str;
     }
-    return new Date(Date.parse(str));
+    if (typeof str === 'string' && str.length < 11) {
+        if (str.length < 11) {
+            str = str + 'T00:00:00';
+        }
+        if (str.slice(-1) !== 'Z') {
+            str = str + 'Z';
+        }
+    }
+    return moment.utc(str, 'YYYY-MM-DD HH:mm:ss').toDate();
 }
 
 // Create a date object 1 day after the param

@@ -74,10 +74,6 @@ class AppServiceProvider extends ServiceProvider
             return \App\Services\ChannelService::getInstance();
         });
 
-        $this->app->singleton('OpeninghoursService', function ($app) {
-            return \App\Services\OpeninghoursService::getInstance();
-        });
-
         $this->app->singleton('SparqlService', function ($app) {
             return \App\Services\SparqlService::getInstance();
         });
@@ -92,33 +88,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('UserService', function ($app) {
             return \App\Services\UserService::getInstance();
-        });
-
-        /* FORMATTERS **/
-        $this->app->bind('OHJsonFormatter', function () {
-            return new \App\Formatters\Openinghours\JsonFormatter();
-        });
-
-        $this->app->bind('OHJsonLdFormatter', function () {
-            return new \App\Formatters\Openinghours\JsonLdFormatter();
-        });
-
-        $this->app->bind('OHHtmlFormatter', function () {
-            return new \App\Formatters\Openinghours\HtmlFormatter();
-        });
-        $this->app->bind('OHTextFormatter', function () {
-            return new \App\Formatters\Openinghours\TextFormatter();
-        });
-
-        $this->app->tag(['OHJsonFormatter', 'OHJsonLdFormatter', 'OHHtmlFormatter', 'OHTextFormatter'], 'OHFormatters');
-
-        $this->app->bind('OpeninghoursFormatter', function ($app) {
-            $modelFormatter = new \App\Formatters\OpeninghoursFormatter();
-            foreach ($app->tagged('OHFormatters') as $format) {
-                $modelFormatter->addFormat($format);
-            }
-
-            return $modelFormatter;
         });
     }
 }

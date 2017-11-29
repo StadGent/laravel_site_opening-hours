@@ -63,10 +63,11 @@ class UsersControllerTest extends \TestCase
      */
     public function testInviteNewUserValidation($userRole, $email, $role, $serviceId, $statusCode)
     {
+        Mail::fake();
         $authUser = \App\Models\User::where('name', $userRole . 'user')->first();
         $this->actingAs($authUser, 'api');
 
-        $newUser = factory(User::class)->create();
+        $newUser = factory(User::class)->make();
 
         if ($email) {
             $request['email'] = $email == 'unknown' ? $newUser->email : $email;
@@ -106,10 +107,11 @@ class UsersControllerTest extends \TestCase
      */
     public function testWhenAdminIsMadeOwnerHeIsRemovedFromTheGlobalAdminRole()
     {
+        Mail::fake();
         $adminUser = \App\Models\User::where('name', 'adminuser')->first();
         $this->actingAs($adminUser, 'api');
 
-        $newUser = factory(User::class)->create();
+        $newUser = factory(User::class)->make();
         // lets make new user Admin
         $request['email'] = $newUser->email;
         $request['role'] = 'Admin';
