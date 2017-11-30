@@ -19,13 +19,13 @@ class ServicesRepository extends EloquentRepository
      * @param $serviceId
      * @return mixed
      */
-    public function getExpandedServices($serviceId = null)
+    public function getExpandedServices($serviceId = null, $offset = null, $limit = null)
     {
         if ($serviceId) {
             return $this->getExpandedServicesQuery($serviceId)->first();
         }
 
-        return $this->getExpandedServicesQuery()->get();
+        return $this->getExpandedServicesQuery(null, $offset, $limit)->get();
     }
 
     /**
@@ -47,10 +47,10 @@ class ServicesRepository extends EloquentRepository
      * has_missing_oh =     Missing calender(s)
      * has_inactive_oh =    Missing active calender(s)
      *
-     * @param  int   $serviceId
+     * @param  int $serviceId
      * @return Collection
      */
-    private function getExpandedServicesQuery($serviceId = null)
+    private function getExpandedServicesQuery($serviceId = null, $offset = 0, $limit = 1000)
     {
         $rawSelect = \DB::raw("services.*,
             count(channelId) countChannels,
@@ -65,7 +65,11 @@ class ServicesRepository extends EloquentRepository
         $query = \DB::table('services')
             ->select($rawSelect)
             ->leftJoin($rawSubQuery, 'services.id', '=', 'tmp.service_id')
-            ->groupBy('services.id');
+            ->groupBy('services.id')
+            ->orderBy('services.id')
+            ->orderBy('services.draft')
+            ->take($limit)
+            ->skip($offset);
 
         if ($serviceId) {
             $query->where('id', $serviceId);
@@ -77,7 +81,7 @@ class ServicesRepository extends EloquentRepository
     /**
      * Return a specific service with linked channels
      *
-     * @param  int   $serviceId
+     * @param  int $serviceId
      * @return array
      */
     private function getExpandedServiceForUserQuery($userId)
@@ -97,7 +101,7 @@ class ServicesRepository extends EloquentRepository
     /**
      * Return a specific service with linked channels
      *
-     * @param  int   $serviceId
+     * @param  int $serviceId
      * @return array
      */
     public function getById($serviceId)
@@ -114,7 +118,7 @@ class ServicesRepository extends EloquentRepository
     /**
      * Get all services where the user, based on the passed user ID, is part of
      *
-     * @param  integer    $userId
+     * @param  integer $userId
      * @return Collection
      */
     public function getForUser($userId)

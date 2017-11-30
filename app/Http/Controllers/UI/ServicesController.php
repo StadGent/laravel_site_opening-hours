@@ -36,8 +36,11 @@ class ServicesController extends Controller
      */
     public function index(Request $request)
     {
+        $offset = $request->get('offset', 0);
+        $limit = $request->get('limit', 1000);
+
         if ($request->user('api')->hasRole('Admin')) {
-            return $this->servicesRepository->getExpandedServices();
+            return $this->servicesRepository->getExpandedServices(null, $offset, $limit);
         }
 
         return $this->servicesRepository->getExpandedServiceForUser($request->user('api')->id);
@@ -46,8 +49,8 @@ class ServicesController extends Controller
     /**
      * Update/Patch the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Service       $service
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\Service $service
      * @return Collection
      */
     public function update(Request $request, Service $service)
