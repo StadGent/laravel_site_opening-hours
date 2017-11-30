@@ -140,4 +140,22 @@ class VestaServiceTest extends \TestCase
         $openinghours->channel->service->source = 'vesta';
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'delete');
     }
+
+    /**
+     * @test
+     * @group jobs
+     */
+    public function testTriggerJobOnlyOnce()
+    {
+        if (env('APP_SKIP_TRAVIS_TEST')) {
+            return;
+        }
+
+        $this->doesntExpectJobs(DeleteLodOpeninghours::class);
+
+        $openinghours = \App\Models\Openinghours::first();
+        $openinghours->channel->service->source = 'vesta';
+        $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'update');
+        $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'delete');
+    }
 }

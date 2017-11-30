@@ -23,6 +23,6 @@ class ChannelObserver
      */
     public function deleting(Channel $channel)
     {
-        app('ChannelService')->makeSyncJobsForExternalServices($channel, 'update');
+        app('ChannelService')->makeSyncJobsForExternalServices($channel);
     }
 }

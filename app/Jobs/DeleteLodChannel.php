@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Models\Channel;
 use App\Repositories\LodOpeninghoursRepository;
+use App\Services\QueueService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -23,6 +25,12 @@ class DeleteLodChannel implements ShouldQueue
     protected $channelId;
 
     /**
+     * @var QueueService
+     */
+    private $queueService;
+
+
+    /**
      * Create a new job instance.
      *
      * @param int $serviceId
@@ -33,8 +41,8 @@ class DeleteLodChannel implements ShouldQueue
     public function __construct($serviceId, $channelId)
     {
         $this->serviceId = $serviceId;
-
         $this->channelId = $channelId;
+        $this->queueService = app('QueueService');
     }
 
     /**
@@ -53,5 +61,6 @@ class DeleteLodChannel implements ShouldQueue
                 $this->channelId
             )));
         }
+        $this->queueService->removeJobFromQueue($this, Channel::class, $this->channelId);
     }
 }
