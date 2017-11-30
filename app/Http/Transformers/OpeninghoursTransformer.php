@@ -12,7 +12,6 @@ use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 
 class OpeninghoursTransformer implements TransformerInterface
 {
-
     const SUPPORTED_FORMATS = [
         'collection' => [
             'application/json' => 'transformJsonCollection',
@@ -134,7 +133,6 @@ class OpeninghoursTransformer implements TransformerInterface
         $ohCollection = $channel->openinghours()
             ->where('start_date', '<=', $this->end->toDateString())
             ->where('end_date', '>=', $this->start->toDateString())
-            ->where('active', '=', 1)
             ->get();
 
         if (!$this->includeIsOpenNow) {

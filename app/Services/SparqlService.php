@@ -12,7 +12,6 @@ use GuzzleHttp\Psr7\Response;
  */
 class SparqlService
 {
-
     /**
      * HttpClient to be fixed with endpoint to send requests
      * @var Client
@@ -69,7 +68,7 @@ class SparqlService
     public static function getInstance()
     {
         if (!self::$instance) {
-            self::$instance = new SparqlService();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -89,7 +88,6 @@ class SparqlService
      */
     public function setClient($endpoint = null, $username = null, $password = null, $defaultGraph = null)
     {
-
         $this->username = $username ?: env('SPARQL_WRITE_ENDPOINT_USERNAME');
         $this->password = $password ?: env('SPARQL_WRITE_ENDPOINT_PASSWORD');
         $this->defaultGraph = $defaultGraph ?: env('SPARQL_WRITE_GRAPH');
@@ -136,7 +134,6 @@ class SparqlService
         if ($data !== true && $data !== false) {
             throw new \Exception("No correct data came back in connection test", 1);
         }
-
     }
 
     /**
@@ -154,6 +151,9 @@ class SparqlService
      */
     public function performSparqlQuery($query, $method = 'GET', $format = null)
     {
+        if (!$this->username || $this->password) {
+            $this->setClient();
+        }
         try {
             switch ($method) {
                 case 'POST':
@@ -166,7 +166,7 @@ class SparqlService
                     throw new \Exception('Given method: ' . $method . ' is not supported by this SparqlService');
             }
         } catch (\Exception $ex) {
-            \Log::error('Something went wrong while writing to the LOD repository: ' . $ex->getMessage());
+            \Log::error('Something went wrong while using ' . $method . ' to the LOD repository: ' . $ex->getMessage());
         }
 
         return false;
@@ -191,6 +191,7 @@ class SparqlService
         $options = ['body' => $query];
 
         $options['headers']['Content-Type'] = 'application/sparql-update';
+
         return $this->executeQuery('POST', $uri, $options);
     }
 
@@ -210,6 +211,7 @@ class SparqlService
         $this->lastResponseCode = null;
         $uri = '?query=' . static::transformQuery($query) . '&format=' . ($format ?: 'json');
         $options['headers']['Content-Type'] = 'application/sparql-query';
+
         return $this->executeQuery('GET', $uri, $options);
     }
 
@@ -297,12 +299,12 @@ class SparqlService
      *
      * @return Client
      */
-    protected function getClient() {
+    protected function getClient()
+    {
         if (!$this->guzzleClient) {
             $this->setClient();
         }
 
         return $this->guzzleClient;
     }
-
 }
