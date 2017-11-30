@@ -2,7 +2,6 @@
 
 namespace Tests\Services;
 
-
 use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;

@@ -79,7 +79,7 @@ class VestaService
         if (substr($wsdl, -5) !== '?wsdl') {
             $wsdl .= '?wsdl';
         }
-        
+
         $this->client = new \SoapClient($wsdl, [
             'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
         ]);
