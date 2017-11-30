@@ -43,10 +43,17 @@ class VestaService
     private static $instance;
 
     /**
+     * @var QueueService
+     */
+    private $queueService;
+
+
+    /**
      * Private contructor for Singleton pattern
      */
     private function __construct()
     {
+        $this->queueService = app('QueueService');
     }
 
     /**
@@ -79,7 +86,7 @@ class VestaService
         if (substr($wsdl, -5) !== '?wsdl') {
             $wsdl .= '?wsdl';
         }
-        
+
         $this->client = new \SoapClient($wsdl, [
             'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
         ]);
@@ -214,7 +221,7 @@ class VestaService
      * Make job update LOD or delete LOD
      *
      * @param  Openinghours $openinghours
-     * @param  string       $type
+     * @param  string $type
      */
     public function makeSyncJobsForExternalServices(Openinghours $openinghours, $type)
     {
@@ -233,10 +240,12 @@ class VestaService
 
         switch ($type) {
             case 'update':
-                dispatch(new UpdateLodOpeninghours($service->id, $openinghours->id, $channel->id));
+                $job = new UpdateLodOpeninghours($service->id, $openinghours->id, $channel->id);
+                $this->queueService->addJobToQueue($job, get_class($openinghours), $openinghours->id);
                 break;
             case 'delete':
-                dispatch(new DeleteLodOpeninghours($service->id, $openinghours->id));
+                $job = new DeleteLodOpeninghours($service->id, $openinghours->id);
+                $this->queueService->addJobToQueue($job, get_class($openinghours), $openinghours->id);
                 break;
         }
     }

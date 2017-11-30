@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\Service;
+use App\Services\QueueService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,6 +26,11 @@ class UpdateVestaOpeninghours implements ShouldQueue
     private $serviceId;
 
     /**
+     * @var QueueService
+     */
+    private $queueService;
+
+    /**
      * Create a new job instance.
      *
      * @return void
@@ -32,6 +39,7 @@ class UpdateVestaOpeninghours implements ShouldQueue
     {
         $this->vestaUid = $vestaUid;
         $this->serviceId = $serviceId;
+        $this->queueService = app('QueueService');
     }
 
     /**
@@ -58,5 +66,8 @@ class UpdateVestaOpeninghours implements ShouldQueue
                 $this->serviceId
             )));
         }
+
+        $this->queueService->removeJobFromQueue($this, Service::class, $this->serviceId);
+
     }
 }

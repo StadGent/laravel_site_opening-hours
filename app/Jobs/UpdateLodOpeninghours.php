@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Models\Openinghours;
 use App\Repositories\ChannelRepository;
 use App\Repositories\LodOpeninghoursRepository;
 use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ServicesRepository;
+use App\Services\QueueService;
 use EasyRdf_Graph as Graph;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,6 +34,11 @@ class UpdateLodOpeninghours implements ShouldQueue
     protected $channelId;
 
     /**
+     * @var QueueService
+     */
+    private $queueService;
+
+    /**
      * Create a new job instance.
      *
      * @param int $serviceId
@@ -45,6 +52,7 @@ class UpdateLodOpeninghours implements ShouldQueue
         $this->serviceId = $serviceId;
         $this->openinghoursId = $openinghoursId;
         $this->channelId = $channelId;
+        $this->queueService = app('QueueService');
     }
 
     /**
@@ -74,14 +82,16 @@ class UpdateLodOpeninghours implements ShouldQueue
                 $this->openinghoursId
             )));
         }
+
+        $this->queueService->removeJobFromQueue($this, Openinghours::class, $this->openinghoursId);
     }
 
     /**
      * Return an EasyRdf_Resource based on the service, channel and openinghours
      *
-     * @param  array            $service
-     * @param  array            $channel
-     * @param  EasyRdf_Graph    $openinghoursGraph
+     * @param  array $service
+     * @param  array $channel
+     * @param  EasyRdf_Graph $openinghoursGraph
      * @return EasyRdf_Resource
      */
     private function createServiceResource($service, $channel, $openinghoursGraph)
@@ -103,7 +113,7 @@ class UpdateLodOpeninghours implements ShouldQueue
 
         $channel->addResource('cv:isOwnedBy', $service);
 
-        if (! empty(env('DATA_REPRESENTATION_URI'))) {
+        if (!empty(env('DATA_REPRESENTATION_URI'))) {
             $channel->addResource('rdfs:isDefinedBy', env('DATA_REPRESENTATION_URI') . '/channel/' . $channelId);
         }
 
