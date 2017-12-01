@@ -69,7 +69,7 @@ class UpdateLodOpeninghours extends BaseJob implements ShouldQueue
         // Add the service and the openinghours' channel to the graph
         $graph = $this->createServiceResource($service, $channel, $openinghoursGraph);
 
-        if (!$app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph)) {
+        if (!app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph)) {
             $this->letsFail();
         }
         $this->letsFinish();
