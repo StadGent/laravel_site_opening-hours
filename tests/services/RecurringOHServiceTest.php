@@ -55,8 +55,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testEmptyServiceIsEmptysomething()
     {
         $initStart = new Carbon('2017-12-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
         $calendar = factory(Calendar::class)->make(['closinghours' => 1]);
 
         $service = factory(Service::class)->create();
@@ -82,8 +82,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testFullServiceWithMultipleOHs()
     {
         $initStart = new Carbon('2017-12-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
 
         $service = factory(Service::class)->create();
 
@@ -141,8 +141,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testFullServiceWithMultipleOHsButWithOneOHWithoutRelevantEvents()
     {
         $initStart = new Carbon('2017-12-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
 
         $service = factory(Service::class)->create();
 
@@ -231,8 +231,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testValideYearlyEventInCurrentYear()
     {
         $initStart = new Carbon('2017-04-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
 
         $event = factory(Event::class)->make([
             'rrule' => 'FREQ=YEARLY',
@@ -253,8 +253,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testValideYearlyEventInNextYear()
     {
         $initStart = new Carbon('2017-12-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
         $calendar = factory(Calendar::class)->make(['closinghours' => 1]);
 
         $event = factory(Event::class)->make([
@@ -279,8 +279,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testValideYearlyEventPeriodeLeapingOverYear()
     {
         $initStart = new Carbon('2017-12-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
         $calendar = factory(Calendar::class)->make(['closinghours' => 1]);
 
         $event = factory(Event::class)->make([
@@ -302,8 +302,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testCollectForEvent()
     {
         $initStart = new Carbon('2017-12-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
         $calendar = factory(Calendar::class)->make(['closinghours' => 0]);
         $event = factory(Event::class)->make([
             'rrule' => 'BYDAY=MO,TU,WE,TH,FR;FREQ=WEEKLY',
@@ -325,8 +325,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testCollectForDaylyEvent()
     {
         $initStart = new Carbon('2017-04-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
         $calendar = factory(Calendar::class)->make(['closinghours' => 0]);
         $event = factory(Event::class)->make([
             'rrule' => 'FREQ=DAYLY',
@@ -347,8 +347,8 @@ class RecurringOHServiceTest extends \TestCase
     public function testCollectForDaylyEventPeriode()
     {
         $initStart = new Carbon('2017-04-25');
-        $this->recurringOHService->setStartPeriode($initStart);
-        $this->recurringOHService->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
         $calendar = factory(Calendar::class)->make(['closinghours' => 0]);
         $event = factory(Event::class)->make([
             'rrule' => 'FREQ=DAYLY',

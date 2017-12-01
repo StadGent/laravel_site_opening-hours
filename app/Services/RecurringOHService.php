@@ -24,13 +24,13 @@ class RecurringOHService
      * Start of current periode => NOW->startOfWeek()
      * @var Carbon
      */
-    private $startPeriode;
+    private $startPeriod;
 
     /**
      * End of current periode => NOW + 3 months
      * @var Carbon
      */
-    private $endPeriode;
+    private $endPeriod;
 
     /**
      * Start property of active Event record
@@ -57,8 +57,8 @@ class RecurringOHService
     private function __construct()
     {
         $initStart = Carbon::today()->startOfWeek();
-        $this->setStartPeriode($initStart);
-        $this->setEndPeriode($initStart->copy()->addMonths(3));
+        $this->setStartPeriod($initStart);
+        $this->setEndPeriod($initStart->copy()->addMonths(3));
     }
 
     /**
@@ -76,19 +76,19 @@ class RecurringOHService
     }
 
     /**
-     * @param Carbon $startPeriode
+     * @param Carbon $startPeriod
      */
-    public function setStartPeriode(Carbon $startPeriode)
+    public function setStartPeriod(Carbon $startPeriod)
     {
-        $this->startPeriode = $startPeriode;
+        $this->startPeriod = $startPeriod;
     }
 
     /**
-     * @param Carbon $endPeriode
+     * @param Carbon $endPeriod
      */
-    public function setEndPeriode(Carbon $endPeriode)
+    public function setEndPeriod(Carbon $endPeriod)
     {
-        $this->endPeriode = $endPeriode;
+        $this->endPeriod = $endPeriod;
     }
 
     /**
@@ -109,8 +109,8 @@ class RecurringOHService
             $channelOutput = '';
             // get openinghours that have begin and end overlapping the periode-> calendars + events
             $ohCollection = $channel->openinghours()
-                ->where('start_date', '<=', $this->endPeriode)
-                ->where('end_date', '>=', $this->startPeriode)
+                ->where('start_date', '<=', $this->endPeriod)
+                ->where('end_date', '>=', $this->startPeriod)
                 ->get();
             foreach ($ohCollection as $openinghours) {
                 $ohOutput = '';
@@ -118,7 +118,7 @@ class RecurringOHService
                 $calendarsCollection = $openinghours->calendars()->orderBy('priority', 'desc')->get();
                 foreach ($calendarsCollection as $calendar) {
                     $calendarRule = $this->collectForCalendar($calendar);
-                    $calendarOutput = $this->clearnUpOutput($calendarRule);
+                    $calendarOutput = $this->cleanUpOutput($calendarRule);
 
                     if ($calendarOutput !== '') {
                         $ohOutput .= '<div>' . "\n";
@@ -217,12 +217,12 @@ class RecurringOHService
         $this->eventUntil = new Carbon($event->until);
 
         // check event until > begin of periode to skip
-        if ($this->eventUntil->lt($this->startPeriode)) {
+        if ($this->eventUntil->lt($this->startPeriod)) {
             return false;
         }
 
         // check event start is later then end of periode to skip
-        if ($this->eventStart->gt($this->endPeriode)) {
+        if ($this->eventStart->gt($this->endPeriod)) {
             return false;
         }
 
@@ -239,30 +239,30 @@ class RecurringOHService
     /**
      * Check or event of FREQ=YEARLY overlaps in active periode of now and  next 3 months
      *
-     * Adjust event to the year of the startPeriode
-     * And the year of the endPeriode when not the same as startPeriode
+     * Adjust event to the year of the startPeriod
+     * And the year of the endPeriod when not the same as startPeriod
      *
      * @return boolean
      */
     public function checkTheFreqYearRruleInPeriode()
     {
         $theDifference = $this->eventEnd->year - $this->eventStart->year;
-        // take the year of the startPeriode
-        $this->eventStart->year = $this->startPeriode->year;
-        $this->eventEnd->year = $this->startPeriode->year;
+        // take the year of the startPeriod
+        $this->eventStart->year = $this->startPeriod->year;
+        $this->eventEnd->year = $this->startPeriod->year;
         // the end could be in the next year for example Christmas Holidays
         $this->eventEnd->addYears($theDifference);
-        if ($this->eventEnd->gt($this->startPeriode) && $this->eventStart->lt($this->endPeriode)) {
+        if ($this->eventEnd->gt($this->startPeriod) && $this->eventStart->lt($this->endPeriod)) {
             return true;
         }
 
         // check on year leap (needed for when request if from December until February you have a 2nd new year to check)
-        if ($this->startPeriode->year != $this->endPeriode->year) {
-            $this->eventStart->year = $this->endPeriode->year;
-            $this->eventEnd->year = $this->endPeriode->year;
+        if ($this->startPeriod->year != $this->endPeriod->year) {
+            $this->eventStart->year = $this->endPeriod->year;
+            $this->eventEnd->year = $this->endPeriod->year;
             // the end could be in the next year
             $this->eventEnd->addYears($theDifference);
-            if ($this->eventEnd->gt($this->startPeriode) && $this->eventStart->lt($this->endPeriode)) {
+            if ($this->eventEnd->gt($this->startPeriod) && $this->eventStart->lt($this->endPeriod)) {
                 return true;
             }
         }
@@ -397,7 +397,7 @@ class RecurringOHService
      * @param array $calendarRule
      * @return string
      */
-    protected function clearnUpOutput($calendarRule)
+    protected function cleanUpOutput($calendarRule)
     {
         if (empty($calendarRule)) {
             return '';
