@@ -50,7 +50,7 @@ class ServicesRepository extends EloquentRepository
      * @param  int $serviceId
      * @return Collection
      */
-    private function getExpandedServicesQuery($serviceId = null, $offset = 0, $limit = 1000)
+    private function getExpandedServicesQuery($serviceId = null, $offset = 0, $limit = null)
     {
         $rawSelect = \DB::raw("services.*,
             count(channelId) countChannels,
@@ -68,8 +68,14 @@ class ServicesRepository extends EloquentRepository
             ->groupBy('services.id')
             ->orderBy('services.id')
             ->orderBy('services.draft')
-            ->take($limit)
             ->skip($offset);
+
+        if($limit === null){
+            $query->take(\DB::table('services')->count() - $offset);
+        }
+        else {
+            $query->take($limit);
+        }
 
         if ($serviceId) {
             $query->where('id', $serviceId);
