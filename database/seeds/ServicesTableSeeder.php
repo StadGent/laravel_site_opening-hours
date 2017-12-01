@@ -2,11 +2,18 @@
 
 namespace Database\Seeds;
 
+use App\Jobs\FetchServices;
 use App\Models\Service;
 use Illuminate\Database\Seeder;
 
 class ServicesTableSeeder extends Seeder
 {
+    /**
+     * trigger the FetchServices job
+     * @var boolean
+     */
+    protected $getExternal = false;
+
     /**
      * Run the database seeds.
      *
@@ -14,6 +21,14 @@ class ServicesTableSeeder extends Seeder
      */
     public function run()
     {
+        if ($this->getExternal) {
+            $job = new FetchServices();
+            $job->handle();
+            $this->command->info(self::class . " seeded with external data\r");
+
+            return;
+        }
+
         $sampleServiceNames = [
             'Cultuurdienst',
             'DeCentrale',

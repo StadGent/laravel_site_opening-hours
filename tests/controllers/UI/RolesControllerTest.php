@@ -11,6 +11,15 @@ class RolesControllerTest extends \TestCase
     use DatabaseTransactions;
 
     /**
+     * setup for each test
+     */
+    public function setup()
+    {
+        parent::setUp();
+        Mail::fake();
+    }
+
+    /**
      * @var string
      */
     protected $apiUrl = '/api/v1/ui/roles';
@@ -97,7 +106,6 @@ class RolesControllerTest extends \TestCase
      */
     public function testUIRoleRequests($userRole, $verb, $pathArg, $data, $statusCode)
     {
-        Mail::fake();
         $this->requestsByUserWithRoleAndCheckStatusCode($userRole, $verb, $pathArg, $data, $statusCode);
     }
 

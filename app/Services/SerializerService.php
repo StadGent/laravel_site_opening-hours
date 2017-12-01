@@ -15,7 +15,6 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
  */
 class SerializerService
 {
-
     private $request;
     private static $instance;
     const MIME_TYPES = ['application/json', 'text/html', 'application/ld+json', 'text/plain'];
@@ -25,6 +24,13 @@ class SerializerService
         $this->request = app(Request::class);
     }
 
+    /**
+     * Private contructor for Singleton pattern
+     */
+    private function __construct()
+    {
+    }
+    
     /**
      * GetInstance for Singleton pattern
      *

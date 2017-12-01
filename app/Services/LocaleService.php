@@ -78,6 +78,13 @@ class LocaleService
 
         return config('app.fallback_locale_location');
     }
+    
+    /**
+     * Private contructor for Singleton pattern
+     */
+    private function __construct()
+    {
+    }
 
     /**
      * GetInstance for Singleton pattern
@@ -182,11 +189,17 @@ class LocaleService
         return $formats[$locale];
     }
 
+    /**
+     * @param $timeFormat
+     */
     public function setTimeFormat($timeFormat)
     {
         $this->format['time'] = $timeFormat;
     }
 
+    /**
+     * @param $dateFormat
+     */
     public function setDateFormat($dateFormat)
     {
         $this->format['date'] = $dateFormat;
