@@ -19,13 +19,7 @@ class RecurringOHService
      * @var LocaleService
      */
     private static $instance;
-
-    /**
-     * The ID of the service
-     * @var int
-     */
-    private $serviceId;
-
+ 
     /**
      * Start of current periode => NOW->startOfWeek()
      * @var Carbon
