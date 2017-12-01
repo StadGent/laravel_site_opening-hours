@@ -37,7 +37,7 @@ class ServicesController extends Controller
     public function index(Request $request)
     {
         $offset = $request->get('offset', 0);
-        $limit = $request->get('limit', 1000);
+        $limit = $request->get('limit', null);
 
         if ($request->user('api')->hasRole('Admin')) {
             return $this->servicesRepository->getExpandedServices(null, $offset, $limit);
