@@ -84,7 +84,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
             }
             $this->sendToVesta($service, $output);
         } catch (\Exception $ex) {
-            throw $ex;
             $this->fail($ex);
         }
     }
@@ -109,10 +108,10 @@ class UpdateVestaOpeninghours implements ShouldQueue
         $currentContent = $vService->getOpeningshoursByGuid($service->identifier);
         if ($currentContent != $output) {
             $vService->updateOpeninghours($service->identifier, $output);
-            \Log::info('New data for (' . $service->id . ') ' . $service->label . ' met UID ' .
+            \Log::info('New data for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
                 $service->identifier . ' is send to VESTA.');
         }
-        \Log::info('Service (' . $service->id . ') ' . $service->label . ' met UID ' .
+        \Log::info('Service (' . $service->id . ') ' . $service->label . ' with UID ' .
             $service->identifier . ' is sync with VESTA.');
     }
 

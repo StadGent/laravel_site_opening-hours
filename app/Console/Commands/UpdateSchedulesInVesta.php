@@ -49,7 +49,6 @@ class UpdateSchedulesInVesta extends BaseCommand
      */
     public function handle()
     {
-        $checkedServices = 0;
         $this->info('Init UpdateSchedulesInVesta');
         $services = Service::where('source', 'vesta')->where('draft', 0)
             ->get();
@@ -58,10 +57,9 @@ class UpdateSchedulesInVesta extends BaseCommand
             $this->info('Dispatch a job that will update the services (' . $service->id . ') ' .
                 $service->label . ' to VESTA');
             dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
-            $checkedServices++;
         }
 
-        $this->info('Nr of services set in queue: ' . $checkedServices);
+        $this->info('Nr of services set in queue: ' . $services->count());
         $this->info('Done UpdateSchedulesInVesta');
     }
 }
