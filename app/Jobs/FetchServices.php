@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class FetchServices implements ShouldQueue
+class FetchServices extends BaseJob implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
@@ -19,16 +19,6 @@ class FetchServices implements ShouldQueue
      * @var App\Repositories\LodServicesRepository
      */
     private $lodServices;
-
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
 
     /**
      * Execute the job.
@@ -49,10 +39,9 @@ class FetchServices implements ShouldQueue
 
                 try {
                     $services->updateOrCreate($uniqueProperties, $service);
+                    $this->letsFinish();
                 } catch (\Exception $ex) {
-                    \Log::error('An error occured while upserting services: ' . $ex->getMessage());
-                    \Log::error($ex->getTraceAsString());
-                    $this->fail($ex);
+                    $this->letsFail($ex->getMessage());
                 }
             });
         }

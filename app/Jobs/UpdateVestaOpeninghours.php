@@ -3,13 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Service;
-use App\Services\QueueService;
 use App\Services\RecurringOHService;
 use App\Services\VestaService;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * This JOB will collect the Openinghours data for the next 3 months of a service
@@ -20,10 +16,8 @@ use Illuminate\Queue\SerializesModels;
  *
  * Currently all output is in Dutch nl-BE
  */
-class UpdateVestaOpeninghours implements ShouldQueue
+class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
-
     /**
      * The UID of the service in VESTA
      * @var string
@@ -37,11 +31,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
     private $serviceId;
 
     /**
-     * @var QueueService
-     */
-    private $queueService;
-
-    /**
      * @var boolean
      */
     protected $test;
@@ -53,10 +42,13 @@ class UpdateVestaOpeninghours implements ShouldQueue
      */
     public function __construct($vestaUid, $serviceId, $test = false)
     {
+        parent::__construct();
         $this->vestaUid = $vestaUid;
         $this->serviceId = $serviceId;
-        $this->queueService = app(QueueService::class);
         $this->test = $test;
+
+        $this->extModelClass = Service::class;
+        $this->extId = $serviceId;
     }
 
     /**
@@ -76,33 +68,23 @@ class UpdateVestaOpeninghours implements ShouldQueue
             ->where('source', 'vesta')
             ->where('identifier', $this->vestaUid);
         if ($serviceCollection->count() != 1) {
-            $this->letsFail('The %s job did not find a VESTA service (%s) with uid %s.');
+            $this->letsFail('Incompatible with VESTA or uid ' . $this->vestaUid);
         }
         $service = $serviceCollection->first();
         if ($service->draft) {
-            $this->letsFail('The %s job tried to sync an inactive service (%s) with uid %s to VESTA.');
+            $this->letsFail('Service is inactive');
         }
 
         try {
             $recurringOHService = app(RecurringOHService::class);
             $output = $recurringOHService->getRecurringOHForService($service);
             if ($output === '') {
-                $this->letsFail('The %s job tried to sync empty data for service (%s) with uid %s to VESTA.');
+                throw new \Exception('No data was found to send to VESTA.', 1);
             }
             $this->sendToVesta($service, $output);
         } catch (\Exception $ex) {
-            $this->fail($ex);
+            $this->letsFail($ex->getMessage());
         }
-    }
-
-    /**
-     * lest make a method for this repeating code
-     * @param $message
-     */
-    protected function letsFail($message)
-    {
-        $errorMsg = sprintf($message, static::class, $this->serviceId, $this->vestaUid);
-        $this->fail(new \Exception($errorMsg));
     }
 
     /**
@@ -116,28 +98,14 @@ class UpdateVestaOpeninghours implements ShouldQueue
         if ($currentContent != $output) {
             $synced = $vService->updateOpeninghours($service->identifier, $output);
             if (!$synced) {
-                $this->letsFail('The %s job was not able to send the data for service (%s) with uid %s to VESTA.');
+                $this->letsFail('Nnot able to send the data to VESTA.');
             }
             \Log::info('New data for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
                 $service->identifier . ' is send to VESTA.');
         }
         \Log::info('Service (' . $service->id . ') ' . $service->label . ' with UID ' .
             $service->identifier . ' is sync with VESTA.');
-    }
 
-    /**
-     * The job failed to process.
-     *
-     * @param  Exception  $exception
-     * @return void
-     */
-    public function failed(\Exception $exception)
-    {
-        \Log::error('FAIL: ' . $exception->getMessage());
-        if ($this->test) {
-            throw $exception;
-        }
-
-        $this->queueService->removeJobFromQueue($this, Service::class, $this->serviceId);
+        $this->letsFinish();
     }
 }
