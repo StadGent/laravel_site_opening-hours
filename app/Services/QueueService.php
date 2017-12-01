@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Services;
-
 
 use App\Models\QueuedJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,7 +9,6 @@ use PhpParser\Node\Expr\AssignOp\Mod;
 
 class QueueService
 {
-
     /**
      * Singleton class instance.
      *
@@ -27,7 +24,7 @@ class QueueService
     public static function getInstance()
     {
         if (!self::$instance) {
-            self::$instance = new QueueService();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -76,5 +73,4 @@ class QueueService
             $queuedJob->delete();
         }
     }
-
 }

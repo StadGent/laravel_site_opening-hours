@@ -2,13 +2,16 @@
 
 namespace Tests\Services;
 
-
 use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
+use App\Models\Openinghours;
+use App\Models\QueuedJob;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class VestaServiceTest extends \TestCase
 {
+    use DatabaseTransactions;
     /**
      * @var string
      */
@@ -100,7 +103,7 @@ class VestaServiceTest extends \TestCase
         }
 
         $this->setExpectedException('Exception');
-        $openinghours = \App\Models\Openinghours::first();
+        $openinghours = Openinghours::first();
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'thisIsNotAType');
     }
 
@@ -117,7 +120,7 @@ class VestaServiceTest extends \TestCase
         $this->expectsJobs(UpdateVestaOpeninghours::class);
         $this->expectsJobs(UpdateLodOpeninghours::class);
 
-        $openinghours = \App\Models\Openinghours::first();
+        $openinghours = Openinghours::first();
         $openinghours->channel->service->source = 'vesta';
         $openinghours->label = 'testLabel';
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'update');
@@ -136,7 +139,7 @@ class VestaServiceTest extends \TestCase
         $this->expectsJobs(UpdateVestaOpeninghours::class);
         $this->expectsJobs(DeleteLodOpeninghours::class);
 
-        $openinghours = \App\Models\Openinghours::first();
+        $openinghours = Openinghours::first();
         $openinghours->channel->service->source = 'vesta';
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'delete');
     }
@@ -151,11 +154,17 @@ class VestaServiceTest extends \TestCase
             return;
         }
 
-        $this->doesntExpectJobs(DeleteLodOpeninghours::class);
+        $jobsNrOriginal = QueuedJob::all()->count();
 
-        $openinghours = \App\Models\Openinghours::first();
+        $openinghours = Openinghours::first();
         $openinghours->channel->service->source = 'vesta';
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'update');
-        $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'delete');
+
+        $jobsNrOneAdded = QueuedJob::all()->count();
+        $this->assertEquals($jobsNrOriginal + 1, $jobsNrOneAdded);
+
+        $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'update');
+        $jobsNrStillTheSame = QueuedJob::all()->count();
+        $this->assertEquals($jobsNrOneAdded, $jobsNrStillTheSame);
     }
 }

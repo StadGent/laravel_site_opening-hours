@@ -49,7 +49,6 @@ class UpdateVestaOpeninghours implements ShouldQueue
      */
     public function handle()
     {
-
         try {
             // TODO : generate html output for full week
             $output = '';
@@ -68,6 +67,5 @@ class UpdateVestaOpeninghours implements ShouldQueue
         }
 
         $this->queueService->removeJobFromQueue($this, Service::class, $this->serviceId);
-
     }
 }

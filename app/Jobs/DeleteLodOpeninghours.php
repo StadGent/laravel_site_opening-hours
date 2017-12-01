@@ -53,8 +53,9 @@ class DeleteLodOpeninghours implements ShouldQueue
     {
         $result = app(LodOpeninghoursRepository::class)->deleteOpeninghours($this->openinghoursId);
         if (!$result) {
-            $this->fail(new \Exception(sprintf('The %s job failed with service id %s and opening hours id %s. Check the logs for details',
-                static::class, $this->serviceId, $this->openinghoursId)));
+            $failString = 'The %s job failed with service id %s and opening hours id %s. Check the logs for details';
+            $failMsg = sprintf($failString, static::class, $this->serviceId, $this->openinghoursId);
+            $this->fail(new \Exception($failMsg));
         }
 
         $this->queueService->removeJobFromQueue($this, Openinghours::class, $this->openinghoursId);
