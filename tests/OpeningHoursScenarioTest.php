@@ -249,7 +249,7 @@ class OpeningHoursScenarioTest extends \TestCase
             "Wednesday 09-06: 09:00 AM-12:00 PM and 01:00 PM-05:00 PM" .
             "Thursday 09-07: 09:00 AM-12:00 PM and 01:00 PM-05:00 PM" .
             "Friday 09-08: 09:00 AM-12:00 PM and 01:00 PM-05:00 PM" .
-            "Saterday 09-09: 10:00 AM-12:00 PM";
+            "Saturday 09-09: 10:00 AM-12:00 PM";
         $this->assertEquals($expected, $cleanedoutput);
     }
 

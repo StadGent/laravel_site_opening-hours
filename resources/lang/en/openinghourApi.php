@@ -25,6 +25,6 @@ return [
     'day_3'  => 'Wednesday',
     'day_4'  => 'Thursday',
     'day_5'  => 'Friday',
-    'day_6'  => 'Saterday',
+    'day_6'  => 'Saturday',
 
 ];
