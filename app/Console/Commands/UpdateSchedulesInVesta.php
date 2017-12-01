@@ -28,7 +28,9 @@ class UpdateSchedulesInVesta extends BaseCommand
      *
      * @var string
      */
-    protected $description = 'Update the output of all VESTA related services to VESTA. The output will be the week schedule starting on monday of the week in which the timestamp of the execution of the command falls in.';
+    protected $description = 'Update the output of all VESTA related services to VESTA. ' .
+        'The output will be the week schedule starting on monday of the week in which the timestamp ' .
+        'of the execution of the command falls in.';
 
     /**
      * Create a new command instance.
@@ -53,7 +55,8 @@ class UpdateSchedulesInVesta extends BaseCommand
             ->get();
 
         foreach ($services as $service) {
-            $this->info('Dispatch a job that will update the services (' . $service->id . ') ' . $service->label . ' to VESTA');
+            $this->info('Dispatch a job that will update the services (' . $service->id . ') ' .
+                $service->label . ' to VESTA');
             dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
             $checkedServices++;
         }
