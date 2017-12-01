@@ -29,7 +29,6 @@ class DeleteLodChannel implements ShouldQueue
      */
     private $queueService;
 
-
     /**
      * Create a new job instance.
      *

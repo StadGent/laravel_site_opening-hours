@@ -90,8 +90,9 @@ class AppServiceProvider extends ServiceProvider
             return \App\Services\UserService::getInstance();
         });
 
-        $this->app->singleton('QueueService', function ($app) {
+        $this->app->singleton(\App\Services\QueueService::class, function ($app) {
             return \App\Services\QueueService::getInstance();
         });
+        $this->app->alias(\App\Services\QueueService::class, 'QueueService');
     }
 }

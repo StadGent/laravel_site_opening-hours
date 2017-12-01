@@ -6,6 +6,7 @@ use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Openinghours;
+use App\Services\QueueService;
 
 /**
  * This class writes text to the VESTA application based on a certain VESTA UID
@@ -47,13 +48,12 @@ class VestaService
      */
     private $queueService;
 
-
     /**
      * Private contructor for Singleton pattern
      */
     private function __construct()
     {
-        $this->queueService = app('QueueService');
+        $this->queueService = app(QueueService::class);
     }
 
     /**
