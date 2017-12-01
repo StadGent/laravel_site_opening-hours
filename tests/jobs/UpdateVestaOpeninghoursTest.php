@@ -51,8 +51,8 @@ class UpdateVestaOpeninghoursTest extends \TestCase
         $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'recreatex']);
         $this->setExpectedException(
             \Exception::class,
-            'The App\Jobs\UpdateVestaOpeninghours job did not find a VESTA service (' . $service->id .
-            ') with uid JyeehBaby.'
+            'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
+            '). Check the logs for details. - Incompatible with VESTA or uid JyeehBab'
         );
         $job = new UpdateVestaOpeninghours($service->identifier, $service->id, true);
 
@@ -76,8 +76,8 @@ class UpdateVestaOpeninghoursTest extends \TestCase
         $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta']);
         $this->setExpectedException(
             \Exception::class,
-            'The App\Jobs\UpdateVestaOpeninghours job tried to sync empty data for service (' . $service->id .
-            ') with uid JyeehBaby to VESTA.'
+            'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
+            '). Check the logs for details. - No data was found to send to VEST'
         );
         $job = new UpdateVestaOpeninghours($service->identifier, $service->id, true);
 
@@ -93,8 +93,8 @@ class UpdateVestaOpeninghoursTest extends \TestCase
         $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta', 'draft' => 1]);
         $this->setExpectedException(
             \Exception::class,
-            'The App\Jobs\UpdateVestaOpeninghours job tried to sync an inactive service (' . $service->id .
-            ') with uid JyeehBaby to VESTA.'
+            'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
+            '). Check the logs for details. - Service is inactive'
         );
         $job = new UpdateVestaOpeninghours($service->identifier, $service->id, true);
 

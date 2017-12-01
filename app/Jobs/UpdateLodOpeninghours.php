@@ -7,14 +7,13 @@ use App\Repositories\ChannelRepository;
 use App\Repositories\LodOpeninghoursRepository;
 use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ServicesRepository;
-use App\Services\QueueService;
 use EasyRdf_Graph as Graph;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateLodOpeninghours implements ShouldQueue
+class UpdateLodOpeninghours extends BaseJob implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
@@ -34,11 +33,6 @@ class UpdateLodOpeninghours implements ShouldQueue
     protected $channelId;
 
     /**
-     * @var QueueService
-     */
-    private $queueService;
-
-    /**
      * Create a new job instance.
      *
      * @param int $serviceId
@@ -49,10 +43,13 @@ class UpdateLodOpeninghours implements ShouldQueue
      */
     public function __construct($serviceId, $openinghoursId, $channelId)
     {
+        parent::__construct();
         $this->serviceId = $serviceId;
         $this->openinghoursId = $openinghoursId;
         $this->channelId = $channelId;
-        $this->queueService = app('QueueService');
+
+        $this->extModelClass = Openinghours::class;
+        $this->extId = $openinghoursId;
     }
 
     /**
@@ -72,18 +69,10 @@ class UpdateLodOpeninghours implements ShouldQueue
         // Add the service and the openinghours' channel to the graph
         $graph = $this->createServiceResource($service, $channel, $openinghoursGraph);
 
-        $result = app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph);
-        if (!$result) {
-            $this->fail(new \Exception(sprintf(
-                'The %s job failed with service id %s channel id %s, and opening hours id %s. Check the logs for details',
-                static::class,
-                $this->serviceId,
-                $this->channelId,
-                $this->openinghoursId
-            )));
+        if (!$app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph)) {
+            $this->letsFail();
         }
-
-        $this->queueService->removeJobFromQueue($this, Openinghours::class, $this->openinghoursId);
+        $this->letsFinish();
     }
 
     /**

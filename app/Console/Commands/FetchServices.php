@@ -21,16 +21,6 @@ class FetchServices extends BaseCommand
     protected $description = 'Fetch the available public services from an LOD endpoint.';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
