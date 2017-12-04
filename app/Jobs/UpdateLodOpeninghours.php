@@ -15,8 +15,6 @@ use Illuminate\Queue\SerializesModels;
 
 class UpdateLodOpeninghours extends BaseJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
-
     /**
      * @var int
      */

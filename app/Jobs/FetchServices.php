@@ -11,7 +11,6 @@ use Illuminate\Queue\SerializesModels;
 
 class FetchServices extends BaseJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * The LOD service repository
