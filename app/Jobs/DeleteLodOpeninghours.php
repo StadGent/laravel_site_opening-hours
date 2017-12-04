@@ -11,7 +11,6 @@ use Illuminate\Queue\SerializesModels;
 
 class DeleteLodOpeninghours extends BaseJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var int
