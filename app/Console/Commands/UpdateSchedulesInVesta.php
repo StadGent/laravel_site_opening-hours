@@ -33,16 +33,6 @@ class UpdateSchedulesInVesta extends BaseCommand
         'of the execution of the command falls in.';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -56,7 +46,8 @@ class UpdateSchedulesInVesta extends BaseCommand
         foreach ($services as $service) {
             $this->info('Dispatch a job that will update the services (' . $service->id . ') ' .
                 $service->label . ' to VESTA');
-            dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
+            $job = new UpdateVestaOpeninghours($service->identifier, $service->id);
+            $this->queueService->addJobToQueue($job, Service::class, $service->id);
         }
 
         $this->info('Nr of services set in queue: ' . $services->count());
