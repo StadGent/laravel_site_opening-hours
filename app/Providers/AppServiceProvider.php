@@ -70,24 +70,39 @@ class AppServiceProvider extends ServiceProvider
         });
 
         /* SERVICES **/
-        $this->app->singleton('ChannelService', function ($app) {
+        $this->app->singleton(\App\Services\ChannelService::class, function ($app) {
             return \App\Services\ChannelService::getInstance();
         });
+        $this->app->alias(\App\Services\ChannelService::class, 'ChannelService');
 
-        $this->app->singleton('SparqlService', function ($app) {
+        $this->app->singleton(\App\Services\SparqlService::class, function ($app) {
             return \App\Services\SparqlService::getInstance();
         });
+        $this->app->alias(\App\Services\SparqlService::class, 'SparqlService');
 
-        $this->app->singleton('VestaService', function ($app) {
+        $this->app->singleton(\App\Services\VestaService::class, function ($app) {
             return \App\Services\VestaService::getInstance();
         });
+        $this->app->alias(\App\Services\VestaService::class, 'VestaService');
 
-        $this->app->singleton('LocaleService', function ($app) {
+        $this->app->singleton(\App\Services\LocaleService::class, function ($app) {
             return \App\Services\LocaleService::getInstance();
         });
+        $this->app->alias(\App\Services\LocaleService::class, 'LocaleService');
 
-        $this->app->singleton('UserService', function ($app) {
+        $this->app->singleton(\App\Services\UserService::class, function ($app) {
             return \App\Services\UserService::getInstance();
         });
+        $this->app->alias(\App\Services\UserService::class, 'UserService');
+
+        $this->app->singleton(\App\Services\RecurringOHService::class, function ($app) {
+            return \App\Services\RecurringOHService::getInstance();
+        });
+        $this->app->alias(\App\Services\RecurringOHService::class, 'RecurringOHService');
+
+        $this->app->singleton(\App\Services\QueueService::class, function ($app) {
+            return \App\Services\QueueService::getInstance();
+        });
+        $this->app->alias(\App\Services\QueueService::class, 'QueueService');
     }
 }

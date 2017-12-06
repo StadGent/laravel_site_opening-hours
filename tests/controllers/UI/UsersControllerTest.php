@@ -13,6 +13,15 @@ class UsersControllerTest extends \TestCase
     use DatabaseTransactions;
 
     /**
+     * setup for each test
+     */
+    public function setup()
+    {
+        parent::setUp();
+        Mail::fake();
+    }
+
+    /**
      * @var string
      */
     protected $apiUrl = '/api/v1/ui';
@@ -63,7 +72,6 @@ class UsersControllerTest extends \TestCase
      */
     public function testInviteNewUserValidation($userRole, $email, $role, $serviceId, $statusCode)
     {
-        Mail::fake();
         $authUser = \App\Models\User::where('name', $userRole . 'user')->first();
         $this->actingAs($authUser, 'api');
 
@@ -145,7 +153,6 @@ class UsersControllerTest extends \TestCase
         $this->actingAs($user, 'api');
 
         $newUser = factory(User::class)->make();
-        Mail::fake();
 
         $request = [
             'email' => $newUser->email,
@@ -180,7 +187,6 @@ class UsersControllerTest extends \TestCase
         $this->actingAs($user, 'api');
 
         $knownUser = \App\Models\User::find(2);
-        Mail::fake();
 
         $request = [
             'email' => $knownUser->email,
