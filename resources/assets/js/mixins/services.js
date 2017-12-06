@@ -12,7 +12,7 @@ export default {
         };
     },
     created() {
-        this.fetchServices(0, 500);
+        this.fetchServices(0, 499);
         this.fetchServices(499);
     },
     computed: {
