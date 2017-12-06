@@ -43,7 +43,7 @@ class ServicesController extends Controller
             return $this->servicesRepository->getExpandedServices(null, $offset, $limit);
         }
 
-        return $this->servicesRepository->getExpandedServiceForUser($request->user('api')->id);
+        return $this->servicesRepository->getExpandedServiceForUser($request->user('api')->id, $offset, $limit);
     }
 
     /**

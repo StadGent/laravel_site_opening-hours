@@ -32,13 +32,13 @@ class ServicesRepository extends EloquentRepository
      * @param $userId
      * @return mixed
      */
-    public function getExpandedServiceForUser($userId)
+    public function getExpandedServiceForUser($userId, $offset, $limit)
     {
         if (empty($userId)) {
             return;
         }
 
-        return $this->getExpandedServiceForUserQuery($userId)->get();
+        return $this->getExpandedServiceForUserQuery($userId, $offset, $limit)->get();
     }
 
     /**
@@ -66,12 +66,12 @@ class ServicesRepository extends EloquentRepository
             ->select($rawSelect)
             ->leftJoin($rawSubQuery, 'services.id', '=', 'tmp.service_id')
             ->groupBy('services.id')
-            ->orderBy('services.id')
-            ->orderBy('services.draft')
+            ->orderBy('services.draft', 'ASC')
+            ->orderBy('services.updated_at', 'DESC')
             ->skip($offset);
 
-        if($limit === null){
-            $query->take(\DB::table('services')->count() - $offset);
+        if ($limit === null){
+            $query->take(Service::all()->count() - $offset > 0 ? Service::all()->count() - $offset : 0);
         }
         else {
             $query->take($limit);
@@ -88,15 +88,16 @@ class ServicesRepository extends EloquentRepository
      * Return a specific service with linked channels
      *
      * @param  int $serviceId
-     * @return array
+     *
+     * @return \App\Repositories\Collection
      */
-    private function getExpandedServiceForUserQuery($userId)
+    private function getExpandedServiceForUserQuery($userId, $offset, $limit)
     {
         if (empty($userId)) {
             return;
         }
 
-        $query = $this->getExpandedServicesQuery();
+        $query = $this->getExpandedServicesQuery(null, $offset, $limit);
 
         $query->join('user_service_role', 'services.id', '=', 'user_service_role.service_id')
             ->where('user_service_role.user_id', $userId);
