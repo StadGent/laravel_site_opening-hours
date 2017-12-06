@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\DefaultCalendar;
 use App\Models\DefaultEvent;
-use Illuminate\Console\Command;
 
 /**
  * Fetch the holidays for GENT and import them
@@ -13,7 +12,7 @@ use Illuminate\Console\Command;
  * In second stage: import ical data from LOD
  * Also only use nl_BE for now, multi lang is no prio yet
  */
-class FetchODHolidays extends Command
+class FetchODHolidays extends BaseCommand
 {
     /**
      * The name and signature of the console command.
@@ -194,35 +193,5 @@ class FetchODHolidays extends Command
             $this->info($msg);
         });
         $notUsedEvents->delete();
-    }
-
-    /**
-     * Write a string as error output.
-     *
-     * overwrite parent to make sure errors go to log
-     *
-     * @param  string  $string
-     * @param  null|int|string  $verbosity
-     * @return void
-     */
-    public function error($string, $verbosity = null)
-    {
-        \Log::error($string);
-        parent::error($string, $verbosity);
-    }
-
-    /**
-     * Write a string as info output.
-     *
-     * overwrite parent to make info go to log
-     *
-     * @param  string  $string
-     * @param  null|int|string  $verbosity
-     * @return void
-     */
-    public function info($string, $verbosity = null)
-    {
-        \Log::info($string);
-        parent::error($string, $verbosity);
     }
 }

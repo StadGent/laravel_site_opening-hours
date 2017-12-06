@@ -12,7 +12,8 @@ export default {
         };
     },
     created() {
-        this.fetchServices();
+        this.fetchServices(0, 499);
+        this.fetchServices(499);
     },
     computed: {
         isRecreatex() {
@@ -55,13 +56,25 @@ export default {
             if (index === -1) return;
             this.$set(this.services, index, this.routeService);
         },
-        fetchServices() {
+        fetchServices(offset, limit) {
             this.statusStart();
             this.serviceLock = true;
 
-            return this.$http.get(API_PREFIX + '/services')
+            let query = API_PREFIX + '/services';
+
+            if (limit && offset) {
+                query += '?offset=' + offset + '&limit=' + limit;
+            }
+            else if (limit) {
+                query += '?limit=' + limit;
+            }
+            else if (offset) {
+                query += '?offset=' + offset;
+            }
+
+            return this.$http.get(query)
                 .then(({data}) => {
-                    this.services = data || [];
+                    this.services = this.services.concat(data);
                 })
                 .then(() => {
                     this.serviceLock = false;
@@ -95,6 +108,7 @@ export default {
             return this.$http.get(API_PREFIX + '/services/' + this.route.service + '/channels')
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
+                    console.log('channels fetched');
                 })
                 .then(() => {
                     this.fetchUsers(this.route.service)
@@ -141,7 +155,7 @@ export default {
             return this.services.find(s => s.id === id) || {};
         },
         fetchPresets(start, end, next) {
-            Vue.http.get(API_PREFIX + '/presets?start_date='+ start + '&end_date=' + end)
+            Vue.http.get(API_PREFIX + '/presets?start_date=' + start + '&end_date=' + end)
                 .then(({data}) => {
                     if (next) {
                         next(data);
@@ -257,7 +271,7 @@ export default {
 
             this.$http.put(API_PREFIX + '/openinghours/' + version.id, version)
                 .then(({data}) => {
-                    this.fetchServices();
+                    this.fetchChannels();
                     this.modalClose();
                 })
                 .then(this.statusReset)
@@ -278,8 +292,8 @@ export default {
             this.$http.delete(API_PREFIX + '/openinghours/' + version.id)
                 .then(() => {
                     this.modalClose();
+                    this.fetchChannels();
                     this.toChannel(version.channel_id);
-                    this.fetchServices();
                 })
                 .then(this.statusReset)
                 .catch(fetchError);

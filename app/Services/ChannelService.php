@@ -19,11 +19,18 @@ class ChannelService
     private static $instance;
 
     /**
+     * @var QueueService
+     */
+    private $queueService;
+
+    /**
      * Private contructor for Singleton pattern
      */
     private function __construct()
     {
+        $this->queueService = app('QueueService');
     }
+
     /**
      * GetInstance for Singleton pattern
      *
@@ -54,10 +61,12 @@ class ChannelService
 
         // Update VESTA if the service is linked to a VESTA UID
         if (!empty($service) && $service->source == 'vesta') {
-            dispatch((new UpdateVestaOpeninghours($service->identifier, $service->id)));
+            $job = new UpdateVestaOpeninghours($service->identifier, $service->id);
+            $this->queueService->addJobToQueue($job, get_class($service), $service->id);
         }
 
         // Remove the LOD repository
-        dispatch(new DeleteLodChannel($service->id, $channel->id));
+        $job = new DeleteLodChannel($service->id, $channel->id);
+        $this->queueService->addJobToQueue($job, get_class($channel), $channel->id);
     }
 }

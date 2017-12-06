@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -107,6 +108,12 @@ class GetQueryRequest extends FormRequest
                     $validator->errors()->add('Channel', "The selected service '" . $service->label .
                         "' does not contain a channel with the identifier " . $this->route('channel')->id);
                 }
+            }
+
+            if($service->draft){
+                $exception = new ModelNotFoundException();
+                $exception->setModel(Service::class);
+                throw $exception;
             }
         });
     }

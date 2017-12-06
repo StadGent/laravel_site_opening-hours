@@ -126,7 +126,10 @@ class LodOpeninghoursRepository
      */
     private function makeSparqlService()
     {
-        return app('SparqlService');
+        $sparqlService = app('SparqlService');
+        $sparqlService->setClient();
+
+        return $sparqlService;
     }
 
     /**
