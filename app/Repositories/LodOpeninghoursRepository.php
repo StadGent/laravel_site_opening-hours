@@ -30,7 +30,7 @@ class LodOpeninghoursRepository
         }
 
         $newTriples = $header . ' ' . $newTriples;
-        $this->makeSparqlService()->performSparqlQuery($newTriples, 'POST');
+        return $this->makeSparqlService()->performSparqlQuery($newTriples, 'POST');
     }
 
     /**
