@@ -76,7 +76,7 @@ abstract class BaseJob implements ShouldQueue
         if (!empty($this->extModelClass) && !empty($this->extId)) {
             $this->queueService->removeJobFromQueue($this, $this->extModelClass, $this->extId);
         }
-        if ($this->test) {
+        if (isset($this->test) && $this->test) {
             throw $exception;
         }
     }
