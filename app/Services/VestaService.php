@@ -89,6 +89,8 @@ class VestaService
 
         $this->client = new \SoapClient($wsdl, [
             'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
+            'trace' => true,
+            'exception' => true,
         ]);
         $this->username = $username ?: env('VESTA_USER');
         $this->password = $password ?: env('VESTA_PASSWORD');
@@ -102,9 +104,9 @@ class VestaService
     protected function getSecurity()
     {
         $security = new \stdClass();
-        $security->Domain = base64_encode($this->domain);
-        $security->Username = base64_encode($this->username);
-        $security->Password = base64_encode($this->password);
+        $security->Domain = new \SoapVar(base64_encode($this->domain), XSD_STRING, null, null, 'Domain', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        $security->Password = new \SoapVar(base64_encode($this->password), XSD_STRING, null, null, 'Domain', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        $security->Username = new \SoapVar(base64_encode($this->username), XSD_STRING, null, null, 'Domain', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
 
         return $security;
     }
@@ -115,7 +117,7 @@ class VestaService
     protected function getActionParams()
     {
         $parameters = new \stdClass();
-        $parameters->cred = $this->getSecurity();
+        $parameters->cred = new \SoapVar($this->getSecurity(), SOAP_ENC_OBJECT, null, null, 'cred', 'http://tempuri.org/');
 
         return $parameters;
     }
@@ -133,14 +135,14 @@ class VestaService
      */
     public function updateOpeninghours($guid, $hours = '')
     {
+        $client =  $this->getClient();
         if (!$guid) {
             throw new \Exception('A guid is required to update the data in VESTA');
         }
         $parameters = $this->getActionParams();
-        $parameters->accountId = $guid;
-        $parameters->hours = $hours;
-
-        $response = $this->getClient()->FillHours($parameters);
+        $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        $parameters->hours = new \SoapVar($hours, XSD_STRING, null, null, 'hours', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        $response = $client->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
             \Log::error('Something went wrong in VESTA.', [
                 'response' => print_r($response, 1),
@@ -204,7 +206,7 @@ class VestaService
      *
      * @return \SoapClient
      */
-    protected function getClient()
+    public function getClient()
     {
         if (!$this->client) {
             $this->setClient();
