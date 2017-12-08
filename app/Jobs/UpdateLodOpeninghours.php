@@ -69,6 +69,7 @@ class UpdateLodOpeninghours extends BaseJob implements ShouldQueue
 
         if (!app(LodOpeninghoursRepository::class)->update($service, $channel, $this->openinghoursId, $graph)) {
             $this->letsFail();
+            return;
         }
         $this->letsFinish();
     }
