@@ -141,7 +141,7 @@ class VestaService
         }
         $parameters = $this->getActionParams();
         $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
-        $parameters->hours = new \SoapVar($hours, XSD_STRING, null, null, 'hours', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        $parameters->hours = new \SoapVar('<![CDATA[' . $hours . ']]>', XSD_ANYXML, null, null, 'hours', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
         $response = $client->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
             \Log::error('Something went wrong in VESTA.', [
