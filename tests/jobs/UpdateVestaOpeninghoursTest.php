@@ -109,10 +109,10 @@ class UpdateVestaOpeninghoursTest extends \TestCase
     public function testHappyPath()
     {
         $this->app->singleton(VestaService::class, function () {
-            $mock = $this->createMock(\App\Services\VestaService::class, ['getOpeningshoursByGuid']);
+            $mock = $this->createMock(\App\Services\VestaService::class, ['updateOpeninghours']);
             $mock->expects($this->once())
-                ->method('getOpeningshoursByGuid')
-                ->willReturn('thisWouldBeOutdatedData');
+                ->method('updateOpeninghours')
+                ->willReturn(true);
 
             return $mock;
         });
