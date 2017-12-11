@@ -19,7 +19,7 @@ class RecurringOHService
      * @var LocaleService
      */
     private static $instance;
- 
+
     /**
      * Start of current periode => NOW->startOfWeek()
      * @var Carbon
@@ -459,7 +459,7 @@ class RecurringOHService
         $usefullDays = [
             'MO' => 'maandag',
             'TU' => 'dinsdag',
-            'WE' => 'woendag',
+            'WE' => 'woensdag',
             'TH' => 'donderdag',
             'FR' => 'vrijdag',
             'SA' => 'zaterdag',
