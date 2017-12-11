@@ -407,7 +407,7 @@ class RecurringOHServiceTest extends \TestCase
 
         $byDay = 'MO,WE,FR,SU';
         $byDayProcessed = $this->recurringOHService->hrByDay($byDay);
-        $this->assertEquals('maandag, woendag, vrijdag, zondag', $byDayProcessed);
+        $this->assertEquals('maandag, woensdag, vrijdag, zondag', $byDayProcessed);
 
         $byDay = 'TU,TH,SA';
         $byDayProcessed = $this->recurringOHService->hrByDay($byDay);
