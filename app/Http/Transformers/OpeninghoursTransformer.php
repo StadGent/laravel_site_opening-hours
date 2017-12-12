@@ -9,6 +9,7 @@ use App\Services\LocaleService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class OpeninghoursTransformer implements TransformerInterface
 {
@@ -32,6 +33,8 @@ class OpeninghoursTransformer implements TransformerInterface
     private $includeIsOpenNow;
 
     private $hasOneChannel;
+
+    private $calendarLength;
 
     /**
      * @return array
@@ -84,8 +87,14 @@ class OpeninghoursTransformer implements TransformerInterface
     /**
      * @param $hasOneChannel
      */
-    public function setHasOneChannel($hasOneChannel){
+    public function setHasOneChannel($hasOneChannel)
+    {
         $this->hasOneChannel = $hasOneChannel;
+    }
+
+    public function setCalendarLength($calendarLength)
+    {
+        $this->calendarLength = $calendarLength;
     }
 
     /**
@@ -214,7 +223,17 @@ class OpeninghoursTransformer implements TransformerInterface
     public function transformJsonCollection(Collection $channels)
     {
         $data = $this->getCollectionData($channels);
-        if($this->hasOneChannel){
+
+        if (!$this->includeIsOpenNow) {
+            foreach ($data as $channelKey => $channelArr) {
+                foreach ($data[$channelKey]['openinghours'] as $openinghourkey => $openinghourArr) {
+                    $datestring = $data[$channelKey]['openinghours'][$openinghourkey]->date->toDateString();
+                    $data[$channelKey]['openinghours'][$openinghourkey]->date = $datestring;
+                }
+            }
+        }
+
+        if ($this->hasOneChannel) {
             $data = array_first($data);
         }
         return json_encode($data);
@@ -295,45 +314,12 @@ class OpeninghoursTransformer implements TransformerInterface
     {
         $data = $this->getCollectionData($channels);
 
-        $formattedSchedule = '<div vocab="http://schema.org/" typeof="Library">';
-
-        foreach ($data as $channelArr) {
-            $formattedSchedule .= "<h1>" . $channelArr['channel'] . "</h1>";
-
-            if (isset($channelArr['openNow'])) {
-                $formattedSchedule .= "<div>" . $channelArr['openNow']['label'] . "</div>";
-                continue;
-            }
-
-            foreach ($channelArr['openinghours'] as $ohObj) {
-                $formattedSchedule .= '<div property="openingHoursSpecification" typeof="OpeningHoursSpecification">';
-                $formattedSchedule .= '<time property="validFrom validThrough" datetime="';
-                $formattedSchedule .= date('Y-m-d', strtotime($ohObj->date)) . '">';
-                $formattedSchedule .= date($this->localeService->getDateFormat(), strtotime($ohObj->date));
-                $formattedSchedule .= '</time>: ';
-                if (!$ohObj->open) {
-                    $formattedSchedule .= '<time property="closes" datetime="' .
-                        date('Y-m-d', strtotime($ohObj->date)) . '">' .
-                        trans('openinghourApi.CLOSED') .
-                        '</time></div>';
-                    continue;
-                }
-
-                foreach ($ohObj->hours as $hoursObj) {
-                    $formattedSchedule .= ' ' . trans('openinghourApi.FROM_HOUR') . ' ' .
-                        '<time property="opens" content="' . date('H:i:s', strtotime($hoursObj['from'])) . '">' .
-                        date($this->localeService->getTimeFormat(), strtotime($hoursObj['from'])) .
-                        '</time> ' .
-                        trans('openinghourApi.UNTIL_HOUR') . ' ' .
-                        '<time property="closes" content="' . date('H:i:s', strtotime($hoursObj['until'])) . '">' .
-                        date($this->localeService->getTimeFormat(), strtotime($hoursObj['until'])) .
-                        '</time> ';
-                }
-                $formattedSchedule .= "</div>";
-            }
+        try {
+            $output = view('api.openinghours.' . $this->calendarLength, ['data' => $data]);
+        } catch (\InvalidArgumentException $ex) {
+            throw new NotAcceptableHttpException();
         }
-        $formattedSchedule .= '</div>';
 
-        return $formattedSchedule;
+        return $output;
     }
 }
