@@ -311,7 +311,8 @@ class RecurringOHService
 
         $eventOutput .= $this->hrOpenClosedEvent($event->calendar->closinghours);
 
-        if ($event->calendar->priority !== 0 && ($rrulePerProp['FREQ'] == 'MONTHLY' || $rrulePerProp['FREQ'] == 'WEEKLY')) {
+        if ($event->calendar->priority !== 0 &&
+            ($rrulePerProp['FREQ'] == 'MONTHLY' || $rrulePerProp['FREQ'] == 'WEEKLY')) {
             $eventOutput .= $this->hrEventAvailabillity();
         }
 

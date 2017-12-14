@@ -66,7 +66,11 @@ class RecurringOHServiceTest extends \TestCase
         $service->channels()->save($channel);
         $channel->openinghours()->save($openinghour);
 
-        $openinghour2 = factory(Openinghours::class)->create(['channel_id' => $channel->id, 'start_date' => '2018-01-01', 'end_date' => '2018-12-31']);
+        $openinghour2 = factory(Openinghours::class)->create([
+            'channel_id' => $channel->id,
+            'start_date' => '2018-01-01',
+            'end_date' => '2018-12-31'
+        ]);
         $openinghour2->calendars()->saveMany(
             factory(Calendar::class, 5)->make(['openinghours_id' => $openinghour2->id])
         );
