@@ -9,7 +9,7 @@ use App\Services\RecurringOHService;
 use Carbon\Carbon;
 
 /**
- *
+ * @todo implement locale service
  */
 class RecurringOHService
 {
@@ -122,14 +122,22 @@ class RecurringOHService
 
                     if ($calendarOutput !== '') {
                         $ohOutput .= '<div>' . "\n";
-                        $ohOutput .= '<h3>' . $calendar->label;
-                        // set OH start and end to make distinct titles when +1 OH obj in periode
-                        if ($ohCollection->count() > 1) {
-                            $ohOutput .= ' ' . $openinghours->start_date . ' ' . $openinghours->end_date;
+                        if ($calendar->priority !== 0 || $ohCollection->count() > 1) {
+                            $ohOutput .= '<h3>' . $calendar->label;
+                            // when multiple openinghours we add these on the base calendar (and not on the time line)
+                            if ($calendar->priority == 0) {
+                                $ohStart = new Carbon($openinghours->start_date);
+                                $ohEnd = new Carbon($openinghours->end_date);
+                                if ($ohStart->gt($this->startPeriod)) {
+                                    $ohOutput .= ' geldig vanaf ' . $ohStart->format('d/m/Y');
+                                }
+                                if ($ohEnd->lt($this->endPeriod)) {
+                                    $ohOutput .= ' geldig t.e.m. ' . $ohEnd->format('d/m/Y');
+                                }
+                            }
+                            $ohOutput .= '</h3>' . "\n";
                         }
-                        $ohOutput .= '</h3>' . "\n";
-                        $ohOutput .= $calendarOutput;
-                        $ohOutput .= '</div>' . "\n";
+                        $ohOutput .= $calendarOutput . '</div>' . "\n";
                     }
                 }
                 if ($ohOutput !== '') {
@@ -303,6 +311,34 @@ class RecurringOHService
 
         $eventOutput .= $this->hrOpenClosedEvent($event->calendar->closinghours);
 
+        if ($event->calendar->priority !== 0 && ($rrulePerProp['FREQ'] == 'MONTHLY' || $rrulePerProp['FREQ'] == 'WEEKLY')) {
+            $eventOutput .= $this->hrEventAvailabillity();
+        }
+
+        return $eventOutput;
+    }
+
+    /**
+     * Get the Human Readable text of vailable from until
+     *
+     * Make an output that returns the availabillity of the event
+     * when a recurring event starts or stops (until) in the requested period
+     *
+     * @return string
+     */
+    protected function hrEventAvailabillity()
+    {
+        $eventOutput = '';
+        if ($this->eventStart->gt($this->startPeriod)) {
+            $eventOutput .= ' geldig vanaf ' . $this->eventStart->format('d/m/Y');
+        }
+        if ($this->eventUntil->lt($this->endPeriod)) {
+            if (empty($eventOutput)) {
+                $eventOutput .= ' geldig';
+            }
+            $eventOutput .= ' t.e.m. ' . $this->eventUntil->format('d/m/Y');
+        }
+
         return $eventOutput;
     }
 
@@ -319,10 +355,10 @@ class RecurringOHService
     protected function hrYearly()
     {
         if ($this->eventStart->format('Y-m-d') !== $this->eventEnd->format('Y-m-d')) {
-            return $this->eventStart->format('d-m-Y') . ' tot ' . $this->eventEnd->format('d-m-Y');
+            return $this->eventStart->format('d/m/Y') . ' - ' . $this->eventEnd->format('d/m/Y');
         }
 
-        return 'Op ' . $this->eventStart->format('d-m-Y');
+        return 'Op ' . $this->eventStart->format('d/m/Y');
     }
 
     /**
@@ -337,11 +373,15 @@ class RecurringOHService
     {
         $eventOutput = '';
         if (isset($rrulePerProp['BYSETPOS'])) {
-            $eventOutput .= $this->hrBySetPos($rrulePerProp['BYSETPOS']) . ' ';
+            $eventOutput .= $this->hrForNumber($rrulePerProp['BYSETPOS']) . ' ';
         }
 
         if (isset($rrulePerProp['BYDAY'])) {
             $eventOutput .= $this->hrByDay($rrulePerProp['BYDAY']);
+        }
+
+        if (isset($rrulePerProp['BYMONTHDAY'])) {
+            $eventOutput .= $this->hrForNumber($rrulePerProp['BYMONTHDAY']);
         }
 
         $eventOutput .= ($rrulePerProp['FREQ'] === 'MONTHLY' ? ' van de maand' : '');
@@ -362,10 +402,10 @@ class RecurringOHService
     protected function hrDaily()
     {
         if ($this->eventStart->format('Y-m-d') !== $this->eventUntil->format('Y-m-d')) {
-            return $this->eventStart->format('d-m-Y') . ' tot ' . $this->eventUntil->format('d-m-Y');
+            return $this->eventStart->format('d/m/Y') . ' - ' . $this->eventUntil->format('d/m/Y');
         }
 
-        return 'Op ' . $this->eventStart->format('d-m-Y');
+        return 'Op ' . $this->eventStart->format('d/m/Y');
     }
 
     /**
@@ -491,7 +531,7 @@ class RecurringOHService
      * @param $number
      * @return string
      */
-    public function hrBySetPos($number)
+    public function hrForNumber($number)
     {
         // special negative numbers
         switch ($number) {
