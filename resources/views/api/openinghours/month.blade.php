@@ -6,7 +6,8 @@
     $weekdays = \App\Models\DayInfo::WEEKDAYS_SHORT;
     for ($i = 0; $i < $localeService->getWeekStartDay(); $i++) {
         $value = array_shift($weekdays);
-        $weekdays[] = $value;}
+        $weekdays[] = $value;
+    }
 
     ?>
     <div class="openinghours openinghours--calendar">
