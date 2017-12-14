@@ -443,4 +443,70 @@ class RecurringOHServiceTest extends \TestCase
         $hrBySetPos = $this->recurringOHService->hrForNumber(-3);
         $this->assertEquals('2 na laatste', $hrBySetPos);
     }
+
+    /**
+     * @test
+     * @group content
+     */
+    public function testHrEventAvailabilityFrom()
+    {
+        $initStart = new Carbon('2017-04-25');
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
+        $calendar = factory(Calendar::class)->make(['closinghours' => 0, 'priority' => -1]);
+        $event = factory(Event::class)->make([
+            'rrule' => 'BYDAY=MO;FREQ=WEEKLY',
+            'start_date' => new Carbon('2017-05-01-01 08:30:00'),
+            'end_date' => new Carbon('2017-05-01 17:00:00'),
+            'until' => new Carbon('2017-12-25 00:00:00'),
+            'calendar' => $calendar,
+        ]);
+
+        $rrOutput = $this->recurringOHService->collectForEvent($event);
+        $this->assertEquals('Elke maandag: open 08:30 - 17:00 geldig vanaf 01/05/2017', $rrOutput);
+    }
+
+    /**
+     * @test
+     * @group content
+     */
+    public function testHrEventAvailabilityUntil()
+    {
+        $initStart = new Carbon('2017-04-25');
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
+        $calendar = factory(Calendar::class)->make(['closinghours' => 0, 'priority' => -1]);
+        $event = factory(Event::class)->make([
+            'rrule' => 'BYDAY=MO;FREQ=WEEKLY',
+            'start_date' => new Carbon('2017-01-02-01 08:30:00'),
+            'end_date' => new Carbon('2017-01-02 17:00:00'),
+            'until' => new Carbon('2017-05-01 00:00:00'),
+            'calendar' => $calendar,
+        ]);
+
+        $rrOutput = $this->recurringOHService->collectForEvent($event);
+        $this->assertEquals('Elke maandag: open 08:30 - 17:00 geldig t.e.m. 01/05/2017', $rrOutput);
+    }
+
+    /**
+     * @test
+     * @group content
+     */
+    public function testHrByMonthDay()
+    {
+        $initStart = new Carbon('2017-04-25');
+        $this->recurringOHService->setStartPeriod($initStart);
+        $this->recurringOHService->setEndPeriod($initStart->copy()->addMonths(3));
+        $calendar = factory(Calendar::class)->make(['closinghours' => 0, 'priority' => -1]);
+        $event = factory(Event::class)->make([
+            'rrule' => 'BYMONTHDAY=15;FREQ=MONTHLY',
+            'start_date' => new Carbon('2017-01-15-01 08:30:00'),
+            'end_date' => new Carbon('2017-01-15 17:00:00'),
+            'until' => new Carbon('2017-12-15 17:00:00'),
+            'calendar' => $calendar,
+        ]);
+
+        $rrOutput = $this->recurringOHService->collectForEvent($event);
+        $this->assertEquals('Elke 15de van de maand: open 08:30 - 17:00', $rrOutput);
+    }
 }
