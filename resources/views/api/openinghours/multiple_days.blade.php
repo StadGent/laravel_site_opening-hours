@@ -1,5 +1,5 @@
 <div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--table">
-    <h1>Openinghours</h1>
+    <h1>@lang('openinghourApi.title')</h1>
     @if($data[0]['openinghours'])
         @foreach($data[0]['openinghours'] as $dayInfoObj)
             <?php $dayString = \App\Models\DayInfo::WEEKDAYS[$dayInfoObj->date->dayOfWeek]; ?>
