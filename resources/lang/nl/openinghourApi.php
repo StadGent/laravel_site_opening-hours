@@ -58,4 +58,6 @@ return [
     'October' => 'Oktober',
     'November' => 'November',
     'December' => 'December',
+
+    'title' => 'Openingsuren',
 ];
