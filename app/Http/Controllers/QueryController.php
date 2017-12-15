@@ -24,7 +24,7 @@ class QueryController extends Controller
     const CALENDAR_LENGTH_DAY = 'day';
     const CALENDAR_LENGTH_MONTH = 'month';
     const CALENDAR_LENGTH_MULTIPLE_DAYS = 'multiple_days';
-    const CALENDAR_LENGTH_UNDEFINED = 'undefined';
+    const CALENDAR_LENGTH_OPEN_NOW = 'open_now';
 
     const SUPPORTED_CALENDAR_LENGTHS = [
         self::CALENDAR_LENGTH_DAY,
@@ -55,7 +55,7 @@ class QueryController extends Controller
             $start = new Carbon($testDateTime);
         }
 
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_UNDEFINED, true);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_OPEN_NOW, true);
     }
 
     /**
@@ -142,7 +142,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
 
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_UNDEFINED);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
     }
 
     /**
