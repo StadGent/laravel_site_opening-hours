@@ -24,12 +24,32 @@ class DayInfo
      */
     public $hours = [];
 
+    const WEEKDAYS_SHORT = [
+        Carbon::SUNDAY => 'Su',
+        Carbon::MONDAY => 'Mo',
+        Carbon::TUESDAY => 'Tu',
+        Carbon::WEDNESDAY => 'We',
+        Carbon::THURSDAY => 'Th',
+        Carbon::FRIDAY => 'Fr',
+        Carbon::SATURDAY => 'Sa',
+    ];
+
+    const WEEKDAYS = [
+        Carbon::SUNDAY => 'Sunday',
+        Carbon::MONDAY => 'Monday',
+        Carbon::TUESDAY => 'Tuesday',
+        Carbon::WEDNESDAY => 'Wednesday',
+        Carbon::THURSDAY => 'Thursday',
+        Carbon::FRIDAY => 'Friday',
+        Carbon::SATURDAY => 'Saturday',
+    ];
+
     /**
      * @param Carbon $date
      */
     public function __construct(Carbon $date)
     {
-        $this->date = $date->toDateString();
+        $this->date = $date;
     }
 
     /**
@@ -39,8 +59,8 @@ class DayInfo
      */
     public function __toString()
     {
-        $theString = '[' . $this->date . ' => [' . PHP_EOL .
-        'open => ' . (int) $this->open . ', ' .
+        $theString = '[' . $this->date->toDateString() . ' => [' . PHP_EOL .
+            'open => ' . (int)$this->open . ', ' .
             'hours => [';
         foreach ($this->hours as $hours) {
             $theString .= PHP_EOL . '[from => ';
@@ -56,7 +76,7 @@ class DayInfo
 
         if (isset($this->openNow)) {
             $theString .= 'openNow => [status => ' . $this->openNow->status .
-            ', label' . $this->openNow->label . '], ' . PHP_EOL;
+                ', label' . $this->openNow->label . '], ' . PHP_EOL;
         }
 
         $theString .= ']]';
