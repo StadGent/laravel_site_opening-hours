@@ -171,7 +171,7 @@ class RecurringOHService
                 continue;
             }
 
-            $calendarRule[] = $output;
+            $calendarRule[$this->eventStart->format('Y-m-d H:i')] = $output;
         }
 
         return $calendarRule;
@@ -300,6 +300,8 @@ class RecurringOHService
                 $eventOutput = $this->hrYearly();
                 break;
             case 'MONTHLY':
+                $eventOutput = 'Elke ' . $this->hrMonthlyAndWeekly($rrulePerProp);
+                break;
             case 'WEEKLY':
                 $eventOutput = $this->hrMonthlyAndWeekly($rrulePerProp);
                 break;
@@ -387,7 +389,7 @@ class RecurringOHService
 
         $eventOutput .= ($rrulePerProp['FREQ'] === 'MONTHLY' ? ' van de maand' : '');
 
-        return 'Elke ' . $eventOutput;
+        return $eventOutput;
     }
 
     /**
@@ -429,22 +431,24 @@ class RecurringOHService
      *
      * returns empty string when param is empty
      * breaks up the array an put it in a nice html paragraphe with line breaks
+     * Sorts the events in the calendar on the start date (saved in the key)
      *
-     * Does nothing special YET, but good location for:
-     * - sorting on start date
+     * Nice to have todo's:
      * - clean up duplications that distinct between morning and afternoon hours
      *   could use the method longest_common_substring from https://gist.github.com/chrisbloom7/1021218 for this
+     * - put more intelegence behind connected events and merge where possible
      *
      * @param array $calendarRule
      * @return string
      */
     protected function cleanUpOutput($calendarRule)
     {
+        ksort($calendarRule);
         if (empty($calendarRule)) {
             return '';
         }
 
-        return '<p>' . implode("<br />\n", $calendarRule) . '</p>' . "\n";
+        return '<p>' . implode("<br />\n" . "en ", $calendarRule) . '</p>' . "\n";
     }
 
     /**

@@ -69,7 +69,7 @@ class RecurringOHServiceTest extends \TestCase
         $openinghour2 = factory(Openinghours::class)->create([
             'channel_id' => $channel->id,
             'start_date' => '2018-01-01',
-            'end_date' => '2018-12-31'
+            'end_date' => '2018-12-31',
         ]);
         $openinghour2->calendars()->saveMany(
             factory(Calendar::class, 5)->make(['openinghours_id' => $openinghour2->id])
@@ -83,7 +83,7 @@ class RecurringOHServiceTest extends \TestCase
      * @test
      * @group validate
      */
-    public function testFullServiceWithMultipleOHs()
+    public function testFullServiceWithMultipleOHsWillOrderAndAddGlue()
     {
         $initStart = new Carbon('2017-12-25');
         $this->recurringOHService->setStartPeriod($initStart);
@@ -119,21 +119,31 @@ class RecurringOHServiceTest extends \TestCase
 
         $event2 = factory(Event::class)->make([
             'start_date' => '2018-01-01 08:00:00',
+            'start_date' => '2018-01-01 13:00:00',
             'end_date' => '2018-01-01 17:00:00',
             'until' => '2018-12-31 17:00:00',
             'calendar_id' => $calendar2->id,
         ]);
         $calendar2->events()->save($event2);
 
+        $event3 = factory(Event::class)->make([
+            'start_date' => '2018-01-01 08:00:00',
+            'end_date' => '2018-01-01 12:00:00',
+            'until' => '2018-12-31 12:00:00',
+            'calendar_id' => $calendar2->id,
+        ]);
+        $calendar2->events()->save($event3);
+
         $rrOutput = $this->recurringOHService->getRecurringOHForService($service);
         $expected = '<h2>BALIE</h2>' .
             '<div>' .
             '<h3>Normale uren geldig t.e.m. 31/12/2017</h3>' .
-            '<p>Elke maandag tot vrijdag gesloten</p>' .
+            '<p>maandag tot vrijdag gesloten</p>' .
             '</div>' .
             '<div>' .
             '<h3>Normale uren geldig vanaf 01/01/2018</h3>' .
-            '<p>Elke maandag tot vrijdag: open 08:00 - 17:00</p>' .
+            '<p>maandag tot vrijdag: open 08:00 - 12:00<br />'.
+            'en maandag tot vrijdag: open 13:00 - 17:00</p>' .
             '</div>';
         $this->assertEquals($expected, str_replace("\n", '', $rrOutput));
     }
@@ -183,7 +193,7 @@ class RecurringOHServiceTest extends \TestCase
         $expected = '<h2>BALIE</h2>' .
             '<div>' .
             '<h3>Normale uren geldig t.e.m. 31/12/2017</h3>' .
-            '<p>Elke maandag tot vrijdag gesloten</p>' .
+            '<p>maandag tot vrijdag gesloten</p>' .
             '</div>';
         $this->assertEquals($expected, str_replace("\n", '', $rrOutput));
     }
@@ -319,7 +329,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('Elke maandag tot vrijdag: open 08:30 - 17:00', $rrOutput);
+        $this->assertEquals('maandag tot vrijdag: open 08:30 - 17:00', $rrOutput);
     }
 
     /**
@@ -467,7 +477,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('Elke maandag: open 08:30 - 17:00 geldig vanaf 01/05/2017', $rrOutput);
+        $this->assertEquals('maandag: open 08:30 - 17:00 geldig vanaf 01/05/2017', $rrOutput);
     }
 
     /**
@@ -489,7 +499,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('Elke maandag: open 08:30 - 17:00 geldig t.e.m. 01/05/2017', $rrOutput);
+        $this->assertEquals('maandag: open 08:30 - 17:00 geldig t.e.m. 01/05/2017', $rrOutput);
     }
 
     /**
