@@ -2,6 +2,7 @@
 
 namespace Tests\Transformers;
 
+use App\Http\Controllers\QueryController;
 use App\Http\Transformers\OpeninghoursTransformer;
 use App\Models\Service;
 use App\Services\LocaleService;
@@ -35,33 +36,76 @@ class OpeninghoursTransformerTest extends \TestCase
      * @test
      * @group content
      */
-    public function testTransformHtmlTextCollection()
+    public function testTransformHtmlTextDay()
     {
         $service = Service::first();
 
         $transformer = new OpeninghoursTransformer();
         $transformer->setIncludeIsOpenNow(false);
         $transformer->setService($service);
-        $transformer->setStart((new Carbon('2017-09-15'))->startOfDay());
-        $transformer->setEnd((new Carbon('2017-09-15'))->endOfDay());
+        $transformer->setStart((new Carbon('2017-01-01'))->startOfDay());
+        $transformer->setEnd((new Carbon('2017-01-07'))->endOfDay());
+        $transformer->setCalendarLength(QueryController::CALENDAR_LENGTH_DAY);
         $transformer->setLocaleService($this->localeService);
+        $actual = response()->collection($transformer, $service->channels)->content();
+        $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/day.html');
+        $expected = str_replace(' ','',$content);
+        $actual = str_replace(' ','',$actual);
+        $this->assertEquals($expected, $actual);
+    }
 
-        $actual = $transformer->transformHtmlTextCollection($service->channels);
+    /**
+     * @test
+     * @group content
+     */
+    public function testTransformHtmlTextMultipleDays()
+    {
+        $service = Service::first();
 
-        $expected = '<div vocab="http://schema.org/" typeof="Library">';
-        foreach ($service->channels as $channel) {
-            $expected .= '<h1>' . $channel->label . '</h1>' .
-                '<div property="openingHoursSpecification" typeof="OpeningHoursSpecification">' .
-                '<time property="validFrom validThrough" datetime="2017-09-15">15-09-2017</time>:  ' .
-                'van <time property="opens" content="09:00:00">09:00</time> ' .
-                'tot <time property="closes" content="12:00:00">12:00</time>  ' .
-                'van <time property="opens" content="13:00:00">13:00</time> ' .
-                'tot <time property="closes" content="17:00:00">17:00</time> </div>';
-        }
-        $expected .= '</div>';
+        $transformer = new OpeninghoursTransformer();
+        $transformer->setIncludeIsOpenNow(false);
+        $transformer->setService($service);
+        $transformer->setStart((new Carbon('2017-01-01'))->startOfDay());
+        $transformer->setEnd((new Carbon('2017-01-31'))->endOfDay());
+        $transformer->setCalendarLength(QueryController::CALENDAR_LENGTH_MULTIPLE_DAYS);
+        $transformer->setLocaleService($this->localeService);
+        $actual = response()->collection($transformer, $service->channels)->content();
+        $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/multiple_days.html');
+        $expected = str_replace(' ','',$content);
+        $actual = str_replace(' ','',$actual);
+        $expected = str_replace(PHP_EOL, '', $expected);
+        $actual = str_replace(PHP_EOL, '', $actual);
 
         $this->assertEquals($expected, $actual);
     }
+
+    /**
+     * @test
+     * @group content
+     */
+    public function testTransformHtmlTextMonth()
+    {
+        $service = Service::first();
+
+        $transformer = new OpeninghoursTransformer();
+        $transformer->setIncludeIsOpenNow(false);
+        $transformer->setService($service);
+        $transformer->setStart((new Carbon('2017-01-01'))->startOfDay());
+        $transformer->setEnd((new Carbon('2017-01-07'))->endOfDay());
+        $transformer->setCalendarLength(QueryController::CALENDAR_LENGTH_MONTH);
+        $transformer->setLocaleService($this->localeService);
+        $actual = response()->collection($transformer, $service->channels)->content();
+        $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/month.html');
+
+        $expected = str_replace(' ','',$content);
+        $actual = str_replace(' ','',$actual);
+        $expected = str_replace(PHP_EOL, '', $expected);
+        $actual = str_replace(PHP_EOL, '', $actual);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+
 
     /**
      * @test
