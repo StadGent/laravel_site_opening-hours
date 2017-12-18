@@ -18,4 +18,7 @@ return [
     'FROM_DATA' => 'del',
     'UNTILL_DATA' => 'al',
     'SHORT_HOUR' => 'h',
+
+    'TODAY' => 'Hoy',
+    'TOMORROW' => 'Mañana',
 ];
