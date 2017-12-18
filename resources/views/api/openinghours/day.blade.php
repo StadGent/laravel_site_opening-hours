@@ -18,17 +18,7 @@
                     <span class="openinghours--date-day">@if($dayPrefix)@lang('openinghourApi.' . $dayPrefix )@else{{ $date->day }} @lang('openinghourApi.'.$date->format('F'))@endif</span>
                     <span class="openinghours--status">@lang('openinghourApi.' . $status)</span>
                     @if($isOpen)
-                        @foreach($dayInfoObj->hours as $hourArr)
-                            <div class="openinghours--time">
-                                <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
-                                <time datetime="{{$hourArr['from']}}">{{$hourArr['from']}}</time>
-                                <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
-                                <time datetime="{{$hourArr['until']}}">{{$hourArr['until']}}</time>
-                            </div>
-                            @if(end($dayInfoObj->hours) != $hourArr)
-                                <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
-                            @endif
-                        @endforeach
+                        @include('api/openinghours/times', array('dayHours' => $dayInfoObj->hours))
                     @endif
                 </div>
             </div>
