@@ -13,7 +13,7 @@
             }
         ?>
         <div class="openinghours openinghours--short">
-            <div class="openinghours--day openinghours--day-{{ $isOpen ? 'open' : 'closed' }}">
+            <div class="openinghours--day openinghours--day-{{ strtolower($status) }}">
                 <div class="openinghours--times">
                     <span class="openinghours--date-day">@if($dayPrefix)@lang('openinghourApi.' . $dayPrefix )@else{{ $date->day }} @lang('openinghourApi.'.$date->format('F'))@endif</span>
                     <span class="openinghours--status">@lang('openinghourApi.' . $status)</span>
