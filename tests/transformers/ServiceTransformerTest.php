@@ -41,7 +41,7 @@ class ServiceTransformerTest extends \TestCase
     public function testTransformJsonItem()
     {
         $actual = $this->transformer->transformJsonItem($this->service);
-        $content = file_get_contents(__DIR__ . '/../data/transformers/service/transformJsonItem.json');
+        $content = file_get_contents(__DIR__ . '/../data/transformers/json/service/transformJsonItem.json');
         $expected = json_encode(json_decode($content,true));
         $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
         $actual = preg_replace("/\"description\":\"[\w\s.]*\"/", "\"description\":\"\"", $actual);
@@ -55,7 +55,7 @@ class ServiceTransformerTest extends \TestCase
     public function testTransformJsonCollection()
     {
         $actual = $this->transformer->transformJsonCollection((new Collection())->add($this->service));
-        $content = file_get_contents(__DIR__ . '/../data/transformers/service/transformJsonCollection.json');
+        $content = file_get_contents(__DIR__ . '/../data/transformers/json/service/transformJsonCollection.json');
         $expected = json_encode(json_decode($content,true));
         $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
         $actual = preg_replace("/\"description\":\"[\w\s.]*\"/", "\"description\":\"\"", $actual);

@@ -38,7 +38,7 @@ class ChannelTransformerTest extends \TestCase
     public function testTransformJsonItem()
     {
         $actual = $this->transformer->transformJsonItem($this->channel);
-        $content = file_get_contents(__DIR__ . '/../data/transformers/channel/transformJsonItem.json');
+        $content = file_get_contents(__DIR__ . '/../data/transformers/json/channel/transformJsonItem.json');
         $expected = json_encode(json_decode($content,true));
         $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
         $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
@@ -52,7 +52,7 @@ class ChannelTransformerTest extends \TestCase
     public function testTransformJsonCollection()
     {
         $actual = $this->transformer->transformJsonCollection((new Collection())->add($this->channel));
-        $content = file_get_contents(__DIR__ . '/../data/transformers/channel/transformJsonCollection.json');
+        $content = file_get_contents(__DIR__ . '/../data/transformers/json/channel/transformJsonCollection.json');
         $expected = json_encode(json_decode($content,true));
         $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);
         $actual = preg_replace(self::DATETIME_REPLACEMENT, "", $actual);

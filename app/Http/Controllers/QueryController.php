@@ -16,8 +16,21 @@ use Illuminate\Http\Response;
  */
 class QueryController extends Controller
 {
-
+    /**
+     * @var LocaleService
+     */
     private $localeService;
+
+    const CALENDAR_LENGTH_DAY = 'day';
+    const CALENDAR_LENGTH_MONTH = 'month';
+    const CALENDAR_LENGTH_MULTIPLE_DAYS = 'multiple_days';
+    const CALENDAR_LENGTH_OPEN_NOW = 'open_now';
+
+    const SUPPORTED_CALENDAR_LENGTHS = [
+        self::CALENDAR_LENGTH_DAY,
+        self::CALENDAR_LENGTH_MONTH,
+        self::CALENDAR_LENGTH_MULTIPLE_DAYS,
+    ];
 
     public function __construct()
     {
@@ -42,7 +55,7 @@ class QueryController extends Controller
             $start = new Carbon($testDateTime);
         }
 
-        return $this->getResponse($request, $start, $end, $service, $channel, true);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_OPEN_NOW, true);
     }
 
     /**
@@ -58,7 +71,7 @@ class QueryController extends Controller
         $start = new Carbon($request['from']);
         $end = new Carbon($request['until']);
 
-        return $this->getResponse($request, $start, $end, $service, $channel);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
     }
 
     /**
@@ -74,7 +87,7 @@ class QueryController extends Controller
         $start = new Carbon($request['date']);
         $end = $start->copy()->endOfDay();
 
-        return $this->getResponse($request, $start, $end, $service, $channel);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_DAY);
     }
 
     /**
@@ -95,7 +108,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
 
-        return $this->getResponse($request, $start, $end, $service, $channel);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
     }
 
     /**
@@ -112,7 +125,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfMonth();
         $end = $date->copy()->endOfMonth();
 
-        return $this->getResponse($request, $start, $end, $service, $channel);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MONTH);
     }
 
     /**
@@ -129,7 +142,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
 
-        return $this->getResponse($request, $start, $end, $service, $channel);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
     }
 
     /**
@@ -149,10 +162,11 @@ class QueryController extends Controller
         Carbon $end,
         Service $service,
         Channel $channel,
+        $calendarLength,
         $includeIsOpenNow = false
     ) {
         $this->localeService->setRequest($request);
-        $hasOneChannel =  isset($channel->id);
+        $hasOneChannel = isset($channel->id);
 
         $transformer = new OpeninghoursTransformer();
         $transformer->setStart($start);
@@ -161,6 +175,7 @@ class QueryController extends Controller
         $transformer->setLocaleService($this->localeService);
         $transformer->setIncludeIsOpenNow($includeIsOpenNow);
         $transformer->setHasOneChannel($hasOneChannel);
+        $transformer->setCalendarLength($calendarLength);
 
         $channels = isset($channel->id) ? (new Collection())->add($channel) : $service->channels;
 
