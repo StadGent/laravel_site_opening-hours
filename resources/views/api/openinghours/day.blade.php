@@ -14,13 +14,10 @@
         ?>
         <div class="openinghours openinghours--short">
             <div class="openinghours--day openinghours--day-{{ strtolower($status) }}">
-                <div class="openinghours--times">
-                    <span class="openinghours--date-day">@if($dayPrefix)@lang('openinghourApi.' . $dayPrefix )@else{{ $date->day }} @lang('openinghourApi.'.$date->format('F'))@endif</span>
-                    <span class="openinghours--status">@lang('openinghourApi.' . $status)</span>
-                    @if($isOpen)
-                        @include('api.openinghours.times', array('dayHours' => $dayInfoObj->hours))
-                    @endif
+                <div class="openinghours--date">
+                    <time property="validFrom validThrough" datetime="{{ $date->toDateString() }}">@if($dayPrefix)@lang('openinghourApi.' . $dayPrefix )@else{{ $date->day }} @lang('openinghourApi.'.$date->format('F'))@endif</time>
                 </div>
+                @include('api.openinghours.times', ['dayInfoObj' => $dayInfoObj])
             </div>
         </div>
     @endforeach

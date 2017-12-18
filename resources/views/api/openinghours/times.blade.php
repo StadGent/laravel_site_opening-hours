@@ -1,12 +1,14 @@
 {{--
-  -- Template rendeing a single time (from - to).
+  -- Template rendering the times information for a day.
   --
   -- Variables:
-  --   @param array $dayHours : Array containing array of hours (from-to).
+  --   Variables:
+  --       - @param dayInfoObj $dayInfoObj : Day object.
   --}}
-@foreach($dayHours as $hours)
-    @include('api.openinghours.time', array('hours' => $hours))
-    @if(end($dayHours) != $hours)
-        <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
+<div class="openinghours--times">
+    @if(!empty($dayInfoObj->hours))
+        @include('api.openinghours.times_open', ['dayHours' => $dayInfoObj->hours])
+    @else
+        @include('api.openinghours.times_closed')
     @endif
-@endforeach
+</div>
