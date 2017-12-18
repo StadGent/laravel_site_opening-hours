@@ -18,7 +18,7 @@
                     <span class="openinghours--date-day">@if($dayPrefix)@lang('openinghourApi.' . $dayPrefix )@else{{ $date->day }} @lang('openinghourApi.'.$date->format('F'))@endif</span>
                     <span class="openinghours--status">@lang('openinghourApi.' . $status)</span>
                     @if($isOpen)
-                        @include('api/openinghours/times', array('dayHours' => $dayInfoObj->hours))
+                        @include('api.openinghours.times', array('dayHours' => $dayInfoObj->hours))
                     @endif
                 </div>
             </div>
