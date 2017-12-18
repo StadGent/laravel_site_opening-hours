@@ -267,9 +267,9 @@
                     .forEach(({start_date, rrule, until, ended}) => {
                         // Repeating events
                         if (rrule) {
-                            const start = toDatetime(start_date)
-                            const versionStart = toDatetime(this.$parent.version.start_date)
-                            start.setFullYear(versionStart.getFullYear())
+                            const start = toDatetime(start_date);
+                            const versionStart = toDatetime(this.$parent.version.start_date);
+                            start.setFullYear(versionStart.getFullYear());
                             if (start < versionStart) {
                                 start.setFullYear(start.getFullYear() + 1)
                             }
@@ -287,7 +287,7 @@
                         if (ended) {
                             this.cal.events.push(createEvent({
                                 start_date: toDatetime(start_date),
-                                until: new Date(toDatetime(ended).valueOf() - 36e5),
+                                until: toDatetime(ended),
                                 rrule: 'FREQ=DAILY'
                             }))
                         }
@@ -296,8 +296,8 @@
         },
         filters: {
             dayMonth(d) {
-                const start = toDatetime(d.start_date)
-                const until = d.ended ? new Date(toDatetime(d.ended).valueOf() - 23 * 36e5) : start
+                const start = toDatetime(d.start_date);
+                const until = d.ended ? toDatetime(d.ended) : start;
                 if (start.getMonth() === until.getMonth()) {
                     if (start.getDate() === until.getDate()) {
                         return start.getDate() + ' ' + MONTHS[start.getMonth()]
