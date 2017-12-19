@@ -73,9 +73,6 @@ class OpeninghoursTransformerTest extends \TestCase
         $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/multiple_days.html');
         $expected = str_replace(' ','',$content);
         $actual = str_replace(' ','',$actual);
-        $expected = str_replace(PHP_EOL, '', $expected);
-        $actual = str_replace(PHP_EOL, '', $actual);
-
         $this->assertEquals($expected, $actual);
     }
 
