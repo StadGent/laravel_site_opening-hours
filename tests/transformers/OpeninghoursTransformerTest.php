@@ -73,9 +73,6 @@ class OpeninghoursTransformerTest extends \TestCase
         $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/multiple_days.html');
         $expected = str_replace(' ','',$content);
         $actual = str_replace(' ','',$actual);
-        $expected = str_replace(PHP_EOL, '', $expected);
-        $actual = str_replace(PHP_EOL, '', $actual);
-
         $this->assertEquals($expected, $actual);
     }
 
@@ -86,6 +83,7 @@ class OpeninghoursTransformerTest extends \TestCase
     public function testTransformHtmlTextMonth()
     {
         $service = Service::first();
+        $this->localeService->setLocale('nl');
 
         $transformer = new OpeninghoursTransformer();
         $transformer->setIncludeIsOpenNow(false);
@@ -96,12 +94,8 @@ class OpeninghoursTransformerTest extends \TestCase
         $transformer->setLocaleService($this->localeService);
         $actual = response()->collection($transformer, $service->channels)->content();
         $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/month.html');
-
         $expected = str_replace(' ','',$content);
         $actual = str_replace(' ','',$actual);
-        $expected = str_replace(PHP_EOL, '', $expected);
-        $actual = str_replace(PHP_EOL, '', $actual);
-
         $this->assertEquals($expected, $actual);
     }
 

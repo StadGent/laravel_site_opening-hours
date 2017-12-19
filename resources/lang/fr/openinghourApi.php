@@ -19,6 +19,9 @@ return [
     'UNTIL_DATA' => "jusqu'au",
     'SHORT_HOUR' => 'h',
 
+    'TODAY' => "Aujourd'hui",
+    'TOMORROW' => 'Demain',
+
     'day_0' => 'dimanche',
     'day_1' => 'lundi',
     'day_2' => 'mardi',
