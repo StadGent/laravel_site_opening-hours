@@ -30,6 +30,9 @@ return [
     'PREVIOUS'   => 'previous',
     'NEXT' => 'next',
 
+    'TODAY' => 'Today',
+    'TOMORROW' => 'Tomorrow',
+
     'Monday' => 'Monday',
     'Tuesday' => 'Tuesday',
     'Wednesday' => 'Wednesday',
