@@ -19,11 +19,9 @@
             @foreach($weekdays as $weekday)
                 <div class="openinghours--day openinghours--day--day-of-week">@lang('openinghourApi.'.$weekday)</div>
             @endforeach
-
             @for($i=0;$i<((7 - $firstDay->dayOfWeek - $localeService->getWeekStartDay()) % 7);$i++)
                 <div class="openinghours--day openinghours--day-disabled"></div>
             @endfor
-
             @foreach($data[0]['openinghours'] as $dayInfoObj)
                 <?php $isSameDay = (new \Carbon\Carbon())->isSameDay($dayInfoObj->date);?>
                 <?php $isOpen = !empty($dayInfoObj->hours);?>
@@ -35,29 +33,11 @@
                             <span class="openinghours--date-month">@lang('openinghourApi.'.$dayInfoObj->date->format('F'))</span>
                         </div>
                         <div class="openinghours--content">
-                            <div class="openinghours--times">
-                                @if($isOpen)
-                                    <span class="openinghours--status">@lang('openinghourApi.OPEN')</span>
-                                    <div class="openinghours--time">
-                                        @foreach($dayInfoObj->hours as $hourArr)
-                                            <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
-                                            <time datetime="{{$hourArr['from']}}">{{$hourArr['from']}}</time>
-                                            <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
-                                            <time datetime="{{$hourArr['until']}}">{{$hourArr['until']}}</time>
-                                            @if(end($dayInfoObj->hours) != $hourArr)
-                                                <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <span class="openinghours--status">@lang('openinghourApi.CLOSED')</span>
-                                @endif
-                            </div>
+                            @include('api.openinghours.times', ['dayInfoObj' => $dayInfoObj])
                         </div>
                     </div>
                 </div>
             @endforeach
-
             @for($i=0;$i<((7 - $lastDay->dayOfWeek + $localeService->getWeekEndDay()) % 7);$i++)
                 <div class="openinghours--day openinghours--day-disabled"></div>
             @endfor

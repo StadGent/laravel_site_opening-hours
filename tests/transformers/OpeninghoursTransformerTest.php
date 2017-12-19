@@ -87,18 +87,14 @@ class OpeninghoursTransformerTest extends \TestCase
         $transformer = new OpeninghoursTransformer();
         $transformer->setIncludeIsOpenNow(false);
         $transformer->setService($service);
-        $transformer->setStart((new Carbon('2017-01-01'))->startOfDay());
-        $transformer->setEnd((new Carbon('2017-01-07'))->endOfDay());
+        $transformer->setStart((new Carbon('2018-01-01'))->startOfDay());
+        $transformer->setEnd((new Carbon('2018-01-07'))->endOfDay());
         $transformer->setCalendarLength(QueryController::CALENDAR_LENGTH_MONTH);
         $transformer->setLocaleService($this->localeService);
         $actual = response()->collection($transformer, $service->channels)->content();
         $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/month.html');
-
         $expected = str_replace(' ','',$content);
         $actual = str_replace(' ','',$actual);
-        $expected = str_replace(PHP_EOL, '', $expected);
-        $actual = str_replace(PHP_EOL, '', $actual);
-
         $this->assertEquals($expected, $actual);
     }
 
