@@ -1,8 +1,8 @@
 <div class="openinghours openinghours--calendar">
     <div class="openinghours--header">
-        <a href="#" class="openinghours--prev">Vorige</a>
+        <button class="openinghours--prev">Vorige</button>
         <div class="openinghours--month">Januari 2017</div>
-        <a href="#" class="openinghours--next">Volgende</a>
+        <button class="openinghours--next">Volgende</button>
     </div>
     <div class="openinghours--days">
         <div class="openinghours--day openinghours--day--day-of-week">Ma</div>
@@ -12,14 +12,12 @@
         <div class="openinghours--day openinghours--day--day-of-week">Vr</div>
         <div class="openinghours--day openinghours--day--day-of-week">Za</div>
         <div class="openinghours--day openinghours--day--day-of-week">Zo</div>
-
         <div class="openinghours--day openinghours--day-disabled"></div>
         <div class="openinghours--day openinghours--day-disabled"></div>
         <div class="openinghours--day openinghours--day-disabled"></div>
         <div class="openinghours--day openinghours--day-disabled"></div>
         <div class="openinghours--day openinghours--day-disabled"></div>
         <div class="openinghours--day openinghours--day-disabled"></div>
-
         <div class="openinghours--day openinghours--day-open ">
             <span>1</span>
             <div class="openinghours openinghours--details openinghours--day-open">
@@ -49,7 +47,8 @@
                 </div>
                 <div class="openinghours--content">
                     <div class="openinghours--times">
-                        <span class="openinghours--status">gesloten</span>
+                        <time property="opens" datetime="00:00:00">gesloten</time>
+                        <time property="closes" datetime="00:00:00"></time>
                     </div>
                 </div>
             </div>
@@ -69,7 +68,9 @@
                             <time datetime="09:00">09:00</time>
                             <span class="openinghours--time-separator">tot</span>
                             <time datetime="12:00">12:00</time>
-                            <div class="openinghours--times-between">en</div>
+                        </div>
+                        <div class="openinghours--times-between">en</div>
+                        <div class="openinghours--time">
                             <span class="openinghours--time-prefix">van</span>
                             <time datetime="13:00">13:00</time>
                             <span class="openinghours--time-separator">tot</span>
@@ -94,7 +95,9 @@
                             <time datetime="09:00">09:00</time>
                             <span class="openinghours--time-separator">tot</span>
                             <time datetime="12:00">12:00</time>
-                            <div class="openinghours--times-between">en</div>
+                        </div>
+                        <div class="openinghours--times-between">en</div>
+                        <div class="openinghours--time">
                             <span class="openinghours--time-prefix">van</span>
                             <time datetime="13:00">13:00</time>
                             <span class="openinghours--time-separator">tot</span>
@@ -119,7 +122,9 @@
                             <time datetime="09:00">09:00</time>
                             <span class="openinghours--time-separator">tot</span>
                             <time datetime="12:00">12:00</time>
-                            <div class="openinghours--times-between">en</div>
+                        </div>
+                        <div class="openinghours--times-between">en</div>
+                        <div class="openinghours--time">
                             <span class="openinghours--time-prefix">van</span>
                             <time datetime="13:00">13:00</time>
                             <span class="openinghours--time-separator">tot</span>
@@ -144,7 +149,9 @@
                             <time datetime="09:00">09:00</time>
                             <span class="openinghours--time-separator">tot</span>
                             <time datetime="12:00">12:00</time>
-                            <div class="openinghours--times-between">en</div>
+                        </div>
+                        <div class="openinghours--times-between">en</div>
+                        <div class="openinghours--time">
                             <span class="openinghours--time-prefix">van</span>
                             <time datetime="13:00">13:00</time>
                             <span class="openinghours--time-separator">tot</span>
@@ -163,12 +170,12 @@
                 </div>
                 <div class="openinghours--content">
                     <div class="openinghours--times">
-                        <span class="openinghours--status">gesloten</span>
+                        <time property="opens" datetime="00:00:00">gesloten</time>
+                        <time property="closes" datetime="00:00:00"></time>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="openinghours--day openinghours--day-disabled"></div>
     </div>
 </div>
