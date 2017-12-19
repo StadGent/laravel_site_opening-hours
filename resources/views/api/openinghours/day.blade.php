@@ -14,7 +14,7 @@
         $dayName = 'openinghourApi.' . $date->format('F');
         $dayPrefix = null;
         if ((new \Carbon\Carbon())->isSameDay($date)) {
-            $dayPrefix = 'openinghourApiTODAY';
+            $dayPrefix = 'openinghourApi.TODAY';
         } elseif ((new \Carbon\Carbon())->addDay()->isSameDay($date)) {
             $dayPrefix = 'openinghourApi.TOMORROW';
         }
