@@ -18,4 +18,7 @@ return [
     'FROM_DATA' => 'vom',
     'UNTIL_DATA' => 'bis zum',
     'SHORT_HOUR' => 'Urh',
+
+    'TODAY' => 'Heute',
+    'TOMORROW' => 'Morgen',
 ];

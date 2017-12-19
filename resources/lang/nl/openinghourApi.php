@@ -30,6 +30,9 @@ return [
     'PREVIOUS'   => 'Vorige',
     'NEXT' => 'Volgende',
 
+    'TODAY' => 'Vandaag',
+    'TOMORROW' => 'Morgen',
+
     'Mo' => 'Ma',
     'Tu' => 'Di',
     'We' => 'Wo',
