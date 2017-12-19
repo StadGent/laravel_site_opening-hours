@@ -1,3 +1,12 @@
+{{--
+  -- Template to print out the Opening hours for multiple days.
+  --
+  -- Used for week and period calls.
+  --
+  -- Variables:
+  -- @param aray $data
+  --     Data containing the Opening hours information.
+  --}}
 <div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--table">
     <h1>@lang('openinghourApi.title')</h1>
     @if($data[0]['openinghours'])

@@ -2,8 +2,8 @@
   -- Template rendering the times information for an open day.
   --
   -- Variables:
-  --   Variables:
-  --       - @param array $dayHours : Array of from-until hours for a day.
+  -- @param array $dayHours
+  --     Array of from-until hours for a day.
   --}}
 <span class="openinghours--status">@lang('openinghourApi.OPEN')</span>
 @foreach($dayHours as $hours)

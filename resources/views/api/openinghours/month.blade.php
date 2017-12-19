@@ -1,3 +1,10 @@
+{{--
+  -- Template to print out the Opening hours for a single month.
+  --
+  -- Variables:
+  -- @param aray $data
+  --     Data containing the Opening hours information.
+  --}}
 @if($data[0]['openinghours'])
     <?php $firstDay = reset($data[0]['openinghours'])->date; ?>
     <?php  $lastDay = end($data[0]['openinghours'])->date; ?>
@@ -11,9 +18,9 @@
     ?>
     <div class="openinghours openinghours--calendar">
         <div class="openinghours--header">
-            <a href="#" class="openinghours--prev">@lang('openinghourApi.PREVIOUS')</a>
+            <button class="openinghours--prev">@lang('openinghourApi.PREVIOUS')</button>
             <div class="openinghours--month">@lang('openinghourApi.'.$firstDay->format('F')) {{ $firstDay->format('Y') }}</div>
-            <a href="#" class="openinghours--next">@lang('openinghourApi.NEXT')</a>
+            <button class="openinghours--next">@lang('openinghourApi.NEXT')</button>
         </div>
         <div class="openinghours--days">
             @foreach($weekdays as $weekday)
