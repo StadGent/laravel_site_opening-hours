@@ -83,6 +83,7 @@ class OpeninghoursTransformerTest extends \TestCase
     public function testTransformHtmlTextMonth()
     {
         $service = Service::first();
+        $this->localeService->setLocale('nl');
 
         $transformer = new OpeninghoursTransformer();
         $transformer->setIncludeIsOpenNow(false);
