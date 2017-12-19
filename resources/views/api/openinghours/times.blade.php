@@ -2,8 +2,8 @@
   -- Template rendering the times information for a day.
   --
   -- Variables:
-  --   Variables:
-  --       - @param dayInfoObj $dayInfoObj : Day object.
+  -- @param \App\Models\DayInfo $dayInfoObj
+  --     Day object.
   --}}
 <div class="openinghours--times">
     @if(!empty($dayInfoObj->hours))
