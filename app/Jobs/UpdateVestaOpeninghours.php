@@ -96,7 +96,7 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
         $vService->setClient();
         $synced = $vService->updateOpeninghours($service->identifier, $output);
         if (!$synced) {
-            $this->letsFail('Nnot able to send the data to VESTA.');
+            $this->letsFail('Not able to send the data to VESTA.');
         }
         \Log::info('New data for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
                 $service->identifier . ' is send to VESTA.');
