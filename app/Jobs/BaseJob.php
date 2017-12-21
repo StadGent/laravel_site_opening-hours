@@ -42,7 +42,7 @@ abstract class BaseJob implements ShouldQueue
      */
     protected function letsFinish()
     {
-        \Log::error('JOB SUCCES: ' . static::class . ': ' . $this->extModelClass . ' - ' . $this->extId);
+        \Log::info('JOB SUCCES: ' . static::class . ': ' . $this->extModelClass . ' - ' . $this->extId);
         $this->queueService->removeJobFromQueue($this, $this->extModelClass, $this->extId);
     }
 
@@ -66,6 +66,7 @@ abstract class BaseJob implements ShouldQueue
 
     /**
      * The job failed to process.
+     * Set error message in log
      *
      * @param  Exception  $exception
      * @return void
