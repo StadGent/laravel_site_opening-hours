@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Formatters\OpeninghoursFormatter;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -49,7 +49,6 @@ class GetQueryRequest extends FormRequest
      *
      * Validate and sanitize all inputs and combinations.
      * - chech if required parameters are given for the correct types
-     * - check if format is conform with OpeninghoursFormatter::OUTPUT_MAPPER
      * - check if requested serivce has children
      * - check if (when) requested channel is child of requested service
      *
@@ -109,6 +108,12 @@ class GetQueryRequest extends FormRequest
                     $validator->errors()->add('Channel', "The selected service '" . $service->label .
                         "' does not contain a channel with the identifier " . $this->route('channel')->id);
                 }
+            }
+
+            if($service->draft){
+                $exception = new ModelNotFoundException();
+                $exception->setModel(Service::class);
+                throw $exception;
             }
         });
     }

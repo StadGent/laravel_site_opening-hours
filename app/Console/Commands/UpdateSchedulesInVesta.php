@@ -2,10 +2,19 @@
 
 namespace App\Console\Commands;
 
-use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Jobs\UpdateVestaOpeninghours;
+use App\Models\Service;
 
-class UpdateSchedulesInVesta extends Command
+/**
+ * Command to run every week to refresh the data on VESTA
+ * Data of 3 months and update will be hanlded in the JOB per service
+ *
+ * The JOB will also be triggered by alterations on the models by the Observers
+ *
+ * This command makes sure that the data is up to date for the next 3 months
+ * when no updates where triggerd by the observers
+ */
+class UpdateSchedulesInVesta extends BaseCommand
 {
     /**
      * The name and signature of the console command.
@@ -19,17 +28,9 @@ class UpdateSchedulesInVesta extends Command
      *
      * @var string
      */
-    protected $description = 'Update the output of all VESTA related services to VESTA. The output will be the week schedule starting on monday of the week in which the timestamp of the execution of the command falls in.';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Update the output of all VESTA related services to VESTA. ' .
+        'The output will be the week schedule starting on monday of the week in which the timestamp ' .
+        'of the execution of the command falls in.';
 
     /**
      * Execute the console command.
@@ -38,20 +39,18 @@ class UpdateSchedulesInVesta extends Command
      */
     public function handle()
     {
-        $vestaServices = app('ServicesRepository')->where('source', 'vesta')->get();
+        $this->info('Init UpdateSchedulesInVesta');
+        $services = Service::where('source', 'vesta')->where('draft', 0)
+            ->get();
 
-        $startOfWeek = Carbon::today()->startOfWeek();
-
-        foreach ($vestaServices as $vestaService) {
-            try {
-                $openinghoursService = app('OpeninghoursService');
-                $openinghoursService->isOpenForFullWeek();
-                $output = app('OpeninghoursFormatter')->render('html', $openinghoursService->getData());
-                app('VestaService')->updateOpeninghours($vestaService->identifier, $output);
-                $this->info('Openingsuren voor dienst ' . $vestaService->label . ' met UID ' . $vestaService->identifier . ' werden geupdatet.');
-            } catch (\Exception $ex) {
-                $this->error('Er ging iets mis met dienst ' . $vestaService->label . ' met UID ' . $vestaService->identifier . '. Foutbericht: ' . $ex->getMessage());
-            }
+        foreach ($services as $service) {
+            $this->info('Dispatch a job that will update the services (' . $service->id . ') ' .
+                $service->label . ' to VESTA');
+            $job = new UpdateVestaOpeninghours($service->identifier, $service->id);
+            $this->queueService->addJobToQueue($job, Service::class, $service->id);
         }
+
+        $this->info('Nr of services set in queue: ' . $services->count());
+        $this->info('Done UpdateSchedulesInVesta');
     }
 }

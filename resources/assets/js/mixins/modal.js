@@ -58,8 +58,8 @@ export default {
 
       const expires = expiresOn(hasActiveOh(this.$root.routeChannel));
       if (expires) {
-        this.modal.start_date = expires.slice(0, 4) + '-01-01';
-        this.modal.end_date = (parseInt(expires.slice(0, 4), 10) + VERSION_YEARS - 1) + '-12-31';
+        this.modal.start_date = expires;
+        this.modal.end_date = moment(expires).add(1, 'years').month(11).date(31).format();
         this.modal.label = '';
       }
     },

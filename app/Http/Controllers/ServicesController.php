@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Transformers\ServiceTransformer;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ServicesController extends Controller
 {
     /**
      * Get all entities
-     *
      * Display a listing of the resource.
      *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -25,18 +28,25 @@ class ServicesController extends Controller
             $services->where('uri', $uri);
         }
 
-        return $services->get();
+        $services->where('draft', false);
+
+        return response()->collection(new ServiceTransformer(), $services->get());
     }
 
     /**
      * Get with id
-     *
      * Base get and return the service
      *
-     * @return \App\Models\Service
+     * @return Response
      */
     public function show(Service $service)
     {
-        return $service;
+        if($service->draft){
+            $exception = new ModelNotFoundException();
+            $exception->setModel(Service::class);
+            throw $exception;
+        }
+
+        return response()->item(new ServiceTransformer(), $service);
     }
 }

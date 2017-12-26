@@ -56,23 +56,32 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
             'text' => 'text/plain',
         ];
 
-        $request = 'json';
-        if (isset($data['format'])) {
-            $request = $data['format'];
-            if (!array_key_exists($data['format'], $formats)) {
-                $request = 'json';
-            }
-
+        $format = 'json';
+        if (isset($data['format']) && array_key_exists($data['format'], $formats)) {
+            $format = $data['format'];
             unset($data['format']);
         }
-        $accept = $formats[$request];
+        $accept = $formats[$format];
+
+        $langs = [
+            'nl', 'nl-BE', 'nl-NL',
+            'fr', 'fr-BE', 'fr-FR',
+            'en', 'en-GB', 'en-US',
+            'de', 'de-DE',
+            'es', 'es-ES',
+        ];
+        $lang = 'nl';
+        if (isset($data['lang']) && in_array($data['lang'], $langs)) {
+            $lang = $data['lang'];
+            unset($data['lang']);
+        }
 
         $content = json_encode($data);
 
         $headers = [
             'CONTENT_LENGTH' => mb_strlen($content, '8bit'),
             'CONTENT_TYPE' => $accept,
-            'Accept-Language' => 'nl-BE,nl;q=0.8,en-US;q=0.6,en;q=0.4',
+            'Accept-Language' => $lang,
             'X-Requested-With' => 'XMLHttpRequest',
             'Accept' => $accept,
             'Accept-type' => $accept,
@@ -116,6 +125,13 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
     {
     }
 
+    /**
+     * @param $userRole
+     * @param $verb
+     * @param $pathArg
+     * @param $data
+     * @param $statusCode
+     */
     public function requestsByUserWithRoleAndCheckStatusCode($userRole, $verb, $pathArg, $data, $statusCode)
     {
         if ($userRole !== 'unauth') {

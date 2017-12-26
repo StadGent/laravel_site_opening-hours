@@ -13,6 +13,15 @@ class UsersControllerTest extends \TestCase
     use DatabaseTransactions;
 
     /**
+     * setup for each test
+     */
+    public function setup()
+    {
+        parent::setUp();
+        Mail::fake();
+    }
+
+    /**
      * @var string
      */
     protected $apiUrl = '/api/v1/ui';
@@ -66,7 +75,7 @@ class UsersControllerTest extends \TestCase
         $authUser = \App\Models\User::where('name', $userRole . 'user')->first();
         $this->actingAs($authUser, 'api');
 
-        $newUser = factory(User::class)->create();
+        $newUser = factory(User::class)->make();
 
         if ($email) {
             $request['email'] = $email == 'unknown' ? $newUser->email : $email;
@@ -106,10 +115,11 @@ class UsersControllerTest extends \TestCase
      */
     public function testWhenAdminIsMadeOwnerHeIsRemovedFromTheGlobalAdminRole()
     {
+        Mail::fake();
         $adminUser = \App\Models\User::where('name', 'adminuser')->first();
         $this->actingAs($adminUser, 'api');
 
-        $newUser = factory(User::class)->create();
+        $newUser = factory(User::class)->make();
         // lets make new user Admin
         $request['email'] = $newUser->email;
         $request['role'] = 'Admin';
@@ -143,7 +153,6 @@ class UsersControllerTest extends \TestCase
         $this->actingAs($user, 'api');
 
         $newUser = factory(User::class)->make();
-        Mail::fake();
 
         $request = [
             'email' => $newUser->email,
@@ -178,7 +187,6 @@ class UsersControllerTest extends \TestCase
         $this->actingAs($user, 'api');
 
         $knownUser = \App\Models\User::find(2);
-        Mail::fake();
 
         $request = [
             'email' => $knownUser->email,

@@ -107,15 +107,20 @@ return [
      * https://www.ibm.com/support/knowledgecenter/SSS28S_8.1.0/XFDL/i_xfdl_r_formats_es_ES.html
      */
     'locale_date_time_formats' => [
-        'nl_BE' => ['date' => 'd/m/Y', 'time' => 'H:i'],
-        'fr_BE' => ['date' => 'd/m/Y', 'time' => 'H:i'],
-        'nl_NL' => ['date' => 'd-m-Y', 'time' => 'H:i'],
-        'fr_FR' => ['date' => 'd/m/Y', 'time' => 'H:i'],
-        'en_GB' => ['date' => 'd/m/Y', 'time' => 'H:i'],
-        'en_US' => ['date' => 'Y-m-d', 'time' => 'h:i A'],
-        'de_DE' => ['date' => 'd.m.Y', 'time' => 'H:i'],
-        'es_ES' => ['date' => 'd-m-Y', 'time' => 'H:i'],
+        'nl_BE' => ['date' => 'd/m', 'time' => 'H:i'],
+        'fr_BE' => ['date' => 'd/m', 'time' => 'H:i'],
+        'nl_NL' => ['date' => 'd-m', 'time' => 'H:i'],
+        'fr_FR' => ['date' => 'd/m', 'time' => 'H:i'],
+        'en_GB' => ['date' => 'd/m', 'time' => 'H:i'],
+        'en_US' => ['date' => 'm-d', 'time' => 'h:i A'],
+        'de_DE' => ['date' => 'd.m', 'time' => 'H:i'],
+        'es_ES' => ['date' => 'd-m', 'time' => 'H:i'],
+    ],
 
+    'supported_exception_callendars' => [
+        'feestdagen' => 'https://data.stad.gent/sites/default/files/feestdagen-nl-BE.ical',
+        'schoolvakanties' => 'https://data.stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
+        'gentsefeesten' => 'https://data.stad.gent/sites/default/files/gentsefeesten-nl-BE.ical',
     ],
 
     /*
@@ -202,6 +207,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\SerializerServiceProvider::class,
         /*
          * Laravel Passport
          */
