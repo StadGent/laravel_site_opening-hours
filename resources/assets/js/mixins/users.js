@@ -170,7 +170,10 @@ export default {
             }
             this.$http.delete(API_PREFIX + '/users/' + user.id).then(() => {
                 this.fetchUsers();
-                this.fetchServices();
+                /* current users for some services may now be incorrect
+                reset channels
+                fetching channels triggers fetching users for that service */
+                this.services.forEach(s => s.channels = null);
                 this.modalClose();
             }).catch(fetchError)
         })

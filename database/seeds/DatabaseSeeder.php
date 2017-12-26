@@ -66,6 +66,8 @@ class DatabaseSeeder extends Seeder
         foreach ($seeders as $seedClass) {
             $this->call($seedClass);
         }
+
+        DB::table('queued_jobs')->truncate();
     }
 
     /**

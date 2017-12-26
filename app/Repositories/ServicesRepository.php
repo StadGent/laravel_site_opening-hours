@@ -19,47 +19,63 @@ class ServicesRepository extends EloquentRepository
      * @param $serviceId
      * @return mixed
      */
-    public function getExpandedServices($serviceId = null)
+    public function getExpandedServices($serviceId = null, $offset = null, $limit = null)
     {
-        if($serviceId) {
+        if ($serviceId) {
             return $this->getExpandedServicesQuery($serviceId)->first();
         }
-        return $this->getExpandedServicesQuery()->get();
+
+        return $this->getExpandedServicesQuery(null, $offset, $limit)->get();
     }
 
     /**
      * @param $userId
      * @return mixed
      */
-    public function getExpandedServiceForUser($userId)
+    public function getExpandedServiceForUser($userId, $offset, $limit)
     {
         if (empty($userId)) {
             return;
         }
 
-        return $this->getExpandedServiceForUserQuery($userId)->get();
+        return $this->getExpandedServiceForUserQuery($userId, $offset, $limit)->get();
     }
 
     /**
      * Return all services with their channels and openinghours (without the attached calendars)
      *
-     * @param  int   $serviceId
+     * has_missing_oh =     Missing calender(s)
+     * has_inactive_oh =    Missing active calender(s)
+     *
+     * @param  int $serviceId
      * @return Collection
      */
-    private function getExpandedServicesQuery($serviceId = null)
+    private function getExpandedServicesQuery($serviceId = null, $offset = 0, $limit = null)
     {
         $rawSelect = \DB::raw("services.*,
             count(channelId) countChannels,
             if(group_concat(missingOH) like '%1%', 1, 0) has_missing_oh,
-            if(group_concat(inactiveOH) like '%1%', 1, 0) has_inactive_oh");
+            if(group_concat(activeOH) like '%0%', 1, 0) has_inactive_oh");
 
-        $rawSubQuery = \DB::raw("(select distinct c.service_id, c.id channelId , if(oh.id is null, true, false) missingOH, if(oh.active = 0, true, false) inactiveOH
-            from channels c left join openinghours oh on c.id = oh.channel_id) as tmp");
-
+        $rawSubQuery = \DB::raw("(select  c.service_id, c.id channelId ,
+                if(oh.id is null, true, false) missingOH,
+                if(group_concat(oh.active) like '%1%', 1, 0) activeOH
+                from channels c left join openinghours oh on c.id = oh.channel_id
+                group by c.id) as tmp");
         $query = \DB::table('services')
             ->select($rawSelect)
             ->leftJoin($rawSubQuery, 'services.id', '=', 'tmp.service_id')
-            ->groupBy('services.id');
+            ->groupBy('services.id')
+            ->orderBy('services.draft', 'ASC')
+            ->orderBy('services.updated_at', 'DESC')
+            ->skip($offset);
+
+        if ($limit === null){
+            $query->take(Service::all()->count() - $offset > 0 ? Service::all()->count() - $offset : 0);
+        }
+        else {
+            $query->take($limit);
+        }
 
         if ($serviceId) {
             $query->where('id', $serviceId);
@@ -71,28 +87,28 @@ class ServicesRepository extends EloquentRepository
     /**
      * Return a specific service with linked channels
      *
-     * @param  int   $serviceId
-     * @return array
+     * @param  int $serviceId
+     *
+     * @return \App\Repositories\Collection
      */
-    private function getExpandedServiceForUserQuery($userId)
+    private function getExpandedServiceForUserQuery($userId, $offset, $limit)
     {
         if (empty($userId)) {
             return;
         }
 
-        $query = $this->getExpandedServicesQuery();
+        $query = $this->getExpandedServicesQuery(null, $offset, $limit);
 
         $query->join('user_service_role', 'services.id', '=', 'user_service_role.service_id')
             ->where('user_service_role.user_id', $userId);
 
         return $query;
-
     }
 
     /**
      * Return a specific service with linked channels
      *
-     * @param  int   $serviceId
+     * @param  int $serviceId
      * @return array
      */
     public function getById($serviceId)
@@ -109,7 +125,7 @@ class ServicesRepository extends EloquentRepository
     /**
      * Get all services where the user, based on the passed user ID, is part of
      *
-     * @param  integer    $userId
+     * @param  integer $userId
      * @return Collection
      */
     public function getForUser($userId)
@@ -133,13 +149,11 @@ class ServicesRepository extends EloquentRepository
             $result['c'] = [];
 
             foreach ($service->channels as $channel) {
-
                 if ($channel->openinghours->count() == 0) {
                     $result['c']['has_missing_oh'] = true;
                 }
 
                 foreach ($channel->openinghours as $openinghours) {
-
                     if (!$openinghours->active) {
                         $result['c']['has_inactive_oh'] = true;
                         break;
@@ -164,16 +178,13 @@ class ServicesRepository extends EloquentRepository
      */
     public function getChannels()
     {
-
         $result = [];
         // Get all of the channels for the service
         foreach ($this->model->channels as $channel) {
-
             $tmpChannel = $channel->toArray();
             $tmpChannel['openinghours'] = [];
 
             foreach ($channel->openinghours as $openinghours) {
-
                 $instance = $openinghours->toArray();
                 $tmpChannel['openinghours'][] = $instance;
             }

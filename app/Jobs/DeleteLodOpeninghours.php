@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Models\Openinghours;
 use App\Repositories\LodOpeninghoursRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class DeleteLodOpeninghours implements ShouldQueue
+class DeleteLodOpeninghours extends BaseJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var int
@@ -32,9 +32,12 @@ class DeleteLodOpeninghours implements ShouldQueue
      */
     public function __construct($serviceId, $openinghoursId)
     {
+        parent::__construct();
         $this->serviceId = $serviceId;
-
         $this->openinghoursId = $openinghoursId;
+
+        $this->extModelClass = Openinghours::class;
+        $this->extId = $openinghoursId;
     }
 
     /**
@@ -44,9 +47,9 @@ class DeleteLodOpeninghours implements ShouldQueue
      */
     public function handle()
     {
-        $result = app(LodOpeninghoursRepository::class)->deleteOpeninghours($this->openinghoursId);
-        if (!$result) {
-            $this->fail(new \Exception(sprintf('The %s job failed with service id %s and opening hours id %s. Check the logs for details', static::class, $this->serviceId, $this->openinghoursId)));
+        if (!app(LodOpeninghoursRepository::class)->deleteOpeninghours($this->openinghoursId)) {
+            $this->letsFail();
         }
+        $this->letsFinish();
     }
 }

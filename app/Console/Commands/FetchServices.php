@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Jobs\FetchServices as FetchServicesJob;
 
-class FetchServices extends Command
+class FetchServices extends BaseCommand
 {
     /**
      * The name and signature of the console command.
@@ -20,16 +19,6 @@ class FetchServices extends Command
      * @var string
      */
     protected $description = 'Fetch the available public services from an LOD endpoint.';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.

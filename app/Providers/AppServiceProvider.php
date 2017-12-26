@@ -70,55 +70,39 @@ class AppServiceProvider extends ServiceProvider
         });
 
         /* SERVICES **/
-        $this->app->singleton('ChannelService', function ($app) {
+        $this->app->singleton(\App\Services\ChannelService::class, function ($app) {
             return \App\Services\ChannelService::getInstance();
         });
+        $this->app->alias(\App\Services\ChannelService::class, 'ChannelService');
 
-        $this->app->singleton('OpeninghoursService', function ($app) {
-            return \App\Services\OpeninghoursService::getInstance();
-        });
-
-        $this->app->singleton('SparqlService', function ($app) {
+        $this->app->singleton(\App\Services\SparqlService::class, function ($app) {
             return \App\Services\SparqlService::getInstance();
         });
+        $this->app->alias(\App\Services\SparqlService::class, 'SparqlService');
 
-        $this->app->singleton('VestaService', function ($app) {
+        $this->app->singleton(\App\Services\VestaService::class, function ($app) {
             return \App\Services\VestaService::getInstance();
         });
+        $this->app->alias(\App\Services\VestaService::class, 'VestaService');
 
-        $this->app->singleton('LocaleService', function ($app) {
+        $this->app->singleton(\App\Services\LocaleService::class, function ($app) {
             return \App\Services\LocaleService::getInstance();
         });
+        $this->app->alias(\App\Services\LocaleService::class, 'LocaleService');
 
-        $this->app->singleton('UserService', function ($app) {
+        $this->app->singleton(\App\Services\UserService::class, function ($app) {
             return \App\Services\UserService::getInstance();
         });
+        $this->app->alias(\App\Services\UserService::class, 'UserService');
 
-        /* FORMATTERS **/
-        $this->app->bind('OHJsonFormatter', function () {
-            return new \App\Formatters\Openinghours\JsonFormatter();
+        $this->app->singleton(\App\Services\RecurringOHService::class, function ($app) {
+            return \App\Services\RecurringOHService::getInstance();
         });
+        $this->app->alias(\App\Services\RecurringOHService::class, 'RecurringOHService');
 
-        $this->app->bind('OHJsonLdFormatter', function () {
-            return new \App\Formatters\Openinghours\JsonLdFormatter();
+        $this->app->singleton(\App\Services\QueueService::class, function ($app) {
+            return \App\Services\QueueService::getInstance();
         });
-
-        $this->app->bind('OHHtmlFormatter', function () {
-            return new \App\Formatters\Openinghours\HtmlFormatter();
-        });
-        $this->app->bind('OHTextFormatter', function () {
-            return new \App\Formatters\Openinghours\TextFormatter();
-        });
-
-        $this->app->tag(['OHJsonFormatter', 'OHJsonLdFormatter', 'OHHtmlFormatter', 'OHTextFormatter'], 'OHFormatters');
-
-        $this->app->bind('OpeninghoursFormatter', function ($app) {
-            $modelFormatter = new \App\Formatters\OpeninghoursFormatter();
-            foreach ($app->tagged('OHFormatters') as $format) {
-                $modelFormatter->addFormat($format);
-            }
-
-            return $modelFormatter;
-        });
+        $this->app->alias(\App\Services\QueueService::class, 'QueueService');
     }
 }

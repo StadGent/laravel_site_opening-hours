@@ -1,14 +1,10 @@
-export const VERSION_YEARS = 2
+export const VERSION_YEARS = 2;
 
-const startYear = new Date().getFullYear()
-const untilYear = startYear + VERSION_YEARS
+const startYear = moment().year();
+const untilYear = moment().add(VERSION_YEARS, 'years').year();
 
-const defaultStart = startYear + '-01-01T00:00:00'
-const defaultEnd = startYear + '-01-02T00:00:00'
-const defaultUntil = (untilYear - 1) + '-12-31'
-
-const firstEventStart = startYear + '-01-01T09:00:00'
-const firstEventEnd = startYear + '-01-01T17:00:00'
+const defaultStart = moment().format('YYYY-MM-DD') + 'T00:00:00';
+const defaultUntil = moment().add(1, 'years').month(11).date(31).format('YYYY-MM-DD') + 'T00:00:00';
 
 export function createFirstEvent(version) {
   return {
@@ -23,9 +19,9 @@ export function createFirstEvent(version) {
 export function createEvent({ label, start_date, end_date, rrule, until }) {
 
   return {
-    start_date: (start_date || new Date()).toJSON().slice(0, 11) + '09:00:00',
-    end_date: (start_date || new Date()).toJSON().slice(0, 11) + '17:00:00',
-    until: (until || new Date(start_date.valueOf() + 36e5 * 24)).toJSON().slice(0, 11) + '00:00:00',
+    start_date: (start_date || new Date()).toJSON().slice(0, 11) + '09:00:00Z',
+    end_date: (start_date || new Date()).toJSON().slice(0, 11) + '17:00:00Z',
+    until: (until || new Date(start_date.valueOf() + 36e5 * 24)).toJSON().slice(0, 11) + '00:00:00Z',
     rrule: rrule || 'FREQ=DAILY',
     label: (label || '1').toString()
   }
@@ -41,16 +37,13 @@ export function createFirstCalendar(version) {
   }
 }
 
-export function createCalendar(layer, { start_date }) {
+export function createCalendar(layer) {
   return {
     closinghours: true,
     layer: layer,
     label: 'Uitzondering',
     priority: -layer,
-    events: [createEvent({
-      start_date,
-      label: '1'
-    })]
+    events: []
   }
 }
 

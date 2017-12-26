@@ -2,16 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Models\Channel;
 use App\Repositories\LodOpeninghoursRepository;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
-class DeleteLodChannel implements ShouldQueue
+class DeleteLodChannel extends BaseJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
-
     /**
      * @var int
      */
@@ -32,9 +28,12 @@ class DeleteLodChannel implements ShouldQueue
      */
     public function __construct($serviceId, $channelId)
     {
+        parent::__construct();
         $this->serviceId = $serviceId;
-
         $this->channelId = $channelId;
+
+        $this->extModelClass = Channel::class;
+        $this->extId = $channelId;
     }
 
     /**
@@ -46,12 +45,8 @@ class DeleteLodChannel implements ShouldQueue
     {
         $result = app(LodOpeninghoursRepository::class)->deleteChannel($this->channelId);
         if (!$result) {
-            $this->fail(new \Exception(sprintf(
-                'The %s job failed with service id %s and channel id %s. Check the logs for details',
-                static::class,
-                $this->serviceId,
-                $this->channelId
-            )));
+            $this->letsFail();
         }
+        $this->letsFinish();
     }
 }
