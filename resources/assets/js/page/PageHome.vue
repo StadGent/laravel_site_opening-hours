@@ -154,7 +154,7 @@ export default {
       return this.query ? this.allowedServices.filter(s => (s.label || '').toLowerCase().indexOf(this.query.toLowerCase()) !== -1) : this.allowedServices
     },
     sortedServices () {
-      return this.order ? this.filteredServices.slice().sort(orderBy(this.order)) : this.filteredServices
+      return this.order ? this.filteredServices.sort(orderBy(this.order)) : this.filteredServices;
     },
     pagedServices () {
         let result = this.sortedServices.slice(this.route.offset || 0, this.route.offset + pageSize);
