@@ -18,11 +18,12 @@
         } elseif ((new \Carbon\Carbon())->addDay()->isSameDay($date)) {
             $dayPrefix = 'openinghourApi.TOMORROW';
         }
+        $sameYear = $date->year == ((new \Carbon\Carbon())->year)
         ?>
         <div class="openinghours openinghours--short">
             <div class="openinghours--day openinghours--day-{{ strtolower($status) }}">
                 <div class="openinghours--date">
-                    <time property="validFrom validThrough" datetime="{{ $date->toDateString() }}">@if($dayPrefix)@lang($dayPrefix)@else{{ $date->day }} @lang($dayName)@endif</time>
+                    <time property="validFrom validThrough" datetime="{{ $date->toDateString() }}">@if($dayPrefix)@lang($dayPrefix)@else{{ $date->day }} @lang($dayName)@endif @if(!$sameYear){{ $date->year }}@endif</time>
                 </div>
                 @include('api.openinghours.times', ['dayInfoObj' => $dayInfoObj])
             </div>
