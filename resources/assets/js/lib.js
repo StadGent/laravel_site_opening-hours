@@ -180,11 +180,9 @@ export function orderBy(order) {
     if (order) {
         if (order.startsWith('-')) {
             order = order.slice(1);
-            return function (a, b) {
-                return a[order] < b[order];
-            }
+            return (a, b) => a[order] < b[order] ? 1 : -1;
         }
-        return (a, b) => a[order] > b[order];
+        return (a, b) => a[order] > b[order] ? 1 : -1;
     }
 
     // No sorting
@@ -241,7 +239,7 @@ export function fetchError(response) {
     //display custom errors
     if (this.modalActive) {
         this.modalResume();
-        if(response.body.message) {
+        if (response.body.message) {
             this.modalError(response.body.message);
         }
         return;
