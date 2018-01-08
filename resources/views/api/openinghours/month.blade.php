@@ -36,14 +36,14 @@
                 <?php
                     $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date);
                     $currentDay = $dayInfoObj->date->day;
-                    $tabIndex = 0;
+                    $tabIndex = -1;
                     if($isSameDay){
-                        $tabIndex = -1;
+                        $tabIndex = 0;
                     }elseif (
                         $dayInfoObj->date->day == 1 &&
                         !$firstDay->isSameDay((new \Carbon\Carbon())->firstOfMonth())
                     ){
-                        $tabIndex = -1;
+                        $tabIndex = 0;
                     }
                     ?>
                 <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}" @if($isSameDay)class="openinghours--day-active"@endif>
