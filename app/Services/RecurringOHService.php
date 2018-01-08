@@ -311,6 +311,10 @@ class RecurringOHService
                 break;
         }
 
+        if(!$event->calendar){
+            return false;
+        }
+
         $eventOutput .= $this->hrOpenClosedEvent($event->calendar->closinghours);
 
         if ($event->calendar->priority !== 0 &&
