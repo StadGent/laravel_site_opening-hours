@@ -49,8 +49,9 @@ class OpeninghoursTransformerTest extends \TestCase
         $transformer->setLocaleService($this->localeService);
         $actual = response()->collection($transformer, $service->channels)->content();
         $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/day.html');
-        $expected = str_replace(' ','',$content);
-        $actual = str_replace(' ','',$actual);
+        $expected = str_replace([PHP_EOL,' '],['',''],$content);
+        $actual = str_replace([PHP_EOL,' '],['',''],$actual);
+
         $this->assertEquals($expected, $actual);
     }
 
@@ -71,8 +72,8 @@ class OpeninghoursTransformerTest extends \TestCase
         $transformer->setLocaleService($this->localeService);
         $actual = response()->collection($transformer, $service->channels)->content();
         $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/multiple_days.html');
-        $expected = str_replace(' ','',$content);
-        $actual = str_replace(' ','',$actual);
+        $expected = str_replace([PHP_EOL,' '],['',''],$content);
+        $actual = str_replace([PHP_EOL,' '],['',''],$actual);
         $this->assertEquals($expected, $actual);
     }
 
@@ -94,12 +95,10 @@ class OpeninghoursTransformerTest extends \TestCase
         $transformer->setLocaleService($this->localeService);
         $actual = response()->collection($transformer, $service->channels)->content();
         $content = file_get_contents(__DIR__ . '/../data/transformers/html/openinghours/month.html');
-        $expected = str_replace(' ','',$content);
-        $actual = str_replace(' ','',$actual);
+        $expected = str_replace([PHP_EOL,' '],['',''],$content);
+        $actual = str_replace([PHP_EOL,' '],['',''],$actual);
         $this->assertEquals($expected, $actual);
     }
-
-
 
     /**
      * @test
@@ -130,27 +129,27 @@ class OpeninghoursTransformerTest extends \TestCase
         $this->assertEquals($expected, $actual);
     }
 
-//    /**
-//     * @test
-//     * @group content
-//     * TODO : refactor test
-//     */
-//    public function testTransformJsonCollection()
-//    {
-//        $service = Service::first();
-//
-//        $transformer = new OpeninghoursTransformer();
-//        $transformer->setIncludeIsOpenNow(false);
-//        $transformer->setService($service);
-//        $transformer->setStart((new Carbon('2017-09-15'))->startOfDay());
-//        $transformer->setEnd((new Carbon('2017-09-15'))->endOfDay());
-//        $transformer->setLocaleService($this->localeService);
-//
-//        $actual = $transformer->transformJsonCollection($service->channels);
-//        $content = file_get_contents(__DIR__ . '/../data/transformers/openinghours/transformJsonCollection.json');
-//        $expected = json_encode(json_decode($content, true));
-//        $this->assertEquals($expected, $actual);
-//    }
+    /**
+     * @test
+     * @group content
+     * TODO : refactor test
+     */
+    public function testTransformJsonCollection()
+    {
+        $service = Service::first();
+
+        $transformer = new OpeninghoursTransformer();
+        $transformer->setIncludeIsOpenNow(false);
+        $transformer->setService($service);
+        $transformer->setStart((new Carbon('2017-09-15'))->startOfDay());
+        $transformer->setEnd((new Carbon('2017-09-15'))->endOfDay());
+        $transformer->setLocaleService($this->localeService);
+
+        $actual = $transformer->transformJsonCollection($service->channels);
+        $content = file_get_contents(__DIR__ . '/../data/transformers/json/openinghours/transformJsonCollection.json');
+        $expected = json_encode(json_decode($content, true));
+        $this->assertEquals($expected, $actual);
+    }
 
     /**
      * @test
@@ -255,6 +254,4 @@ class OpeninghoursTransformerTest extends \TestCase
             $this->assertEquals($expected, $actual);
         }
     }
-
-
 }

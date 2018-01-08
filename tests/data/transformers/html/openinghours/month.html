@@ -1,181 +1,409 @@
-<div class="openinghours openinghours--calendar">
+<div class="channel-label">
+    Balie
+</div>
+<div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--calendar">
     <div class="openinghours--header">
         <button class="openinghours--prev">Vorige</button>
         <div class="openinghours--month">januari 2017</div>
         <button class="openinghours--next">Volgende</button>
     </div>
-    <div class="openinghours--days">
-        <div class="openinghours--day openinghours--day--day-of-week">Ma</div>
-        <div class="openinghours--day openinghours--day--day-of-week">Di</div>
-        <div class="openinghours--day openinghours--day--day-of-week">Wo</div>
-        <div class="openinghours--day openinghours--day--day-of-week">Do</div>
-        <div class="openinghours--day openinghours--day--day-of-week">Vr</div>
-        <div class="openinghours--day openinghours--day--day-of-week">Za</div>
-        <div class="openinghours--day openinghours--day--day-of-week">Zo</div>
-        <div class="openinghours--day openinghours--day-open ">
-            <span>1</span>
-            <div class="openinghours openinghours--details openinghours--day-open">
-                <div class="openinghours--date">
+    <ul class="openinghours--days">
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Ma</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Di</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Wo</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Do</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Vr</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Za</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Zo</li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">1</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-01">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Sunday">Zondag</span>
                     <span class="openinghours--date-day">1</span>
                     <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
                 </div>
-                <div class="openinghours--content">
-                    <div class="openinghours--times">
-                        <span class="openinghours--status">open</span>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="10:00">10:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="12:00">12:00</time>
-                        </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="10:00" aria-label="10:00">10:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="openinghours--day openinghours--day-closed ">
-            <span>2</span>
-            <div class="openinghours openinghours--details openinghours--day-closed">
-                <div class="openinghours--date">
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">2</span>
+            <div class="openinghours openinghours--details openinghours--day-closed"
+                 property="openingHoursSpecification" typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-02">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Monday">Maandag</span>
                     <span class="openinghours--date-day">2</span>
                     <span class="openinghours--date-month">januari</span>
-                </div>
-                <div class="openinghours--content">
-                    <div class="openinghours--times">
-                        <span class="openinghours--status">gesloten</span>
-                        <div class="openinghours--time">
-                            <time property="opens" datetime="00:00:00"></time>
-                            <time property="closes" datetime="00:00:00"></time>
-                        </div>
-                    </div>
+                    <span class="openinghours--date-year">2017</span>
                 </div>
             </div>
-        </div>
-        <div class="openinghours--day openinghours--day-open ">
-            <span>3</span>
-            <div class="openinghours openinghours--details openinghours--day-open">
-                <div class="openinghours--date">
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">gesloten</span>
+                </div>
+            </div>
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">3</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-03">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Tuesday">Dinsdag</span>
                     <span class="openinghours--date-day">3</span>
                     <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
                 </div>
-                <div class="openinghours--content">
-                    <div class="openinghours--times">
-                        <span class="openinghours--status">open</span>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="09:00">09:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="12:00">12:00</time>
-                        </div>
-                        <div class="openinghours--times-between">en</div>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="13:00">13:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="17:00">17:00</time>
-                        </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="openinghours--day openinghours--day-open ">
-            <span>4</span>
-            <div class="openinghours openinghours--details openinghours--day-open">
-                <div class="openinghours--date">
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">4</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-04">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Wednesday">Woensdag</span>
                     <span class="openinghours--date-day">4</span>
                     <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
                 </div>
-                <div class="openinghours--content">
-                    <div class="openinghours--times">
-                        <span class="openinghours--status">open</span>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="09:00">09:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="12:00">12:00</time>
-                        </div>
-                        <div class="openinghours--times-between">en</div>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="13:00">13:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="17:00">17:00</time>
-                        </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="openinghours--day openinghours--day-open ">
-            <span>5</span>
-            <div class="openinghours openinghours--details openinghours--day-open">
-                <div class="openinghours--date">
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">5</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-05">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Thursday">Donderdag</span>
                     <span class="openinghours--date-day">5</span>
                     <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
                 </div>
-                <div class="openinghours--content">
-                    <div class="openinghours--times">
-                        <span class="openinghours--status">open</span>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="09:00">09:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="12:00">12:00</time>
-                        </div>
-                        <div class="openinghours--times-between">en</div>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="13:00">13:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="17:00">17:00</time>
-                        </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="openinghours--day openinghours--day-open ">
-            <span>6</span>
-            <div class="openinghours openinghours--details openinghours--day-open">
-                <div class="openinghours--date">
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">6</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-06">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Friday">Vrijdag</span>
                     <span class="openinghours--date-day">6</span>
                     <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
                 </div>
-                <div class="openinghours--content">
-                    <div class="openinghours--times">
-                        <span class="openinghours--status">open</span>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="09:00">09:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="12:00">12:00</time>
-                        </div>
-                        <div class="openinghours--times-between">en</div>
-                        <div class="openinghours--time">
-                            <span class="openinghours--time-prefix">van</span>
-                            <time datetime="13:00">13:00</time>
-                            <span class="openinghours--time-separator">tot</span>
-                            <time datetime="17:00">17:00</time>
-                        </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="openinghours--day openinghours--day-closed ">
-            <span>7</span>
-            <div class="openinghours openinghours--details openinghours--day-closed">
-                <div class="openinghours--date">
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">7</span>
+            <div class="openinghours openinghours--details openinghours--day-closed"
+                 property="openingHoursSpecification" typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-07">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Saturday">Zaterdag</span>
                     <span class="openinghours--date-day">7</span>
                     <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
                 </div>
-                <div class="openinghours--content">
-                    <div class="openinghours--times">
-                        <span class="openinghours--status">gesloten</span>
-                        <div class="openinghours--time">
-                            <time property="opens" datetime="00:00:00"></time>
-                            <time property="closes" datetime="00:00:00"></time>
-                        </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">gesloten</span>
+                </div>
+            </div>
+        </li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day-disabled"></li>
+    </ul>
+</div>
+
+<div class="channel-label">
+    Tele-service
+</div>
+<div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--calendar">
+    <div class="openinghours--header">
+        <button class="openinghours--prev">Vorige</button>
+        <div class="openinghours--month">januari 2017</div>
+        <button class="openinghours--next">Volgende</button>
+    </div>
+    <ul class="openinghours--days">
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Ma</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Di</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Wo</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Do</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Vr</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Za</li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">Zo</li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">1</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-01">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Sunday">Zondag</span>
+                    <span class="openinghours--date-day">1</span>
+                    <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
+                </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="10:00" aria-label="10:00">10:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="openinghours--day openinghours--day-disabled"></div>
-    </div>
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">2</span>
+            <div class="openinghours openinghours--details openinghours--day-closed"
+                 property="openingHoursSpecification" typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-02">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Monday">Maandag</span>
+                    <span class="openinghours--date-day">2</span>
+                    <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
+                </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">gesloten</span>
+                </div>
+            </div>
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">3</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-03">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Tuesday">Dinsdag</span>
+                    <span class="openinghours--date-day">3</span>
+                    <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
+                </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">4</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-04">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Wednesday">Woensdag</span>
+                    <span class="openinghours--date-day">4</span>
+                    <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
+                </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">5</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-05">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Thursday">Donderdag</span>
+                    <span class="openinghours--date-day">5</span>
+                    <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
+                </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">6</span>
+            <div class="openinghours openinghours--details openinghours--day-open" property="openingHoursSpecification"
+                 typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-06">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Friday">Vrijdag</span>
+                    <span class="openinghours--date-day">6</span>
+                    <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
+                </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">open</span>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="09:00" aria-label="09:00">09:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="12:00" aria-label="12:00">12:00</time>
+                    </div>
+                    <div class="openinghours--times-between">en</div>
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">van</span>
+                        <time property="opens" datetime="13:00" aria-label="13:00">13:00</time>
+                        <span class="openinghours--time-separator">tot</span>
+                        <time property="closes" datetime="17:00" aria-label="17:00">17:00</time>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li aria-setsize="30" aria-posinset="1" tabindex="0">
+            <span aria-hidden="true">7</span>
+            <div class="openinghours openinghours--details openinghours--day-closed"
+                 property="openingHoursSpecification" typeof="OpeningHoursSpecification">
+                <div class="openinghours--date" property="validFrom validThrough" datetime="2017-01-07">
+                    <span class="openinghours--date-day-of-week"><link property="dayOfWeek"
+                                                                       href="http://schema.org/Saturday">Zaterdag</span>
+                    <span class="openinghours--date-day">7</span>
+                    <span class="openinghours--date-month">januari</span>
+                    <span class="openinghours--date-year">2017</span>
+                </div>
+            </div>
+            <div class="openinghours--content">
+                <div class="openinghours--times">
+                    <span class="openinghours--status">gesloten</span>
+                </div>
+            </div>
+        </li>
+        <li aria-hidden="true" class="openinghours--day openinghours--day-disabled"></li>
+    </ul>
 </div>
