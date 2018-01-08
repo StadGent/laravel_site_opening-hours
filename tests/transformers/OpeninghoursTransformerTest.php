@@ -90,7 +90,7 @@ class OpeninghoursTransformerTest extends \TestCase
         $transformer->setIncludeIsOpenNow(false);
         $transformer->setService($service);
         $transformer->setStart((new Carbon('2017-01-01'))->startOfDay());
-        $transformer->setEnd((new Carbon('2017-01-07'))->endOfDay());
+        $transformer->setEnd((new Carbon('2017-01-31'))->endOfDay());
         $transformer->setCalendarLength(QueryController::CALENDAR_LENGTH_MONTH);
         $transformer->setLocaleService($this->localeService);
         $actual = response()->collection($transformer, $service->channels)->content();

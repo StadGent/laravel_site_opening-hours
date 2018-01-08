@@ -9,6 +9,7 @@
         </div>
     @endif
     <?php
+    /** @var \Carbon\Carbon $firstDay */
     $firstDay = reset($channelData['openinghours'])->date;
     $lastDay = end($channelData['openinghours'])->date;
     $weekdays = \App\Models\DayInfo::WEEKDAYS_SHORT;
@@ -32,8 +33,20 @@
                 <li aria-hidden="true" class="openinghours--day openinghours--day-disabled"></li>
             @endfor
             @foreach($channelData['openinghours'] as $dayInfoObj)
-                <?php $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date); ?>
-                <li aria-setsize="30" aria-posinset="1" tabindex="0" @if($isSameDay)class="openinghours--day-active"@endif>
+                <?php
+                    $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date);
+                    $currentDay = $dayInfoObj->date->day;
+                    $tabIndex = 0;
+                    if($isSameDay){
+                        $tabIndex = -1;
+                    }elseif (
+                        $dayInfoObj->date->day == 1 &&
+                        !$firstDay->isSameDay((new \Carbon\Carbon())->firstOfMonth())
+                    ){
+                        $tabIndex = -1;
+                    }
+                    ?>
+                <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}" @if($isSameDay)class="openinghours--day-active"@endif>
                     <span aria-hidden="true">{{ $dayInfoObj->date->day }}</span>
                     @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
                 </li>
