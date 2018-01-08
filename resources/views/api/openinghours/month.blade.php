@@ -11,6 +11,7 @@
     @inject('localeService', 'App\Services\LocaleService')
     <?php
     $weekdays = \App\Models\DayInfo::WEEKDAYS_SHORT;
+    $addedValue = $localeService->getWeekStartDay();
     for ($i = 0; $i < $localeService->getWeekStartDay(); $i++) {
         $value = array_shift($weekdays);
         $weekdays[] = $value;
@@ -26,7 +27,7 @@
             @foreach($weekdays as $weekday)
                 <div class="openinghours--day openinghours--day--day-of-week">@lang('openinghourApi.'.$weekday)</div>
             @endforeach
-            @for($i=0;$i<((7 - $firstDay->dayOfWeek - $localeService->getWeekStartDay()) % 7);$i++)
+            @for($i=0;$i< $firstDay->dayOfWeek - $localeService->getWeekStartDay();$i++)
                 <div class="openinghours--day openinghours--day-disabled"></div>
             @endfor
             @foreach($data[0]['openinghours'] as $dayInfoObj)
@@ -45,7 +46,7 @@
                     </div>
                 </div>
             @endforeach
-            @for($i=0;$i<((7 - $lastDay->dayOfWeek + $localeService->getWeekEndDay()) % 7);$i++)
+            @for($i=0;$i<7 - $lastDay->dayOfWeek -1 + $localeService->getWeekStartDay();$i++)
                 <div class="openinghours--day openinghours--day-disabled"></div>
             @endfor
         </div>
