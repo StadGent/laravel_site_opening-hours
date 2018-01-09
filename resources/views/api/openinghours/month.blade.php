@@ -37,6 +37,9 @@
                     $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date);
                     $currentDay = $dayInfoObj->date->day;
                     $tabIndex = -1;
+                    $isOpen = !empty($dayInfoObj->hours);
+                    $status = $isOpen ? 'OPEN' : 'CLOSED';
+
                     if($isSameDay){
                         $tabIndex = 0;
                     }elseif (
@@ -46,7 +49,7 @@
                         $tabIndex = 0;
                     }
                     ?>
-                <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}" @if($isSameDay)class="openinghours--day-active"@endif>
+                <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}" class="openinghours--day openinghours--day-{{ strtolower($status) }} @if($isSameDay){{"openinghours--day-active"}}@endif">
                     <span aria-hidden="true">{{ $dayInfoObj->date->day }}</span>
                     @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
                 </li>
