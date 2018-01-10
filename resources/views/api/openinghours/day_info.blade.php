@@ -31,22 +31,22 @@ if ((new \Carbon\Carbon())->isSameDay($date)) {
             <span class="openinghours--date-year">{{ $date->year }}</span>
         @endif
     </div>
-</div>
-<div class="openinghours--content">
-    <div class="openinghours--times">
-        <span class="openinghours--status">{{ $translatedStatus }}</span>
-        @if($isOpen)
-            @foreach($dayInfoObj->hours as $hours)
-                <div class="openinghours--time">
-                    <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
-                    <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">{{$hours['from']}}</time>
-                    <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
-                    <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">{{ $hours['until']}}</time>
-                </div>
-                @if(end($dayInfoObj->hours) != $hours)
-                    <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
-                @endif
-            @endforeach
-        @endif
+    <div class="openinghours--content">
+        <div class="openinghours--times">
+            <span class="openinghours--status">{{ $translatedStatus }}</span>
+            @if($isOpen)
+                @foreach($dayInfoObj->hours as $hours)
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
+                        <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">{{$hours['from']}}</time>
+                        <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
+                        <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">{{ $hours['until']}}</time>
+                    </div>
+                    @if(end($dayInfoObj->hours) != $hours)
+                        <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
+                    @endif
+                @endforeach
+            @endif
+        </div>
     </div>
 </div>
