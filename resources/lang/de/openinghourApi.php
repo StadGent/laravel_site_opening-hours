@@ -32,6 +32,7 @@ return [
 
     'TODAY' => 'Heute',
     'TOMORROW' => 'Morgen',
+    'YESTERDAY' => 'Gestern',
 
     'Monday' => 'Montag',
     'Tuesday' => 'Dienstag',
