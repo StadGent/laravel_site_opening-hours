@@ -454,9 +454,9 @@ class RecurringOHService
 
         $firstIteration = true;
 
-        foreach ($calendarRule as $key => $value){
+        foreach ($calendarRule as $key => $value) {
             $value = lcfirst($value);
-            if($firstIteration){
+            if ($firstIteration) {
                 $value = ucfirst($value);
                 $firstIteration = false;
             }
