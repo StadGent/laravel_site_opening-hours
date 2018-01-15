@@ -19,15 +19,15 @@ return [
     'UNTILL_DATA' => 'al',
     'SHORT_HOUR' => 'h',
 
-    'day_0'  => 'Domingo',
-    'day_1'  => 'Lunes',
-    'day_2'  => 'Martes',
-    'day_3'  => 'Miércoles',
-    'day_4'  => 'Jueves',
-    'day_5'  => 'Viernes',
-    'day_6'  => 'Viernes',
+    'day_0' => 'Domingo',
+    'day_1' => 'Lunes',
+    'day_2' => 'Martes',
+    'day_3' => 'Miércoles',
+    'day_4' => 'Jueves',
+    'day_5' => 'Viernes',
+    'day_6' => 'Viernes',
 
-    'PREVIOUS'   => 'previous',
+    'PREVIOUS' => 'previous',
     'NEXT' => 'next',
 
     'TODAY' => 'Hoy',
