@@ -21,8 +21,7 @@ if ((new \Carbon\Carbon())->isSameDay($date)) {
 <div class="openinghours openinghours--details openinghours--day-{{ strtolower($status) }}" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
     <div class="openinghours--date" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
-            <span class="openinghours--date-special-day">{{ $specialDayName }}</span>
-            <span class="openinghours--date-between">, </span>
+            <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span class="openinghours--date-between">, </span>
         @endif
         <span class="openinghours--date-day-of-week"><link property="dayOfWeek" href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}</span>
         <span class="openinghours--date-day">{{ $dayOfMonth }}</span>
