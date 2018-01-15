@@ -19,7 +19,7 @@ if ((new \Carbon\Carbon())->isSameDay($date)) {
 }
 ?>
 <div class="openinghours openinghours--details openinghours--day-{{ strtolower($status) }}" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
-    <div class="openinghours--date" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
+    <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
             <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span class="openinghours--date-between">, </span>
         @endif

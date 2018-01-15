@@ -32,6 +32,7 @@ return [
 
     'TODAY' => 'Vandaag',
     'TOMORROW' => 'Morgen',
+    'YESTERDAY' => 'Gisteren',
 
     'Mo' => 'Ma',
     'Tu' => 'Di',
