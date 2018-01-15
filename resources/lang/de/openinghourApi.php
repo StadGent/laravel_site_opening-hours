@@ -19,19 +19,20 @@ return [
     'UNTIL_DATA' => 'bis zum',
     'SHORT_HOUR' => 'Urh',
 
-    'day_0'  => 'Sonntag',
-    'day_1'  => 'Montag',
-    'day_2'  => 'Dienstag',
-    'day_3'  => 'Mittwoch',
-    'day_4'  => 'Donnerstag',
-    'day_5'  => 'Freitag',
-    'day_6'  => 'Samstag',
+    'day_0' => 'Sonntag',
+    'day_1' => 'Montag',
+    'day_2' => 'Dienstag',
+    'day_3' => 'Mittwoch',
+    'day_4' => 'Donnerstag',
+    'day_5' => 'Freitag',
+    'day_6' => 'Samstag',
 
-    'PREVIOUS'   => 'bisherige',
+    'PREVIOUS' => 'bisherige',
     'NEXT' => 'nächster',
 
     'TODAY' => 'Heute',
     'TOMORROW' => 'Morgen',
+    'YESTERDAY' => 'Gestern',
 
     'Monday' => 'Montag',
     'Tuesday' => 'Dienstag',
