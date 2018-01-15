@@ -32,6 +32,7 @@ return [
 
     'TODAY' => "Aujourd'hui",
     'TOMORROW' => 'Demain',
+    'YESTERDAY' => 'Hier',
 
     'Monday' => 'Dimanche',
     'Tuesday' => 'Lundi',
