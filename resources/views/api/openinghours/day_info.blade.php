@@ -19,10 +19,9 @@ if ((new \Carbon\Carbon())->isSameDay($date)) {
 }
 ?>
 <div class="openinghours openinghours--details openinghours--day-{{ strtolower($status) }}" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
-    <div class="openinghours--date" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
+    <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
-            <span class="openinghours--date-special-day">{{ $specialDayName }}</span>
-            <span class="openinghours--date-between">, </span>
+            <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span class="openinghours--date-between">, </span>
         @endif
         <span class="openinghours--date-day-of-week"><link property="dayOfWeek" href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}</span>
         <span class="openinghours--date-day">{{ $dayOfMonth }}</span>
@@ -31,22 +30,22 @@ if ((new \Carbon\Carbon())->isSameDay($date)) {
             <span class="openinghours--date-year">{{ $date->year }}</span>
         @endif
     </div>
-</div>
-<div class="openinghours--content">
-    <div class="openinghours--times">
-        <span class="openinghours--status">{{ $translatedStatus }}</span>
-        @if($isOpen)
-            @foreach($dayInfoObj->hours as $hours)
-                <div class="openinghours--time">
-                    <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
-                    <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">{{$hours['from']}}</time>
-                    <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
-                    <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">{{ $hours['until']}}</time>
-                </div>
-                @if(end($dayInfoObj->hours) != $hours)
-                    <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
-                @endif
-            @endforeach
-        @endif
+    <div class="openinghours--content">
+        <div class="openinghours--times">
+            <span class="openinghours--status">{{ $translatedStatus }}</span>
+            @if($isOpen)
+                @foreach($dayInfoObj->hours as $hours)
+                    <div class="openinghours--time">
+                        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
+                        <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">{{$hours['from']}}</time>
+                        <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
+                        <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">{{ $hours['until']}}</time>
+                    </div>
+                    @if(end($dayInfoObj->hours) != $hours)
+                        <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
+                    @endif
+                @endforeach
+            @endif
+        </div>
     </div>
 </div>

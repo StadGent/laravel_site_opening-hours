@@ -7,4 +7,4 @@
             <div>@lang('openinghourApi.CLOSED')</div>
         @endif
     </div>
-@endforeachb
+@endforeach
