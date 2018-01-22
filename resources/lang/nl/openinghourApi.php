@@ -27,11 +27,12 @@ return [
     'day_5' => 'vrijdag',
     'day_6' => 'zaterdag',
 
-    'PREVIOUS'   => 'Vorige',
+    'PREVIOUS' => 'Vorige',
     'NEXT' => 'Volgende',
 
     'TODAY' => 'Vandaag',
     'TOMORROW' => 'Morgen',
+    'YESTERDAY' => 'Gisteren',
 
     'Mo' => 'Ma',
     'Tu' => 'Di',

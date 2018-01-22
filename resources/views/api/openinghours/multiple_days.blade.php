@@ -10,8 +10,11 @@
     <div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--list">
         <ul class="openinghours--days">
             @foreach($channelData['openinghours'] as $dayInfoObj)
-                <?php $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date); ?>
-                <li @if($isSameDay)class="openinghours--day-active"@endif>
+                <?php
+                $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date);
+                $status = empty($dayInfoObj->hours) ? 'closed' : 'open';
+                ?>
+                <li class="openinghours--day openinghours--day-{{ $status }}@if($isSameDay){{" openinghours--day-active"}}@endif">
                     @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
                 </li>
             @endforeach

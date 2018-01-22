@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Calendar;
 use App\Models\Event;
 use App\Models\Service;
-use App\Services\RecurringOHService;
 use Carbon\Carbon;
 
 /**
@@ -311,7 +310,7 @@ class RecurringOHService
                 break;
         }
 
-        if(!$event->calendar){
+        if (!$event->calendar) {
             return false;
         }
 
@@ -448,8 +447,21 @@ class RecurringOHService
     protected function cleanUpOutput($calendarRule)
     {
         ksort($calendarRule);
+
         if (empty($calendarRule)) {
             return '';
+        }
+
+        $firstIteration = true;
+
+        foreach ($calendarRule as $key => $value) {
+            $value = lcfirst($value);
+            if ($firstIteration) {
+                $value = ucfirst($value);
+                $firstIteration = false;
+            }
+
+            $calendarRule[$key] = $value;
         }
 
         return '<p>' . implode("<br />\n" . "en ", $calendarRule) . '</p>' . "\n";
