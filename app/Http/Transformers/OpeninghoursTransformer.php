@@ -7,8 +7,8 @@ use App\Models\DayInfo;
 use App\Models\Service;
 use App\Services\LocaleService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
+use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class OpeninghoursTransformer implements TransformerInterface
@@ -92,9 +92,35 @@ class OpeninghoursTransformer implements TransformerInterface
         $this->hasOneChannel = $hasOneChannel;
     }
 
+    /**
+     * @param $calendarLength
+     */
     public function setCalendarLength($calendarLength)
     {
         $this->calendarLength = $calendarLength;
+    }
+
+    /**
+     * @param Collection $channels
+     * @return string
+     */
+    public function transformJsonCollection(Collection $channels)
+    {
+        $data = $this->getCollectionData($channels);
+
+        if (!$this->includeIsOpenNow) {
+            foreach ($data as $channelKey => $channelArr) {
+                foreach ($data[$channelKey]['openinghours'] as $openinghourkey => $openinghourArr) {
+                    $datestring = $data[$channelKey]['openinghours'][$openinghourkey]->date->toDateString();
+                    $data[$channelKey]['openinghours'][$openinghourkey]->date = $datestring;
+                }
+            }
+        }
+
+        if ($this->hasOneChannel) {
+            $data = array_first($data);
+        }
+        return json_encode($data);
     }
 
     /**
@@ -119,12 +145,11 @@ class OpeninghoursTransformer implements TransformerInterface
                 continue;
             }
 
-            $dayInterval = \DateInterval::createFromDateString('1 day');
+            if (!$this->includeIsOpenNow) {
+                $dayInterval = \DateInterval::createFromDateString('1 day');
+                $datePeriod = new \DatePeriod($this->start, $dayInterval, $this->end);
 
-            $datePeriod = new \DatePeriod($this->start, $dayInterval, $this->end);
-
-            foreach ($datePeriod as $day) {
-                if (!$this->includeIsOpenNow) {
+                foreach ($datePeriod as $day) {
                     $dataCollection[$channel->id]['openinghours'][] = new DayInfo($day);
                 }
             }
@@ -149,7 +174,7 @@ class OpeninghoursTransformer implements TransformerInterface
         }
 
         foreach ($ohCollection as $openinghours) {
-            // addapt begin and end to dates of openinghours
+            // Copy the calendar start and end
             $calendarBegin = new Carbon($openinghours->start_date);
             if ($this->start > $openinghours->start_date) {
                 $calendarBegin = clone $this->start;
@@ -178,65 +203,6 @@ class OpeninghoursTransformer implements TransformerInterface
                 $dataCollection[$channel->id]['openNow']['status'] = $open ? true : false;
             }
         }
-    }
-
-    /**
-     * @param $openinghours
-     * @return string
-     */
-    private function makeTextForDayInfo($openinghours)
-    {
-        $text = '';
-        foreach ($openinghours as $openinghoursObj) {
-            $text .= trans('openinghourApi.day_' . date('w', strtotime($openinghoursObj->date))) . ' ';
-            $text .= date($this->localeService->getDateFormat(), strtotime($openinghoursObj->date)) . ': ';
-            if (!$openinghoursObj->open) {
-                $text .= trans('openinghourApi.CLOSED');
-                $text .= PHP_EOL;
-                continue;
-            }
-
-            $hours = [];
-            foreach ($openinghoursObj->hours as $hoursArr) {
-                $hours[] = date($this->localeService->getTimeFormat(), strtotime($hoursArr['from'])) . "-" .
-                    date($this->localeService->getTimeFormat(), strtotime($hoursArr['until']));
-            }
-
-            // implode hours[] with ', ' but make last ', '  =>  "and"
-            // to result in for example 'HH:ii-HH:ii, HH:ii-HH:ii, HH:ii-HH:ii and HH:ii-HH:ii'
-            // https://stackoverflow.com/a/8586179
-            $last = array_slice($hours, -1);
-            $first = implode(', ', array_slice($hours, 0, -1));
-            $both = array_filter(array_merge([$first], $last), 'strlen');
-            $text .= implode(' ' . trans('openinghourApi.AND') . ' ', $both);
-            $text .= PHP_EOL;
-        }
-        $text .= PHP_EOL;
-
-        return $text;
-    }
-
-    /**
-     * @param Collection $channels
-     * @return string
-     */
-    public function transformJsonCollection(Collection $channels)
-    {
-        $data = $this->getCollectionData($channels);
-
-        if (!$this->includeIsOpenNow) {
-            foreach ($data as $channelKey => $channelArr) {
-                foreach ($data[$channelKey]['openinghours'] as $openinghourkey => $openinghourArr) {
-                    $datestring = $data[$channelKey]['openinghours'][$openinghourkey]->date->toDateString();
-                    $data[$channelKey]['openinghours'][$openinghourkey]->date = $datestring;
-                }
-            }
-        }
-
-        if ($this->hasOneChannel) {
-            $data = array_first($data);
-        }
-        return json_encode($data);
     }
 
     /**
@@ -277,6 +243,42 @@ class OpeninghoursTransformer implements TransformerInterface
         $serialiser = new JsonLdSerialiser();
 
         return $serialiser->serialise($graph, 'jsonld');
+    }
+
+    /**
+     * @param $openinghours
+     * @return string
+     */
+    private function makeTextForDayInfo($openinghours)
+    {
+        $text = '';
+        foreach ($openinghours as $openinghoursObj) {
+            $text .= trans('openinghourApi.day_' . date('w', strtotime($openinghoursObj->date))) . ' ';
+            $text .= date($this->localeService->getDateFormat(), strtotime($openinghoursObj->date)) . ': ';
+            if (!$openinghoursObj->open) {
+                $text .= trans('openinghourApi.CLOSED');
+                $text .= PHP_EOL;
+                continue;
+            }
+
+            $hours = [];
+            foreach ($openinghoursObj->hours as $hoursArr) {
+                $hours[] = date($this->localeService->getTimeFormat(), strtotime($hoursArr['from'])) . "-" .
+                    date($this->localeService->getTimeFormat(), strtotime($hoursArr['until']));
+            }
+
+            // implode hours[] with ', ' but make last ', '  =>  "and"
+            // to result in for example 'HH:ii-HH:ii, HH:ii-HH:ii, HH:ii-HH:ii and HH:ii-HH:ii'
+            // https://stackoverflow.com/a/8586179
+            $last = array_slice($hours, -1);
+            $first = implode(', ', array_slice($hours, 0, -1));
+            $both = array_filter(array_merge([$first], $last), 'strlen');
+            $text .= implode(' ' . trans('openinghourApi.AND') . ' ', $both);
+            $text .= PHP_EOL;
+        }
+        $text .= PHP_EOL;
+
+        return $text;
     }
 
     /**
