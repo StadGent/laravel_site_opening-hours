@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use ICal\ICal as ICalParser;
 use Illuminate\Database\Eloquent\Collection;
-use \ICal\ICal as ICalParser;
 
 /**
  * Model to keep specific Ical object per Openinghours
@@ -34,31 +34,13 @@ class Ical
      */
     public function __construct(Collection $calendars)
     {
-        $calendars = array_sort($calendars, function ($calendar) {
-            return $calendar['priority'];
+        $calendars = $calendars->sort(function ($calendar) {
+            return $calendar->priority;
         });
+
         $this->calendars = $calendars;
 
         return $this;
-    }
-
-    /**
-     * Create parser within from until range
-     *
-     * For performance reasons it is better to init the parser only
-     * for the from until periode that will be needed
-     * The parser does a processDateConversions
-     * that converts all the dates and this is expensive
-     *
-     * @param Carbon   $from
-     * @param Carbon   $until
-     *
-     * @return ICal
-     */
-    public function initParser()
-    {
-        $this->parser = new ICalParser();
-        $this->parser->initString($this->icalString);
     }
 
     /**
@@ -82,17 +64,9 @@ class Ical
     }
 
     /**
-     * @return ICal string
-     */
-    public function getIcalString()
-    {
-        return $this->icalString;
-    }
-
-    /**
      * Create an ICAL string from a calendar
      *
-     * @param  Calendar    $calendar     [description]
+     * @param  Calendar $calendar [description]
      * @param  Carbon|null $minTimestamp [description]
      * @param  Carbon|null $maxTimestamp [description]
      * @return [type]                    [description]
@@ -136,8 +110,8 @@ class Ical
             $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . PHP_EOL;
             $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . PHP_EOL;
             $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . PHP_EOL;
-            $icalString .= 'UID:' . 'PRIOR_' . ((int) $calendar->priority + 99) . '_' . $status . '_CAL_' ;
-            $icalString .=  $calendar->id . PHP_EOL;
+            $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 99) . '_' . $status . '_CAL_';
+            $icalString .= $calendar->id . PHP_EOL;
             $icalString .= "END:VEVENT" . PHP_EOL;
         }
 
@@ -145,10 +119,37 @@ class Ical
     }
 
     /**
+     * Create parser within from until range
+     *
+     * For performance reasons it is better to init the parser only
+     * for the from until periode that will be needed
+     * The parser does a processDateConversions
+     * that converts all the dates and this is expensive
+     *
+     * @param Carbon $from
+     * @param Carbon $until
+     *
+     * @return ICal
+     */
+    public function initParser()
+    {
+        $this->parser = new ICalParser();
+        $this->parser->initString($this->icalString);
+    }
+
+    /**
+     * @return ICal string
+     */
+    public function getIcalString()
+    {
+        return $this->icalString;
+    }
+
+    /**
      * Check if there are events for a given day
      * Attr openNow respects the given time and adds an extra minute
      *
-     * @param  Carbon  $date    [description]
+     * @param  Carbon $date [description]
      * @param  boolean $openNow [description]
      * @return [type]           [description]
      */
@@ -162,6 +163,7 @@ class Ical
         $datePeriod = new \DatePeriod($startDate, new \DateInterval('P1D'), $endDate);
         // Get the info for today.
         $data = $this->getPeriodInfo($datePeriod);
+
         $today = reset($data);
         if ($today->open === false) {
             return false;
@@ -184,12 +186,19 @@ class Ical
      * Check if there are events for a given day
      * Attr openNow respects the given time and adds an extra minute
      *
-     * @param  DatePeriod  $datePeriod    [description]
+     * @param  DatePeriod $datePeriod [description]
      * @return DayInfo[]                  [description]
      */
     public function getPeriodInfo(\DatePeriod $datePeriod)
     {
         $events = $this->getEvents($datePeriod);
+
+        // If there are several priorities for one day the event should not be shown for that day
+        $priorities = [];
+        foreach ($events as $event) {
+            $priorities[$event->dtstart][$event->priority] = $event->priority;
+        }
+
         $data = [];
         // Prefill data.
         foreach ($datePeriod as $day) {
@@ -198,6 +207,12 @@ class Ical
             $data[$carbonDay->toDateString()] = $dayInfo;
         }
         foreach ($events as $event) {
+
+            // If there are several priorities for one day the event should not be shown for that day
+            if (count($priorities[$event->dtstart]) > 1 && $event->priority == max($priorities[$event->dtstart])) {
+                continue;
+            }
+
             $start = $event->dtstart;
             $end = $event->dtend;
             $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
@@ -218,6 +233,7 @@ class Ical
                 $data[$carbonDay->toDateString()]->open = false;
             }
         }
+
         return $data;
     }
 
@@ -232,12 +248,9 @@ class Ical
         $startDate = new Carbon($datePeriod->getStartDate());
         $endDate = new Carbon($datePeriod->getEndDate());
 
-        if (empty($this->icalString)) {
-            $this->initParser($startDate, $endDate);
-        }
-
         $events = $this->parser->eventsFromRange($startDate, $endDate);
         usort($events, [$this, 'sortEvents']);
+
         return $events;
     }
 
