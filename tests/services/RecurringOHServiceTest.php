@@ -135,13 +135,13 @@ class RecurringOHServiceTest extends \TestCase
         $calendar2->events()->save($event3);
 
         $rrOutput = $this->recurringOHService->getRecurringOHForService($service);
-        $expected = '<h2>BALIE</h2>' .
+        $expected = '<h3>BALIE</h3>' .
             '<div>' .
-            '<h3>Normale uren geldig t.e.m. 31/12/2017</h3>' .
+            '<h4>Normale uren geldig t.e.m. 31/12/2017</h4>' .
             '<p>Maandag tot vrijdag gesloten</p>' .
             '</div>' .
             '<div>' .
-            '<h3>Normale uren geldig vanaf 01/01/2018</h3>' .
+            '<h4>Normale uren geldig vanaf 01/01/2018</h4>' .
             '<p>Maandag tot vrijdag: open 08:00 - 12:00<br />'.
             'en maandag tot vrijdag: open 13:00 - 17:00</p>' .
             '</div>';
@@ -190,9 +190,9 @@ class RecurringOHServiceTest extends \TestCase
         ]);
         $calendar2->events()->save($event2);
         $rrOutput = $this->recurringOHService->getRecurringOHForService($service);
-        $expected = '<h2>BALIE</h2>' .
+        $expected = '<h3>BALIE</h3>' .
             '<div>' .
-            '<h3>Normale uren geldig t.e.m. 31/12/2017</h3>' .
+            '<h4>Normale uren geldig t.e.m. 31/12/2017</h4>' .
             '<p>Maandag tot vrijdag gesloten</p>' .
             '</div>';
         $this->assertEquals($expected, str_replace("\n", '', $rrOutput));

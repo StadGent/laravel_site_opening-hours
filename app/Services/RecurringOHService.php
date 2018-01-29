@@ -122,7 +122,7 @@ class RecurringOHService
                     if ($calendarOutput !== '') {
                         $ohOutput .= '<div>' . "\n";
                         if ($calendar->priority !== 0 || $ohCollection->count() > 1) {
-                            $ohOutput .= '<h3>' . $calendar->label;
+                            $ohOutput .= '<h4>' . $calendar->label;
                             // when multiple openinghours we add these on the base calendar (and not on the time line)
                             if ($calendar->priority == 0) {
                                 $ohStart = new Carbon($openinghours->start_date);
@@ -134,7 +134,7 @@ class RecurringOHService
                                     $ohOutput .= ' geldig t.e.m. ' . $ohEnd->format('d/m/Y');
                                 }
                             }
-                            $ohOutput .= '</h3>' . "\n";
+                            $ohOutput .= '</h4>' . "\n";
                         }
                         $ohOutput .= $calendarOutput . '</div>' . "\n";
                     }
@@ -144,7 +144,7 @@ class RecurringOHService
                 }
             }
             if ($channelOutput !== '') {
-                $output .= '<h2>' . $channel->label . '</h2>' . "\n" . $channelOutput;
+                $output .= '<h3>' . $channel->label . '</h3>' . "\n" . $channelOutput;
             }
         }
 
