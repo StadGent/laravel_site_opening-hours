@@ -6,6 +6,7 @@ use App\Models\Calendar;
 use App\Models\Event;
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Lang;
 
 /**
  * @todo implement locale service
@@ -411,7 +412,19 @@ class RecurringOHService
             return $this->eventStart->format('d/m/Y') . ' - ' . $this->eventUntil->format('d/m/Y');
         }
 
-        return 'Op ' . $this->eventStart->format('d/m/Y');
+        $translatedDay = trans('openinghourApi.' . $this->eventStart->format('l'),[],'messages','nl');
+        $translatedMonth = trans('openinghourApi.' . $this->eventStart->format('F'),[],'messages','nl');
+
+        $output = 'Op ';
+        $output .= strtolower($translatedDay);
+        $output .= ' ';
+        $output .= $this->eventStart->format('d');
+        $output .= ' ';
+        $output .= strtolower($translatedMonth);
+        $output .= ' ';
+        $output .= $this->eventStart->format('Y');
+
+        return $output;
     }
 
     /**

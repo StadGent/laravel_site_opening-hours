@@ -264,10 +264,11 @@ class Ical
 
     public function sortEvents(\ICal\Event $a, \ICal\Event $b)
     {
-        $result = $a->priority - $b->priority;
-        if ($result !== 0) {
-            return $result;
-        }
+//        $result = $a->priority - $b->priority;
+//        if ($result !== 0) {
+//            return $result;
+//        }
+
         $aStart = Carbon::createFromFormat('Ymd\THis', $a->dtstart);
         $bStart = Carbon::createFromFormat('Ymd\THis', $b->dtstart);
         if ($aStart > $bStart || $aStart < $bStart) {
