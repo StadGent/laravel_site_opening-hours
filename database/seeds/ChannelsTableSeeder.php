@@ -25,7 +25,7 @@ class ChannelsTableSeeder extends Seeder
 
         $services = Service::all();
         foreach ($services as $service) {
-            $tmpChannels = array_slice($sampleChannels, 0, rand(2, 4));
+            $tmpChannels = array_slice($sampleChannels, 0, 2);
             foreach ($tmpChannels as $newChannel) {
                 $service->channels()->save(
                     factory(Channel::class)

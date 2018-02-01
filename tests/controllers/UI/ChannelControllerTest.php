@@ -42,14 +42,14 @@ class ChannelControllerTest extends \TestCase
             ['unauth', 'get', '1/channels', [], '401'], // getFromService
             ['unauth', 'post', '1/channels', [], '401'], // store
             ['unauth', 'get', '1/channels/1', [], '405'], // show
-            ['unauth', 'put', '1/channels/1', [], '405'], // update (full)
+            ['unauth', 'put', '1/channels/1', [], '401'], // update (full)
             ['unauth', 'patch', '1/channels/1', [], '405'], // update (partial)
             ['unauth', 'delete', '1/channels/1', [], '401'], // destroy
             // admin user
             ['admin', 'get', '1/channels', [], '200'], // getFromService
             ['admin', 'post', '1/channels', ['label' => 'test', 'service_id' => 1], '200'], // store
             ['admin', 'get', '1/channels/1', [], '405'], // show
-            ['admin', 'put', '1/channels/1', [], '405'], // update (full)
+            ['admin', 'put', '1/channels/1', ['label' => 'updated label'], '200'], // update (full)
             ['admin', 'patch', '1/channels/1', [], '405'], // update (partial)
             ['admin', 'delete', '1/channels/1', [], '200'], // destroy
             ['admin', 'delete', '2/channels/1', [], '422'], // Model mismatch
@@ -59,7 +59,8 @@ class ChannelControllerTest extends \TestCase
             ['owner', 'post', '1/channels', ['label' => 'test', 'service_id' => 1], '200'], // store
             ['owner', 'post', '2/channels', ['label' => 'test', 'service_id' => 2], '401'], // cannot store on not owned service
             ['owner', 'get', '1/channels/1', [], '405'], // show
-            ['owner', 'put', '1/channels/1', [], '405'], // update (full)
+            ['owner', 'put', '1/channels/1', ['label' => 'updated label', 'channel_id' => 1], '200'], // update (full)
+            ['owner', 'put', '1/channels/7', ['label' => 'updated label', 'channel_id' => 7], '401'],  // can't update channels from not membered service
             ['owner', 'patch', '1/channels/1', [], '405'], // update (partial)
             ['owner', 'delete', '1/channels/1', [], '200'], // destroy
             ['owner', 'delete', '2/channels/6', [], '401'], // cannot destroy on not owned service
@@ -69,7 +70,8 @@ class ChannelControllerTest extends \TestCase
             ['member', 'post', '1/channels', ['label' => 'test', 'service_id' => 1], '200'], // store
             ['member', 'post', '2/channels', ['label' => 'test', 'service_id' => 2], '401'], // cannot store on not membered service
             ['member', 'get', '1/channels/1', [], '405'], // show
-            ['member', 'put', '1/channels/1', [], '405'], // update (full)
+            ['member', 'put', '1/channels/1', ['label' => 'updated label', 'channel_id' => 1], '200'], // update (full)
+            ['member', 'put', '1/channels/7', ['label' => 'updated label', 'channel_id' => 7], '401'],  // can't update from not membered service
             ['member', 'patch', '1/channels/1', [], '405'], // update (partial)
             ['member', 'delete', '1/channels/1', [], '200'], // destroy
             ['member', 'delete', '2/channels/6', [], '401'], // cannot destroy on not membered service
