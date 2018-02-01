@@ -27,6 +27,7 @@ Route::group(['prefix' => 'v1'], function () {
         // channels
         Route::get('/services/{service}/channels', 'UI\ChannelController@getFromService');
         Route::post('/services/{service}/channels', 'UI\ChannelController@store');
+        Route::put('/services/{service}/channels/{channel}', 'UI\ChannelController@update');
         Route::delete('/services/{service}/channels/{channel}', 'UI\ChannelController@destroy');
 
         // openinghours
