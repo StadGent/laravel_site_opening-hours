@@ -43,6 +43,29 @@ class ChannelController extends Controller
         return response()->json($channel);
     }
 
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param StoreChannelRequest $request
+     * @param Service $service
+     * @param Channel $channel
+     * @return \Illuminate\Http\Response
+     */
+    public function update(StoreChannelRequest $request, Service $service, Channel $channel)
+    {
+        $input = $request->input();
+
+        if (!$channel->update(['label' =>$input['label']])) {
+            return response()->json(
+                ['message' => 'Something went wrong while updating the channel, check the logs.'],
+                400
+            );
+        }
+
+        return response()->json(Channel::find($channel->id));
+    }
+
     /**
      * Get subset of Channels from Serivce
      * @param $id
