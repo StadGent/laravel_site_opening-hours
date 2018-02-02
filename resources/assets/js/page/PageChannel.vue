@@ -1,7 +1,9 @@
 <template>
   <div class="container">
-    <h1>Versies <small>{{ channel.label }}</small></h1>
+    <h1>{{ channel.label }}</h1>
+    <button type="button" class="btn btn-default" @click="editChannel(channel)" :disabled="$root.isRecreatex">Bewerk kanaal</button>
 
+    <h2>Versies</h2>
     <button type="button" class="btn btn-primary" @click="newVersion" :disabled="$root.isRecreatex">+ Nieuwe versie</button>
 
     <div v-if="!versions||!versions.length" class="table-message">
