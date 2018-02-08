@@ -317,11 +317,51 @@ class OpeninghoursTransformer implements TransformerInterface
         $data = $this->getCollectionData($channels);
 
         try {
-            $output = view('api.openinghours.' . $this->calendarLength, ['data' => $data]);
+            $output = view('api.openinghours.' . $this->calendarLength, ['data' => $data, 'transformer' => $this]);
         } catch (\InvalidArgumentException $ex) {
             throw new NotAcceptableHttpException();
         }
 
         return $output;
+    }
+
+    /**
+     * See if the next iteration is available
+     *
+     * @param $channelId
+     * @return bool
+     */
+    public function hasNextIteration($channelId)
+    {
+        $channel = Channel::find($channelId);
+
+        $referenceDate = clone $this->end;
+        $referenceDate->addDay()->startOfDay();
+
+        $ohCollection = $channel->openinghours()
+            ->where('end_date', '>=', $referenceDate->toDateString())
+            ->get();
+
+        return count($ohCollection) > 0;
+    }
+
+    /**
+     * See if the previous iteration is available
+     *
+     * @param $channelId
+     * @return bool
+     */
+    public function hasPreviousIteration($channelId)
+    {
+        $channel = Channel::find($channelId);
+
+        $referenceDate = clone $this->start;
+        $referenceDate->subDay()->endOfDay();
+
+        $ohCollection = $channel->openinghours()
+            ->where('start_date', '<=', $referenceDate->toDateString())
+            ->get();
+
+        return count($ohCollection) > 0;
     }
 }
