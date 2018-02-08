@@ -109,25 +109,6 @@ class LodServicesRepository
                 {
                     ?agent a foaf:Agent;
                     <http://purl.org/dc/terms/source> "VESTA"^^xsd:string ;
-                    <http://purl.org/dc/terms/type> "Stad Gent"^^<http://www.w3.org/2001/XMLSchema#string>;
-                    <http://purl.org/dc/terms/type> "Dienst"^^<http://www.w3.org/2001/XMLSchema#string>;
-                    <http://purl.org/dc/terms/identifier> ?identifier;
-                    foaf:name ?name.
-                }
-                UNION
-                {
-                    ?agent a foaf:Agent;
-                    <http://purl.org/dc/terms/source> "VESTA"^^xsd:string;
-                    <http://purl.org/dc/terms/type> "Stad Gent"^^<http://www.w3.org/2001/XMLSchema#string>;
-                    <http://purl.org/dc/terms/type> "Departement"^^<http://www.w3.org/2001/XMLSchema#string>;
-                    <http://purl.org/dc/terms/identifier> ?identifier;
-                    foaf:name ?name.
-                }
-                UNION
-                {
-                    ?agent a foaf:Agent;
-                    <http://purl.org/dc/terms/source> "VESTA"^^xsd:string;
-                    <http://purl.org/dc/terms/type> "OCMW"^^<http://www.w3.org/2001/XMLSchema#string>;
                     <http://purl.org/dc/terms/identifier> ?identifier;
                     foaf:name ?name.
                 }

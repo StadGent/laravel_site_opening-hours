@@ -179,6 +179,12 @@ class QueryController extends Controller
 
         $channels = isset($channel->id) ? (new Collection())->add($channel) : $service->channels;
 
-        return response()->collection($transformer, $channels);
+        $headers = [];
+
+        if ($includeIsOpenNow) {
+            $headers['Cache-Control'] = 'private';
+        }
+
+        return response()->collection($transformer, $channels, 200, $headers);
     }
 }

@@ -408,21 +408,28 @@ class RecurringOHService
      */
     protected function hrDaily()
     {
-        if ($this->eventStart->format('Y-m-d') !== $this->eventUntil->format('Y-m-d')) {
-            return $this->eventStart->format('d/m/Y') . ' - ' . $this->eventUntil->format('d/m/Y');
+        if ($this->eventStart->format('Y-m-d') == $this->eventUntil->format('Y-m-d')) {
+            $output = 'op ' . $this->getFullDayOutput($this->eventStart);
+        } else {
+            $output = $this->getFullDayOutput($this->eventStart) . ' tot en met ' . $this->getFullDayOutput($this->eventUntil);
         }
 
-        $translatedDay = trans('openinghourApi.' . $this->eventStart->format('l'),[],'messages','nl');
-        $translatedMonth = trans('openinghourApi.' . $this->eventStart->format('F'),[],'messages','nl');
+        return ucfirst($output);
+    }
 
-        $output = 'Op ';
-        $output .= strtolower($translatedDay);
+    private function getFullDayOutput(Carbon $event)
+    {
+        $translatedDay = trans('openinghourApi.' . $event->format('l'), [], 'messages', 'nl');
+        $translatedMonth = trans('openinghourApi.' . $event->format('F'), [], 'messages', 'nl');
+
+        $output = strtolower($translatedDay);
         $output .= ' ';
-        $output .= $this->eventStart->format('d');
+        $output .= $event->format('d');
         $output .= ' ';
         $output .= strtolower($translatedMonth);
         $output .= ' ';
-        $output .= $this->eventStart->format('Y');
+        $output .= $event->format('Y');
+
 
         return $output;
     }
@@ -439,7 +446,7 @@ class RecurringOHService
             return ' gesloten';
         }
 
-        return ': open ' . $this->eventStart->format('H:i') . ' - ' . $this->eventEnd->format('H:i');
+        return ': ' . $this->eventStart->format('H:i') . ' - ' . $this->eventEnd->format('H:i');
     }
 
     /**

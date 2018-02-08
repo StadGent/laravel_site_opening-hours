@@ -206,6 +206,28 @@ export default {
                 .then(this.statusReset)
                 .catch(fetchError)
         });
+        Hub.$on('updateChannel', channel => {
+            this.statusStart();
+
+            if (!channel || !channel.id) {
+                this.statusUpdate(ID_MISSING);
+                return;
+            }
+
+            if (!channel.service_id) {
+                this.statusUpdate(ID_MISSING);
+                return;
+            }
+
+            this.$http.put(API_PREFIX + '/services/' + channel.service_id + '/channels/' + channel.id, {'channel_id': channel.id, 'label' : channel.label})
+                .then(({data}) => {
+                    console.log(inert(data));
+                    this.fetchChannels();
+                    this.modalClose();
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
+        });
         Hub.$on('deleteChannel', channel => {
             this.statusStart();
 

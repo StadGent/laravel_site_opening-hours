@@ -73,6 +73,11 @@ export default {
       Object.assign(this.modal, v);
     },
 
+    editChannel(c) {
+        this.modal.text = 'newChannel';
+        Object.assign(this.modal, c);
+    },
+
     newUser(srv) {
       this.modal.text = 'newUser';
       this.modal.role = 'Member';
