@@ -1,12 +1,11 @@
 <template>
   <div class="container">
-    <h1>{{ route.tab2 ? 'Gebruikers' : 'Kanalen'}} <small>{{ srv.label || 'Dienst zonder naam' }}</small></h1>
-
+    <h1>{{ srv.label || 'Dienst zonder naam' }}</h1>
     <div v-if="isOwner" class="btn-group">
       <button type="button" class="btn btn-primary" :class="{active: !route.tab2}" @click="route.tab2=0">Toon kanalen</button>
       <button type="button" class="btn btn-primary" :class="{active: route.tab2}" @click="route.tab2='users'">Toon gebruikers</button>
     </div>
-
+    <h2>{{ route.tab2 ? 'Gebruikers' : 'Kanalen'}}</h2>
     <button v-if="route.tab2" type="button" class="btn btn-primary" @click="newRole(srv)">+ Gebruiker uitnodigen</button>
     <button v-if="!route.tab2" type="button" class="btn btn-primary" @click="newChannel(srv)" :disabled="$root.isRecreatex">+ Nieuw kanaal</button>
 
