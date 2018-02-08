@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Console\Commands\FetchODHolidays;
 use App\Console\Commands\FetchRecreatex;
 use App\Console\Commands\FetchServices;
+use App\Console\Commands\PrintVestaOutput;
 use App\Console\Commands\UpdateSchedulesInVesta;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -21,6 +22,7 @@ class Kernel extends ConsoleKernel
         FetchServices::class,
         FetchRecreatex::class,
         UpdateSchedulesInVesta::class,
+        PrintVestaOutput::class,
     ];
 
     /**
