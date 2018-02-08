@@ -25,12 +25,12 @@
     $weekStartDay = $localeService->getWeekStartDay();
 
     $disabledDaysBeforeStart = $monthStartDay - $weekStartDay;
-    if($disabledDaysBeforeStart  < 0){
+    if ($disabledDaysBeforeStart < 0) {
         $disabledDaysBeforeStart += 7;
     }
 
-    $disabledDaysAfterEnd = 7 - $lastDay->dayOfWeek -1 + $weekStartDay;
-    if($disabledDaysAfterEnd >= 7){
+    $disabledDaysAfterEnd = 7 - $lastDay->dayOfWeek - 1 + $weekStartDay;
+    if ($disabledDaysAfterEnd >= 7) {
         $disabledDaysAfterEnd -= 7;
     }
     ?>
@@ -42,13 +42,15 @@
         </div>
         <ul class="openinghours--days">
             @foreach($weekdays as $weekday)
-                <li aria-hidden="true" class="openinghours--day openinghours--day--day-of-week">@lang('openinghourApi.'.$weekday)</li>
+                <li aria-hidden="true"
+                    class="openinghours--day openinghours--day--day-of-week">@lang('openinghourApi.'.$weekday)</li>
             @endforeach
             @for($i=0;$i< $disabledDaysBeforeStart;$i++)
                 <li aria-hidden="true" class="openinghours--day openinghours--day-disabled"></li>
             @endfor
             @foreach($channelData['openinghours'] as $dayInfoObj)
                 <?php
+                $dayInfoObj->date->endOfDay();
                 $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date);
                 $currentDay = $dayInfoObj->date->day;
                 $tabIndex = -1;
@@ -63,9 +65,10 @@
                 ) {
                     $tabIndex = 0;
                 }
+                $isDayPassed = (new \Carbon\Carbon())->greaterThan($dayInfoObj->date);
                 ?>
                 <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}"
-                    class="openinghours--day openinghours--day-{{ strtolower($status) }} @if($isSameDay){{"openinghours--day-active"}}@endif">
+                    class="openinghours--day openinghours--day-{{ strtolower($status) }} @if($isSameDay){{"openinghours--day-active"}}@elseif($isDayPassed){{"openinghours--day-passed"}}@endif">
                     <span aria-hidden="true">{{ $dayInfoObj->date->day }}</span>
                     @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
                 </li>
