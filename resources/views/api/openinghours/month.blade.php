@@ -2,6 +2,7 @@
 {{--Check if the channel has multiple channels--}}
 <?php $hasMultipleChannels = count($data) > 1; ?>
 @foreach($data as $channelData)
+
     {{--If multiple channels are present the channel name is printed--}}
     @if($hasMultipleChannels)
         <div class="channel-label">
@@ -9,7 +10,6 @@
         </div>
     @endif
     <?php
-
     /** @var \Carbon\Carbon $firstDay */
     $firstDay = reset($channelData['openinghours'])->date;
     $lastDay = end($channelData['openinghours'])->date;
@@ -33,12 +33,22 @@
     if ($disabledDaysAfterEnd >= 7) {
         $disabledDaysAfterEnd -= 7;
     }
+
+    $hasNextIteration = $transformer->hasNextIteration($channelData['channelId']);
+    $hasPreviousIteration = $transformer->hasPreviousIteration($channelData['channelId']);
+
     ?>
     <div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--calendar">
         <div class="openinghours--header">
-            <button class="openinghours--prev">@lang('openinghourApi.PREVIOUS')</button>
-            <div class="openinghours--month">@lang('openinghourApi.'.$firstDay->format('F')) {{ $firstDay->format('Y') }}</div>
-            <button class="openinghours--next">@lang('openinghourApi.NEXT')</button>
+            <button class="openinghours--prev" @if(!$hasPreviousIteration)disabled="disabled"@endif>
+                @lang('openinghourApi.PREVIOUS')
+            </button>
+            <div class="openinghours--month">
+                @lang('openinghourApi.'.$firstDay->format('F')) {{ $firstDay->format('Y') }}
+            </div>
+            <button class="openinghours--next" @if(!$hasNextIteration)disabled="disabled"@endif>
+                @lang('openinghourApi.NEXT')
+            </button>
         </div>
         <ul class="openinghours--days">
             @foreach($weekdays as $weekday)
@@ -50,9 +60,11 @@
             @endfor
             @foreach($channelData['openinghours'] as $dayInfoObj)
                 <?php
-                $dayInfoObj->date->endOfDay();
-                $isSameDay = (new Carbon\Carbon())->isSameDay($dayInfoObj->date);
-                $currentDay = $dayInfoObj->date->day;
+                $referenceDate = clone $dayInfoObj->date;
+
+                $referenceDate->endOfDay();
+                $isSameDay = (new Carbon\Carbon())->isSameDay($referenceDate);
+                $currentDay = $referenceDate->day;
                 $tabIndex = -1;
                 $isOpen = !empty($dayInfoObj->hours);
                 $status = $isOpen ? 'OPEN' : 'CLOSED';
@@ -60,16 +72,16 @@
                 if ($isSameDay) {
                     $tabIndex = 0;
                 } elseif (
-                    $dayInfoObj->date->day == 1 &&
+                    $referenceDate->day == 1 &&
                     !$firstDay->isSameDay((new \Carbon\Carbon())->firstOfMonth())
                 ) {
                     $tabIndex = 0;
                 }
-                $isDayPassed = (new \Carbon\Carbon())->greaterThan($dayInfoObj->date);
+                $isDayPassed = (new \Carbon\Carbon())->greaterThan($referenceDate);
                 ?>
                 <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}"
                     class="openinghours--day openinghours--day-{{ strtolower($status) }} @if($isSameDay){{"openinghours--day-active"}}@elseif($isDayPassed){{"openinghours--day-passed"}}@endif">
-                    <span aria-hidden="true">{{ $dayInfoObj->date->day }}</span>
+                    <span aria-hidden="true">{{ $referenceDate->day }}</span>
                     @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
                 </li>
             @endforeach
