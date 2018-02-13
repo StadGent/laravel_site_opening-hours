@@ -6,7 +6,6 @@ use App\Models\Calendar;
 use App\Models\Event;
 use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Lang;
 
 /**
  * @todo implement locale service
@@ -409,12 +408,12 @@ class RecurringOHService
     protected function hrDaily()
     {
         if ($this->eventStart->format('Y-m-d') == $this->eventUntil->format('Y-m-d')) {
-            $output = 'op ' . $this->getFullDayOutput($this->eventStart);
+            $output = $this->getFullDayOutput($this->eventStart);
         } else {
             $output = $this->getFullDayOutput($this->eventStart) . ' tot en met ' . $this->getFullDayOutput($this->eventUntil);
         }
 
-        return ucfirst($output);
+        return $output;
     }
 
     private function getFullDayOutput(Carbon $event)
@@ -424,7 +423,7 @@ class RecurringOHService
 
         $output = strtolower($translatedDay);
         $output .= ' ';
-        $output .= $event->format('d');
+        $output .= $event->format('j');
         $output .= ' ';
         $output .= strtolower($translatedMonth);
         $output .= ' ';
@@ -446,7 +445,26 @@ class RecurringOHService
             return ' gesloten';
         }
 
-        return ': ' . $this->eventStart->format('H:i') . ' - ' . $this->eventEnd->format('H:i');
+        $output = ': ';
+        $output .= $this->getFullTimeOutput($this->eventStart);
+        $output .= ' tot ';
+        $output .= $this->getFullTimeOutput($this->eventEnd);
+        $output .= ' uur';
+
+        return $output;
+    }
+
+    private function getFullTimeOutput(Carbon $event)
+    {
+        $hour = $event->format('G');
+        $minutes = $event->format('i');
+
+        $output = $hour;
+        if ($minutes != '00') {
+            $output .= '.' . $minutes;
+        }
+
+        return $output;
     }
 
     /**
@@ -477,14 +495,13 @@ class RecurringOHService
         foreach ($calendarRule as $key => $value) {
             $value = lcfirst($value);
             if ($firstIteration) {
-                $value = ucfirst($value);
                 $firstIteration = false;
             }
 
             $calendarRule[$key] = $value;
         }
 
-        return '<p>' . implode("<br />\n" . "en ", $calendarRule) . '</p>' . "\n";
+        return '<p>' . implode("<br />\n", $calendarRule) . '</p>' . "\n";
     }
 
     /**
