@@ -3,69 +3,22 @@
 namespace App\Services;
 
 use App\Models\Calendar;
+use App\Models\Channel;
 use App\Models\Event;
+use App\Models\Openinghours;
 use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Lang;
 
-/**
- * @todo implement locale service
- */
 class RecurringOHService
 {
-    /**
-     * Singleton class instance.
-     *
-     * @var LocaleService
-     */
+
     private static $instance;
 
-    /**
-     * Start of current periode => NOW->startOfWeek()
-     * @var Carbon
-     */
-    private $startPeriod;
+    const YEARLY = 'YEARLY';
+    const MONTHLY = 'MONTHLY';
+    const WEEKLY = 'WEEKLY';
+    const DAILY = 'DAILY';
 
-    /**
-     * End of current periode => NOW + 3 months
-     * @var Carbon
-     */
-    private $endPeriod;
-
-    /**
-     * Start property of active Event record
-     * @var Carbon
-     */
-    private $eventStart;
-
-    /**
-     * End property of active Event record
-     * @var Carbon
-     */
-    private $eventEnd;
-
-    /**
-     * Until property of active Event record
-     * @var Carbon
-     */
-    private $eventUntil;
-
-    /**
-     * Private contructor for Singleton pattern
-     * set init periode between now and +3 months
-     */
-    private function __construct()
-    {
-        $initStart = Carbon::today()->startOfWeek();
-        $this->setStartPeriod($initStart);
-        $this->setEndPeriod($initStart->copy()->addMonths(3));
-    }
-
-    /**
-     * GetInstance for Singleton pattern
-     *
-     * @return ChannelService
-     */
     public static function getInstance()
     {
         if (!self::$instance) {
@@ -75,416 +28,169 @@ class RecurringOHService
         return self::$instance;
     }
 
-    /**
-     * @param Carbon $startPeriod
-     */
-    public function setStartPeriod(Carbon $startPeriod)
-    {
-        $this->startPeriod = $startPeriod;
-    }
-
-    /**
-     * @param Carbon $endPeriod
-     */
-    public function setEndPeriod(Carbon $endPeriod)
-    {
-        $this->endPeriod = $endPeriod;
-    }
-
-    /**
-     * Render the output for a calender in htlm format
-     *
-     * Take only the OH(s) that are active from now until +3 months
-     * for each of its calendar it looks for output
-     *
-     * @param Service $service
-     * @return string text/html
-     */
-    public function getRecurringOHForService(Service $service)
+    public function getServiceOutput(Service $service, Carbon $startDate, Carbon $endDate)
     {
         $output = '';
 
         foreach ($service->channels as $channel) {
-            // set channel header
-            $channelOutput = '';
-            // get openinghours that have begin and end overlapping the periode-> calendars + events
-            $ohCollection = $channel->openinghours()
-                ->where('start_date', '<=', $this->endPeriod)
-                ->where('end_date', '>=', $this->startPeriod)
-                ->get();
-            foreach ($ohCollection as $openinghours) {
-                $ohOutput = '';
-                // Loop over calendars and add events to output
-                $calendarsCollection = $openinghours->calendars()->orderBy('priority', 'desc')->get();
-                foreach ($calendarsCollection as $calendar) {
-                    $calendarRule = $this->collectForCalendar($calendar);
-                    $calendarOutput = $this->cleanUpOutput($calendarRule);
-
-                    if ($calendarOutput !== '') {
-                        $ohOutput .= '<div>' . "\n";
-                        if ($calendar->priority !== 0 || $ohCollection->count() > 1) {
-                            $ohOutput .= '<h4>' . $calendar->label;
-                            // when multiple openinghours we add these on the base calendar (and not on the time line)
-                            if ($calendar->priority == 0) {
-                                $ohStart = new Carbon($openinghours->start_date);
-                                $ohEnd = new Carbon($openinghours->end_date);
-                                if ($ohStart->gt($this->startPeriod)) {
-                                    $ohOutput .= ' geldig vanaf ' . $ohStart->format('d/m/Y');
-                                }
-                                if ($ohEnd->lt($this->endPeriod)) {
-                                    $ohOutput .= ' geldig t.e.m. ' . $ohEnd->format('d/m/Y');
-                                }
-                            }
-                            $ohOutput .= '</h4>' . "\n";
-                        }
-                        $ohOutput .= $calendarOutput . '</div>' . "\n";
-                    }
-                }
-                if ($ohOutput !== '') {
-                    $channelOutput .= $ohOutput;
-                }
-            }
-            if ($channelOutput !== '') {
-                $output .= '<h3>' . $channel->label . '</h3>' . "\n" . $channelOutput;
+            $channelOutput = $this->getChannelOutput($channel, $startDate, $endDate);
+            if ($channelOutput) {
+                $output .= '<h3>' . $channel->label . '</h3>' . PHP_EOL;
+                $output .= $channelOutput;
             }
         }
-
-        return trim($output);
-    }
-
-    /**
-     * Loop over the events of the calendar
-     *
-     * Valid events will be renered
-     * Output of the event will be collected in the array
-     *
-     * @param Calendar $calendar
-     * @return array
-     */
-    private function collectForCalendar(Calendar $calendar)
-    {
-        $calendarRule = [];
-        $events = $calendar->events;
-        foreach ($events as $event) {
-            $output = $this->collectForEvent($event);
-            if ($output === false) {
-                continue;
-            }
-
-            $calendarRule[$this->eventStart->format('Y-m-d H:i')] = $output;
-        }
-
-        return $calendarRule;
-    }
-
-    /**
-     * Eliminate events not within the periode of next 3 months
-     *
-     * Event must begin before periode ends and event until must be after start of periode
-     * Let me sketch this: (god knows I needed this confusing sh*t visualised)
-     * -----------------------------------------------------------------------
-     * |  = start/end of periode
-     * <  = start event
-     * // = end event
-     * >  = until event
-     * ++ = relevant duration of event in periode
-     * -- = irralivant duration of event
-     * -------------------------------------
-     *            NOW            +3M
-     * ------------|++++++++++++++|-------- == PERIODE now -> +3 months
-     * ------->    |              |         -- until event < start periode
-     * ------------|+++++>        |         ++ until event > start periode
-     *  <--//------|--<++//-------|-<--//>  ++ event sequence in periode
-     *         <---|++++++++++++++|---->    ++ start event < end periode && until event > start periode
-     *             |         <++++|-------- ++ start event < end periode
-     *  <--//------|--------------|-<--//>  -- event sequence not in periode => FREQ=YEARLY
-     *             |              |  <----- -- start event > end periode
-     * -------------------------------------
-     * Event end has no meaning as this is only the end of a frequency and could be repeated within the periode
-     * FREQ YEARLY will need extra check on overlap in active periode of 3 month
-     * FREQ MONTHLY / WEEKLY / DAILY will occure in active periode of 3 months
-     *
-     * NEVER MIND events without FREQ
-     * NEVER MIND events without until
-     * NEVER MIND events without end
-     *
-     * The UI always provides (doesn't make much sence but that's faith for you infidels)
-     * When we stop beleving, we start having problems ... (big ones)
-     * The UI gives and the UI takes...
-     *
-     * \Log::debug('EVENT => ' . $event->rrule . ': ' . $this->eventStart . "-> " .
-     * $this->eventEnd . " <- " . $this->eventUntil);
-     *
-     * @param Event $event
-     * @return boolean
-     */
-    public function validateEvent(Event $event)
-    {
-        $this->eventStart = new Carbon($event->start_date);
-        $this->eventEnd = new Carbon($event->end_date);
-        $this->eventUntil = new Carbon($event->until);
-
-        // check event until > begin of periode to skip
-        if ($this->eventUntil->lt($this->startPeriod)) {
-            return false;
-        }
-
-        // check event start is later then end of periode to skip
-        if ($this->eventStart->gt($this->endPeriod)) {
-            return false;
-        }
-
-        // FREQ=YEARLY => checkTheFreqYearRrule
-        if (strpos($event->rrule, 'FREQ=YEARLY') !== false &&
-            !$this->checkTheFreqYearRruleInPeriode()) {
-            return false;
-        }
-        // FREQ MONTHLY / WEEKLY / DAILY will occure in active periode of 3 months
-
-        return true;
-    }
-
-    /**
-     * Check or event of FREQ=YEARLY overlaps in active periode of now and  next 3 months
-     *
-     * Adjust event to the year of the startPeriod
-     * And the year of the endPeriod when not the same as startPeriod
-     *
-     * @return boolean
-     */
-    public function checkTheFreqYearRruleInPeriode()
-    {
-        $theDifference = $this->eventEnd->year - $this->eventStart->year;
-        // take the year of the startPeriod
-        $this->eventStart->year = $this->startPeriod->year;
-        $this->eventEnd->year = $this->startPeriod->year;
-        // the end could be in the next year for example Christmas Holidays
-        $this->eventEnd->addYears($theDifference);
-        if ($this->eventEnd->gt($this->startPeriod) && $this->eventStart->lt($this->endPeriod)) {
-            return true;
-        }
-
-        // check on year leap (needed for when request if from December until February you have a 2nd new year to check)
-        if ($this->startPeriod->year != $this->endPeriod->year) {
-            $this->eventStart->year = $this->endPeriod->year;
-            $this->eventEnd->year = $this->endPeriod->year;
-            // the end could be in the next year
-            $this->eventEnd->addYears($theDifference);
-            if ($this->eventEnd->gt($this->startPeriod) && $this->eventStart->lt($this->endPeriod)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the Human Readable text of an event
-     *
-     * @param Event $event
-     * @return string
-     */
-    public function collectForEvent(Event $event)
-    {
-        if (!$this->validateEvent($event)) {
-            return false;
-        }
-        $eventOutput = '';
-
-        if (!empty($event->rrule)) {
-            $rrulePerProp = $this->splitRrule($event->rrule);
-        }
-
-        switch ($rrulePerProp['FREQ']) {
-            case 'YEARLY':
-                $eventOutput = $this->hrYearly();
-                break;
-            case 'MONTHLY':
-                $eventOutput = 'Elke ' . $this->hrMonthlyAndWeekly($rrulePerProp);
-                break;
-            case 'WEEKLY':
-                $eventOutput = $this->hrMonthlyAndWeekly($rrulePerProp);
-                break;
-            case 'DAILY':
-            default:
-                $eventOutput = $this->hrDaily();
-                break;
-        }
-
-        if (!$event->calendar) {
-            return false;
-        }
-
-        $eventOutput .= $this->hrOpenClosedEvent($event->calendar->closinghours);
-
-        if ($event->calendar->priority !== 0 &&
-            ($rrulePerProp['FREQ'] == 'MONTHLY' || $rrulePerProp['FREQ'] == 'WEEKLY')) {
-            $eventOutput .= $this->hrEventAvailabillity();
-        }
-
-        return $eventOutput;
-    }
-
-    /**
-     * Get the Human Readable text of vailable from until
-     *
-     * Make an output that returns the availabillity of the event
-     * when a recurring event starts or stops (until) in the requested period
-     *
-     * @return string
-     */
-    protected function hrEventAvailabillity()
-    {
-        $eventOutput = '';
-        if ($this->eventStart->gt($this->startPeriod)) {
-            $eventOutput .= ' geldig vanaf ' . $this->eventStart->format('d/m/Y');
-        }
-        if ($this->eventUntil->lt($this->endPeriod)) {
-            if (empty($eventOutput)) {
-                $eventOutput .= ' geldig';
-            }
-            $eventOutput .= ' t.e.m. ' . $this->eventUntil->format('d/m/Y');
-        }
-
-        return $eventOutput;
-    }
-
-    /**
-     * Get the Human Readable text of an event with Yearly Frequenty
-     *
-     * Compile based on event is covering one or multiple days
-     * => use eventEND to get last day of single event
-     * => use eventUNTIL to get last day of frequenty (so don't use it here)
-     * ignore attributes as BYMONTH and BYMONTHDAY as these are in the start_date
-     *
-     * @return string
-     */
-    protected function hrYearly()
-    {
-        if ($this->eventStart->format('Y-m-d') !== $this->eventEnd->format('Y-m-d')) {
-            return $this->eventStart->format('d/m/Y') . ' - ' . $this->eventEnd->format('d/m/Y');
-        }
-
-        return 'Op ' . $this->eventStart->format('d/m/Y');
-    }
-
-    /**
-     * Get the Human Readable text of an event with Monthly or Weekly Frequenty
-     *
-     * Use the rrule attributes BYSETPOS and BYDAY to compile the sequence info
-     *
-     * @param array rrulePerProp
-     * @return string
-     */
-    protected function hrMonthlyAndWeekly($rrulePerProp)
-    {
-        $eventOutput = '';
-        if (isset($rrulePerProp['BYSETPOS'])) {
-            $eventOutput .= $this->hrForNumber($rrulePerProp['BYSETPOS']) . ' ';
-        }
-
-        if (isset($rrulePerProp['BYDAY'])) {
-            $eventOutput .= $this->hrByDay($rrulePerProp['BYDAY']);
-        }
-
-        if (isset($rrulePerProp['BYMONTHDAY'])) {
-            $eventOutput .= $this->hrForNumber($rrulePerProp['BYMONTHDAY']);
-        }
-
-        $eventOutput .= ($rrulePerProp['FREQ'] === 'MONTHLY' ? ' van de maand' : '');
-
-        return $eventOutput;
-    }
-
-    /**
-     * Get the Human Readable text of an event with Daily Frequenty
-     *
-     * Compile based on event is covering one or multiple days
-     * => use eventEND to get last day of single event (always same day as eventStart so don't use it here)
-     * => use eventUNTIL to get last day of frequenty (that is the full event we need)
-     * => in case the event has no until => event of 1 day ... we do use the end
-     *
-     * @return  string
-     */
-    protected function hrDaily()
-    {
-        if ($this->eventStart->format('Y-m-d') == $this->eventUntil->format('Y-m-d')) {
-            $output = 'op ' . $this->getFullDayOutput($this->eventStart);
-        } else {
-            $output = $this->getFullDayOutput($this->eventStart) . ' tot en met ' . $this->getFullDayOutput($this->eventUntil);
-        }
-
-        return ucfirst($output);
-    }
-
-    private function getFullDayOutput(Carbon $event)
-    {
-        $translatedDay = trans('openinghourApi.' . $event->format('l'), [], 'messages', 'nl');
-        $translatedMonth = trans('openinghourApi.' . $event->format('F'), [], 'messages', 'nl');
-
-        $output = strtolower($translatedDay);
-        $output .= ' ';
-        $output .= $event->format('d');
-        $output .= ' ';
-        $output .= strtolower($translatedMonth);
-        $output .= ' ';
-        $output .= $event->format('Y');
-
 
         return $output;
     }
 
-    /**
-     * Get the Human Readable text of an event that is open or closed
-     *
-     * @param $isClosed
-     * @return string
-     */
-    protected function hrOpenClosedEvent($isClosed)
+    public function getChannelOutput(Channel $channel, Carbon $startDate, Carbon $endDate)
     {
-        if ($isClosed) {
-            return ' gesloten';
+        $output = '';
+
+        $openinghoursCollection = $channel->openinghours()
+            ->where('start_date', '<=', $endDate)
+            ->where('end_date', '>=', $startDate)
+            ->get();
+
+        foreach ($openinghoursCollection as $openinghours) {
+            $output .= $this->getOpeninghoursOutput($openinghours, $startDate, $endDate);
         }
 
-        return ': ' . $this->eventStart->format('H:i') . ' - ' . $this->eventEnd->format('H:i');
+        return $output;
     }
 
-    /**
-     * Clean up the Output
-     *
-     * returns empty string when param is empty
-     * breaks up the array an put it in a nice html paragraphe with line breaks
-     * Sorts the events in the calendar on the start date (saved in the key)
-     *
-     * Nice to have todo's:
-     * - clean up duplications that distinct between morning and afternoon hours
-     *   could use the method longest_common_substring from https://gist.github.com/chrisbloom7/1021218 for this
-     * - put more intelegence behind connected events and merge where possible
-     *
-     * @param array $calendarRule
-     * @return string
-     */
-    protected function cleanUpOutput($calendarRule)
+    public function getOpeninghoursOutput(Openinghours $openinghours, Carbon $startDate, Carbon $endDate)
     {
-        ksort($calendarRule);
+        $output = '';
 
-        if (empty($calendarRule)) {
-            return '';
+        $calendarCollection = $openinghours->calendars()->orderBy('priority', 'desc')->get();
+        foreach ($calendarCollection as $calendar) {
+            $output .= $this->getCalendarOutput($calendar, $startDate, $endDate);
         }
 
-        $firstIteration = true;
+        return $output;
+    }
 
-        foreach ($calendarRule as $key => $value) {
-            $value = lcfirst($value);
-            if ($firstIteration) {
-                $value = ucfirst($value);
-                $firstIteration = false;
+    public function getCalendarOutput(Calendar $calendar, Carbon $startDate, Carbon $endDate)
+    {
+        $output = '';
+
+        $rules = [];
+        foreach ($calendar->events as $event) {
+            $isValid = $this->validateEvent($event, $startDate, $endDate);
+
+            if ($isValid) {
+                $eventStartHour = new Carbon($event->start_date);
+                $key = $eventStartHour->format('Y-m-d H:i');
+                $rule = $this->getHumandReadableRule($event, $startDate, $endDate);
+                $rules[$key] = lcfirst($rule);
+            }
+        }
+
+        if (!empty($rules)) {
+            ksort($rules);
+
+            $output .= '<div>' . PHP_EOL;
+            $output .= '<h4>';
+            $output .= $calendar->label;
+
+            if ($calendar->priority == 0) {
+                $openinghours = $calendar->openinghours;
+
+                $ohStart = new Carbon($openinghours->start_date);
+                $ohEnd = new Carbon($openinghours->end_date);
+
+                if ($ohStart->greaterThan($startDate)) {
+                    $output .= ' geldig vanaf ' . $this->getFullDayOutput($ohStart);
+                }
+                if ($ohEnd->lessThan($endDate)) {
+                    $output .= ' geldig t.e.m. '  . $this->getFullDayOutput($ohEnd);
+                }
             }
 
-            $calendarRule[$key] = $value;
+            $output .= '</h4>' . PHP_EOL;
+            $output .= '<p>' . implode("<br />" . PHP_EOL, $rules) . '</p>' . PHP_EOL;
+
+            $output .= '<\div>' . PHP_EOL;
         }
 
-        return '<p>' . implode("<br />\n" . "en ", $calendarRule) . '</p>' . "\n";
+        return $output;
+    }
+
+    private function getHumandReadableRule(Event $event, Carbon $startDate, Carbon $endDate)
+    {
+        $output = '';
+
+        $eventStart = new Carbon($event->start_date);
+        $eventEnd = new Carbon($event->start_date);
+        $eventUntill = new Carbon($event->untill);
+
+        if (!empty($event->rrule)) {
+            $properties = $this->getRuleProperties($event->rrule);
+        }
+
+        $frequency = $properties['FREQ'];
+
+        if ($frequency == self::YEARLY) {
+            if ($eventStart->format('Y-m-d') == $eventEnd->format('Y-m-d')) {
+                $output .= $eventStart->format('d/m/Y') . ' - ' . $eventEnd->format('d/m/Y');
+            }
+
+            if ($eventStart->format('Y-m-d') != $eventEnd->format('Y-m-d')) {
+                $output .= 'Op ' . $this->eventStart->format('d/m/Y');
+            }
+        }
+
+        if ($frequency == self::WEEKLY) {
+            if (isset($properties['BYSETPOS'])) {
+                $output .= $this->getHumanReadableFormatForNumber($properties['BYSETPOS']) . ' ';
+            }
+
+            if (isset($properties['BYDAY'])) {
+                $output .= $this->getHumanReadableFormatForDay($properties['BYDAY']);
+            }
+
+            if (isset($rrulePerProp['BYMONTHDAY'])) {
+                $output .= $this->getHumanReadableFormatForNumber($properties['BYMONTHDAY']);
+            }
+        }
+
+        if ($frequency == self::MONTHLY) {
+            $output .= 'Elke ';
+
+            if (isset($properties['BYSETPOS'])) {
+                $output .= $this->getHumanReadableFormatForNumber($properties['BYSETPOS']) . ' ';
+            }
+
+            if (isset($properties['BYDAY'])) {
+                $output .= $this->getHumanReadableFormatForDay($properties['BYDAY']);
+            }
+
+            if (isset($rrulePerProp['BYMONTHDAY'])) {
+                $output .= $this->getHumanReadableFormatForNumber($properties['BYMONTHDAY']);
+            }
+
+            $output .= ' van de maand';
+        }
+
+        if ($frequency == self::DAILY || $frequency == '') {
+            if ($eventStart->format('Y-m-d') == $eventUntill->format('Y-m-d')) {
+                $output .= $this->getFullDayOutput($eventStart);
+            } else {
+                $output .= $this->getFullDayOutput($eventStart) . ' tot en met ' . $this->getFullDayOutput($eventUntill);
+            }
+        }
+
+        $output .= $this->getHumanReadableHoursForEvent($event);
+
+        if (
+            $event->calendar->priority !== 0 &&
+            ($frequency == self::MONTHLY || $frequency == self::WEEKLY)
+        ) {
+            $output .= $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
+        }
+
+        return $output;
     }
 
     /**
@@ -493,35 +199,111 @@ class RecurringOHService
      * @param $rrime
      * @return mixed
      */
-    public function splitRrule($rrule)
+    public function getRuleProperties($rrule)
     {
-        $splitRrule = explode(';', $rrule);
-        $rrulePerProp = [];
-        foreach ($splitRrule as $prop) {
-            $cut = explode('=', $prop);
-            $rrulePerProp[$cut[0]] = $cut[1];
+        $properties = [];
+        $propertyStrings = explode(';', $rrule);
+
+        foreach ($propertyStrings as $propertyString) {
+            $propertyStringParts = explode('=', $propertyString);
+            $propertyKey = $propertyStringParts[0];
+            $propertyValue = $propertyStringParts[1];
+            $properties[$propertyKey] = $propertyValue;
         }
 
-        return $rrulePerProp;
+        return $properties;
+    }
+
+
+    /**
+     * @param Event $event
+     * @param Carbon $startDate
+     * @param Carbon $endDate
+     * @return bool
+     *
+     * Eliminate events not within the periode of next 3 months
+     */
+    public function validateEvent(Event $event, Carbon $startDate, Carbon $endDate)
+    {
+        if (!$event->calendar) {
+            return false;
+        }
+
+        $eventStartHour = new Carbon($event->start_date);
+        $eventEndHour = new Carbon($event->end_date);
+        $eventUntilDate = new Carbon($event->until);
+
+        // check event until > begin of periode to skip
+        if ($eventUntilDate->lessThan($startDate)) {
+            return false;
+        }
+
+        // check event start is later then end of periode to skip
+        if ($eventStartHour->greaterThan($endDate)) {
+            return false;
+        }
+
+        if (strpos($event->rrule, 'FREQ=YEARLY') !== false) {
+            $difference = $eventEndHour->year - $eventStartHour->year;
+
+            // take the year of the startDate
+            $eventStartHour->year = $startDate->year;
+            $eventEndHour->year = $startDate->year;
+
+            $eventEndHour->addYears($difference);
+
+            // the end could be in the next year for example Christmas Holidays
+            if ($eventEndHour->greaterThan($startDate) && $eventStartHour->lessThan($endDate)) {
+                return true;
+            }
+
+            // check on year leap (needed for when request if from December until February you have a 2nd new year to check)
+            if ($startDate->year != $endDate->year) {
+                $eventStartHour->year = $endDate->year;
+                $eventEndHour->year = $endDate->year;
+
+                // the end could be in the next year
+                $eventEndHour->addYears($difference);
+                if ($eventEndHour->greaterThan($startDate) && $eventStartHour->lessThan($endDate)) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * Make human readable string for BYDAY
-     *
-     * Make the individual weekdays of BYDAY to a human readable string
-     * Translation only in NL (Dutch)
-     *
-     * First try to find some day groups
-     * When days are not in calenderal order, they will be returned as individual days
-     * ('TU,MO,TH,FR,WE' => will NOT produce 'maandag tot vrijdag')
-     *
-     * Second go over the given day(s) to name each one of them
-     * this can be one, or multiple:  'WE' / 'MO,TH,FR' / 'WE,FR'
-     *
-     * @param $byDay
+     * @param $number
      * @return string
      */
-    public function hrByDay($byDay)
+    private function getHumanReadableFormatForNumber($number)
+    {
+        // special negative numbers
+        switch ($number) {
+            case -1:
+                return 'laatste';
+            case -2:
+                return 'voorlaatste';
+        }
+
+        // regular negative numbers
+        if ($number < 0) {
+            return abs($number + 1) . ' na laatste';
+        }
+
+        if ($number == 1 || ($number % 10) == 8 || $number >= 20) {
+            return $number . 'ste';
+        }
+
+        return $number . 'de';
+    }
+
+    public function getHumanReadableFormatForDay($byDay)
     {
         // handle BYDAY
         switch ($byDay) {
@@ -558,39 +340,72 @@ class RecurringOHService
         return implode(', ', $transDays);
     }
 
-    /**
-     * Make human readable string for BYSETPOS
-     *
-     * Nicked and altered from https://github.com/simshaun/recurr/blob/master/translations/nl.php
-     * Made extra rule for 2nd last => "voorlaatste" in NL (Dutch)
-     *
-     * Rules for NL (Dutch) http://ans.ruhosting.nl/e-ans/07/03/01/body.html
-     * state that only 8 and numbers >= 20 get suffix "ste"
-     * other rules are applied for combination of number == 1 and ($number % 100) < 20 combinations
-     * but this latter will not be of use in ical locig (so we take the 1 hardcoded in the exceptions)
-     *
-     * @param $number
-     * @return string
-     */
-    public function hrForNumber($number)
+    private function getFullDayOutput(Carbon $event)
     {
-        // special negative numbers
-        switch ($number) {
-            case -1:
-                return 'laatste';
-            case -2:
-                return 'voorlaatste';
+        $translatedDay = trans('openinghourApi.' . $event->format('l'), [], 'messages', 'nl');
+        $translatedMonth = trans('openinghourApi.' . $event->format('F'), [], 'messages', 'nl');
+
+        $output = strtolower($translatedDay);
+        $output .= ' ';
+        $output .= $event->format('j');
+        $output .= ' ';
+        $output .= strtolower($translatedMonth);
+        $output .= ' ';
+        $output .= $event->format('Y');
+
+
+        return $output;
+    }
+
+    private function getHumanReadableHoursForEvent(Event $event)
+    {
+        $hours = $event->calendar->closinghours;
+
+        if ($hours) {
+            return ' gesloten';
         }
 
-        // regular negative numbers
-        if ($number < 0) {
-            return abs($number + 1) . ' na laatste';
+        $eventStart = new Carbon($event->start_date);
+        $eventEnd = new Carbon($event->end_date);
+
+        $output = ': ';
+        $output .= $this->getFullTimeOutput($eventStart);
+        $output .= ' tot ';
+        $output .= $this->getFullTimeOutput($eventEnd);
+        $output .= ' uur';
+
+        return $output;
+    }
+
+    private function getFullTimeOutput(Carbon $date)
+    {
+        $hour = $date->format('G');
+        $minutes = $date->format('i');
+
+        $output = $hour;
+        if ($minutes != '00') {
+            $output .= '.' . $minutes;
         }
 
-        if ($number == 1 || ($number % 10) == 8 || $number >= 20) {
-            return $number . 'ste';
+        return $output;
+    }
+
+    private function getHumanReadableAvailabillity(Event $event, Carbon $startDate, Carbon $endDate)
+    {
+        $eventStart = new Carbon($event->start_date);
+        $eventUntil = new Carbon($event->untill);
+
+        $output = '';
+        if ($eventStart->greaterThan($startDate)) {
+            $output .= ' geldig vanaf ' . $eventStart->format('d/m/Y');
+        }
+        if ($eventUntil->lessThan($endDate)) {
+            if ($output == '') {
+                $output .= ' geldig';
+            }
+            $output .= ' t.e.m. ' . $this->getFullDayOutput($eventUntil);
         }
 
-        return $number . 'de';
+        return $output;
     }
 }

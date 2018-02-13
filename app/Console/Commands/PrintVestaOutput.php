@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 
 use App\Models\Service;
+use Carbon\Carbon;
 
 class PrintVestaOutput extends BaseCommand
 {
@@ -29,9 +30,11 @@ class PrintVestaOutput extends BaseCommand
     public function handle()
     {
         $serviceId = $this->argument('service-id');
-        $service  = Service::find($serviceId);
+        $service = Service::find($serviceId);
         $recurringOHService = App('RecurringOHService');
-        $output = $recurringOHService->getRecurringOHForService($service);
-        echo $output.PHP_EOL;
+        $startDate = Carbon::today()->startOfWeek();
+        $endDate = $startDate->copy()->addMonths(3);
+        $output = $recurringOHService->getServiceOutput($service, $startDate, $endDate);
+        echo $output . PHP_EOL;
     }
 }
