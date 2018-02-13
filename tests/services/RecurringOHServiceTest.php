@@ -142,8 +142,8 @@ class RecurringOHServiceTest extends \TestCase
             '</div>' .
             '<div>' .
             '<h4>Normale uren geldig vanaf 01/01/2018</h4>' .
-            '<p>Maandag tot vrijdag: open 08:00 - 12:00<br />'.
-            'en maandag tot vrijdag: open 13:00 - 17:00</p>' .
+            '<p>Maandag tot vrijdag: 08:00 - 12:00<br />'.
+            'en maandag tot vrijdag: 13:00 - 17:00</p>' .
             '</div>';
         $this->assertEquals($expected, str_replace("\n", '', $rrOutput));
     }
@@ -329,7 +329,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('maandag tot vrijdag: open 08:30 - 17:00', $rrOutput);
+        $this->assertEquals('maandag tot vrijdag: 08:30 - 17:00', $rrOutput);
     }
 
     /**
@@ -351,7 +351,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('Op maandag 01 mei 2017: open 08:30 - 17:00', $rrOutput);
+        $this->assertEquals('Op maandag 01 mei 2017: 08:30 - 17:00', $rrOutput);
     }
 
     /**
@@ -373,7 +373,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('01/05/2017 - 05/05/2017: open 08:30 - 17:00', $rrOutput);
+        $this->assertEquals('Maandag 01 mei 2017 tot en met vrijdag 05 mei 2017: 08:30 - 17:00', $rrOutput);
     }
 
     /**
@@ -477,7 +477,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('maandag: open 08:30 - 17:00 geldig vanaf 01/05/2017', $rrOutput);
+        $this->assertEquals('maandag: 08:30 - 17:00 geldig vanaf 01/05/2017', $rrOutput);
     }
 
     /**
@@ -499,7 +499,7 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('maandag: open 08:30 - 17:00 geldig t.e.m. 01/05/2017', $rrOutput);
+        $this->assertEquals('maandag: 08:30 - 17:00 geldig t.e.m. 01/05/2017', $rrOutput);
     }
 
     /**
@@ -521,6 +521,6 @@ class RecurringOHServiceTest extends \TestCase
         ]);
 
         $rrOutput = $this->recurringOHService->collectForEvent($event);
-        $this->assertEquals('Elke 15de van de maand: open 08:30 - 17:00', $rrOutput);
+        $this->assertEquals('Elke 15de van de maand: 08:30 - 17:00', $rrOutput);
     }
 }

@@ -77,10 +77,20 @@
                 ) {
                     $tabIndex = 0;
                 }
+
                 $isDayPassed = (new \Carbon\Carbon())->greaterThan($referenceDate);
+
+                $class = 'openinghours--day openinghours--day-'.strtolower($status);
+                if($isSameDay){
+                    $class .= ' openinghours--day-active';
+                }
+                if($isDayPassed){
+                    $class .= ' openinghours--day-passed';
+                }
+
                 ?>
                 <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}"
-                    class="openinghours--day openinghours--day-{{ strtolower($status) }} @if($isSameDay){{"openinghours--day-active"}}@elseif($isDayPassed){{"openinghours--day-passed"}}@endif">
+                    class="{{ $class }}">
                     <span aria-hidden="true">{{ $referenceDate->day }}</span>
                     @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
                 </li>
