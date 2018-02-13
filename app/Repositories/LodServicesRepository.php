@@ -108,9 +108,10 @@ class LodServicesRepository
                 WHERE {
                 {
                     ?agent a foaf:Agent;
-                    <http://purl.org/dc/terms/source> "VESTA"^^xsd:string ;
-                    <http://purl.org/dc/terms/identifier> ?identifier;
+                    <http://purl.org/dc/terms/source> ?source ; 
+                    <http://purl.org/dc/terms/identifier> ?identifier; 
                     foaf:name ?name.
+                    filter strstarts(?source, "VESTA"^^xsd:string)
                 }
                 }  ORDER BY ?name ';
 
