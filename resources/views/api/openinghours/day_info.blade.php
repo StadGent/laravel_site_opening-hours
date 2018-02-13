@@ -1,7 +1,6 @@
 <?php
 /** @var Carbon\Carbon $date */
 $date = $dayInfoObj->date;
-$isDayPassed = (new \Carbon\Carbon())->greaterThan($dayInfoObj->date);
 $isOpen = !empty($dayInfoObj->hours);
 $status = $isOpen ? 'OPEN' : 'CLOSED';
 $dayName = $date->format('l');
@@ -18,8 +17,18 @@ if ((new \Carbon\Carbon())->isSameDay($date)) {
 }elseif ((new \Carbon\Carbon())->subDay()->isSameDay($date)){
     $specialDayName = trans('openinghourApi.YESTERDAY');
 };
+
+$referenceDate = clone $dayInfoObj->date;
+$referenceDate->endOfDay();
+$isDayPassed = (new \Carbon\Carbon())->greaterThan($referenceDate);
+
+$outerClass = 'openinghours openinghours--details openinghours--day-'.strtolower($status);
+if($isDayPassed){
+    $outerClass .= ' openinghours--day-passed';
+}
+
 ?>
-<div class="openinghours openinghours--details openinghours--day-{{ strtolower($status) }} @if($isDayPassed){{"openinghours--day-passed"}}@endif" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
+<div class="{{ $outerClass }}" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
     <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
             <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span class="openinghours--date-between">, </span>

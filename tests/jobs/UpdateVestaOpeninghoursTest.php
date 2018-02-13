@@ -29,7 +29,7 @@ class UpdateVestaOpeninghoursTest extends \TestCase
         $this->app->singleton(RecurringOHService::class, function () {
             $mock = $this->createMock(\App\Services\RecurringOHService::class, ['getRecurringOHForService']);
             $mock->expects($this->once())
-                ->method('getRecurringOHForService')
+                ->method('getServiceOutput')
                 ->willReturn(date('ymdhis'));
 
             return $mock;
@@ -66,9 +66,9 @@ class UpdateVestaOpeninghoursTest extends \TestCase
     public function testFailOnEmptyService()
     {
         $this->app->singleton(RecurringOHService::class, function () {
-            $mock = $this->createMock(\App\Services\RecurringOHService::class, ['getRecurringOHForService']);
+            $mock = $this->createMock(\App\Services\RecurringOHService::class, ['getServiceOutput']);
             $mock->expects($this->once())
-                ->method('getRecurringOHForService')
+                ->method('getServiceOutput')
                 ->willReturn('');
 
             return $mock;
