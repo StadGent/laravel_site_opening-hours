@@ -403,7 +403,7 @@ class RecurringOHService
             if ($output == '') {
                 $output .= ' geldig';
             }
-            $output .= ' t.e.m. ' . $eventUntil->format('d/m/Y');
+            $output .= ' t.e.m. ' . $this->getFullDayOutput($eventUntil);
         }
 
         return $output;
