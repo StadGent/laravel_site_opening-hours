@@ -173,7 +173,7 @@ class RecurringOHService
 
         if ($frequency == self::YEARLY) {
             if ($eventStart->format('Y-m-d') == $eventEnd->format('Y-m-d')) {
-                $output .= $eventStart->format('d/m/Y') . ' - ' . $eventEnd->format('d/m/Y');
+                $output .= $this->getFullDayOutput($eventStart) . ' - ' . $this->getFullDayOutput($eventEnd);
             }
 
             if ($eventStart->format('Y-m-d') != $eventEnd->format('Y-m-d')) {
