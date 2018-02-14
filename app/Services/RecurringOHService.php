@@ -136,6 +136,7 @@ class RecurringOHService
                 }
 
                 $lastAvailability = $currentAvailability;
+
             }
 
             $rule .= $lastAvailability;
@@ -442,14 +443,13 @@ class RecurringOHService
             $frequency == self::MONTHLY ||
             $frequency == self::WEEKLY
         ) {
-            $eventStart = new Carbon($event->start_date);
-            $eventUntil = new Carbon($event->until);
+            $eventStart = (new Carbon($event->start_date))->startOfDay();
+            $eventUntil = (new Carbon($event->until))->startOfDay();
 
             if ($event->calendar->priority == 0) {
                 $eventUntil = (new Carbon($event->calendar->openinghours->end_date));
             }
 
-            $output = '';
             if ($eventStart->greaterThan($startDate)) {
                 $output .= ' geldig vanaf ' . $this->getFullDayOutput($eventStart);
             }
