@@ -77,6 +77,11 @@ class RecurringOHService
 
         $rulesMatrix = [];
 
+        // TODO : the code below should be refactored, this is a quick and ugly workaround
+        // The frequency, hours and availability are made human readable but this is done line by line
+        // If you want to combine 2 lines (for example 08:00-09:00 and 10:00-12:00) this should be put
+        // in a matrix to combine these before they are made human readable
+
         foreach ($calendar->events as $event) {
             $isValid = $this->validateEvent($event, $startDate, $endDate);
 
@@ -93,49 +98,58 @@ class RecurringOHService
 
                 $key = $eventStartHour->format('H:i');
 
-                $rulesMatrix[lcfirst($frequency)][$key] = $hours . $availability;
+                $rulesMatrix[lcfirst($frequency)][] = [
+                    'key' => $key,
+                    'hours' => $hours,
+                    'availability' => $availability,
+                ];
             }
         }
 
         $rules = [];
 
-        foreach ($rulesMatrix as $frequency => $hours) {
-            ksort($hours);
+        foreach ($rulesMatrix as $frequency => $ruleMatrix) {
+
+            usort($ruleMatrix, function ($a, $b) {
+                return $a['key'] > $b['key'];
+            });
+
+            $lastAvailability = false;
 
             $rule = $frequency . ' : ';
-            $firstIteration = true;
-            foreach ($hours as $hour) {
-                if (!$firstIteration) {
-                    $rule .= ' en ';
+
+            foreach ($ruleMatrix as $eventMatrix) {
+                $currentHours = $eventMatrix['hours'];
+                $currentAvailability = $eventMatrix['availability'];
+
+                if($lastAvailability === false){
+                    $rule .= $currentHours;
+                }
+                elseif($currentAvailability == $lastAvailability) {
+                    $rule .= ' en ' . $currentHours;
+                } else {
+                    $rule .= $currentHours.' '.$currentAvailability . PHP_EOL;
+                    $rules[] = $rule;
+
+                    $rule = $frequency . ' : ';
+                    $rule .= $currentHours;
                 }
 
-                $rule .= $hour;
-                $firstIteration = false;
+                $lastAvailability = $currentAvailability;
             }
+
+            $rule .= $lastAvailability;
+
             $rules[] = $rule;
         }
 
         if (!empty($rules)) {
             ksort($rules);
-            $openinghours = $calendar->openinghours;
-
-            $ohStart = new Carbon($openinghours->start_date);
-            $ohEnd = new Carbon($openinghours->end_date);
 
             $output .= '<div>' . PHP_EOL;
-            if (
-                $calendar->priority != 0 ||
-                $ohStart->greaterThan($startDate) ||
-                $ohEnd->lessThan($endDate)
-            ) {
+            if ($calendar->priority != 0) {
                 $output .= '<h4>';
                 $output .= $calendar->label;
-                if ($ohStart->greaterThan($startDate)) {
-                    $output .= ' geldig vanaf ' . $this->getFullDayOutput($ohStart);
-                }
-                if ($ohEnd->lessThan($endDate)) {
-                    $output .= ' geldig t.e.m. ' . $this->getFullDayOutput($ohEnd);
-                }
                 $output .= '</h4>' . PHP_EOL;
             }
 
@@ -425,11 +439,15 @@ class RecurringOHService
         $frequency = $this->getFrequency($event);
 
         if (
-            $event->calendar->priority !== 0 &&
-            ($frequency == self::MONTHLY || $frequency == self::WEEKLY)
+            $frequency == self::MONTHLY ||
+            $frequency == self::WEEKLY
         ) {
             $eventStart = new Carbon($event->start_date);
-            $eventUntil = new Carbon($event->untill);
+            $eventUntil = new Carbon($event->until);
+
+            if ($event->calendar->priority == 0) {
+                $eventUntil = (new Carbon($event->calendar->openinghours->end_date));
+            }
 
             $output = '';
             if ($eventStart->greaterThan($startDate)) {

@@ -142,12 +142,10 @@ class RecurringOHServiceTest extends \TestCase
         $expected = <<<EOL
 <h3>BALIE</h3>
 <div>
-<h4>Normale uren geldig t.e.m. zondag 31 december 2017</h4>
-<p>maandag tot vrijdag : gesloten</p>
+<p>maandag tot vrijdag : gesloten geldig t.e.m. zondag 31 december 2017</p>
 </div>
 <div>
-<h4>Normale uren geldig vanaf maandag 1 januari 2018</h4>
-<p>maandag tot vrijdag : 8 tot 12 uur en 13 tot 17 uur</p>
+<p>maandag tot vrijdag : 8 tot 12 uur en 13 tot 17 uur geldig vanaf maandag 1 januari 2018</p>
 </div>
 EOL;
 
@@ -202,8 +200,7 @@ EOL;
         $expected = <<<EOL
 <h3>BALIE</h3>
 <div>
-<h4>Normale uren geldig t.e.m. zondag 31 december 2017</h4>
-<p>maandag tot vrijdag : gesloten</p>
+<p>maandag tot vrijdag : gesloten geldig t.e.m. zondag 31 december 2017</p>
 </div>
 EOL;
 
