@@ -122,13 +122,16 @@ class RecurringOHService
                 $currentHours = $eventMatrix['hours'];
                 $currentAvailability = $eventMatrix['availability'];
 
-                if($lastAvailability === false){
+                if ($lastAvailability === false) {
                     $rule .= $currentHours;
-                }
-                elseif($currentAvailability == $lastAvailability) {
+                } elseif ($currentAvailability == $lastAvailability) {
                     $rule .= ' en ' . $currentHours;
                 } else {
-                    $rule .= $currentHours.' '.$currentAvailability . PHP_EOL;
+                    $rule .= $currentHours;
+                    if($currentAvailability != ''){
+                        $rule .= ', '.$currentAvailability;
+                    }
+                    $rule .= PHP_EOL;
                     $rules[] = $rule;
 
                     $rule = $frequency . ' : ';
@@ -136,17 +139,13 @@ class RecurringOHService
                 }
 
                 $lastAvailability = $currentAvailability;
-
             }
 
             $rule .= $lastAvailability;
-
             $rules[] = $rule;
         }
 
         if (!empty($rules)) {
-            ksort($rules);
-
             $output .= '<div>' . PHP_EOL;
             if ($calendar->priority != 0) {
                 $output .= '<h4>';
@@ -167,7 +166,7 @@ class RecurringOHService
 
         $eventStart = new Carbon($event->start_date);
         $eventEnd = new Carbon($event->start_date);
-        $eventUntill = new Carbon($event->untill);
+        $eventUntill = new Carbon($event->until);
 
         $frequency = $this->getFrequency($event);
         $properties = $this->getRuleProperties($event->rrule);
@@ -178,7 +177,7 @@ class RecurringOHService
             }
 
             if ($eventStart->format('Y-m-d') != $eventEnd->format('Y-m-d')) {
-                $output .= 'Op ' . $this->eventStart->format('d/m/Y');
+                $output .= 'Op ' . $this->getFullDayOutput($eventStart);
             }
         }
 
