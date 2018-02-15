@@ -35,7 +35,7 @@ class RecurringOHService
         foreach ($service->channels as $channel) {
             $channelOutput = $this->getChannelOutput($channel, $startDate, $endDate);
             if ($channelOutput) {
-                $output .= '<h3>' . $channel->label . '</h3>' . PHP_EOL;
+                $output .= '<h3>' . ucfirst($channel->label) . '</h3>' . PHP_EOL;
                 $output .= $channelOutput;
             }
         }
@@ -149,7 +149,7 @@ class RecurringOHService
             $output .= '<div>' . PHP_EOL;
             if ($calendar->priority != 0) {
                 $output .= '<h4>';
-                $output .= $calendar->label;
+                $output .= ucfirst($calendar->label);
                 $output .= '</h4>' . PHP_EOL;
             }
 
@@ -165,18 +165,18 @@ class RecurringOHService
         $output = '';
 
         $eventStart = new Carbon($event->start_date);
-        $eventEnd = new Carbon($event->start_date);
+        $eventEnd = new Carbon($event->end_date);
         $eventUntill = new Carbon($event->until);
 
         $frequency = $this->getFrequency($event);
         $properties = $this->getRuleProperties($event->rrule);
 
         if ($frequency == self::YEARLY) {
-            if ($eventStart->format('Y-m-d') == $eventEnd->format('Y-m-d')) {
+            if ($eventStart->format('Y-m-d') != $eventEnd->format('Y-m-d')) {
                 $output .= $this->getFullDayOutput($eventStart) . ' - ' . $this->getFullDayOutput($eventEnd);
             }
 
-            if ($eventStart->format('Y-m-d') != $eventEnd->format('Y-m-d')) {
+            if ($eventStart->format('Y-m-d') == $eventEnd->format('Y-m-d')) {
                 $output .= 'Op ' . $this->getFullDayOutput($eventStart);
             }
         }
