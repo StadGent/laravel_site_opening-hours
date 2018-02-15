@@ -129,7 +129,7 @@ class RecurringOHService
                 } else {
                     $rule .= $currentHours;
                     if ($currentAvailability != '') {
-                        $rule .= ', ' . $currentAvailability;
+                        $rule .= ',' . $currentAvailability;
                     }
                     $rule .= PHP_EOL;
                     $rules[] = $rule;
@@ -142,7 +142,7 @@ class RecurringOHService
             }
 
             if ($lastAvailability != '') {
-                $rule .= ', ' . $lastAvailability;
+                $rule .= ',' . $lastAvailability;
             }
 
             $rules[] = $rule;
