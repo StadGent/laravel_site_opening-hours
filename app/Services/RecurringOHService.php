@@ -128,8 +128,8 @@ class RecurringOHService
                     $rule .= ' en ' . $currentHours;
                 } else {
                     $rule .= $currentHours;
-                    if($currentAvailability != ''){
-                        $rule .= ', '.$currentAvailability;
+                    if ($currentAvailability != '') {
+                        $rule .= ', ' . $currentAvailability;
                     }
                     $rule .= PHP_EOL;
                     $rules[] = $rule;
@@ -141,7 +141,10 @@ class RecurringOHService
                 $lastAvailability = $currentAvailability;
             }
 
-            $rule .= $lastAvailability;
+            if ($lastAvailability != '') {
+                $rule .= ', ' . $lastAvailability;
+            }
+
             $rules[] = $rule;
         }
 
@@ -177,7 +180,7 @@ class RecurringOHService
             }
 
             if ($eventStart->format('Y-m-d') == $eventEnd->format('Y-m-d')) {
-                $output .= 'Op ' . $this->getFullDayOutput($eventStart);
+                $output .= $this->getFullDayOutput($eventStart);
             }
         }
 
