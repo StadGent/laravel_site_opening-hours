@@ -142,14 +142,11 @@ class RecurringOHServiceTest extends \TestCase
         $expected = <<<EOL
 <h3>BALIE</h3>
 <div>
-<h4>Normale uren geldig t.e.m. zondag 31 december 2017</h4>
-<p>maandag tot vrijdag gesloten</p>
-<\div>
+<p>maandag tot vrijdag : gesloten geldig t.e.m. zondag 31 december 2017</p>
+</div>
 <div>
-<h4>Normale uren geldig vanaf maandag 1 januari 2018</h4>
-<p>maandag tot vrijdag: 8 tot 12 uur<br />
-maandag tot vrijdag: 13 tot 17 uur</p>
-<\div>
+<p>maandag tot vrijdag : 8 tot 12 uur en 13 tot 17 uur geldig vanaf maandag 1 januari 2018</p>
+</div>
 EOL;
 
         $expected = str_replace(PHP_EOL,'',$expected);
@@ -203,9 +200,8 @@ EOL;
         $expected = <<<EOL
 <h3>BALIE</h3>
 <div>
-<h4>Normale uren geldig t.e.m. zondag 31 december 2017</h4>
-<p>maandag tot vrijdag gesloten</p>
-<\div>
+<p>maandag tot vrijdag : gesloten geldig t.e.m. zondag 31 december 2017</p>
+</div>
 EOL;
 
         $expected = str_replace(PHP_EOL,'',$expected);

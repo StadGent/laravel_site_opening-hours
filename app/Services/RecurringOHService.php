@@ -35,7 +35,7 @@ class RecurringOHService
         foreach ($service->channels as $channel) {
             $channelOutput = $this->getChannelOutput($channel, $startDate, $endDate);
             if ($channelOutput) {
-                $output .= '<h3>' . $channel->label . '</h3>' . PHP_EOL;
+                $output .= '<h3>' . ucfirst($channel->label) . '</h3>' . PHP_EOL;
                 $output .= $channelOutput;
             }
         }
@@ -75,73 +75,121 @@ class RecurringOHService
     {
         $output = '';
 
-        $rules = [];
+        $rulesMatrix = [];
+
+        // TODO : the code below should be refactored, this is a quick and ugly workaround
+        // The frequency, hours and availability are made human readable but this is done line by line
+        // If you want to combine 2 lines (for example 08:00-09:00 and 10:00-12:00) this should be put
+        // in a matrix to combine these before they are made human readable
+
         foreach ($calendar->events as $event) {
             $isValid = $this->validateEvent($event, $startDate, $endDate);
 
             if ($isValid) {
                 $eventStartHour = new Carbon($event->start_date);
-                $key = $eventStartHour->format('Y-m-d H:i');
-                $rule = $this->getHumandReadableRule($event, $startDate, $endDate);
-                $rules[$key] = lcfirst($rule);
+
+                $frequency = $this->getHumandReadableFrequency($event, $startDate, $endDate);
+                $hours = $this->getHumanReadableHours($event);
+                $availability = $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
+
+                if (!$hours) {
+                    $hours = 'gesloten';
+                }
+
+                $key = $eventStartHour->format('H:i');
+
+                $rulesMatrix[lcfirst($frequency)][] = [
+                    'key' => $key,
+                    'hours' => $hours,
+                    'availability' => $availability,
+                ];
             }
         }
 
-        if (!empty($rules)) {
-            ksort($rules);
+        $rules = [];
 
-            $output .= '<div>' . PHP_EOL;
-            $output .= '<h4>';
-            $output .= $calendar->label;
+        foreach ($rulesMatrix as $frequency => $ruleMatrix) {
 
-            if ($calendar->priority == 0) {
-                $openinghours = $calendar->openinghours;
+            usort($ruleMatrix, function ($a, $b) {
+                return $a['key'] > $b['key'];
+            });
 
-                $ohStart = new Carbon($openinghours->start_date);
-                $ohEnd = new Carbon($openinghours->end_date);
+            $lastAvailability = false;
 
-                if ($ohStart->greaterThan($startDate)) {
-                    $output .= ' geldig vanaf ' . $this->getFullDayOutput($ohStart);
+            $rule = $frequency . ' : ';
+
+            foreach ($ruleMatrix as $eventMatrix) {
+                $currentHours = $eventMatrix['hours'];
+                $currentAvailability = $eventMatrix['availability'];
+
+                if ($lastAvailability === false) {
+                    $rule .= $currentHours;
+                } elseif ($currentAvailability == $lastAvailability) {
+                    $rule .= ' en ' . $currentHours;
+                } else {
+                    $rule .= $currentHours;
+                    if ($currentAvailability != '') {
+                        $rule .= ',' . $currentAvailability;
+                    }
+                    $rule .= PHP_EOL;
+                    $rules[] = $rule;
+
+                    $rule = $frequency . ' : ';
+                    $rule .= $currentHours;
                 }
-                if ($ohEnd->lessThan($endDate)) {
-                    $output .= ' geldig t.e.m. '  . $this->getFullDayOutput($ohEnd);
-                }
+
+                $lastAvailability = $currentAvailability;
             }
 
-            $output .= '</h4>' . PHP_EOL;
-            $output .= '<p>' . implode("<br />" . PHP_EOL, $rules) . '</p>' . PHP_EOL;
+            if ($lastAvailability != '') {
+                $rule .= ',' . $lastAvailability;
+            }
 
-            $output .= '<\div>' . PHP_EOL;
+            $rules[] = $rule;
+        }
+
+        if (!empty($rules)) {
+            $output .= '<div>' . PHP_EOL;
+            if ($calendar->priority != 0) {
+                $output .= '<h4>';
+                $output .= ucfirst($calendar->label);
+                $output .= '</h4>' . PHP_EOL;
+            }
+
+            $output .= '<p>' . implode("<br />" . PHP_EOL, $rules) . '</p>' . PHP_EOL;
+            $output .= '</div>' . PHP_EOL;
         }
 
         return $output;
     }
 
-    private function getHumandReadableRule(Event $event, Carbon $startDate, Carbon $endDate)
+    private function getHumandReadableFrequency(Event $event, Carbon $startDate, Carbon $endDate)
     {
         $output = '';
 
         $eventStart = new Carbon($event->start_date);
-        $eventEnd = new Carbon($event->start_date);
-        $eventUntill = new Carbon($event->untill);
+        $eventEnd = new Carbon($event->end_date);
+        $eventUntill = new Carbon($event->until);
 
-        if (!empty($event->rrule)) {
-            $properties = $this->getRuleProperties($event->rrule);
-        }
-
-        $frequency = $properties['FREQ'];
+        $frequency = $this->getFrequency($event);
+        $properties = $this->getRuleProperties($event->rrule);
 
         if ($frequency == self::YEARLY) {
-            if ($eventStart->format('Y-m-d') == $eventEnd->format('Y-m-d')) {
-                $output .= $eventStart->format('d/m/Y') . ' - ' . $eventEnd->format('d/m/Y');
+            if ($eventStart->format('Y-m-d') != $eventEnd->format('Y-m-d')) {
+                $output .= $this->getFullDayOutput($eventStart) . ' - ' . $this->getFullDayOutput($eventEnd);
             }
 
-            if ($eventStart->format('Y-m-d') != $eventEnd->format('Y-m-d')) {
-                $output .= 'Op ' . $this->eventStart->format('d/m/Y');
+            if ($eventStart->format('Y-m-d') == $eventEnd->format('Y-m-d')) {
+                $output .= $this->getFullDayOutput($eventStart);
             }
         }
 
         if ($frequency == self::WEEKLY) {
+
+            if (isset($properties['INTERVAL'])) {
+                $output .= $properties['INTERVAL'] . '-wekelijks ';
+            }
+
             if (isset($properties['BYSETPOS'])) {
                 $output .= $this->getHumanReadableFormatForNumber($properties['BYSETPOS']) . ' ';
             }
@@ -179,15 +227,6 @@ class RecurringOHService
             } else {
                 $output .= $this->getFullDayOutput($eventStart) . ' tot en met ' . $this->getFullDayOutput($eventUntill);
             }
-        }
-
-        $output .= $this->getHumanReadableHoursForEvent($event);
-
-        if (
-            $event->calendar->priority !== 0 &&
-            ($frequency == self::MONTHLY || $frequency == self::WEEKLY)
-        ) {
-            $output .= $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
         }
 
         return $output;
@@ -357,18 +396,18 @@ class RecurringOHService
         return $output;
     }
 
-    private function getHumanReadableHoursForEvent(Event $event)
+    private function getHumanReadableHours(Event $event)
     {
         $hours = $event->calendar->closinghours;
 
         if ($hours) {
-            return ' gesloten';
+            return false;
         }
 
         $eventStart = new Carbon($event->start_date);
         $eventEnd = new Carbon($event->end_date);
 
-        $output = ': ';
+        $output = '';
         $output .= $this->getFullTimeOutput($eventStart);
         $output .= ' tot ';
         $output .= $this->getFullTimeOutput($eventEnd);
@@ -390,20 +429,38 @@ class RecurringOHService
         return $output;
     }
 
+    private function getFrequency(Event $event)
+    {
+        $properties = $this->getRuleProperties($event->rrule);
+        return $properties['FREQ'];
+    }
+
     private function getHumanReadableAvailabillity(Event $event, Carbon $startDate, Carbon $endDate)
     {
-        $eventStart = new Carbon($event->start_date);
-        $eventUntil = new Carbon($event->untill);
-
         $output = '';
-        if ($eventStart->greaterThan($startDate)) {
-            $output .= ' geldig vanaf ' . $eventStart->format('d/m/Y');
-        }
-        if ($eventUntil->lessThan($endDate)) {
-            if ($output == '') {
-                $output .= ' geldig';
+
+        $frequency = $this->getFrequency($event);
+
+        if (
+            $frequency == self::MONTHLY ||
+            $frequency == self::WEEKLY
+        ) {
+            $eventStart = (new Carbon($event->start_date))->startOfDay();
+            $eventUntil = (new Carbon($event->until))->startOfDay();
+
+            if ($event->calendar->priority == 0) {
+                $eventUntil = (new Carbon($event->calendar->openinghours->end_date));
             }
-            $output .= ' t.e.m. ' . $this->getFullDayOutput($eventUntil);
+
+            if ($eventStart->greaterThan($startDate)) {
+                $output .= ' geldig vanaf ' . $this->getFullDayOutput($eventStart);
+            }
+            if ($eventUntil->lessThan($endDate)) {
+                if ($output == '') {
+                    $output .= ' geldig';
+                }
+                $output .= ' t.e.m. ' . $this->getFullDayOutput($eventUntil);
+            }
         }
 
         return $output;
