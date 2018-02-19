@@ -75,74 +75,77 @@ class RecurringOHService
     {
         $output = '';
 
-        $rulesMatrix = [];
-
         // TODO : the code below should be refactored, this is a quick and ugly workaround
         // The frequency, hours and availability are made human readable but this is done line by line
         // If you want to combine 2 lines (for example 08:00-09:00 and 10:00-12:00) this should be put
         // in a matrix to combine these before they are made human readable
 
+        $rulesMatrix = [];
+
         foreach ($calendar->events as $event) {
             $isValid = $this->validateEvent($event, $startDate, $endDate);
 
             if ($isValid) {
-                $eventStartHour = new Carbon($event->start_date);
-
-                $frequency = $this->getHumandReadableFrequency($event, $startDate, $endDate);
+                $period = $this->getHumandReadableFrequency($event, $startDate, $endDate);
                 $hours = $this->getHumanReadableHours($event);
-                $availability = $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
-
                 if (!$hours) {
                     $hours = 'gesloten';
                 }
 
-                $key = $eventStartHour->format('H:i');
+                $availability = $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
 
-                $rulesMatrix[lcfirst($frequency)][] = [
+                if ($event->calendar->priority != 0) {
+                    $key = (new Carbon($event->start_date))->getTimestamp();
+                } else {
+                    $key = (new Carbon($event->start_date))->format('His');
+                }
+
+                $rulesMatrix[] = [
                     'key' => $key,
+                    'period' => $period,
                     'hours' => $hours,
                     'availability' => $availability,
                 ];
             }
         }
 
-        $rules = [];
-
-        foreach ($rulesMatrix as $frequency => $ruleMatrix) {
-
-            usort($ruleMatrix, function ($a, $b) {
-                return $a['key'] > $b['key'];
-            });
-
-            $lastAvailability = false;
-
-            $rule = $frequency . ' : ';
-
-            foreach ($ruleMatrix as $eventMatrix) {
-                $currentHours = $eventMatrix['hours'];
-                $currentAvailability = $eventMatrix['availability'];
-
-                if ($lastAvailability === false) {
-                    $rule .= $currentHours;
-                } elseif ($currentAvailability == $lastAvailability) {
-                    $rule .= ' en ' . $currentHours;
-                } else {
-                    $rule .= $currentHours;
-                    if ($currentAvailability != '') {
-                        $rule .= ',' . $currentAvailability;
-                    }
-                    $rule .= PHP_EOL;
-                    $rules[] = $rule;
-
-                    $rule = $frequency . ' : ';
-                    $rule .= $currentHours;
+        if ($event->calendar->priority == 0) {
+            usort($rulesMatrix, function ($a, $b) {
+                $name = strcmp($a['period'], $b['period']);
+                if ($name === 0) {
+                    return $a['key'] - $b['key'];
                 }
+                return $name;
+            });
+        } else {
+            usort($rulesMatrix, function ($a, $b) {
+                return $a['key'] - $b['key'];
+            });
+        }
 
-                $lastAvailability = $currentAvailability;
+        $lastPeriod = null;
+        $lastAvailability = null;
+
+        foreach ($rulesMatrix as $index => $rulesArray) {
+            $currentPeriod = $rulesArray['period'];
+            $currentAvailability = $rulesArray['availability'];
+
+            if ($currentPeriod == $lastPeriod && $lastAvailability == $currentAvailability) {
+                $rulesMatrix[$index - 1]['hours'] = $rulesMatrix[$index - 1]['hours'] . ' en ' . $rulesArray['hours'];
+                unset($rulesMatrix[$index]);
+                continue;
             }
 
-            if ($lastAvailability != '') {
-                $rule .= ',' . $lastAvailability;
+            $lastPeriod = $currentPeriod;
+            $lastAvailability = $currentAvailability;
+        }
+
+        $rules = [];
+
+        foreach ($rulesMatrix as $ruleArray) {
+            $rule = $ruleArray['period'] . ' : ' . $ruleArray['hours'];
+            if ($ruleArray['availability'] != '') {
+                $rule .= ',' . $ruleArray['availability'];
             }
 
             $rules[] = $rule;
