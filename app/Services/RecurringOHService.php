@@ -109,7 +109,7 @@ class RecurringOHService
             }
         }
 
-        if ($event->calendar->priority == 0) {
+        if ($calendar->priority == 0) {
             usort($rulesMatrix, function ($a, $b) {
                 $name = strcmp($a['period'], $b['period']);
                 if ($name === 0) {
