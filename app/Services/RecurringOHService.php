@@ -82,71 +82,70 @@ class RecurringOHService
         // If you want to combine 2 lines (for example 08:00-09:00 and 10:00-12:00) this should be put
         // in a matrix to combine these before they are made human readable
 
+        $mergable = true;
+        $lastAvailability = null;
+        $lastPeriod = null;
+
         foreach ($calendar->events as $event) {
             $isValid = $this->validateEvent($event, $startDate, $endDate);
 
             if ($isValid) {
-                $eventStartHour = new Carbon($event->start_date);
-
-                $frequency = $this->getHumandReadableFrequency($event, $startDate, $endDate);
+                $period = $this->getHumandReadableFrequency($event, $startDate, $endDate);
                 $hours = $this->getHumanReadableHours($event);
-                $availability = $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
-
                 if (!$hours) {
                     $hours = 'gesloten';
                 }
 
-                $key = $eventStartHour->format('H:i');
+                $availability = $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
+                $timestamp = (new Carbon($event->start_date))->getTimestamp();
 
-                $rulesMatrix[lcfirst($frequency)][] = [
-                    'key' => $key,
+                if (
+                    (!is_null($lastAvailability) && $lastAvailability != $availability) ||
+                    (!is_null($lastPeriod) && $lastPeriod != $period)
+                ) {
+                    $mergable = false;
+                }
+
+                $rulesMatrix[] = [
+                    'timestamp' => $timestamp,
+                    'period' => $period,
                     'hours' => $hours,
                     'availability' => $availability,
                 ];
+
+                $lastPeriod = $period;
+                $lastAvailability = $availability;
             }
         }
 
         $rules = [];
 
-        foreach ($rulesMatrix as $frequency => $ruleMatrix) {
+        if ($mergable) {
+            $rule = $rulesMatrix[0]['period'] . ' : ';
 
-            usort($ruleMatrix, function ($a, $b) {
-                return $a['key'] > $b['key'];
-            });
-
-            $lastAvailability = false;
-
-            $rule = $frequency . ' : ';
-
-            foreach ($ruleMatrix as $eventMatrix) {
-                $currentHours = $eventMatrix['hours'];
-                $currentAvailability = $eventMatrix['availability'];
-
-                if ($lastAvailability === false) {
-                    $rule .= $currentHours;
-                } elseif ($currentAvailability == $lastAvailability) {
-                    $rule .= ' en ' . $currentHours;
-                } else {
-                    $rule .= $currentHours;
-                    if ($currentAvailability != '') {
-                        $rule .= ',' . $currentAvailability;
-                    }
-                    $rule .= PHP_EOL;
-                    $rules[] = $rule;
-
-                    $rule = $frequency . ' : ';
-                    $rule .= $currentHours;
-                }
-
-                $lastAvailability = $currentAvailability;
+            foreach ($rulesMatrix as $ruleArray) {
+                $hoursArray[] = $ruleArray['hours'];
             }
 
-            if ($lastAvailability != '') {
-                $rule .= ',' . $lastAvailability;
+            $rule .= implode(' en ', $hoursArray);
+
+            if ($rulesMatrix[0]['availability'] != '') {
+                $rule .= ',' . $rulesMatrix[0]['availability'];
             }
 
             $rules[] = $rule;
+        } else {
+            foreach ($rulesMatrix as $ruleArray) {
+                $rule = $ruleArray['period'] . ' : ' . $ruleArray['hours'];
+                if ($ruleArray['availability'] != '') {
+                    $rule .= ',' . $ruleArray['availability'];
+                }
+
+                $rules[$ruleArray['timestamp']] = $rule;
+            }
         }
+
+        ksort($rules);
 
         if (!empty($rules)) {
             $output .= '<div>' . PHP_EOL;
