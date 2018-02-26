@@ -196,27 +196,29 @@ class Ical
         // If there are several priorities for one day the event should not be shown for that day
         $priorities = [];
         foreach ($events as $event) {
-            $priorities[$event->dtstart][$event->priority] = $event->priority;
+            $eventStartDate = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
+            $priorities[$eventStartDate->format('dmY')][$event->priority] = $event->priority;
         }
 
         $data = [];
-        // Prefill data.
+//         Prefill data.
         foreach ($datePeriod as $day) {
             $carbonDay = Carbon::instance($day);
             $dayInfo = new DayInfo($carbonDay);
             $data[$carbonDay->toDateString()] = $dayInfo;
         }
+
         foreach ($events as $event) {
 
+            $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
+            $dtEnd = Carbon::createFromFormat('Ymd\THis', $event->dtend);
+
             // If there are several priorities for one day the event should not be shown for that day
-            if (count($priorities[$event->dtstart]) > 1 && $event->priority == max($priorities[$event->dtstart])) {
+            $eventPriorities = array_keys($priorities[$eventStartDate->format('dmY')]);
+            if (count($eventPriorities) > 1 && $event->priority == max($eventPriorities)) {
                 continue;
             }
 
-            $start = $event->dtstart;
-            $end = $event->dtend;
-            $dtStart = Carbon::createFromFormat('Ymd\THis', $start);
-            $dtEnd = Carbon::createFromFormat('Ymd\THis', $end);
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
                 continue;
             }
