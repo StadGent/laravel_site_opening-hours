@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Service;
 use App\Services\RecurringOHService;
 use App\Services\VestaService;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
@@ -64,6 +65,9 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
      */
     public function handle()
     {
+        $startDate = Carbon::today()->startOfWeek();
+        $endDate = $startDate->copy()->addMonths(3);
+
         $serviceCollection = Service::where('id', $this->serviceId)
             ->where('source', 'vesta')
             ->where('identifier', $this->vestaUid);
@@ -77,7 +81,8 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
 
         try {
             $recurringOHService = app(RecurringOHService::class);
-            $output = $recurringOHService->getRecurringOHForService($service);
+            $output = $recurringOHService->getServiceOutput($service, $startDate, $endDate);
+
             if ($output === '') {
                 throw new \Exception('No data was found to send to VESTA.', 1);
             }
@@ -99,7 +104,7 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
             $this->letsFail('Not able to send the data to VESTA.');
         }
         \Log::info('New data for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
-                $service->identifier . ' is send to VESTA.');
+            $service->identifier . ' is send to VESTA.');
         \Log::info('Service (' . $service->id . ') ' . $service->label . ' with UID ' .
             $service->identifier . ' is sync with VESTA.');
 

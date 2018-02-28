@@ -80,7 +80,7 @@
         </div>
         <div class="modal-footer">
           <div v-if="modal.text=='newChannel'">
-            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex || modal.wait">Voeg toe</button>
+            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex || modal.wait">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
             <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else-if="modal.text=='newVersion'">
@@ -147,7 +147,7 @@ export default {
       if (!this.modal.label) {
         this.modal.label = 'Algemeen'
       }
-      Hub.$emit('createChannel', this.modal)
+      Hub.$emit(this.modal.id ? 'updateChannel' : 'createChannel', this.modal)
     },
     createVersion () {
 
