@@ -82,6 +82,21 @@ class RecurringOHService
 
         $rulesMatrix = [];
 
+        $byDayIndexes = [
+            'MO' => 0,
+            'TU' => 1,
+            'WE' => 2,
+            'TH' => 3,
+            'FR' => 4,
+            'SA' => 5,
+            'SU' => 6,
+            'MO,TU,WE,TH' => 7,
+            'MO,TU,WE,TH,FR' => 8,
+            'MO,TU,WE,TH,FR,SA' => 9,
+            'SA,SU' => 10,
+            'MO,TU,WE,TH,FR,SA,SU' => 11,
+        ];
+
         foreach ($calendar->events as $event) {
             $isValid = $this->validateEvent($event, $startDate, $endDate);
 
@@ -97,7 +112,9 @@ class RecurringOHService
                 if ($event->calendar->priority != 0) {
                     $key = (new Carbon($event->start_date))->getTimestamp();
                 } else {
-                    $key = (new Carbon($event->start_date))->format('His');
+                    $properties = $this->getRuleProperties($event->rrule);
+                    $byDayIndex = $byDayIndexes[$properties['BYDAY']];
+                    $key = $byDayIndex . '-' . (new Carbon($event->start_date))->format('His');
                 }
 
                 $rulesMatrix[] = [
@@ -109,19 +126,9 @@ class RecurringOHService
             }
         }
 
-        if ($calendar->priority == 0) {
-            usort($rulesMatrix, function ($a, $b) {
-                $name = strcmp($a['period'], $b['period']);
-                if ($name === 0) {
-                    return $a['key'] - $b['key'];
-                }
-                return $name;
-            });
-        } else {
-            usort($rulesMatrix, function ($a, $b) {
-                return $a['key'] - $b['key'];
-            });
-        }
+        usort($rulesMatrix, function ($a, $b) {
+            return $a['key'] - $b['key'];
+        });
 
         $lastPeriod = null;
         $lastAvailability = null;
