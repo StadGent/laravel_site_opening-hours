@@ -1,7 +1,8 @@
 <template>
   <div class="container">
-    <h1>{{ usr.name || 'Naamloos' }} <small>diensten ({{ filteredServices.length }})</small></h1>
+    <h1>{{ usr.name || 'Naamloos' }}</h1>
 
+    <h2>Diensten</h2>
     <div v-if="usr.admin">
       Admins hebben toegang tot alle diensten.
     </div>

@@ -10,15 +10,19 @@ use Illuminate\Support\ServiceProvider;
 /**
  * Provide 2 macro's to generate a response based on predefined transformers
  *
- * Class SerializerServiceProvider
+ * Class ApiResponseServicePRofiver
  * @package App\Providers
  */
-class SerializerServiceProvider extends ServiceProvider
+class ApiResponseServiceProvider extends ServiceProvider
 {
 
     public function boot()
     {
         $serializer = $this->app->make('SerializerService');
+        $headers = [
+            'Access-Control-Allow-Origin' => '*',
+            'Cache-Control' => 'max-age=900',
+        ];
 
         response()->macro(
             'item',
@@ -26,19 +30,21 @@ class SerializerServiceProvider extends ServiceProvider
                 TransformerInterface $transformer,
                 $item,
                 $status = 200,
-                array $headers = []
+                array $additionalHeaders = []
             ) use (
-                $serializer
+                $serializer,
+                $headers
             ) {
                 $request = app(Request::class);
                 $serializer->setRequest($request);
+
+                $headers = array_merge($headers,$additionalHeaders);
 
                 return response(
                     $serializer->transformItem($transformer, $item),
                     $status,
                     $headers
-                )->header('Access-Control-Allow-Origin', '*')
-                    ->header('content-type', $serializer->getBestSupportedMimeType());
+                )->header('content-type', $serializer->getBestSupportedMimeType());
             }
         );
 
@@ -48,19 +54,21 @@ class SerializerServiceProvider extends ServiceProvider
                 TransformerInterface $transformer,
                 $collection,
                 $status = 200,
-                array $headers = []
+                array $additionalHeaders = []
             ) use (
-                $serializer
+                $serializer,
+                $headers
             ) {
                 $request = app(Request::class);
                 $serializer->setRequest($request);
+
+                $headers = array_merge($headers,$additionalHeaders);
 
                 return response(
                     $serializer->transformCollection($transformer, $collection),
                     $status,
                     $headers
-                )->header('Access-Control-Allow-Origin', '*')
-                    ->header('content-type', $serializer->getBestSupportedMimeType());
+                )->header('content-type', $serializer->getBestSupportedMimeType());
             }
         );
     }
