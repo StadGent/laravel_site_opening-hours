@@ -90,11 +90,7 @@ class RecurringOHService
             'FR' => 4,
             'SA' => 5,
             'SU' => 6,
-            'MO,TU,WE,TH' => 7,
-            'MO,TU,WE,TH,FR' => 8,
-            'MO,TU,WE,TH,FR,SA' => 9,
-            'SA,SU' => 10,
-            'MO,TU,WE,TH,FR,SA,SU' => 11,
+            '_' => 7,
         ];
 
         foreach ($calendar->events as $event) {
@@ -113,7 +109,8 @@ class RecurringOHService
                     $key = (new Carbon($event->start_date))->getTimestamp();
                 } else {
                     $properties = $this->getRuleProperties($event->rrule);
-                    $byDayIndex = $byDayIndexes[$properties['BYDAY']];
+                    $byDayArr = explode(",", $properties['BYDAY'], 2);
+                    $byDayIndex = $byDayIndexes[$byDayArr[0]];
                     $key = $byDayIndex . '-' . (new Carbon($event->start_date))->format('His');
                 }
 
@@ -417,7 +414,7 @@ class RecurringOHService
         $eventStart = new Carbon($event->start_date);
         $eventEnd = new Carbon($event->end_date);
 
-        $output = '';
+        $output = 'van ';
         $output .= $this->getFullTimeOutput($eventStart);
         $output .= ' tot ';
         $output .= $this->getFullTimeOutput($eventEnd);
