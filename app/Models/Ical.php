@@ -193,31 +193,29 @@ class Ical
     {
         $events = $this->getEvents($datePeriod);
 
-        // If there are several priorities for one day the event should not be shown for that day
-        $priorities = [];
-        foreach ($events as $event) {
-            $eventStartDate = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
-            $priorities[$eventStartDate->format('dmY')][$event->priority] = $event->priority;
-        }
-
         $data = [];
-//         Prefill data.
+
         foreach ($datePeriod as $day) {
             $carbonDay = Carbon::instance($day);
             $dayInfo = new DayInfo($carbonDay);
             $data[$carbonDay->toDateString()] = $dayInfo;
         }
 
+        $priorities = [];
+
         foreach ($events as $event) {
-
             $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
-            $dtEnd = Carbon::createFromFormat('Ymd\THis', $event->dtend);
 
-            // If there are several priorities for one day the event should not be shown for that day
-            $eventPriorities = array_keys($priorities[$eventStartDate->format('dmY')]);
-            if (count($eventPriorities) > 1 && $event->priority == max($eventPriorities)) {
+            if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
                 continue;
             }
+
+            $priorities[$dtStart->toDateString()][$event->priority] = $event->priority;
+        }
+
+        foreach ($events as $event) {
+            $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
+            $dtEnd = Carbon::createFromFormat('Ymd\THis', $event->dtend);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
                 continue;
@@ -225,9 +223,21 @@ class Ical
 
             $dayInfo = $data[$dtStart->toDateString()];
             $dayInfo->open = ($event->status === 'OPEN');
-            if ($dayInfo->open) {
-                $dayInfo->hours[] = ['from' => $dtStart->format('H:i'), 'until' => $dtEnd->format('H:i')];
+
+            if (!$dayInfo->open) {
+                continue;
             }
+
+            $eventPriorities = $priorities[$dtStart->toDateString()];
+
+            if (count($eventPriorities) > 1 && max($eventPriorities) == $event->priority) {
+                continue;
+            }
+
+            $dayInfo->hours[] = [
+                'from' => $dtStart->format('H:i'),
+                'until' => $dtEnd->format('H:i'),
+            ];
         }
         foreach ($datePeriod as $day) {
             $carbonDay = Carbon::instance($day);
