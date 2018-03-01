@@ -414,7 +414,7 @@ class RecurringOHService
         $eventStart = new Carbon($event->start_date);
         $eventEnd = new Carbon($event->end_date);
 
-        $output = '';
+        $output = 'van ';
         $output .= $this->getFullTimeOutput($eventStart);
         $output .= ' tot ';
         $output .= $this->getFullTimeOutput($eventEnd);
