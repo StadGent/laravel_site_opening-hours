@@ -41,6 +41,65 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+$app->configureMonologUsing(function (\Monolog\Logger $monolog) {
+    // Client ip processor.
+    $monolog->pushProcessor(function (array $record) {
+        $record['extra']['client_ip'] = 'unavailable';
+        $request = request();
+        if ($request) {
+          $record['extra']['client_ip'] = $request->getClientIp();
+        }
+        return $record;
+    });
+
+    // Base URL processor.
+    $monolog->pushProcessor(function (array $record) {
+        $record['extra']['base_url'] = '';
+        if ($request = request()) {
+          $record['extra']['base_url'] = $request->getSchemeAndHttpHost();
+        }
+        return $record;
+    });
+
+    // Lowercase level name processor.
+    $monolog->pushProcessor(function (array $record) {
+        $record['level_name'] = strtolower($record['level_name']);
+        return $record;
+    });
+
+    // Timestamp processor.
+    $monolog->pushProcessor(function (array $record) {
+        $record['timestamp'] = time();
+        if (isset($record['datetime']) && $record['datetime'] instanceof \DateTime) {
+            $record['timestamp'] = $record['datetime']->getTimestamp();
+        }
+        return $record;
+    });
+
+    // UID processor.
+    $monolog->pushProcessor(function (array $record) {
+        $record['extra']['uid'] = 0;
+        $user = auth()->user();
+        $uid = $user ? $user->getAuthIdentifier() : null;
+        if (null === $uid) {
+            return $record;
+        }
+
+        $record['extra']['uid'] = $uid;
+        return $record;
+    });
+
+    // Syslog handler.
+    $handler = new Monolog\Handler\SyslogHandler('openingsuren', defined('LOG_LOCAL4') ? LOG_LOCAL4 : 160, 'debug', true, LOG_ODELAY);
+
+    // Format parseable for kibana.
+    $formatter = new Monolog\Formatter\LineFormatter('%extra.base_url%|%timestamp%|laravel|%level_name%|%extra.client_ip%|%extra.base_url%%extra.url%|%extra.referrer%|%extra.uid%||%message%');
+    $handler->setFormatter($formatter);
+
+    // Set the handler.
+    $monolog->setHandlers([$handler]);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application
