@@ -2,8 +2,6 @@
 
 namespace App\Monolog\Processor;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 /**
  * Processor that adds a uid to the extra key of a log record.
  */

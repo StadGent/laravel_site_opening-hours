@@ -2,8 +2,6 @@
 
 namespace App\Monolog\Processor;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-
 /**
  * Processor that adds a client_ip to the extra key of a log record.
  */
