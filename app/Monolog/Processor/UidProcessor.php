@@ -9,12 +9,12 @@ class UidProcessor
 {
 
     /**
-       * Adds the uid to the record's extra key.
-       *
-       * @param array $record
-       *
-       * @return array
-       */
+     * Adds the uid to the record's extra key.
+     *
+     * @param array $record
+     *
+     * @return array
+     */
     public function __invoke(array $record)
     {
         $record['extra']['uid'] = 0;
