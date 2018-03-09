@@ -22,12 +22,12 @@ class ClientIpProcessor
      */
     public function __invoke(array $record)
     {
-        // Yhe client_ip will hold the request's actual origin address.
+        // The client_ip will hold the request's actual origin address.
         $record['extra']['client_ip'] = $this->cachedClientIp
             ? $this->cachedClientIp
             : 'unavailable';
 
-        // Return if we already know client's IP
+        // Return if we already know client's IP.
         if ($record['extra']['client_ip'] !== 'unavailable') {
             return $record;
         }
