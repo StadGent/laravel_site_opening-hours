@@ -65,7 +65,7 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
      */
     public function handle()
     {
-        $startDate = Carbon::today()->startOfWeek();
+        $startDate = Carbon::now();
         $endDate = $startDate->copy()->addMonths(3);
 
         $serviceCollection = Service::where('id', $this->serviceId)
