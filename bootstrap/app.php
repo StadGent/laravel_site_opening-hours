@@ -47,7 +47,7 @@ $app->configureMonologUsing(function (\Monolog\Logger $monolog) {
         $record['extra']['client_ip'] = 'unavailable';
         $request = request();
         if ($request) {
-          $record['extra']['client_ip'] = $request->getClientIp();
+            $record['extra']['client_ip'] = $request->getClientIp();
         }
         return $record;
     });
@@ -56,7 +56,7 @@ $app->configureMonologUsing(function (\Monolog\Logger $monolog) {
     $monolog->pushProcessor(function (array $record) {
         $record['extra']['base_url'] = '';
         if ($request = request()) {
-          $record['extra']['base_url'] = $request->getSchemeAndHttpHost();
+            $record['extra']['base_url'] = $request->getSchemeAndHttpHost();
         }
         return $record;
     });
