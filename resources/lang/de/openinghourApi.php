@@ -52,7 +52,7 @@ return [
 
     'January' => 'Januar',
     'February' => 'Februar',
-    'March' => 'Märzv',
+    'March' => 'März',
     'April' => 'April',
     'May' => 'Mai',
     'June' => 'Juni',

@@ -111,7 +111,7 @@ class RecurringOHService
                     $properties = $this->getRuleProperties($event->rrule);
                     $byDayArr = explode(",", $properties['BYDAY'], 2);
                     $byDayIndex = $byDayIndexes[$byDayArr[0]];
-                    $key = $byDayIndex . '-' . (new Carbon($event->start_date))->format('His');
+                    $key = $byDayIndex . (new Carbon($event->start_date))->format('His');
                 }
 
                 $rulesMatrix[] = [
