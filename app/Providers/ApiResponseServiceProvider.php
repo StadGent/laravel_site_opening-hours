@@ -21,7 +21,7 @@ class ApiResponseServiceProvider extends ServiceProvider
         $serializer = $this->app->make('SerializerService');
         $headers = [
             'Access-Control-Allow-Origin' => '*',
-            'Cache-Control' => 'max-age=900',
+            'Cache-Control' => 'max-age=900, public',
         ];
 
         response()->macro(

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Channel;
 use Illuminate\Http\Request;
+use function Psy\debug;
 
 /**
  * LocaleService to get the main locale out of the http request header
@@ -37,9 +38,12 @@ class LocaleService
      */
     public function setRequest(Request $request)
     {
-        $httpAcceptLang = $request->server('HTTP_ACCEPT_LANGUAGE');
-        $requestLocale = \Locale::acceptFromHttp($httpAcceptLang);
-        $this->setLocale($requestLocale);
+        $language= $request->get('language');
+        if(is_null($language)){
+            $language = $request->server('HTTP_ACCEPT_LANGUAGE');
+        }
+        \Locale::acceptFromHttp($language);
+        $this->setLocale($language);
     }
 
     /**
