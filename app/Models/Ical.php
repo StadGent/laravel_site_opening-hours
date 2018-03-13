@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use ICal\ICal as ICalParser;
 use Illuminate\Database\Eloquent\Collection;
+use function Psy\debug;
 
 /**
  * Model to keep specific Ical object per Openinghours
@@ -79,11 +80,14 @@ class Ical
         $icalString = '';
 
         foreach ($calendar->events as $event) {
+
             $until = new Carbon($event->until);
             $until->endOfDay();
 
             $startDate = new Carbon($event->start_date);
+            $startDate->subDay();
             $endDate = new Carbon($event->end_date);
+            $endDate->subDay();
 
             if ($startDate->greaterThan($maxTimestamp) || $until->lessThan($minTimestamp)) {
                 continue;
