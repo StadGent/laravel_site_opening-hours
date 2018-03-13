@@ -176,6 +176,7 @@ class OpeninghoursTransformer implements TransformerInterface
         foreach ($ohCollection as $openinghours) {
             // Copy the calendar start and end
             $calendarBegin = new Carbon($openinghours->start_date);
+
             if ($this->start > $openinghours->start_date) {
                 $calendarBegin = clone $this->start;
             }
