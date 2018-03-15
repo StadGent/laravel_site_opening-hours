@@ -85,9 +85,7 @@ class Ical
             $until->endOfDay();
 
             $startDate = new Carbon($event->start_date);
-            $startDate->subDay();
             $endDate = new Carbon($event->end_date);
-            $endDate->subDay();
 
             if ($startDate->greaterThan($maxTimestamp) || $until->lessThan($minTimestamp)) {
                 continue;
