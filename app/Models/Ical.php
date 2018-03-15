@@ -251,7 +251,7 @@ class Ical
         }
         foreach ($datePeriod as $day) {
             $carbonDay = Carbon::instance($day);
-            if ($data[$carbonDay->toDateString()]->open === null) {
+            if ($data[$carbonDay->toDateString()]->open === null || empty($data[$carbonDay->toDateString()]->hours)) {
                 $data[$carbonDay->toDateString()]->open = false;
             }
         }
