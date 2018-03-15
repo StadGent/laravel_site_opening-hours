@@ -51,12 +51,13 @@ class Ical
     public function createIcalString(Carbon $from, Carbon $till, $initParser = true)
     {
         $this->icalString = "BEGIN:VCALENDAR" . PHP_EOL . "VERSION:2.0" . PHP_EOL . "CALSCALE:GREGORIAN" . PHP_EOL;
+        $this->icalString .= "BEGIN:VTIMEZONE" . PHP_EOL . "TZID:UTC" . PHP_EOL;
 
         foreach ($this->calendars as $calendar) {
             $this->icalString .= $this->createIcalEventStringFromCalendar($calendar, $from, $till);
         }
 
-        $this->icalString .= 'END:VCALENDAR';
+        $this->icalString .= "END:VTIMEZONE" . PHP_EOL . "END:VCALENDAR";
         if ($initParser) {
             $this->initParser();
         }
@@ -108,10 +109,10 @@ class Ical
             $icalString .= 'SUMMARY:' . $calendar->label . PHP_EOL;
             $icalString .= 'STATUS:' . $status . PHP_EOL;
             $icalString .= 'PRIORITY:' . ($calendar->priority + 20) . PHP_EOL;
-            $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . 'Z' . PHP_EOL;
-            $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . 'Z' . PHP_EOL;
+            $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . PHP_EOL;
+            $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . PHP_EOL;
             $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . PHP_EOL;
-            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . 'Z' . PHP_EOL;
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . PHP_EOL;
             $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 99) . '_' . $status . '_CAL_';
             $icalString .= $calendar->id . PHP_EOL;
             $icalString .= "END:VEVENT" . PHP_EOL;
@@ -206,7 +207,7 @@ class Ical
         $priorities = [];
 
         foreach ($events as $event) {
-            $dtStart = Carbon::createFromFormat('Ymd\THisZ', $event->dtstart);
+            $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
                 // This was added once, but now it is said we should be able to
@@ -218,16 +219,16 @@ class Ical
         }
 
         foreach ($events as $event) {
-            $dtStart = Carbon::createFromFormat('Ymd\THisZ', $event->dtstart);
-            $dtEnd = Carbon::createFromFormat('Ymd\THisZ', $event->dtend);
+            $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
+            $dtEnd = Carbon::createFromFormat('Ymd\THis', $event->dtend);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
                 // This was added once, but now it is said we should be able to
                 // ovverride the 'closed' exception, so I'm commenting it.
                 //continue;
             }
-            $rrule = new \RRule\RRule('RRULE:' . $event->rrule . PHP_EOL . 'DTSTART:' . $dtStart->format('Ymd\THis') . 'Z');
-            if (!$rrule->occursAt($dtStart->format('Ymd\THis') . 'Z')) {
+            $rrule = new \RRule\RRule('RRULE:' . $event->rrule . PHP_EOL . 'DTSTART:' . $dtStart->format('Ymd\THis'));
+            if (!$rrule->occursAt($dtStart->format('Ymd\THis'))) {
               continue;
             }
 
@@ -291,14 +292,14 @@ class Ical
 //            return $result;
 //        }
 
-        $aStart = Carbon::createFromFormat('Ymd\THisZ', $a->dtstart);
-        $bStart = Carbon::createFromFormat('Ymd\THisZ', $b->dtstart);
+        $aStart = Carbon::createFromFormat('Ymd\THis', $a->dtstart);
+        $bStart = Carbon::createFromFormat('Ymd\THis', $b->dtstart);
         if ($aStart > $bStart || $aStart < $bStart) {
             return $aStart > $bStart;
         }
 
-        $aEnd = Carbon::createFromFormat('Ymd\THisZ', $a->dtend);
-        $bEnd = Carbon::createFromFormat('Ymd\THisZ', $b->dtend);
+        $aEnd = Carbon::createFromFormat('Ymd\THis', $a->dtend);
+        $bEnd = Carbon::createFromFormat('Ymd\THis', $b->dtend);
         return $aEnd > $bEnd;
     }
 }
