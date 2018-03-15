@@ -231,16 +231,16 @@ class Ical
               continue;
             }
 
+            $eventPriorities = $priorities[$dtStart->toDateString()];
+
+            if (count($eventPriorities) > 1 && max($eventPriorities) == $event->priority) {
+                continue;
+            }
+
             $dayInfo = $data[$dtStart->toDateString()];
             $dayInfo->open = ($event->status === 'OPEN');
 
             if (!$dayInfo->open) {
-                continue;
-            }
-
-            $eventPriorities = $priorities[$dtStart->toDateString()];
-
-            if (count($eventPriorities) > 1 && max($eventPriorities) == $event->priority) {
                 continue;
             }
 
