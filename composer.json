@@ -23,7 +23,8 @@
         "digipolisgent/robo-digipolis-laravel": "^0.1.3",
         "grasmash/yaml-expander": "^1.1",
         "digipolisgent/robo-digipolis-general": "0.1.1",
-        "laravel/passport": "~1.0"
+        "laravel/passport": "~1.0",
+        "rlanvin/php-rrule": "^1.6"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
