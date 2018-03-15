@@ -85,9 +85,7 @@ class Ical
             $until->endOfDay();
 
             $startDate = new Carbon($event->start_date);
-            $startDate->subDay();
             $endDate = new Carbon($event->end_date);
-            $endDate->subDay();
 
             if ($startDate->greaterThan($maxTimestamp) || $until->lessThan($minTimestamp)) {
                 continue;
@@ -110,10 +108,10 @@ class Ical
             $icalString .= 'SUMMARY:' . $calendar->label . PHP_EOL;
             $icalString .= 'STATUS:' . $status . PHP_EOL;
             $icalString .= 'PRIORITY:' . ($calendar->priority + 20) . PHP_EOL;
-            $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . PHP_EOL;
-            $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . PHP_EOL;
+            $icalString .= 'DTSTART:' . $startDate->format('Ymd\THis') . 'Z' . PHP_EOL;
+            $icalString .= 'DTEND:' . $endDate->format('Ymd\THis') . 'Z' . PHP_EOL;
             $icalString .= 'DTSTAMP:' . Carbon::now()->format('Ymd\THis') . 'Z' . PHP_EOL;
-            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . PHP_EOL;
+            $icalString .= 'RRULE:' . $event->rrule . ';UNTIL=' . $until->format('Ymd\THis') . 'Z' . PHP_EOL;
             $icalString .= 'UID:' . 'PRIOR_' . ((int)$calendar->priority + 99) . '_' . $status . '_CAL_';
             $icalString .= $calendar->id . PHP_EOL;
             $icalString .= "END:VEVENT" . PHP_EOL;
@@ -208,20 +206,34 @@ class Ical
         $priorities = [];
 
         foreach ($events as $event) {
-            $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
+            $dtStart = Carbon::createFromFormat('Ymd\THisZ', $event->dtstart);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
-                continue;
+                // This was added once, but now it is said we should be able to
+                // ovverride the 'closed' exception, so I'm commenting it.
+                //continue;
             }
 
             $priorities[$dtStart->toDateString()][$event->priority] = $event->priority;
         }
 
         foreach ($events as $event) {
-            $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
-            $dtEnd = Carbon::createFromFormat('Ymd\THis', $event->dtend);
+            $dtStart = Carbon::createFromFormat('Ymd\THisZ', $event->dtstart);
+            $dtEnd = Carbon::createFromFormat('Ymd\THisZ', $event->dtend);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
+                // This was added once, but now it is said we should be able to
+                // ovverride the 'closed' exception, so I'm commenting it.
+                //continue;
+            }
+            $rrule = new \RRule\RRule('RRULE:' . $event->rrule . PHP_EOL . 'DTSTART:' . $dtStart->format('Ymd\THis') . 'Z');
+            if (!$rrule->occursAt($dtStart->format('Ymd\THis') . 'Z')) {
+              continue;
+            }
+
+            $eventPriorities = $priorities[$dtStart->toDateString()];
+
+            if (count($eventPriorities) > 1 && max($eventPriorities) == $event->priority) {
                 continue;
             }
 
@@ -232,12 +244,6 @@ class Ical
                 continue;
             }
 
-            $eventPriorities = $priorities[$dtStart->toDateString()];
-
-            if (count($eventPriorities) > 1 && max($eventPriorities) == $event->priority) {
-                continue;
-            }
-
             $dayInfo->hours[] = [
                 'from' => $dtStart->format('H:i'),
                 'until' => $dtEnd->format('H:i'),
@@ -245,7 +251,7 @@ class Ical
         }
         foreach ($datePeriod as $day) {
             $carbonDay = Carbon::instance($day);
-            if ($data[$carbonDay->toDateString()]->open === null) {
+            if ($data[$carbonDay->toDateString()]->open === null || empty($data[$carbonDay->toDateString()]->hours)) {
                 $data[$carbonDay->toDateString()]->open = false;
             }
         }
@@ -285,14 +291,14 @@ class Ical
 //            return $result;
 //        }
 
-        $aStart = Carbon::createFromFormat('Ymd\THis', $a->dtstart);
-        $bStart = Carbon::createFromFormat('Ymd\THis', $b->dtstart);
+        $aStart = Carbon::createFromFormat('Ymd\THisZ', $a->dtstart);
+        $bStart = Carbon::createFromFormat('Ymd\THisZ', $b->dtstart);
         if ($aStart > $bStart || $aStart < $bStart) {
             return $aStart > $bStart;
         }
 
-        $aEnd = Carbon::createFromFormat('Ymd\THis', $a->dtend);
-        $bEnd = Carbon::createFromFormat('Ymd\THis', $b->dtend);
+        $aEnd = Carbon::createFromFormat('Ymd\THisZ', $a->dtend);
+        $bEnd = Carbon::createFromFormat('Ymd\THisZ', $b->dtend);
         return $aEnd > $bEnd;
     }
 }
