@@ -260,18 +260,12 @@
                 set(v) {
                     const endDate = toDatetime(this.event.end_date);
                     const startDate = toDatetime(this.event.start_date);
-                    const duration = endDate - startDate;
 
                     // Keep duration the same if it's shorter than 2 days
                     if (!v) {
                         return console.warn('did not select date');
                     }
                     this.event.start_date = v + ((this.event.start_date || '').slice(10, 20) || 'T00:00:00Z');
-                    if (duration < 36e5 * 48) {
-                        // Force end_date to be on same date as start_date
-                        this.event.end_date = this.event.start_date.slice(0, 11) + this.event.end_date.slice(11, 20);
-                    }
-
                     if (this.options.bymonthday) {
                         this.options.bymonthday = toDatetime(this.event.start_date).getDate();
                         this.options.bymonth = toDatetime(this.event.start_date).getMonth() + 1;
