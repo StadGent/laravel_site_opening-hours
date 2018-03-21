@@ -163,14 +163,13 @@
                 <div v-if="!$parent.cal.layer" class="col-xs-2">
                     <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
-                <div class="col-xs-5" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
+                <div class="col-xs-5">
                     <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
                 </div>
             </div>
 
             <!-- Openinghours -->
-            <div v-if="!closinghours" class="form-group"
-                 :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
+            <div v-if="!closinghours" class="form-group">
 
                 <div class="col-xs-3">
                     <label>Van</label>
@@ -205,6 +204,7 @@
 
     import {cleanEmpty, toTime, toDatetime, dateAfter} from '../lib.js'
     import {stringToHM} from '../util/stringToHM'
+    import {nextDateString} from "../lib";
 
     const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
     const fullMonths = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
@@ -320,10 +320,13 @@
                         v = '23:59';
                     }
                     if (this.eventStartTime > v) {
-                        this.warnTime('.inp-endTime');
+                        this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + v + ':00');
+//                        this.warnTime('.inp-endTime');
                     }
-                    // Force end_date to be on same date as start_date
-                    this.event.end_date = this.event.start_date.slice(0, 11) + v + ':00';
+                    else {
+                        // Force end_date to be on same date as start_date
+                        this.event.end_date = this.event.start_date.slice(0, 11) + v + ':00';
+                    }
                 }
             },
             eventUntilSet() {
