@@ -238,9 +238,7 @@ class Ical
                 continue;
             }
 
-            // Undefined index
-            // occurs when the last event of the previous month continues past midngiht,
-            // into the current month
+            // Undefined index occurs when the last event of the previous month continues past midngiht into the current month.
             if (!isset($data[$dtStart->toDateString()])) {
                 continue;
             }
