@@ -273,6 +273,14 @@
                     if (this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)) {
                         this.warnTime('.inp-startDate', 'Dit tijdstip moet voor het eindtijdstip liggen.');
                     }
+                    // update end_date
+                    if (this.eventStartTime > this.eventEndTime) {
+                        this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + this.eventEndTime + ':00');
+                    }
+                    else {
+                        // Force end_date to be on same date as start_date
+                        this.event.end_date = this.event.start_date.slice(0, 11) + this.eventEndTime + ':00';
+                    }
                 }
             },
             eventEndDate: {
