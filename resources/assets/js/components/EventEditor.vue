@@ -179,12 +179,13 @@
                            placeholder="_ _ : _ _">
                 </div>
                 <div class="col-xs-3">
-                    <label>tot</label>
+                    <label :aria-describedby="`next_day_${this._uid}`">tot</label>
                     <input type="text" class="form-control control-time inp-endTime"
                            aria-label="tot"
                            v-model.lazy="eventEndTime"
                            placeholder="_ _ : _ _">
                 </div>
+                <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`" v-if="eventStartTime > eventEndTime">volgende dag</span>
             </div>
         </div>
 
@@ -321,7 +322,6 @@
                     }
                     if (this.eventStartTime > v) {
                         this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + v + ':00');
-//                        this.warnTime('.inp-endTime');
                     }
                     else {
                         // Force end_date to be on same date as start_date
