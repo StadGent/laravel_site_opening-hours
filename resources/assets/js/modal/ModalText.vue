@@ -124,7 +124,8 @@ export default {
     },
 
     allowedServices () {
-      return this.$root.services.filter(s => !s.draft)
+      return this.$root.services.filter(s => !s.draft).sort((a,b)=>{
+          return  (a.label.toLowerCase() <= b.label.toLowerCase()) ? -1 : 1 })
     },
 
     // Pikaday options

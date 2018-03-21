@@ -238,6 +238,10 @@ class Ical
                 continue;
             }
 
+            // Undefined index occurs when the last event of the previous month continues past midngiht into the current month.
+            if (!isset($data[$dtStart->toDateString()])) {
+                continue;
+            }
             $dayInfo = $data[$dtStart->toDateString()];
             $dayInfo->open = ($event->status === 'OPEN');
 

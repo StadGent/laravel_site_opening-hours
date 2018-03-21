@@ -163,14 +163,13 @@
                 <div v-if="!$parent.cal.layer" class="col-xs-2">
                     <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
-                <div class="col-xs-5" :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
+                <div class="col-xs-5">
                     <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
                 </div>
             </div>
 
             <!-- Openinghours -->
-            <div v-if="!closinghours" class="form-group"
-                 :class="{ 'has-error text-danger': eventStartTime > eventEndTime }">
+            <div v-if="!closinghours" class="form-group">
 
                 <div class="col-xs-3">
                     <label>Van</label>
@@ -180,12 +179,13 @@
                            placeholder="_ _ : _ _">
                 </div>
                 <div class="col-xs-3">
-                    <label>tot</label>
+                    <label :aria-describedby="`next_day_${this._uid}`">tot</label>
                     <input type="text" class="form-control control-time inp-endTime"
                            aria-label="tot"
                            v-model.lazy="eventEndTime"
                            placeholder="_ _ : _ _">
                 </div>
+                <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`" v-if="eventStartTime > eventEndTime">volgende dag</span>
             </div>
         </div>
 
@@ -205,6 +205,7 @@
 
     import {cleanEmpty, toTime, toDatetime, dateAfter} from '../lib.js'
     import {stringToHM} from '../util/stringToHM'
+    import {nextDateString} from "../lib";
 
     const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
     const fullMonths = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
@@ -259,24 +260,26 @@
                 set(v) {
                     const endDate = toDatetime(this.event.end_date);
                     const startDate = toDatetime(this.event.start_date);
-                    const duration = endDate - startDate;
 
                     // Keep duration the same if it's shorter than 2 days
                     if (!v) {
                         return console.warn('did not select date');
                     }
                     this.event.start_date = v + ((this.event.start_date || '').slice(10, 20) || 'T00:00:00Z');
-                    if (duration < 36e5 * 48) {
-                        // Force end_date to be on same date as start_date
-                        this.event.end_date = this.event.start_date.slice(0, 11) + this.event.end_date.slice(11, 20);
-                    }
-
                     if (this.options.bymonthday) {
                         this.options.bymonthday = toDatetime(this.event.start_date).getDate();
                         this.options.bymonth = toDatetime(this.event.start_date).getMonth() + 1;
                     }
                     if (this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)) {
                         this.warnTime('.inp-startDate', 'Dit tijdstip moet voor het eindtijdstip liggen.');
+                    }
+                    // update end_date
+                    if (this.eventStartTime > this.eventEndTime) {
+                        this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + this.eventEndTime + ':00');
+                    }
+                    else {
+                        // Force end_date to be on same date as start_date
+                        this.event.end_date = this.event.start_date.slice(0, 11) + this.eventEndTime + ':00';
                     }
                 }
             },
@@ -320,10 +323,12 @@
                         v = '23:59';
                     }
                     if (this.eventStartTime > v) {
-                        this.warnTime('.inp-endTime');
+                        this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + v + ':00');
                     }
-                    // Force end_date to be on same date as start_date
-                    this.event.end_date = this.event.start_date.slice(0, 11) + v + ':00';
+                    else {
+                        // Force end_date to be on same date as start_date
+                        this.event.end_date = this.event.start_date.slice(0, 11) + v + ':00';
+                    }
                 }
             },
             eventUntilSet() {
