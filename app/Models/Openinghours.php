@@ -29,6 +29,13 @@ class Openinghours extends Model
     ];
 
     /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = ['channel'];
+
+    /**
      * Child Objects Calendar
      *
      * @return Illuminate\Database\Eloquent\Relations\HasMany
