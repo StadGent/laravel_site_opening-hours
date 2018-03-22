@@ -51,12 +51,13 @@ class Ical
     public function createIcalString(Carbon $from, Carbon $till, $initParser = true)
     {
         $this->icalString = "BEGIN:VCALENDAR" . PHP_EOL . "VERSION:2.0" . PHP_EOL . "CALSCALE:GREGORIAN" . PHP_EOL;
+        $this->icalString .= "BEGIN:VTIMEZONE" . PHP_EOL . "TZID:UTC" . PHP_EOL;
 
         foreach ($this->calendars as $calendar) {
             $this->icalString .= $this->createIcalEventStringFromCalendar($calendar, $from, $till);
         }
 
-        $this->icalString .= 'END:VCALENDAR';
+        $this->icalString .= "END:VTIMEZONE" . PHP_EOL . "END:VCALENDAR";
         if ($initParser) {
             $this->initParser();
         }
@@ -85,9 +86,7 @@ class Ical
             $until->endOfDay();
 
             $startDate = new Carbon($event->start_date);
-            $startDate->subDay();
             $endDate = new Carbon($event->end_date);
-            $endDate->subDay();
 
             if ($startDate->greaterThan($maxTimestamp) || $until->lessThan($minTimestamp)) {
                 continue;
@@ -211,7 +210,9 @@ class Ical
             $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
-                continue;
+                // This was added once, but now it is said we should be able to
+                // ovverride the 'closed' exception, so I'm commenting it.
+                //continue;
             }
 
             $priorities[$dtStart->toDateString()][$event->priority] = $event->priority;
@@ -222,19 +223,29 @@ class Ical
             $dtEnd = Carbon::createFromFormat('Ymd\THis', $event->dtend);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
-                continue;
+                // This was added once, but now it is said we should be able to
+                // ovverride the 'closed' exception, so I'm commenting it.
+                //continue;
             }
-
-            $dayInfo = $data[$dtStart->toDateString()];
-            $dayInfo->open = ($event->status === 'OPEN');
-
-            if (!$dayInfo->open) {
-                continue;
+            $rrule = new \RRule\RRule('RRULE:' . $event->rrule . PHP_EOL . 'DTSTART:' . $dtStart->format('Ymd\THis'));
+            if (!$rrule->occursAt($dtStart->format('Ymd\THis'))) {
+              continue;
             }
 
             $eventPriorities = $priorities[$dtStart->toDateString()];
 
             if (count($eventPriorities) > 1 && max($eventPriorities) == $event->priority) {
+                continue;
+            }
+
+            // Undefined index occurs when the last event of the previous month continues past midngiht into the current month.
+            if (!isset($data[$dtStart->toDateString()])) {
+                continue;
+            }
+            $dayInfo = $data[$dtStart->toDateString()];
+            $dayInfo->open = ($event->status === 'OPEN');
+
+            if (!$dayInfo->open) {
                 continue;
             }
 
@@ -245,7 +256,7 @@ class Ical
         }
         foreach ($datePeriod as $day) {
             $carbonDay = Carbon::instance($day);
-            if ($data[$carbonDay->toDateString()]->open === null) {
+            if ($data[$carbonDay->toDateString()]->open === null || empty($data[$carbonDay->toDateString()]->hours)) {
                 $data[$carbonDay->toDateString()]->open = false;
             }
         }
