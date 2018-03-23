@@ -185,7 +185,7 @@
                            v-model.lazy="eventEndTime"
                            placeholder="_ _ : _ _">
                 </div>
-                <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`" v-if="eventStartTime > eventEndTime">volgende dag</span>
+                <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`" v-if="eventStartTime >= eventEndTime">volgende dag</span>
             </div>
         </div>
 
@@ -274,7 +274,7 @@
                         this.warnTime('.inp-startDate', 'Dit tijdstip moet voor het eindtijdstip liggen.');
                     }
                     // update end_date
-                    if (this.eventStartTime > this.eventEndTime) {
+                    if (this.eventStartTime >= this.eventEndTime) {
                         this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + this.eventEndTime + ':00');
                     }
                     else {
@@ -322,7 +322,7 @@
                     if (v === '00:00') {
                         v = '23:59';
                     }
-                    if (this.eventStartTime > v) {
+                    if (this.eventStartTime >= v) {
                         this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + v + ':00');
                     }
                     else {
