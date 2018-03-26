@@ -195,8 +195,10 @@
             },
             pushEvent() {
                 const start_date = toDatetime(this.$parent.version.start_date);
+                const until = toDatetime(this.$parent.version.end_date);
                 this.cal.events.push(createEvent({
                     start_date,
+                    until,
                     label: this.cal.events.length + 1
                 }))
             },

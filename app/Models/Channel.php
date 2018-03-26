@@ -16,6 +16,13 @@ class Channel extends Model
     ];
 
     /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = ['service'];
+
+    /**
      * Child Objects Openinghours
      *
      * @return Illuminate\Database\Eloquent\Relations\HasMany
