@@ -41,6 +41,33 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+$app->configureMonologUsing(function (\Monolog\Logger $monolog) {
+    // Client ip processor.
+    $monolog->pushProcessor(new App\Monolog\Processor\ClientIpProcessor());
+
+    // Base URL processor.
+    $monolog->pushProcessor(new App\Monolog\Processor\BaseUrlProcessor());
+
+    // Lowercase level name processor.
+    $monolog->pushProcessor(new App\Monolog\Processor\LowerCaseLevelNameProcessor());
+
+    // Timestamp processor.
+    $monolog->pushProcessor(new App\Monolog\Processor\TimestampProcessor());
+
+    // UID processor.
+    $monolog->pushProcessor(new App\Monolog\Processor\UidProcessor());
+
+    // Syslog handler.
+    $handler = new Monolog\Handler\SyslogHandler('openingsuren', defined('LOG_LOCAL4') ? LOG_LOCAL4 : 160, 'debug', true, LOG_ODELAY);
+
+    // Format parseable for kibana.
+    $formatter = new Monolog\Formatter\LineFormatter('%extra.base_url%|%timestamp%|laravel|%level_name%|%extra.client_ip%|%extra.base_url%%extra.url%|%extra.referrer%|%extra.uid%||%message%');
+    $handler->setFormatter($formatter);
+
+    // Set the handler.
+    $monolog->setHandlers([$handler]);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application
