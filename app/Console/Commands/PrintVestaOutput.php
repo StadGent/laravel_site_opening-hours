@@ -33,7 +33,7 @@ class PrintVestaOutput extends BaseCommand
         $service = Service::find($serviceId);
         $recurringOHService = App('RecurringOHService');
         $startDate = Carbon::today();
-        $endDate = $startDate->copy()->addMonths(3);
+        $endDate = $startDate->copy()->addMonths(1);
         $output = $recurringOHService->getServiceOutput($service, $startDate, $endDate);
         echo $output . PHP_EOL;
     }
