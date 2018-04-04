@@ -35,7 +35,7 @@ class RecurringOHService
         foreach ($service->channels as $channel) {
             $channelOutput = $this->getChannelOutput($channel, $startDate, $endDate);
             if ($channelOutput) {
-                $output .= '<h3>' . ucfirst($channel->label) . '</h3>' . PHP_EOL;
+                $output .= '<b>' . ucfirst($channel->label) . '</b>' . PHP_EOL;
                 $output .= $channelOutput;
             }
         }
@@ -158,9 +158,9 @@ class RecurringOHService
         if (!empty($rules)) {
             $output .= '<div>' . PHP_EOL;
             if ($calendar->priority != 0) {
-                $output .= '<h4>';
+                $output .= '<b>';
                 $output .= ucfirst($calendar->label);
-                $output .= '</h4>' . PHP_EOL;
+                $output .= '</b>' . PHP_EOL;
             }
 
             $output .= '<p>' . implode("<br />" . PHP_EOL, $rules) . '</p>' . PHP_EOL;
