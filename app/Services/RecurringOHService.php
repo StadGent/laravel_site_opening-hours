@@ -147,7 +147,7 @@ class RecurringOHService
         $rules = [];
 
         foreach ($rulesMatrix as $ruleArray) {
-            $rule = $ruleArray['period'] . ' : ' . $ruleArray['hours'];
+            $rule = $ruleArray['period'] . ': ' . $ruleArray['hours'];
             if ($ruleArray['availability'] != '') {
                 $rule .= ',' . $ruleArray['availability'];
             }
