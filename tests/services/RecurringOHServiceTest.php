@@ -140,12 +140,12 @@ class RecurringOHServiceTest extends \TestCase
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h3>BALIE</h3>
+<b>BALIE</b>
 <div>
-<p>maandag tot vrijdag : gesloten, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
 </div>
 <div>
-<p>maandag tot vrijdag : van 8 tot 12 uur en van 13 tot 17 uur, geldig vanaf maandag 1 januari 2018</p>
+<p>maandag tot vrijdag: van 8 tot 12 uur en van 13 tot 17 uur, geldig vanaf maandag 1 januari 2018</p>
 </div>
 EOL;
 
@@ -198,9 +198,9 @@ EOL;
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h3>BALIE</h3>
+<b>BALIE</b>
 <div>
-<p>maandag tot vrijdag : gesloten, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
 </div>
 EOL;
 
