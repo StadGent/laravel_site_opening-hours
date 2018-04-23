@@ -35,7 +35,7 @@ class RecurringOHService
         foreach ($service->channels as $channel) {
             $channelOutput = $this->getChannelOutput($channel, $startDate, $endDate);
             if ($channelOutput) {
-                $output .= '<h3>' . ucfirst($channel->label) . '</h3>' . PHP_EOL;
+                $output .= '<h4>' . ucfirst($channel->label) . '</h4>' . PHP_EOL;
                 $output .= $channelOutput;
             }
         }
@@ -147,7 +147,7 @@ class RecurringOHService
         $rules = [];
 
         foreach ($rulesMatrix as $ruleArray) {
-            $rule = $ruleArray['period'] . ' : ' . $ruleArray['hours'];
+            $rule = $ruleArray['period'] . ': ' . $ruleArray['hours'];
             if ($ruleArray['availability'] != '') {
                 $rule .= ',' . $ruleArray['availability'];
             }
