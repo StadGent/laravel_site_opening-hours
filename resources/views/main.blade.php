@@ -29,7 +29,7 @@
   var appName = {!! json_encode(config('app.name')) !!};
 
   window.vesta = {
-      "source" : '{{ env('VESTA_SOURCE_URL') }}'
+      "source" : '{!! env('VESTA_SOURCE_URL') !!}'
   }
   </script>
 
