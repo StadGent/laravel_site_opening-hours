@@ -6,7 +6,7 @@ Copy the .env.example to .env and
 
 - Fill in the MySQL (or MariaDb) database credentials
 - Fill in the VESTA API configuration (make sure it's not base64 encoded)
-- Fill in the VESTA_SOURCE_URL for the links to vesta services (use a '${uid}' placeholder)
+- Fill in the VESTA_SOURCE_URL for the links to vesta services (use a '${identifier}' placeholder)
 - Fill in the Queue driver, for production environments use redis, beanstalkd or SQS. DO NOT use sync as a queue, rather use database in testing environments (https://laravel.com/docs/5.4/queues)
 - Fill in the base URI that is used to build the LOD version of the openinghours triple (=BASE_URI)
 - Fill in the base URI that is used to link to a data representation of something (=DATA_REPRESENTATION_URI)
