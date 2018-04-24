@@ -82,6 +82,7 @@
           <tr>
             <th>Activeer</th>
             <th-sort by="label">Naam dienst</th-sort>
+            <th-sort>Bron</th-sort>
           </tr>
         </thead>
         <tbody >
@@ -92,6 +93,7 @@
         <thead>
           <tr>
             <th-sort by="label">Naam dienst</th-sort>
+            <th-sort>Bron</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
             <th class="text-right">Deactiveer</th>
@@ -105,6 +107,7 @@
         <thead>
           <tr>
             <th-sort by="label">Naam dienst</th-sort>
+            <th-sort>Bron</th-sort>
             <th>Status</th>
             <th-sort by="updated_at">Aangepast</th-sort>
           </tr>
