@@ -4,7 +4,7 @@
         <a :href="'#!service/'+s.id">{{ s.label }}</a>
       </td>
       <td class="td-sortable">
-        <a v-if="s.source.toUpperCase() === 'vesta'.toUpperCase()" :href="url" target="_blank">{{ s.source.toUpperCase() }}</a>
+        <a v-if="s.source && s.source.toUpperCase() === 'vesta'.toUpperCase()" :href="url" target="_blank">{{ s.source.toUpperCase() }}</a>
         <span v-else>{{ s.source || '' }}</span>
       </td>
       <td :class="statusClass">

@@ -17,7 +17,7 @@ Route::group(['prefix' => 'v1'], function () {
     /*  Authenticated UI API  */
     /*************************/
     
-    Route::group(['prefix' => 'ui', 'middleware' => 'auth:api'], function () {
+    Route::group(['prefix' => 'ui'], function () {
         // calendars
         Route::post('/calendars', 'UI\CalendarsController@store');
         Route::put('/calendars/{calendar}', 'UI\CalendarsController@update');
