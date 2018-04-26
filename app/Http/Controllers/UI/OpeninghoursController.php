@@ -4,7 +4,6 @@ namespace App\Http\Controllers\UI;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOpeninghoursRequest;
-use App\Models\Calendar;
 use App\Models\Openinghours;
 use App\Repositories\ChannelRepository;
 use App\Repositories\OpeninghoursRepository;
@@ -54,12 +53,7 @@ class OpeninghoursController extends Controller
 
         if ($request->originalVersion !== null) {
             // copy all calendars and events from another version
-            foreach ($this->openinghours->getById($request->originalVersion)['calendars'] as $calendar) {
-                $calendar['openinghours_id'] = $result['id'];
-                $new_calendar = Calendar::create($calendar);
-                $new_calendar->events()
-                    ->saveMany(Calendar::find($calendar['id'])->events);
-            }
+            return Openinghours::find($id)->copy($request->originalVersion);
         }
 
         return response()->json(Openinghours::find($id));
