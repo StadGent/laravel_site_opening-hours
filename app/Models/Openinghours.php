@@ -78,4 +78,33 @@ class Openinghours extends Model
 
         return $this->iCal;
     }
+
+    /**
+     * Copy calendars and events from another version.
+     * @param $originalVersion
+     *
+     * @return $this
+     */
+    public function copy($originalVersion) {
+        foreach (Openinghours::find($originalVersion)->calendars->toArray() as $calendar) {
+            $calendar['openinghours_id'] = $this->id;
+            $new_calendar = Calendar::create($calendar);
+
+            foreach (Calendar::find($calendar['id'])->events->toArray() as $event) {
+                // update period of the base openinghours
+                if ($new_calendar->priority === 0) {
+                    // update date, keep time
+                    $event['start_date'] = $this->start_date . ' ' . explode(' ', $event['start_date'])[1];
+                    $event['end_date'] = $this->start_date . ' ' . explode(' ', $event['end_date'])[1];
+
+                    // update until to end_date of the version
+                    $event['until'] = $this->end_date;
+                }
+                $event['calendar_id'] = $new_calendar->id;
+                Event::create($event);
+            }
+        }
+
+        return $this;
+    }
 }
