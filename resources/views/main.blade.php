@@ -27,6 +27,10 @@
   initialUser.admin = {!! json_encode(Auth::user()->hasRole('Admin')) !!};
   Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
   var appName = {!! json_encode(config('app.name')) !!};
+
+  window.vesta = {
+      "source" : '{!! env('VESTA_SOURCE_URL') !!}'
+  }
   </script>
 
   <script src="{{ asset('js/chunks/vendor.min.js') }}?2"></script>
