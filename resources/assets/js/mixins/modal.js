@@ -9,7 +9,8 @@ export const modal = {
   start_date: null,
   end_date: null,
   text: null,
-  error: null
+  error: null,
+  originalVersion: null
 };
 
 export default {
