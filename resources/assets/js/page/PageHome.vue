@@ -80,8 +80,9 @@
       <table v-else-if="draft" class="table table-service-admin">
         <thead>
           <tr>
-            <th>Activeer</th>
+            <th class="narrow">Activeer</th>
             <th-sort by="label">Naam dienst</th-sort>
+            <th-sort class="narrow" by="source">Bron</th-sort>
           </tr>
         </thead>
         <tbody >
@@ -92,9 +93,10 @@
         <thead>
           <tr>
             <th-sort by="label">Naam dienst</th-sort>
-            <th>Status</th>
-            <th-sort by="updated_at">Aangepast</th-sort>
-            <th class="text-right">Deactiveer</th>
+            <th-sort class="narrow" by="source">Bron</th-sort>
+            <th class="narrow">Status</th>
+            <th-sort class="narrow" by="updated_at">Aangepast</th-sort>
+            <th class="text-right narrow">Deactiveer</th>
           </tr>
         </thead>
         <tbody>
@@ -105,8 +107,9 @@
         <thead>
           <tr>
             <th-sort by="label">Naam dienst</th-sort>
-            <th>Status</th>
-            <th-sort by="updated_at">Aangepast</th-sort>
+            <th-sort class="narrow" by="source">Bron</th-sort>
+            <th class="narrow">Status</th>
+            <th-sort class="narrow" by="updated_at">Aangepast</th-sort>
           </tr>
         </thead>
         <tbody>
