@@ -219,7 +219,10 @@ export default {
                 return;
             }
 
-            this.$http.put(API_PREFIX + '/services/' + channel.service_id + '/channels/' + channel.id, {'channel_id': channel.id, 'label' : channel.label})
+            this.$http.put(API_PREFIX + '/services/' + channel.service_id + '/channels/' + channel.id, {
+                'channel_id': channel.id,
+                'label': channel.label
+            })
                 .then(({data}) => {
                     console.log(inert(data));
                     this.fetchChannels();
@@ -253,13 +256,13 @@ export default {
             this.statusStart();
 
             const version = Object.assign(createVersion(), input);
+            const originalVersion = input.originalVersion;
             if (!version.channel_id) {
                 version.channel_id = this.route.channel;
             }
             if (!version.service_id) {
                 version.service_id = this.route.service;
             }
-
             // This will trigger 4 API requests
             // * create new version
             // * refresh all services/channels/versions
@@ -273,12 +276,16 @@ export default {
                     this.routeService.has_missing_oh = true;
 
                     this.fetchChannels().then(() => {
-                        Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
-                            openinghours_id: data.id
-                        }), 'calendar');
+
+                        if (!originalVersion) {
+                            Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
+                                openinghours_id: data.id
+                            }), 'calendar');
+                        }
+                        else {
+                            this.toVersion(data.id);
+                        }
                     });
-
-
                 })
                 .then(this.statusReset)
                 .catch(fetchError)
