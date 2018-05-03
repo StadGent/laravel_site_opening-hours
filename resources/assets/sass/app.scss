@@ -105,6 +105,10 @@ body {
     vertical-align: middle;
     width: auto;
 
+    &.narrow {
+      width: 12%
+    }
+
     &:first-child {
       padding-left: 3em;
       &.td-sortable {

@@ -45,6 +45,18 @@
               <strong>Opgelet!</strong> <br>
               Wanneer je de einddatum wijzigt heeft dit geen effect op de einddatum van de bestaande uitzonderingen.
             </div>
+            <div v-if="!modal.id" class="form-group">
+              <label for="original_version" class="control-label">Kopieer versie (optioneel)</label>
+              <select v-model="modal.originalVersion" id="original_version" class="form-control">
+                  <option></option>
+                <template v-for="channel in serviceVersions">
+                  <optgroup :label="channel.label"></optgroup>
+                  <template v-for="version in channel.versions">
+                    <option :value="version.id">{{version.label}}</option>
+                  </template>
+                </template>
+              </select>
+            </div>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
             <div class="form-group" :class="{'has-error':!validEmail, 'has-success':allowedEmail}">
@@ -138,6 +150,19 @@ export default {
       return {
         minDate: toDatetime(this.modal.start_date)
       }
+    },
+
+    serviceVersions() {
+      return this.$root.routeService.channels.map(c=>{
+        return {
+          "label" : c.label,
+          "versions" : c.openinghours.map(o => {
+            return {
+              "label" : o.label,
+              "id": o.id
+            }
+          })}
+      })
     }
   },
   methods: {
@@ -156,6 +181,16 @@ export default {
 
       if (!this.modal.label) {
         this.modal.label = this.nextVersionLabel
+      }
+
+      if (this.modal.originalVersion) {
+          this.modal.calendars = this.$root.routeService.channels.find(c => {
+              c.openinghours.find(o => {
+                  console.log(inert(o))
+                  if (o.id === this.modal.originalVersion)
+                      return o.calendars
+              })
+          })
       }
 
       // Align events with start_date and end_date

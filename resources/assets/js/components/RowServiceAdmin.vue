@@ -3,6 +3,10 @@
       <td class="td-sortable">
         <a :href="'#!service/'+s.id">{{ s.label }}</a>
       </td>
+      <td class="td-sortable">
+          <a v-if="s.source && s.source.toUpperCase() === 'vesta'.toUpperCase()" :href="url" target="_blank">{{ s.source.toUpperCase() }}</a>
+        <span v-else>{{ s.source || '' }}</span>
+      </td>
       <td :class="statusClass">
         <span
           :data-toggle="statusTooltip ? 'tooltip' : null"
@@ -36,6 +40,6 @@ export default {
           Hub.$emit('deactivateService', service)
       }
   },
-  mixins: [RowServiceMixin],
+  mixins: [RowServiceMixin]
 }
 </script>
