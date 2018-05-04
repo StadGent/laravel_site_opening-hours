@@ -229,7 +229,6 @@ class RecurringOHService
         }
 
         if ($frequency == self::DAILY || $frequency == '') {
-            $output .= 'Elke ';
             if ($eventStart->format('Y-m-d') == $eventUntill->format('Y-m-d')) {
                 $output .= $this->getFullDayOutput($eventStart);
             } else {
@@ -363,7 +362,7 @@ class RecurringOHService
             case 'SA,SU':
                 return 'zaterdag en zondag';
             case 'MO,TU,WE,TH,FR,SA,SU':
-                return 'dag van de week';
+                return 'elke dag van de week';
         }
 
         $usefullDays = [
