@@ -362,7 +362,7 @@ class RecurringOHService
             case 'SA,SU':
                 return 'zaterdag en zondag';
             case 'MO,TU,WE,TH,FR,SA,SU':
-                return 'dag van de week';
+                return 'elke dag van de week';
         }
 
         $usefullDays = [
