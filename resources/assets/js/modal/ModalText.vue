@@ -156,8 +156,10 @@ export default {
         return this.$root.routeService.channels.reduce((sum, c) => {
             if (c.openinghours && c.openinghours.length > 0) {
                 sum.push({
+                    // Use channels as optgroup.
                     "label": c.label,
                     "versions": c.openinghours.map(o => {
+                        // For each channel, add all versions.
                         return {
                             "label": o.label,
                             "id": o.id
