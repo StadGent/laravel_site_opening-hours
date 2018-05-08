@@ -108,7 +108,6 @@ export default {
             return this.$http.get(API_PREFIX + '/services/' + this.route.service + '/channels')
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
-                    console.log('channels fetched');
                 })
                 .then(() => {
                     this.fetchUsers(this.route.service)
