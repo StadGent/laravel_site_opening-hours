@@ -23,6 +23,11 @@
   --}}
 
   <script>
+
+  // bugfix: remove old cookie
+  document.cookie = "laravel_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+
   var initialUser = {!! json_encode(Auth::user()) !!};
   initialUser.admin = {!! json_encode(Auth::user()->hasRole('Admin')) !!};
   Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
