@@ -21,6 +21,8 @@ export default {
     },
     methods: {
         statusUpdate: function (err, data) {
+            console.error(err, data);
+            console.error(JSON.password(JSON.stringify(err)));
             if (err) {
                 if(err.body && err.body.error) {
                     this.status.error = 'Error'
