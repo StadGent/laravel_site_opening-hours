@@ -143,7 +143,6 @@ export default {
     // Pikaday options
     pikadayStart () {
       return {
-        maxDate: toDatetime(this.modal.end_date)
       }
     },
     pikadayEnd () {
