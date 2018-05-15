@@ -143,7 +143,6 @@ export default {
     // Pikaday options
     pikadayStart () {
       return {
-        maxDate: toDatetime(this.modal.end_date)
       }
     },
     pikadayEnd () {
@@ -191,8 +190,10 @@ export default {
 
       if (this.modal.originalVersion) {
           this.modal.calendars = this.$root.routeService.channels.find(c => {
+              if (!c.openinghours) {
+                  return false
+              }
               c.openinghours.find(o => {
-                  console.log(inert(o))
                   if (o.id === this.modal.originalVersion)
                       return o.calendars
               })
