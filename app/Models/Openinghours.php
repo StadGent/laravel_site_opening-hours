@@ -42,7 +42,8 @@ class Openinghours extends Model
      */
     public function calendars()
     {
-        return $this->hasMany('App\Models\Calendar');
+        // only fetch those calendars which are OK to be published
+        return $this->hasMany('App\Models\Calendar')->where('published', true);
     }
 
     /**
