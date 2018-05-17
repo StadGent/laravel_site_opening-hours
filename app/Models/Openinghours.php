@@ -46,6 +46,17 @@ class Openinghours extends Model
     }
 
     /**
+     * Child Objects Calendar
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function publishedCalendars()
+    {
+        // only fetch those calendars which are OK to be published
+        return $this->hasMany('App\Models\Calendar')->where('published', true);
+    }
+
+    /**
      * Parent Object Channel
      *
      * @return Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -73,7 +84,7 @@ class Openinghours extends Model
     public function ical()
     {
         if ($this->iCal === null) {
-            $this->iCal = new Ical($this->calendars);
+            $this->iCal = new Ical($this->publishedCalendars);
         }
 
         return $this->iCal;
@@ -88,6 +99,7 @@ class Openinghours extends Model
     public function copy($originalVersion) {
         foreach (Openinghours::find($originalVersion)->calendars->toArray() as $calendar) {
             $calendar['openinghours_id'] = $this->id;
+            $calendar['published'] = false;
             $new_calendar = Calendar::create($calendar);
 
             foreach (Calendar::find($calendar['id'])->events->toArray() as $event) {

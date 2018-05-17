@@ -87,9 +87,9 @@
                 </button>
                 <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
                 <button type="submit" class="btn btn-primary" @click="saveLabel"
-                        v-else-if="cal.label == 'Uitzondering'">Bewaar
+                        v-else-if="cal.label == 'Uitzondering'">{{ cal.published ? 'Bewaar' : 'Publiceer'}}
                 </button>
-                <button type="button" class="btn btn-primary" @click="save" v-else>Bewaar</button>
+                <button type="button" class="btn btn-primary" @click="save" v-else>{{ cal.published ? 'Bewaar' : 'Publiceer'}}</button>
             </div>
         </div>
     </form>

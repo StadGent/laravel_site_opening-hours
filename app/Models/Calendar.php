@@ -12,7 +12,7 @@ class Calendar extends Model
      * @var array
      */
     protected $fillable = [
-        'priority', 'summary', 'label', 'openinghours_id', 'closinghours',
+        'priority', 'summary', 'label', 'openinghours_id', 'closinghours', 'published',
     ];
 
     /**
