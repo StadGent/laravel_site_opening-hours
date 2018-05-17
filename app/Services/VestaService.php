@@ -164,6 +164,45 @@ class VestaService
     }
 
     /**
+     * Empty Openinghours in VESTA
+     *
+     * Assemble Soap call FillHours
+     * Check response for failing
+     * Return boolean for success
+     *
+     * @param  string $vestaUid
+     * @return boolean
+     */
+    public function emptyOpeninghours($guid)
+    {
+        $client =  $this->getClient();
+        if (!$guid) {
+            throw new \Exception('A guid is required to empty the data in VESTA');
+        }
+        $parameters = $this->getActionParams();
+        $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        $response = $client->EmptyHours($parameters);
+        if (!isset($response->EmptyHoursResult)) {
+            \Log::error('Something went wrong in VESTA.', [
+                'response' => print_r($response, 1),
+            ]);
+
+            return false;
+        }
+
+        $emptyHoursResult = json_decode($response->EmptyHoursResult);
+        if ($emptyHoursResult !== 1) {
+            \Log::error('Something went wrong while writing the data to VESTA.', [
+                'response' => var_export($response, true),
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get the data out of VESTA
      * Only usefull as doublec heck
      * returns the ves_openingsuren of the
@@ -227,6 +266,10 @@ class VestaService
      */
     public function makeSyncJobsForExternalServices(Openinghours $openinghours, $type)
     {
+        error_log('vestaService');
+        error_log($openinghours);
+        error_log($type);
+
         if (!in_array($type, ['update', 'delete'])) {
             throw new \Exception('Define correct type of sync to external services', 1);
         }

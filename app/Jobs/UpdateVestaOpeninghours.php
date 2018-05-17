@@ -58,8 +58,8 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
      * Sync the data for the next 3 months to VESTA
      * Checks:
      * - the service must be active (draft = 1 will fail)
-     * - there is actualy be data to send to VESTA (empty output will fail)
-     * - the data to be send is different from what is already in VESTA (idential will not be send)
+     * - there is actually data to send to VESTA (empty output will fail)
+     * - the data to be send is different from what is already in VESTA (identical will not be send)
      *
      * @return void
      */
@@ -67,6 +67,7 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
     {
         $startDate = Carbon::now();
         $endDate = $startDate->copy()->addMonths(1);
+        error_log('updating vesta openinghours');
 
         $serviceCollection = Service::where('id', $this->serviceId)
             ->where('source', 'vesta')
