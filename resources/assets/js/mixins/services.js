@@ -334,6 +334,7 @@ export default {
             }
 
             if (calendar.id) {
+                calendar.published = true;
                 this.$http.put(API_PREFIX + '/calendars/' + calendar.id, calendar)
                     .then(({data}) => {
 
