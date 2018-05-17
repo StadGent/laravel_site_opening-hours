@@ -455,6 +455,20 @@ h1 + h3 {
 
 .cal-name {
   flex-grow: 1;
+  padding-left: .8rem;
+
+  .btn {
+    display: inline-block;
+    width: 100%;
+    padding: 0;
+  }
+
+  .unpublished {
+    display: block;
+    font-weight: bold;
+    color: $red;
+  }
+
 }
 
 .cal-drag {
