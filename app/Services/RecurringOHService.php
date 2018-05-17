@@ -63,7 +63,7 @@ class RecurringOHService
     {
         $output = '';
 
-        $calendarCollection = $openinghours->calendars()->orderBy('priority', 'desc')->get();
+        $calendarCollection = $openinghours->publishedCalendars()->orderBy('priority', 'desc')->get();
         foreach ($calendarCollection as $calendar) {
             $output .= $this->getCalendarOutput($calendar, $startDate, $endDate);
         }
