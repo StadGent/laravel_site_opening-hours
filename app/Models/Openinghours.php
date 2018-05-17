@@ -43,6 +43,17 @@ class Openinghours extends Model
     public function calendars()
     {
         // only fetch those calendars which are OK to be published
+        return $this->hasMany('App\Models\Calendar');
+    }
+
+    /**
+     * Child Objects Calendar
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function publishedCalendars()
+    {
+        // only fetch those calendars which are OK to be published
         return $this->hasMany('App\Models\Calendar')->where('published', true);
     }
 
@@ -74,7 +85,7 @@ class Openinghours extends Model
     public function ical()
     {
         if ($this->iCal === null) {
-            $this->iCal = new Ical($this->calendars);
+            $this->iCal = new Ical($this->publishedCalendars);
         }
 
         return $this->iCal;
