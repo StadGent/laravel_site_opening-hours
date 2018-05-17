@@ -121,6 +121,7 @@ return [
         'feestdagen' => 'https://data.stad.gent/sites/default/files/feestdagen-nl-BE.ical',
         'schoolvakanties' => 'https://data.stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
         'gentsefeesten' => 'https://data.stad.gent/sites/default/files/gentsefeesten-nl-BE.ical',
+        'extra-stad-gent' => 'https://data.stad.gent/sites/default/files/extra-feestdagen-stad-gent-nl-BE.ical',
     ],
 
     /*
