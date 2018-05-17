@@ -100,6 +100,7 @@ class Openinghours extends Model
     public function copy($originalVersion) {
         foreach (Openinghours::find($originalVersion)->calendars->toArray() as $calendar) {
             $calendar['openinghours_id'] = $this->id;
+            $calendar['published'] = false;
             $new_calendar = Calendar::create($calendar);
 
             foreach (Calendar::find($calendar['id'])->events->toArray() as $event) {
