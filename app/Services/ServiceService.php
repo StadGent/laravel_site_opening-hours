@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Jobs\DeleteLodChannel;
-use App\Jobs\UpdateVestaOpeninghours;
-use App\Models\Channel;
+use App\Jobs\DeleteVestaOpeninghours;
 use App\Models\Service;
 
 /**
@@ -12,6 +10,7 @@ use App\Models\Service;
  */
 class ServiceService
 {
+
     /**
      * Singleton class instance.
      *
@@ -39,7 +38,7 @@ class ServiceService
      */
     public static function getInstance()
     {
-        if (!self::$instance) {
+        if ( ! self::$instance) {
             self::$instance = new self();
         }
         self::$instance->serviceModel = null;
@@ -54,21 +53,18 @@ class ServiceService
      * Make job delete LOD
      *
      * @param  Service $service
+     *
      * @return void
      */
     public function makeSyncJobsForExternalServices(Service $service)
     {
-        error_log('serviceService');
-        error_log($service);
+        // Update VESTA if the service is linked to a VESTA UID
+        if ( ! empty($service) && $service->source == 'vesta' && $service->draft) {
+            $job = new DeleteVestaOpeninghours($service->identifier,
+                $service->id);
+            $this->queueService->addJobToQueue($job, get_class($service),
+                $service->id);
+        }
 
-//        // Update VESTA if the service is linked to a VESTA UID
-//        if (!empty($service) && $service->source == 'vesta') {
-//            $job = new UpdateVestaOpeninghours($service->identifier, $service->id);
-//            $this->queueService->addJobToQueue($job, get_class($service), $service->id);
-//        }
-//
-//        // Remove the LOD repository
-//        $job = new DeleteLodChannel($service->id, $channel->id);
-//        $this->queueService->addJobToQueue($job, get_class($channel), $channel->id);
     }
 }
