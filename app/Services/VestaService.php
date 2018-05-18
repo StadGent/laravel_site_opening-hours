@@ -6,7 +6,6 @@ use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Openinghours;
-use App\Services\QueueService;
 
 /**
  * This class writes text to the VESTA application based on a certain VESTA UID
@@ -266,10 +265,6 @@ class VestaService
      */
     public function makeSyncJobsForExternalServices(Openinghours $openinghours, $type)
     {
-        error_log('vestaService');
-        error_log($openinghours);
-        error_log($type);
-
         if (!in_array($type, ['update', 'delete'])) {
             throw new \Exception('Define correct type of sync to external services', 1);
         }
