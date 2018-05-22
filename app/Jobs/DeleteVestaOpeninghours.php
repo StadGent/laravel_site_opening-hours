@@ -65,6 +65,7 @@ class DeleteVestaOpeninghours extends BaseJob implements ShouldQueue
     public function handle()
     {
         error_log('deleting vesta openinghours');
+        \Log::info('deleting vesta openinghours');
 
         $serviceCollection = Service::where('id', $this->serviceId)
             ->where('source', 'vesta')
