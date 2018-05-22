@@ -7,6 +7,7 @@ use App\Services\RecurringOHService;
 use App\Services\VestaService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 /**
  * This JOB will collect the Openinghours data for the next 3 months of a service
@@ -104,9 +105,9 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
         if (!$synced) {
             $this->letsFail('Not able to send the data to VESTA.');
         }
-        \Log::info('New data for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
+        Log::info('New data for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
             $service->identifier . ' is send to VESTA.');
-        \Log::info('Service (' . $service->id . ') ' . $service->label . ' with UID ' .
+        Log::info('Service (' . $service->id . ') ' . $service->label . ' with UID ' .
             $service->identifier . ' is sync with VESTA.');
 
         $this->letsFinish();

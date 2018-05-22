@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Service;
 use App\Services\VestaService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 /**
  * This JOB will delete openinghours in vesta for inactive services.
@@ -64,9 +65,6 @@ class DeleteVestaOpeninghours extends BaseJob implements ShouldQueue
      */
     public function handle()
     {
-        error_log('deleting vesta openinghours');
-        \Log::info('deleting vesta openinghours');
-
         $serviceCollection = Service::where('id', $this->serviceId)
             ->where('source', 'vesta')
             ->where('identifier', $this->vestaUid);
@@ -97,9 +95,9 @@ class DeleteVestaOpeninghours extends BaseJob implements ShouldQueue
         if ( ! $synced) {
             $this->letsFail('Not able to send the data to VESTA.');
         }
-        \Log::info('Request to empty openinghours for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
+        Log::info('Request to empty openinghours for (' . $service->id . ') ' . $service->label . ' VESTA UID ' .
             $service->identifier . ' is send to VESTA.');
-        \Log::info('Service (' . $service->id . ') ' . $service->label . ' with UID ' .
+        Log::info('Service (' . $service->id . ') ' . $service->label . ' with UID ' .
             $service->identifier . ' is sync with VESTA.');
 
         $this->letsFinish();

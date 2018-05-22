@@ -25,8 +25,6 @@ class ServiceObserver
     public function saved(Service $service)
     {
         Log::info('service observer triggered');
-        Log::error('Something is really going wrong.');
-        error_log('service observer triggered');
         app('ServiceService')->makeSyncJobsForExternalServices($service, 'update');
     }
 }
