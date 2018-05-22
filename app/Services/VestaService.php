@@ -145,7 +145,7 @@ class VestaService
         $parameters->hours = new \SoapVar('<ns2:hours><![CDATA[' . $hours . ']]></ns2:hours>', XSD_ANYXML);
         $response = $client->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
-            \Log::error('Something went wrong in VESTA.', [
+            Log::error('Something went wrong in VESTA.', [
                 'response' => print_r($response, 1),
             ]);
 
@@ -154,7 +154,7 @@ class VestaService
 
         $fillHoursResult = json_decode($response->FillHoursResult);
         if ($fillHoursResult !== 1) {
-            \Log::error('Something went wrong while writing the data to VESTA.', [
+            Log::error('Something went wrong while writing the data to VESTA.', [
                 'response' => var_export($response, true),
             ]);
 
@@ -191,9 +191,7 @@ class VestaService
             return false;
         }
 
-        Log::info('Received response from EmptyHours', [
-            'response' => var_export($response, true),
-        ]);
+        Log::info('Received response from EmptyHours: ' . var_export($response, true));
 
         $emptyHoursResult = json_decode($response->EmptyHoursResult);
         if ($emptyHoursResult !== 1) {
