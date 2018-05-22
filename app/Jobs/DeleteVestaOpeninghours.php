@@ -74,7 +74,7 @@ class DeleteVestaOpeninghours extends BaseJob implements ShouldQueue
         $service = $serviceCollection->first();
 
         if ( ! $service->draft) {
-            $this->letsFail('service was not draft');
+            $this->letsFail('Service was not draft.');
         }
 
         try {
