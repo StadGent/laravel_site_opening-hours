@@ -5,9 +5,11 @@ namespace App\Providers;
 use App\Models\Calendar;
 use App\Models\Channel;
 use App\Models\Openinghours;
+use App\Models\Service;
 use App\Observers\CalendarObserver;
 use App\Observers\ChannelObserver;
 use App\Observers\OpeninghoursObserver;
+use App\Observers\ServiceObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         /* OBSERVERS */
+        Service::observe(ServiceObserver::class);
         Calendar::observe(CalendarObserver::class);
         Channel::observe(ChannelObserver::class);
         Openinghours::observe(OpeninghoursObserver::class);
@@ -70,6 +73,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         /* SERVICES **/
+        $this->app->singleton(\App\Services\ServiceService::class, function ($app) {
+            return \App\Services\ServiceService::getInstance();
+        });
+        $this->app->alias(\App\Services\ServiceService::class, 'ServiceService');
+
         $this->app->singleton(\App\Services\ChannelService::class, function ($app) {
             return \App\Services\ChannelService::getInstance();
         });

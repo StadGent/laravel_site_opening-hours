@@ -6,7 +6,8 @@ use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Openinghours;
-use App\Services\QueueService;
+use Illuminate\Support\Facades\Log;
+
 
 /**
  * This class writes text to the VESTA application based on a certain VESTA UID
@@ -144,7 +145,7 @@ class VestaService
         $parameters->hours = new \SoapVar('<ns2:hours><![CDATA[' . $hours . ']]></ns2:hours>', XSD_ANYXML);
         $response = $client->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
-            \Log::error('Something went wrong in VESTA.', [
+            Log::error('Something went wrong in VESTA.', [
                 'response' => print_r($response, 1),
             ]);
 
@@ -153,7 +154,46 @@ class VestaService
 
         $fillHoursResult = json_decode($response->FillHoursResult);
         if ($fillHoursResult !== 1) {
-            \Log::error('Something went wrong while writing the data to VESTA.', [
+            Log::error('Something went wrong while writing the data to VESTA.', [
+                'response' => var_export($response, true),
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Empty Openinghours in VESTA
+     *
+     * Assemble Soap call FillHours
+     * Check response for failing
+     * Return boolean for success
+     *
+     * @param  string $vestaUid
+     * @return boolean
+     */
+    public function emptyOpeninghours($guid)
+    {
+        $client =  $this->getClient();
+        if (!$guid) {
+            throw new \Exception('A guid is required to empty the data in VESTA');
+        }
+        $parameters = $this->getActionParams();
+        $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        $response = $client->EmptyHours($parameters);
+        if (!isset($response->EmptyHoursResult)) {
+            Log::error('Something went wrong in VESTA.', [
+                'response' => print_r($response, 1),
+            ]);
+
+            return false;
+        }
+
+        $emptyHoursResult = json_decode($response->EmptyHoursResult);
+        if ($emptyHoursResult !== 1) {
+            Log::error('Something went wrong while writing the data to VESTA.', [
                 'response' => var_export($response, true),
             ]);
 
