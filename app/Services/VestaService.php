@@ -6,6 +6,8 @@ use App\Jobs\DeleteLodOpeninghours;
 use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Openinghours;
+use Illuminate\Support\Facades\Log;
+
 
 /**
  * This class writes text to the VESTA application based on a certain VESTA UID
@@ -182,7 +184,7 @@ class VestaService
         $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
         $response = $client->EmptyHours($parameters);
         if (!isset($response->EmptyHoursResult)) {
-            \Log::error('Something went wrong in VESTA.', [
+            Log::error('Something went wrong in VESTA.', [
                 'response' => print_r($response, 1),
             ]);
 
@@ -191,7 +193,7 @@ class VestaService
 
         $emptyHoursResult = json_decode($response->EmptyHoursResult);
         if ($emptyHoursResult !== 1) {
-            \Log::error('Something went wrong while writing the data to VESTA.', [
+            Log::error('Something went wrong while writing the data to VESTA.', [
                 'response' => var_export($response, true),
             ]);
 
