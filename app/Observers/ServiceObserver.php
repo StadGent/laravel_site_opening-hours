@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Service;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Observer on Service Object
@@ -24,7 +23,6 @@ class ServiceObserver
      */
     public function saved(Service $service)
     {
-        Log::info('service observer triggered');
         app('ServiceService')->makeSyncJobsForExternalServices($service, 'update');
     }
 }

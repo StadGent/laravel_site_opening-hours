@@ -191,6 +191,10 @@ class VestaService
             return false;
         }
 
+        Log::info('Received response from EmptyHours', [
+            'response' => var_export($response, true),
+        ]);
+
         $emptyHoursResult = json_decode($response->EmptyHoursResult);
         if ($emptyHoursResult !== 1) {
             Log::error('Something went wrong while writing the data to VESTA.', [
