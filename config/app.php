@@ -262,4 +262,5 @@ return [
         'Laratrust' => Laratrust\LaratrustFacade::class,
     ],
 
+    'vesta_output_months' => 2,
 ];
