@@ -60,7 +60,7 @@ class ServiceService
     public function makeSyncJobsForExternalServices(Service $service)
     {
         // Update VESTA if the service is linked to a VESTA UID
-        if ( ! empty($service) && $service->source == 'vesta' && $service->draft) {
+        if ( ! empty($service) && $service->source == 'vesta') {
 
             if ($service->draft) {
                 $job = new DeleteVestaOpeninghours($service->identifier,
