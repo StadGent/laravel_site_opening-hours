@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\DeleteVestaOpeninghours;
+use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Service;
 
 /**
@@ -59,9 +60,15 @@ class ServiceService
     public function makeSyncJobsForExternalServices(Service $service)
     {
         // Update VESTA if the service is linked to a VESTA UID
-        if ( ! empty($service) && $service->source == 'vesta' && $service->draft) {
-            $job = new DeleteVestaOpeninghours($service->identifier,
-                $service->id);
+        if ( ! empty($service) && $service->source == 'vesta') {
+
+            if ($service->draft) {
+                $job = new DeleteVestaOpeninghours($service->identifier,
+                    $service->id);
+            } else {
+                $job = new UpdateVestaOpeninghours($service->identifier,
+                    $service->id);
+            }
             $this->queueService->addJobToQueue($job, get_class($service),
                 $service->id);
         }
