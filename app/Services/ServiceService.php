@@ -2,19 +2,20 @@
 
 namespace App\Services;
 
-use App\Jobs\DeleteLodChannel;
+use App\Jobs\DeleteVestaOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
-use App\Models\Channel;
+use App\Models\Service;
 
 /**
- * Internal Business logic Service for Channel
+ * Internal Business logic Service for Service
  */
-class ChannelService
+class ServiceService
 {
+
     /**
      * Singleton class instance.
      *
-     * @var ChannelService
+     * @var ServiceService
      */
     private static $instance;
 
@@ -34,11 +35,11 @@ class ChannelService
     /**
      * GetInstance for Singleton pattern
      *
-     * @return ChannelService
+     * @return ServiceService
      */
     public static function getInstance()
     {
-        if (!self::$instance) {
+        if ( ! self::$instance) {
             self::$instance = new self();
         }
         self::$instance->serviceModel = null;
@@ -52,21 +53,25 @@ class ChannelService
      * Make job for VESTA update when service has a vesta source.
      * Make job delete LOD
      *
-     * @param  Channel $channel
+     * @param  Service $service
+     *
      * @return void
      */
-    public function makeSyncJobsForExternalServices(Channel $channel)
+    public function makeSyncJobsForExternalServices(Service $service)
     {
-        $service = $channel->service;
-
         // Update VESTA if the service is linked to a VESTA UID
-        if (!empty($service) && $service->source == 'vesta') {
-            $job = new UpdateVestaOpeninghours($service->identifier, $service->id);
-            $this->queueService->addJobToQueue($job, get_class($service), $service->id);
+        if ( ! empty($service) && $service->source == 'vesta') {
+
+            if ($service->draft) {
+                $job = new DeleteVestaOpeninghours($service->identifier,
+                    $service->id);
+            } else {
+                $job = new UpdateVestaOpeninghours($service->identifier,
+                    $service->id);
+            }
+            $this->queueService->addJobToQueue($job, get_class($service),
+                $service->id);
         }
 
-        // Remove the LOD repository
-        $job = new DeleteLodChannel($service->id, $channel->id);
-        $this->queueService->addJobToQueue($job, get_class($channel), $channel->id);
     }
 }
