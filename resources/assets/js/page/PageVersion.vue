@@ -45,6 +45,7 @@
                                                     @click="toCalendar($root.isRecreatex ? -1 : cal.id)">
                                                 {{ cal.label }}
                                             </button>
+                                            <span class="unpublished" v-if="!cal.published">Niet gepubliceerd</span>
                                         </div>
                                     </div>
                                     <div class="cal-lower cal-action"
@@ -76,6 +77,7 @@
                                                 @click="toCalendar($root.isRecreatex ? -1 :  baseCalendar.id)">
                                             {{ baseCalendar.label }}
                                         </button>
+                                        <span class="unpublished" v-if="!baseCalendar.published">Niet gepubliceerd</span>
                                     </div>
                                 </div>
                             </div>
