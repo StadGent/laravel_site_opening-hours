@@ -106,14 +106,14 @@ class LodServicesRepository
         $query = 'SELECT DISTINCT ?agent ?identifier ?name
                 FROM <http://stad.gent/agents/>
                 WHERE {
-                {
                     ?agent a foaf:Agent;
-                    <http://purl.org/dc/terms/source> ?source ; 
-                    <http://purl.org/dc/terms/identifier> ?identifier; 
-                    foaf:name ?name.
+                    <http://purl.org/dc/terms/source> ?source ;
+                    <http://purl.org/dc/terms/identifier> ?identifier;
+                        foaf:name ?official_name.
+                        OPTIONAL { ?agent  foaf:nickname ?nickname}
                     filter strstarts(?source, "VESTA"^^xsd:string)
-                }
-                }  ORDER BY ?name ';
+                        BIND(IF(BOUND(?nickname) && ?nickname != "" && REPLACE(UCASE(?nickname)," ","") != REPLACE(UCASE(?official_name)," ",""), CONCAT(?official_name, " (", ?nickname, ")"), ?official_name) as ?name)
+                } ORDER BY ?name';
 
         if ($limit) {
             $query .= " LIMIT $limit OFFSET $offset";
