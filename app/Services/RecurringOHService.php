@@ -354,11 +354,11 @@ class RecurringOHService
         // handle BYDAY
         switch ($byDay) {
             case 'MO,TU,WE,TH':
-                return 'maandag tot donderdag';
+                return 'maandag tot en met donderdag';
             case 'MO,TU,WE,TH,FR':
-                return 'maandag tot vrijdag';
+                return 'maandag tot en met vrijdag';
             case 'MO,TU,WE,TH,FR,SA':
-                return 'maandag tot zaterdag';
+                return 'maandag tot en met zaterdag';
             case 'SA,SU':
                 return 'zaterdag en zondag';
             case 'MO,TU,WE,TH,FR,SA,SU':
