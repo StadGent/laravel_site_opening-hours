@@ -14,8 +14,8 @@
         "php": ">=5.6.4",
         "laravel/framework": "5.3.*",
         "santigarcor/laratrust": "3.0.*",
-        "johngrogg/ics-parser": "dev-master",
-        "nesbot/carbon": "^1.21",
+        "johngrogg/ics-parser": "^2.1.5",
+        "nesbot/carbon": "^1.28",
         "doctrine/dbal": "^2.5",
         "easyrdf/easyrdf": "^0.9.1",
         "ml/json-ld": "^1.0",
@@ -24,10 +24,10 @@
         "grasmash/yaml-expander": "^1.1",
         "digipolisgent/robo-digipolis-general": "0.1.1",
         "laravel/passport": "~1.0",
-        "rlanvin/php-rrule": "^1.6"
+        "rlanvin/php-rrule": "^1.6",
+        "fzaninotto/faker": "~1.4"
     },
     "require-dev": {
-        "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~5.0",
         "symfony/css-selector": "3.1.*",
