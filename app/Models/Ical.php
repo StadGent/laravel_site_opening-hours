@@ -234,11 +234,16 @@ class Ical
 
             $eventPriorities = $priorities[$dtStart->toDateString()];
 
-            if (count($eventPriorities) > 1 && max($eventPriorities) == $event->priority) {
+            // This is a weird implementation/naming convention. Priorities are
+            // actually implemented as rankings. This means the *lower* the
+            // priority (read: ranking position) the more important it is
+            // (read: the higher the priority actually is).
+            if (count($eventPriorities) > 1 && min($eventPriorities) != $event->priority) {
                 continue;
             }
 
-            // Undefined index occurs when the last event of the previous month continues past midngiht into the current month.
+            // Undefined index occurs when the last event of the previous month
+            // continues past midnight into the current month.
             if (!isset($data[$dtStart->toDateString()])) {
                 continue;
             }
