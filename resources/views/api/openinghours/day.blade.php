@@ -7,7 +7,6 @@
             {{ $channelData['channel'] }}
         </div>
     @endif
-    {{ $channelData['channelType'] }}
     {{--Looping over all openinghours objects--}}
     @foreach($channelData['openinghours'] as $dayInfoObj)
         @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
