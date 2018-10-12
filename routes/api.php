@@ -91,4 +91,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/services/{service}/channels/{channel}/openinghours/year', 'QueryController@yearAction');
     /* Get the current status of a specific channel for a service */
     Route::get('/services/{service}/channels/{channel}/open-now', 'QueryController@nowOpenAction');
+
+    /* Types */
+    Route::get('/types', 'TypeController@index');
 });
