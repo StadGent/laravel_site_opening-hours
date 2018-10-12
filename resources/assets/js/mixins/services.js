@@ -9,9 +9,11 @@ export default {
             versionDataQueue: [],
             serviceLock: false,
             channelDataQueue: [],
+            types: []
         };
     },
     created() {
+        this.fetchTypes();
         this.fetchServices(0, 499);
         this.fetchServices(499);
     },
@@ -55,6 +57,17 @@ export default {
             let index = this.serviceIndex;
             if (index === -1) return;
             this.$set(this.services, index, this.routeService);
+        },
+        fetchTypes() {
+            this.statusStart();
+            let query = API_PREFIX + '/types';
+
+            return this.$http.get(query)
+                .then(({data}) => {
+                    this.types = data;
+                })
+                .then(this.statusReset)
+                .catch(fetchError);
         },
         fetchServices(offset, limit) {
             this.statusStart();
@@ -220,7 +233,8 @@ export default {
 
             this.$http.put(API_PREFIX + '/services/' + channel.service_id + '/channels/' + channel.id, {
                 'channel_id': channel.id,
-                'label': channel.label
+                'label': channel.label,
+                'type_id': channel.type_id
             })
                 .then(({data}) => {
                     console.log(inert(data));
