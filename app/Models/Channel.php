@@ -41,4 +41,14 @@ class Channel extends Model
     {
         return $this->belongsTo('App\Models\Service');
     }
+
+    /**
+     * Channel type identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function type()
+    {
+        return $this->belongsTo('App\Models\Type', 'type_id');
+    }
 }
