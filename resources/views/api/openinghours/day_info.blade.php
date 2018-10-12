@@ -26,9 +26,7 @@ $outerClass = 'openinghours openinghours--details openinghours--day-'.strtolower
 if($isDayPassed){
     $outerClass .= ' openinghours--day-passed';
 }
-
 ?>
-{{ $channelData['channelType'] }}
 <div class="{{ $outerClass }}" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
     <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
