@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>{{ channel.label }}</h1>
+    <h1>{{ channel.label }}<small v-if="type"> ({{ type.name }})</small></h1>
     <button type="button" class="btn btn-default" @click="editChannel(channel)" :disabled="$root.isRecreatex">Bewerk kanaal</button>
 
     <h2>Versies</h2>
@@ -76,6 +76,9 @@ export default {
     },
     sortedVersions () {
       return this.order ? this.filteredVersions.slice().sort(orderBy(this.order)) : this.filteredVersions
+    },
+    type () {
+        return this.$root.types.find(t => t.id === this.channel.type_id)
     }
   },
   methods: {

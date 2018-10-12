@@ -56,6 +56,9 @@ Route::group(['prefix' => 'v1'], function () {
         // subset
         Route::get('/services/{service}/users', 'UI\UsersController@getFromService');
         Route::post('/inviteuser', 'UI\UsersController@invite');
+
+        // types
+        Route::get('/types', 'TypeController@index');
     });
 
     /****************/

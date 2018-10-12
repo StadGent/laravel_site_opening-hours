@@ -1,3 +1,5 @@
+import {UNKNOWN_ERROR} from "./constants";
+
 const today = new Date().toJSON().slice(0, 10);
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
@@ -241,6 +243,9 @@ export function fetchError(response) {
         this.modalResume();
         if (response.body.message) {
             this.modalError(response.body.message);
+        }
+        else {
+            this.modalError(UNKNOWN_ERROR)
         }
         return;
     }
