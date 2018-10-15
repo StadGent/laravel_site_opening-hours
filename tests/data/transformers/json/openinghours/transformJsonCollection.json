@@ -17,7 +17,8 @@
           }
         ]
       }
-    ]
+    ],
+    "channelType": null
   },
   {
     "channel": "Tele-service",
@@ -37,6 +38,7 @@
           }
         ]
       }
-    ]
+    ],
+    "channelType": null
   }
 ]
