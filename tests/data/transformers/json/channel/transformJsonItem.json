@@ -3,5 +3,6 @@
   "label": "Balie",
   "serviceId": 1,
   "createdAt": "",
-  "updatedAt": ""
+  "updatedAt": "",
+  "type": null
 }

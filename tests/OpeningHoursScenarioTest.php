@@ -37,6 +37,7 @@ class OpeningHoursScenarioTest extends \TestCase
                 'channel' => $channel->label,
                 'channelId' => $channel->id,
                 'openNow' => ['status' => true, 'label' => 'open'],
+                'channelType' => null,
             ];
         }
 
@@ -57,6 +58,7 @@ class OpeningHoursScenarioTest extends \TestCase
                 'channel' => $channel->label,
                 'channelId' => $channel->id,
                 'openNow' => ['status' => false, 'label' => 'gesloten'],
+                'channelType' => null,
             ];
         }
         $this->assertEquals($expected, $content);
@@ -94,7 +96,8 @@ class OpeningHoursScenarioTest extends \TestCase
                             1 => ['from' => '13:00', 'until' => '17:00']
                         ],
                     ],
-                ]
+                ],
+                'channelType' => null,
             ];
         }
         $this->assertEquals($expected, $content);
@@ -123,6 +126,7 @@ class OpeningHoursScenarioTest extends \TestCase
                         ],
                     ],
                 ],
+                'channelType' => null,
             ];
         }
         $this->assertEquals($expected, $content);
@@ -144,6 +148,7 @@ class OpeningHoursScenarioTest extends \TestCase
                 'openinghours' => [
                     ['date' => '2017-09-04', 'open' => false, 'hours' => []]
                 ],
+                'channelType' => null,
             ];
         }
         $this->assertEquals($expected, $content);
@@ -204,6 +209,7 @@ class OpeningHoursScenarioTest extends \TestCase
                     ],
                     ['date' => '2017-09-10', 'open' => false, 'hours' => []],
                 ],
+                'channelType' => null,
             ];
         }
         $this->assertEquals($expected, $content);
