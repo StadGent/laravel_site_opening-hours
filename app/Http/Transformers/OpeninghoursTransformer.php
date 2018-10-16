@@ -136,6 +136,7 @@ class OpeninghoursTransformer implements TransformerInterface
                 $dataCollection[$channel->id] = [
                     'channel' => $channel->label,
                     'channelId' => $channel->id,
+                    'channelType' => $channel->type,
                 ];
             }
 
