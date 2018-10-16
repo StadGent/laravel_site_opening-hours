@@ -19,8 +19,9 @@
             Mail naar <a href="mailto:admin@mijngent.be">admin@mijngent.be</a> om toegang te vragen.
           </div>
           <div v-else-if="modal.text=='newChannel'" class="form-group">
-            <label for="recipient-name" class="control-label">Naam van het kanaal</label>
-            <input-channel :parent="modal" prop="label"></input-channel>
+            <label for="input_channel_name" class="control-label">Naam van het kanaal</label>
+            <input-channel :parent="modal" :id="'input_channel_name'" prop="label"></input-channel>
+            <select-channel-type prop="type_id" :parent="modal"/>
             <div class="help-block">
               Een kanaal is een manier waarop burgers jouw dienst kunnen contacteren.
               <br><br> Dat kunnen algemene openingsuren zijn, maar ook bijvoorbeeld de telefonische beschikbaarheid, afspraak momenten, wanneer er een tolk aanwezig is, of wanneer een bepaalde doelgroep een bezoekje kan brengen zoals jongeren.
@@ -114,6 +115,7 @@
 
 <script>
 import InputChannel from '../components/InputChannel.vue'
+import SelectChannelType from '../components/SelectChannelType.vue'
 import Pikaday from '../components/Pikaday.vue'
 import Status from '../components/Status.vue'
 
@@ -178,6 +180,11 @@ export default {
       if (!this.modal.label) {
         this.modal.label = 'Algemeen'
       }
+
+      if (this.modal.type_id === '') {
+          this.modal.type_id = null
+      }
+
       Hub.$emit(this.modal.id ? 'updateChannel' : 'createChannel', this.modal)
     },
     createVersion () {
@@ -272,6 +279,7 @@ export default {
   },
   components: {
     InputChannel,
+    SelectChannelType,
     Pikaday,
     Status,
   }

@@ -12,7 +12,7 @@ class Channel extends Model
      * @var array
      */
     protected $fillable = [
-        'label', 'service_id',
+        'label', 'service_id', 'type_id',
     ];
 
     /**
@@ -40,5 +40,15 @@ class Channel extends Model
     public function service()
     {
         return $this->belongsTo('App\Models\Service');
+    }
+
+    /**
+     * Channel type identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function type()
+    {
+        return $this->belongsTo('App\Models\Type', 'type_id');
     }
 }
