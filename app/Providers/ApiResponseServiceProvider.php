@@ -22,6 +22,7 @@ class ApiResponseServiceProvider extends ServiceProvider
         $headers = [
             'Access-Control-Allow-Origin' => '*',
             'Cache-Control' => 'max-age=900, public',
+            'Vary' => 'Accept-Encoding, Accept',
         ];
 
         response()->macro(
