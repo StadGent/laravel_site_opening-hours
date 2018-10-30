@@ -1,6 +1,8 @@
 import {fetchError, Hub} from '../lib.js';
 import {createVersion, createFirstCalendar} from '../defaults.js';
 import {API_PREFIX, ID_MISSING} from "../constants.js";
+import {SERVICE_COMPLETE, SERVICE_INACTIVE_OH, SERVICE_MISSING_OH, SERVICE_NO_CH} from "../constants";
+import {hasActiveOh, hasOh} from "../lib";
 
 export default {
     data() {
@@ -53,6 +55,33 @@ export default {
         }
     },
     methods: {
+        serviceStatus(s) {
+            if (!s.channels) {
+                if (s.countChannels === 0) {
+                    return SERVICE_NO_CH;
+                }
+                if (s.has_missing_oh === 1 || s.has_missing_oh === true) {
+                    return SERVICE_MISSING_OH;
+                }
+                if (s.has_inactive_oh === 1 || s.has_inactive_oh === true) {
+                    return SERVICE_INACTIVE_OH;
+                }
+            }
+            else {
+                if (s.channels.length === 0) {
+                    return SERVICE_NO_CH;
+                }
+                // Not every channel of the service has at least 1 version
+                if (s.channels.filter(ch => !hasOh(ch).length).length) {
+                    return SERVICE_MISSING_OH;
+                }
+                // Not every channel of the service has at least 1 active version
+                if (s.channels.filter(ch => !hasActiveOh(ch).length).length) {
+                    return SERVICE_INACTIVE_OH;
+                }
+            }
+            return SERVICE_COMPLETE;
+        },
         updateService() {
             let index = this.serviceIndex;
             if (index === -1) return;
@@ -87,6 +116,9 @@ export default {
 
             return this.$http.get(query)
                 .then(({data}) => {
+                    data.map(service => {
+                        service.status = this.serviceStatus(service);
+                    });
                     this.services = this.services.concat(data);
                 })
                 .then(() => {
@@ -121,6 +153,7 @@ export default {
             return this.$http.get(API_PREFIX + '/services/' + this.route.service + '/channels')
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
+                    this.$set(this.routeService, 'status', this.serviceStatus(this.routeService));
                 })
                 .then(() => {
                     this.fetchUsers(this.route.service)
@@ -192,7 +225,6 @@ export default {
         }
     },
     mounted() {
-
         Hub.$on('fetchChannels', this.fetchChannels);
         Hub.$on('activateService', service => {
             this.patchServiceStatus(service, true);
@@ -212,6 +244,7 @@ export default {
             this.$http.post(API_PREFIX + '/services/' + channel.service_id + '/channels', channel)
                 .then(({data}) => {
                     this.routeService.channels.push(data);
+                    this.routeService.status = this.serviceStatus(this.routeService);
                     this.modalClose();
                     this.toChannel(data.id);
                 })
@@ -260,6 +293,7 @@ export default {
 
                     // remove channel from routeService
                     this.routeService.channels = this.routeService.channels.filter(c => c.id !== channel.id);
+                    this.routeService.status = this.serviceStatus(this.routeService);
                     this.modalClose();
                 })
                 .then(this.statusReset)
@@ -287,9 +321,8 @@ export default {
                     this.modalClose();
 
                     this.routeService.has_missing_oh = true;
-
+                    this.routeService.status = this.serviceStatus(this.routeService);
                     this.fetchChannels().then(() => {
-
                         if (!originalVersion) {
                             Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
                                 openinghours_id: data.id
