@@ -7,13 +7,13 @@
         <a v-if="s.source && s.source.toUpperCase() === 'vesta'.toUpperCase()" :href="url" target="_blank">{{ s.source.toUpperCase() }}</a>
         <span v-else>{{ s.source || '' }}</span>
       </td>
-      <td :class="statusClass">
+      <td :class="getStatusClass(s.status)">
         <span
-          data-toggle="tooltip"
-          :title="statusTooltip"
+          :data-toggle="getStatusTooltip(s.status) ? 'tooltip' : null"
+          :title="getStatusTooltip(s.status)"
         >
-          <span class="pre-wrap">{{ statusMessage }}</span> &nbsp;
-          <i class="glyphicon glyphicon-info-sign" v-if="statusTooltip"></i>
+          <span class="pre-wrap">{{ s.status }}</span> &nbsp;
+          <i class="glyphicon glyphicon-info-sign" v-if="getStatusTooltip(s.status)"></i>
         </span>
       </td>
       <td class="text-muted td-sortable" :title="s.updated_at">
