@@ -46,6 +46,7 @@
         <thead>
           <tr>
             <th-sort by="label">Kanaal</th-sort>
+            <th>Type</th>
             <th>Status</th>
             <th-sort by="updated_at">Laatst aangepast</th-sort>
             <th class="text-right">Verwijder</th>
@@ -60,6 +61,7 @@
             <td>
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')">{{ channel.label }}</a>
             </td>
+            <td>{{ channelType(channel.type_id) }}</td>
             <td>{{ channel | toChannelStatus }}</td>
             <td class="text-muted" :title="channel.updated_at">
               <div>{{ channel.updated_at | date }}</div>
@@ -112,7 +114,9 @@ export default {
     sortedChannels () {
       return this.order ? this.filteredChannels.slice().sort(orderBy(this.order)) : this.filteredChannels
     },
-
+    types () {
+        return this.$root.types
+    },
     // Users
     filteredUsers () {
       return this.srv.users || {};
@@ -131,7 +135,14 @@ export default {
     },
     rmChannel (c) {
       Hub.$emit('deleteChannel', c)
-    }
+    },
+    channelType (id) {
+        let type = this.types.filter(t => t.id === id)[0];
+        if (type) {
+            return type.name;
+        }
+        return '';
+    },
   },
   filters: {
     toChannelStatus
