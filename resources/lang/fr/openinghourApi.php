@@ -18,6 +18,8 @@ return [
     'FROM_DATA' => 'du',
     'UNTIL_DATA' => "jusqu'au",
     'SHORT_HOUR' => 'h',
+    'LONG_HOUR' => '',
+    'HH:MM' => ':HH::MM',
 
     'day_0' => 'Dimanche',
     'day_1' => 'Lundi',
