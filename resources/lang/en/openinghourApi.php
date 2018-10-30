@@ -18,6 +18,8 @@ return [
     'FROM_DATA' => 'from',
     'UNTIL_DATA' => 'to',
     'SHORT_HOUR' => 'h',
+    'LONG_HOUR' => '',
+    'HH:MM' => ':HH::MM',
 
     'day_0'  => 'Sunday',
     'day_1'  => 'Monday',
