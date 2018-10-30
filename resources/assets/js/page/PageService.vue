@@ -137,11 +137,8 @@ export default {
       Hub.$emit('deleteChannel', c)
     },
     channelType (id) {
-        let type = this.types.filter(t => t.id === id)[0];
-        if (type) {
-            return type.name;
-        }
-        return '';
+        let type = this.types.find(t => t.id === id) || {};
+        return type.name || '';
     },
   },
   filters: {
