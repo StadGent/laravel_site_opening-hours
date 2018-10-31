@@ -27,7 +27,7 @@ if($isDayPassed){
     $outerClass .= ' openinghours--day-passed';
 }
 
-if (isset($type)) {
+if (isset($type) && $isOpen) {
     $translatedStatus = trans('openinghourApi.' . $type);
 }
 ?>
