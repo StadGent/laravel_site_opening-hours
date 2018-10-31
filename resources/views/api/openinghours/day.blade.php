@@ -17,7 +17,7 @@
         @endforeach
     @endif
 
-    @if($booking && $booking['openinghours'][0]->open)
+    @if($booking)
         @foreach($booking['openinghours'] as $dayInfoObj)
             @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj, 'type' => $booking['channelTypeLabel'],])
         @endforeach
