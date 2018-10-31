@@ -101,12 +101,23 @@ class QueryController extends Controller
     public function weekAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
+        $from = $request['from'] ? new Carbon($request['from']) : null;
+        $until = $request['until'] ? new Carbon($request['until']) : null;
+
         $this->localeService->setRequest($request);
         $date->setWeekStartsAt($this->localeService->getWeekStartDay());
         $date->setWeekEndsAt($this->localeService->getWeekEndDay());
 
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
+
+        if ($from && $from->greaterThan($start)) {
+            $start = $from;
+        }
+
+        if ($until && $end->greaterThan($until)) {
+            $end = $until;
+        }
 
         return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
     }
@@ -122,8 +133,19 @@ class QueryController extends Controller
     public function monthAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
+        $from = $request['from'] ? new Carbon($request['from']) : null;
+        $until = $request['until'] ? new Carbon($request['until']) : null;
+
         $start = $date->copy()->startOfMonth();
         $end = $date->copy()->endOfMonth();
+
+        if ($from && $from->greaterThan($start)) {
+            $start = $from;
+        }
+
+        if ($until && $end->greaterThan($until)) {
+            $end = $until;
+        }
 
         return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MONTH);
     }
@@ -139,8 +161,19 @@ class QueryController extends Controller
     public function yearAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
+        $from = $request['from'] ? new Carbon($request['from']) : null;
+        $until = $request['until'] ? new Carbon($request['until']) : null;
+
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
+
+        if ($from && $from->greaterThan($start)) {
+            $start = $from;
+        }
+
+        if ($until && $end->greaterThan($until)) {
+            $end = $until;
+        }
 
         return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
     }
