@@ -50,9 +50,15 @@ if (isset($type)) {
                 @foreach($dayInfoObj->hours as $hours)
                     <div class="openinghours--time">
                         <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
-                        <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">{{$hours['from']}}</time>
+                        <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">
+                            @lang('openinghourApi.HH:MM', ['HH' => substr($hours['from'],0,2), 'MM' => substr($hours['from'],3,2)])
+                            @lang('openinghourApi.SHORT_HOUR')
+                        </time>
                         <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
-                        <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">{{ $hours['until']}}</time>
+                        <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">
+                            @lang('openinghourApi.HH:MM', ['HH' => substr($hours['until'],0,2), 'MM' => substr($hours['until'],3,2)])
+                            @lang('openinghourApi.SHORT_HOUR')
+                        </time>
                     </div>
                     @if(end($dayInfoObj->hours) != $hours)
                         <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
