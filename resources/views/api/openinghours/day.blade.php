@@ -1,16 +1,33 @@
 {{--Check if the channel has multiple channels--}}
 <?php $hasMultipleChannels = count($data) > 1; ?>
-@foreach($data as $channelData)
-    {{--If multiple channels are present the channel name is printed--}}
-    @if($hasMultipleChannels)
-        <div class="channel-label">
-            {{ $channelData['channel'] }}
-        </div>
+
+@if($hasMultipleChannels)
+
+    <?php
+    $channelsTypes = array_column($data, 'channelTypeLabel');
+    $defaultIndex = array_search('Algemeen', $channelsTypes);
+    $bookingIndex = array_search('Na afspraak', $channelsTypes);
+    $default = $defaultIndex !== false ? $data[$defaultIndex] : null;
+    $booking = $bookingIndex !== false ? $data[$bookingIndex] : null;
+    ?>
+
+    @if($default && ($default['openinghours'][0]->open || !$booking || !$booking['openinghours'][0]->open))
+        @foreach($default['openinghours'] as $dayInfoObj)
+            @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj, 'type' => $default['channelTypeLabel'],])
+        @endforeach
     @endif
-    {{--Looping over all openinghours objects--}}
-    @foreach($channelData['openinghours'] as $dayInfoObj)
-        @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
+
+    @if($booking && $booking['openinghours'][0]->open)
+        @foreach($booking['openinghours'] as $dayInfoObj)
+            @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj, 'type' => $booking['channelTypeLabel'],])
+        @endforeach
+    @endif
+
+@else
+    @foreach($data as $channelData)
+        {{--Looping over all openinghours objects--}}
+        @foreach($channelData['openinghours'] as $dayInfoObj)
+            @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj])
+        @endforeach
     @endforeach
-@endforeach
-
-
+@endif
