@@ -208,6 +208,10 @@ export default {
                 return;
             }
 
+            if (channel.type_id === "null") {
+                channel.type_id = null;
+            }
+
             channel.service_id = channel.srv && channel.srv.id;
             this.$http.post(API_PREFIX + '/services/' + channel.service_id + '/channels', channel)
                 .then(({data}) => {
@@ -231,13 +235,16 @@ export default {
                 return;
             }
 
+            if (channel.type_id === "null") {
+                channel.type_id = null;
+            }
+
             this.$http.put(API_PREFIX + '/services/' + channel.service_id + '/channels/' + channel.id, {
                 'channel_id': channel.id,
                 'label': channel.label,
                 'type_id': channel.type_id
             })
                 .then(({data}) => {
-                    console.log(inert(data));
                     this.fetchChannels();
                     this.modalClose();
                 })
