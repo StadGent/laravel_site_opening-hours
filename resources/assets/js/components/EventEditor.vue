@@ -319,9 +319,6 @@
                     if (!/\d\d:\d\d/.test(v)) {
                         return;
                     }
-                    if (v === '00:00') {
-                        v = '23:59';
-                    }
                     if (this.eventStartTime >= v) {
                         this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + v + ':00');
                     }
