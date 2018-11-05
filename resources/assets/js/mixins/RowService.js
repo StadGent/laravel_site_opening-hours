@@ -29,6 +29,7 @@ export default {
                     return SERVICE_INACTIVE_OH_TOOLTIP;
                 case SERVICE_COMPLETE:
                     return SERVICE_COMPLETE_TOOLTIP;
+                default: return null;
             }
         },
         getStatusClass(statusMessage) {
