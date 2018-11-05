@@ -12,6 +12,8 @@ return [
     'OPEN' => 'open',
     'CLOSED' => 'gesloten',
     'AND' => 'en',
+    'Algemeen' => 'open',
+    'Na afspraak' => 'op afspraak',
 
     'FROM_HOUR' => 'van',
     'UNTIL_HOUR' => 'tot',

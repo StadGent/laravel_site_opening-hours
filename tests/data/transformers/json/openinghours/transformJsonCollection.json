@@ -2,6 +2,8 @@
   {
     "channel": "Balie",
     "channelId": 1,
+    "channelTypeLabel": "Algemeen",
+    "channelTypeId": 2,
     "openinghours": [
       {
         "date": "2017-09-15",
@@ -17,12 +19,13 @@
           }
         ]
       }
-    ],
-    "channelType": null
+    ]
   },
   {
     "channel": "Tele-service",
     "channelId": 2,
+    "channelTypeLabel": "Telefonisch",
+    "channelTypeId": 3,
     "openinghours": [
       {
         "date": "2017-09-15",
@@ -38,7 +41,28 @@
           }
         ]
       }
-    ],
-    "channelType": null
+    ]
+  },
+  {
+    "channel": "Op afspraak",
+    "channelId": 3,
+    "channelTypeLabel": "Na afspraak",
+    "channelTypeId": 1,
+    "openinghours": [
+      {
+        "date": "2017-09-15",
+        "open": true,
+        "hours": [
+          {
+            "from": "09:00",
+            "until": "12:00"
+          },
+          {
+            "from": "13:00",
+            "until": "17:00"
+          }
+        ]
+      }
+    ]
   }
 ]
