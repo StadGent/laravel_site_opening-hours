@@ -5,6 +5,9 @@
     "serviceId": 1,
     "createdAt": "",
     "updatedAt": "",
-    "type": null
+    "type": {
+      "id": 2,
+      "name": "Algemeen"
+    }
   }
 ]
