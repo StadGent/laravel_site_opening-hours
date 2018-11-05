@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 
 class ChannelsTableSeeder extends Seeder
 {
+
     /**
      * Run the database seeds.
      *
@@ -16,22 +17,29 @@ class ChannelsTableSeeder extends Seeder
     public function run()
     {
         $sampleChannels = [
-            'Balie',
-            'Tele-service',
-            'Web-service',
-            'Technical staff',
-            'Non-public contact',
+            [
+                'label' => 'Balie',
+                'type' => 2,
+            ],
+            [
+                'label' => 'Tele-service',
+                'type' => 3,
+            ],
+            [
+                'label' => 'Op afspraak',
+                'type' => 1,
+            ],
         ];
 
         $services = Service::all();
         foreach ($services as $service) {
-            $tmpChannels = array_slice($sampleChannels, 0, 2);
-            foreach ($tmpChannels as $newChannel) {
+            foreach ($sampleChannels as $newChannel) {
                 $service->channels()->save(
                     factory(Channel::class)
                         ->make([
                             'service_id' => $service,
-                            'label' => $newChannel,
+                            'label' => $newChannel['label'],
+                            'type_id' => $newChannel['type'],
                         ])
                 );
             }
