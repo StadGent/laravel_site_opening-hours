@@ -7,8 +7,8 @@
           <!-- 2 versies -->
         </div>
       </td>
-      <td :class="statusClass" :rowspan="rowspan">
-        {{ statusMessage }}
+      <td :class="getStatusClass(s.status)" :rowspan="rowspan">
+        {{ s.status }}
       </td>
       <td :rowspan="rowspan" class="text-muted" :title="s.updated_at">
         <div>{{ s.updated_at | date }}</div>
