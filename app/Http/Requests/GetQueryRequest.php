@@ -40,7 +40,7 @@ class GetQueryRequest extends FormRequest
             'channel' => 'exists:channels',
             'date' => 'date',
             'from' => 'date',
-            'until' => 'date|after:from',
+            'until' => 'date|after_or_equal:from',
         ];
     }
 
