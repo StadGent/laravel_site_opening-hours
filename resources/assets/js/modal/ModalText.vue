@@ -232,10 +232,15 @@ export default {
           let changed = false;
           cal.events.forEach(event => {
             if (!cal.layer) {
-              event.start_date = version.start_date + event.start_date.slice(10);
-              event.end_date = version.start_date + event.end_date.slice(10);
-              event.until = version.end_date;
-              changed = true
+                // calculate difference to include openinghours past midnight
+                let start = moment(event.start_date);
+                let end = moment(event.end_date);
+                let diff = end.startOf('day').diff(start.startOf('day'), 'days');
+
+                event.start_date = moment(version.start_date).format('YYYY-MM-DD') + event.start_date.slice(10);
+                event.end_date = moment(version.start_date).add(diff, 'days').format('YYYY-MM-DD') + event.end_date.slice(10);
+                event.until = version.end_date;
+                changed = true
             }
           });
           if (changed) {
