@@ -301,9 +301,6 @@
                     if (!/\d\d:\d\d/.test(v)) {
                         return;
                     }
-                    if (this.eventEndTime === '00:00') {
-                        this.eventEndTime = '23:59';
-                    }
                     if (this.eventEndTime < v) {
                         this.warnTime('.inp-startTime');
                     }
