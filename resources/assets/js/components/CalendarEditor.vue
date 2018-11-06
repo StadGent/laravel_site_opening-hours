@@ -263,7 +263,6 @@
                             if (start < versionStart) {
                                 start.setFullYear(start.getFullYear() + 1)
                             }
-//
                             let event = createEvent({
                                 start_date: start,
                                 until: toDatetime(this.$parent.version.end_date),
