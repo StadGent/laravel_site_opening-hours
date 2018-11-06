@@ -128,7 +128,7 @@ class QueryControllerTest extends \TestCase
         $call->seeJsonEquals([
             'error' => [
                 'code' => 'ValidationException',
-                'message' => 'Paramters did not pass validation',
+                'message' => 'Parameters did not pass validation',
                 'target' => 'parameters',
                 'details' => [
                     0 => [
@@ -154,7 +154,7 @@ class QueryControllerTest extends \TestCase
         $call->seeJsonEquals([
             "error" => [
                 "code" => "ValidationException",
-                "message" => "Paramters did not pass validation",
+                "message" => "Parameters did not pass validation",
                 "target" => "parameters",
                 "details" => [
                     [
@@ -179,7 +179,7 @@ class QueryControllerTest extends \TestCase
         $call->seeJsonEquals([
             "error" => [
                 "code" => "ValidationException",
-                "message" => "Paramters did not pass validation",
+                "message" => "Parameters did not pass validation",
                 "target" => "parameters",
                 "details" => [
                     [
@@ -209,7 +209,7 @@ class QueryControllerTest extends \TestCase
         $call->seeJsonEquals([
             "error" => [
                 "code" => "ValidationException",
-                "message" => "Paramters did not pass validation",
+                "message" => "Parameters did not pass validation",
                 "target" => "parameters",
                 "details" => [
                     [
@@ -239,7 +239,7 @@ class QueryControllerTest extends \TestCase
         $call->seeJsonEquals([
             "error" => [
                 "code" => "ValidationException",
-                "message" => "Paramters did not pass validation",
+                "message" => "Parameters did not pass validation",
                 "target" => "parameters",
                 "details" => [
                     [
@@ -264,7 +264,7 @@ class QueryControllerTest extends \TestCase
         $call->seeJsonEquals([
             "error" => [
                 "code" => "ValidationException",
-                "message" => "Paramters did not pass validation",
+                "message" => "Parameters did not pass validation",
                 "target" => "parameters",
                 "details" => [
                     [
@@ -289,7 +289,7 @@ class QueryControllerTest extends \TestCase
         $call->seeJsonEquals([
             "error" => [
                 "code" => "ValidationException",
-                "message" => "Paramters did not pass validation",
+                "message" => "Parameters did not pass validation",
                 "target" => "parameters",
                 "details" => [
                     [
