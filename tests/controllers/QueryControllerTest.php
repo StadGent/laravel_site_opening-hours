@@ -171,7 +171,7 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateOpeninhoursRequiresFromUntilParameters()
+    public function testValidateOpeningHoursRequiresFromUntilParameters()
     {
         $path = $this->assemblePath(['type' => 'openinghours']);
         $call = $this->doRequest('GET', $path);
@@ -201,7 +201,7 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateOpeninhoursFromUntilParametersMustBeVallidDateFormat()
+    public function testValidateOpeningHoursFromUntilParametersMustBeValidDateFormat()
     {
         $path = $this->assemblePath(['type' => 'openinghours', 'from' => 'notADate', 'until' => 'notADate']);
         $call = $this->doRequest('GET', $path);
@@ -231,7 +231,7 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateOpeninhoursFromMustComeBeforUntil()
+    public function testValidateOpeningHoursFromMustComeBeforeUntilOrBeEqualToUntil()
     {
         $path = $this->assemblePath(['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2016-01-01']);
         $call = $this->doRequest('GET', $path);
@@ -244,7 +244,7 @@ class QueryControllerTest extends \TestCase
                 "details" => [
                     [
                         "code" => "NotValidParameter",
-                        "message" => "The until must be a date after from.",
+                        "message" => "The until must be a date after or equal to :date.",
                         "target" => "until",
                     ],
                 ],
@@ -256,7 +256,7 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateOpeninhoursFromUntilParametersMustBeWithinOneYear()
+    public function testValidateOpeningHoursFromUntilParametersMustBeWithinOneYear()
     {
         $path = $this->assemblePath(['type' => 'openinghours', 'from' => '2017-01-01', 'until' => '2018-01-05']);
         $call = $this->doRequest('GET', $path);
@@ -281,7 +281,7 @@ class QueryControllerTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testValidateOpeninhoursWithPeriodRequiresDateParameter()
+    public function testValidateOpeningHoursWithPeriodRequiresDateParameter()
     {
         $path = $this->assemblePath(['type' => 'openinghours', 'period' => 'day']);
         $call = $this->doRequest('GET', $path);
@@ -342,7 +342,7 @@ class QueryControllerTest extends \TestCase
      * @group validation
      * @dataProvider requestDateTypes
      */
-    public function testValidateOpeninhoursDatesCanHandlePHPDateFormats($dateTypes)
+    public function testValidateOpeningHoursDatesCanHandlePHPDateFormats($dateTypes)
     {
         $path = $this->assemblePath(['type' => 'openinghours'] + $dateTypes);
         $call = $this->doRequest('GET', $path);
