@@ -177,7 +177,7 @@ class Handler extends ExceptionHandler
 
     /**
      * ValidationException
-     * Paramters did not pass validatio
+     * Parameters did not pass validatio
      * https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#examples
      *
      * @param ValidationException $exception
@@ -185,7 +185,7 @@ class Handler extends ExceptionHandler
      */
     protected function handleValidationException(ValidationException $exception)
     {
-        $this->errorObj->message = "Paramters did not pass validation";
+        $this->errorObj->message = "Parameters did not pass validation";
         $this->errorObj->target = "parameters";
         $this->errorObj->details = [];
 

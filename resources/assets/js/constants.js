@@ -27,3 +27,7 @@ export const ID_MISSING = 'ID ontbreekt';
 export const COULD_NOT_DENY_ACCESS = 'Toegang kon niet ontzegd worden.';
 export const EVENT_INVALID_RANGE = 'Een event mag niet starten of eindigen buiten de periode van de kalender.';
 export const IS_RECREATEX = 'Recreatex data kan hier niet gewijzigd worden.';
+export const START_AFTER_END = 'De start ligt na het einde.';
+export const START_AFTER_UNTIL = 'De begindatum ligt na de einddatum.';
+export const NAME_CANNOT_BE_EXCEPTION = 'De naam van de kalender kan niet "uitzondering" zijn.';
+export const NO_EVENTS = 'Er zijn geen gebeurtenissen in deze kalender.';
