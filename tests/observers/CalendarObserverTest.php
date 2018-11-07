@@ -16,7 +16,7 @@ class CalendarObserverTest extends \TestCase
     {
         $this->app->singleton('VestaService', function () {
             $mock = $this->createMock(\App\Services\VestaService::class, ['makeSyncJobsForExternalServices']);
-            $mock->expects($this->once())
+            $mock->expects($this->atLeastOnce())
                 ->method('makeSyncJobsForExternalServices');
 
             return $mock;

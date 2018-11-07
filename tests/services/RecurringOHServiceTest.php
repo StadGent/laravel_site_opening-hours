@@ -99,7 +99,7 @@ class RecurringOHServiceTest extends \TestCase
             'start_date' => '2017-01-01',
             'end_date' => '2017-12-31'
         ]);
-        $calendar = factory(Calendar::class)->make(['closinghours' => 1]);
+        $calendar = factory(Calendar::class)->make(['closinghours' => 1, 'published' => 1]);
         $event = factory(Event::class)->make([
             'start_date' => '2017-01-01 08:00:00',
             'end_date' => '2017-01-01 17:00:00',
@@ -117,7 +117,7 @@ class RecurringOHServiceTest extends \TestCase
             'start_date' => '2018-01-01',
             'end_date' => '2018-12-31',
         ]);
-        $calendar2 = factory(Calendar::class)->make(['openinghours_id' => $openinghour2->id]);
+        $calendar2 = factory(Calendar::class)->make(['openinghours_id' => $openinghour2->id, 'published' => 1]);
         $openinghour2->calendars()->save($calendar2);
 
         $event2 = factory(Event::class)->make([
@@ -140,12 +140,12 @@ class RecurringOHServiceTest extends \TestCase
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<b>BALIE</b>
+<h4>BALIE</h4>
 <div>
-<p>maandag tot vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot en met vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
 </div>
 <div>
-<p>maandag tot vrijdag: van 8 tot 12 uur en van 13 tot 17 uur, geldig vanaf maandag 1 januari 2018</p>
+<p>maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur, geldig vanaf maandag 1 januari 2018</p>
 </div>
 EOL;
 
@@ -171,7 +171,7 @@ EOL;
             'start_date' => '2017-01-01',
             'end_date' => '2017-12-31'
         ]);
-        $calendar = factory(Calendar::class)->make(['closinghours' => 1]);
+        $calendar = factory(Calendar::class)->make(['closinghours' => 1, 'published' => 1]);
         $event = factory(Event::class)->make();
         $service->channels()->save($channel);
         $channel->openinghours()->save($openinghour);
@@ -184,7 +184,7 @@ EOL;
             'start_date' => '2018-01-01',
             'end_date' => '2018-12-31',
         ]);
-        $calendar2 = factory(Calendar::class)->make(['openinghours_id' => $openinghour2->id]);
+        $calendar2 = factory(Calendar::class)->make(['openinghours_id' => $openinghour2->id, 'published' => 1]);
         $openinghour2->calendars()->save($calendar2);
 
         $event2 = factory(Event::class)->make([
@@ -198,9 +198,9 @@ EOL;
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<b>BALIE</b>
+<h4>BALIE</h4>
 <div>
-<p>maandag tot vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot en met vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
 </div>
 EOL;
 
