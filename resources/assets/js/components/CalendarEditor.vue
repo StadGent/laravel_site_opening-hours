@@ -152,7 +152,6 @@
                 return this.cal.events
             },
             disabled() {
-                console.log(inert(this.events));
                 if (this.$root.isRecreatex) {
                     return IS_RECREATEX
                 }
