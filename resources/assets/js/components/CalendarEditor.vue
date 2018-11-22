@@ -103,7 +103,7 @@
     import {MONTHS} from '../mixins/filters.js'
     import {rruleToStarts, keepRuleWithin} from '../util/rrule-helpers.js'
     import Services from '../mixins/services.js'
-    import {EVENT_INVALID_RANGE, IS_RECREATEX, NAME_CANNOT_BE_EXCEPTION, START_AFTER_END, START_AFTER_UNTIL} from "../constants";
+    import {EVENT_INVALID_RANGE, IS_RECREATEX, NAME_CANNOT_BE_EXCEPTION, NO_EVENTS, START_AFTER_END, START_AFTER_UNTIL} from "../constants";
 
     const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
 
