@@ -15,7 +15,10 @@ class OpeninghoursTableSeeder extends Seeder
      */
     public function run()
     {
-        $channels = Channel::all();
+        $channels = Channel::whereNotNull('id')
+            ->get()
+            ->values();
+
         foreach ($channels as $channel) {
             $channel->openinghours()->save(factory(Openinghours::class)->make());
         }
