@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae29d011d4884b566448608ba3fc044f",
+    "content-hash": "e9498243b27c7797735ccff4d0f2cc88",
     "packages": [
         {
             "name": "adoy/fastcgi-client",
@@ -4819,6 +4819,52 @@
                 "environment"
             ],
             "time": "2016-09-01T10:05:43+00:00"
+        },
+        {
+            "name": "wildside/userstamps",
+            "version": "0.5.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/WildSideUK/Laravel-Userstamps.git",
+                "reference": "af6b1fc0ceaa0ce13479712e0c5ba6fe845b3d47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/WildSideUK/Laravel-Userstamps/zipball/af6b1fc0ceaa0ce13479712e0c5ba6fe845b3d47",
+                "reference": "af6b1fc0ceaa0ce13479712e0c5ba6fe845b3d47",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*",
+                "php": ">=5.5.9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wildside\\Userstamps\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "WildSide",
+                    "email": "hello@wildside.uk",
+                    "homepage": "https://wildside.uk"
+                }
+            ],
+            "description": "Eloquent trait to automatically maintain created_by and updated_by (and deleted_by when using SoftDeletes) on your models",
+            "keywords": [
+                "created_by",
+                "deleted_by",
+                "eloquent",
+                "laravel",
+                "updated_by",
+                "userstamps"
+            ],
+            "time": "2018-08-31T09:53:18+00:00"
         },
         {
             "name": "zendframework/zend-diactoros",
