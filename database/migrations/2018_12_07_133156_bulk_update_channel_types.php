@@ -40,7 +40,7 @@ class BulkUpdateChannelTypes extends Migration
             ]);
 
         //• Indien na bovenstaande regels het eerste kanaal van een dienst nog geen type heeft, dan wordt het eerste kanaal gemarkeerd als type “Algemeen”
-        foreach (Service::all() as $service) {
+        foreach (Service::has('channels')->get() as $service) {
             $firstChannel = $service->channels[0];
             if ($firstChannel->type === null) {
                 $firstChannel->type_id = $general;
