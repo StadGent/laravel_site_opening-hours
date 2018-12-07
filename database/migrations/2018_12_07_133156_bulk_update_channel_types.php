@@ -25,21 +25,29 @@ class BulkUpdateChannelTypes extends Migration
             ->where('name', 'like', 'Na afspraak')
             ->first()->id;
 
-        //• Kanalen genaamd “Algemeen” zijn van het type “Algemeen”
+        /**
+         * Channels with label “Algemeen” are of type “Algemeen”.
+         */
         DB::table('channels')->where('label', 'like', '%algemeen%')
             ->where('type_id', '=', null)
             ->update([
                 'type_id' => $general,
             ]);
 
-        //• Kanalen met “afspraak” (case insensitive) in de naam zijn van het type “Op afspraak”
+        /**
+         * Channels with label “afspraak” (case insensitive)
+         * are of type “Op afspraak”.
+         */
         DB::table('channels')->where('label', 'like', '%afspraak%')
             ->where('type_id', '=', null)
             ->update([
                 'type_id' => $appointment,
             ]);
 
-        //• Indien na bovenstaande regels het eerste kanaal van een dienst nog geen type heeft, dan wordt het eerste kanaal gemarkeerd als type “Algemeen”
+        /**
+         * If the first channel of a service still has no type,
+         * the type is “Algemeen”.
+         */
         foreach (Service::has('channels')->get() as $service) {
             $firstChannel = $service->channels[0];
             if ($firstChannel->type === null) {
