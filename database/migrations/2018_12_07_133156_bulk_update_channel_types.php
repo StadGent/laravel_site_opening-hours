@@ -29,7 +29,7 @@ class BulkUpdateChannelTypes extends Migration
          * Channels with label “Algemeen” are of type “Algemeen”.
          */
         DB::table('channels')->where('label', 'like', '%algemeen%')
-            ->where('type_id', '=', null)
+            ->whereNull('type_id')
             ->update([
                 'type_id' => $general,
             ]);
@@ -39,7 +39,7 @@ class BulkUpdateChannelTypes extends Migration
          * are of type “Op afspraak”.
          */
         DB::table('channels')->where('label', 'like', '%afspraak%')
-            ->where('type_id', '=', null)
+            ->whereNull('type_id')
             ->update([
                 'type_id' => $appointment,
             ]);
