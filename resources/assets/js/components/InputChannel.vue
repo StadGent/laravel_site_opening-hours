@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input type="text" class="form-control" v-model="parent[prop]" placeholder="Algemeen, na afspraak, tolk aanwezig, ..." list="channel-label">
+    <input type="text" :id="id" class="form-control" v-model="parent[prop]" placeholder="Algemeen, na afspraak, tolk aanwezig, ..." list="channel-label">
     <datalist id="channel-label">
       <option>Algemeen</option>
       <option>Chat</option>
@@ -21,6 +21,6 @@
 
 <script>
 export default {
-  props: ['parent', 'prop']
+  props: ['parent', 'prop', 'id']
 }
 </script>

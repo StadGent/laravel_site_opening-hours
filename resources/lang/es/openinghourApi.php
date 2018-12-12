@@ -12,12 +12,16 @@ return [
     'OPEN' => 'abierto',
     'CLOSED' => 'cerrado',
     'AND' => 'y',
+    'Algemeen' => 'open',
+    'Na afspraak' => 'con cita',
 
     'FROM_HOUR' => 'de',
     'UNTIL_HOUR' => 'a',
     'FROM_DATA' => 'del',
     'UNTILL_DATA' => 'al',
     'SHORT_HOUR' => 'h',
+    'LONG_HOUR' => '',
+    'HH:MM' => ':HH::MM',
 
     'day_0' => 'Domingo',
     'day_1' => 'Lunes',

@@ -51,6 +51,7 @@ export default {
       this.modal.text = 'newChannel';
       this.modal.label = '';
       this.modal.srv = srv;
+      this.modal.type_id = 0;
     },
     newVersion(srv) {
       this.modal = Object.assign(this.modal, createVersion());

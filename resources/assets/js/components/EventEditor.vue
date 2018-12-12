@@ -301,9 +301,6 @@
                     if (!/\d\d:\d\d/.test(v)) {
                         return;
                     }
-                    if (this.eventEndTime === '00:00') {
-                        this.eventEndTime = '23:59';
-                    }
                     if (this.eventEndTime < v) {
                         this.warnTime('.inp-startTime');
                     }
@@ -318,9 +315,6 @@
                     v = stringToHM(v);
                     if (!/\d\d:\d\d/.test(v)) {
                         return;
-                    }
-                    if (v === '00:00') {
-                        v = '23:59';
                     }
                     if (this.eventStartTime >= v) {
                         this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + v + ':00');

@@ -56,7 +56,7 @@ class ChannelController extends Controller
     {
         $input = $request->input();
 
-        if (!$channel->update(['label' =>$input['label']])) {
+        if (!$channel->update($input)) {
             return response()->json(
                 ['message' => 'Something went wrong while updating the channel, check the logs.'],
                 400

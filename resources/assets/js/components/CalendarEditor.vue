@@ -91,6 +91,7 @@
                 </button>
                 <button type="button" class="btn btn-primary" @click="save" v-else>{{ cal.published ? 'Bewaar' : 'Publiceer'}}</button>
             </div>
+            <p class="alert alert-warning" v-if="disabled">{{ disabled }}</p>
         </div>
     </form>
 </template>
@@ -102,7 +103,7 @@
     import {MONTHS} from '../mixins/filters.js'
     import {rruleToStarts, keepRuleWithin} from '../util/rrule-helpers.js'
     import Services from '../mixins/services.js'
-    import {EVENT_INVALID_RANGE, IS_RECREATEX} from "../constants";
+    import {EVENT_INVALID_RANGE, IS_RECREATEX, NAME_CANNOT_BE_EXCEPTION, NO_EVENTS, START_AFTER_END, START_AFTER_UNTIL} from "../constants";
 
     const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
 
@@ -155,14 +156,14 @@
                     return IS_RECREATEX
                 }
 
-                // Start before end
+                // Start after end
                 if (this.events.filter(e => e.start_date > e.end_date).length) {
-                    return true
+                    return START_AFTER_END
                 }
 
-                // Start before until
+                // Start after until
                 if (this.events.filter(e => e.start_date.slice(0, 10) > e.until.slice(0, 10)).length) {
-                    return true
+                    return START_AFTER_UNTIL
                 }
 
                 // Start before versionStart or end after versionEnd
@@ -172,12 +173,12 @@
 
                 // Name cannot be 'Uitzondering'
                 if (this.cal.label === 'Uitzondering' && (!this.calLabel || this.calLabel === 'Uitzondering')) {
-                    return true
+                    return NAME_CANNOT_BE_EXCEPTION
                 }
 
                 // Cannot save a calendar with no events
                 if (!this.showPresets && this.events.length === 0) {
-                    return true;
+                    return NO_EVENTS;
                 }
 
                 return false;
@@ -261,7 +262,6 @@
                             if (start < versionStart) {
                                 start.setFullYear(start.getFullYear() + 1)
                             }
-//
                             let event = createEvent({
                                 start_date: start,
                                 until: toDatetime(this.$parent.version.end_date),
