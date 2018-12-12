@@ -4,6 +4,10 @@
     "label": "Balie",
     "serviceId": 1,
     "createdAt": "",
-    "updatedAt": ""
+    "updatedAt": "",
+    "type": {
+      "id": 2,
+      "name": "Algemeen"
+    }
   }
 ]

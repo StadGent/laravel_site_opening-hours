@@ -28,7 +28,7 @@ class PresetsController extends \TestCase
         $this->assertEquals([
             'error' => [
                 'code' => 'ValidationException',
-                'message' => 'Paramters did not pass validation',
+                'message' => 'Parameters did not pass validation',
                 'target' => 'parameters',
                 'details' => [
                     0 => [

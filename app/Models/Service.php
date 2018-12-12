@@ -32,7 +32,7 @@ class Service extends Model
     /**
      * Child Objects Channel
      *
-     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function channels()
     {
@@ -42,7 +42,7 @@ class Service extends Model
     /**
      * Return roles for each service that the user belongs to
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users()
     {

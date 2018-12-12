@@ -37,6 +37,8 @@ class OpeningHoursScenarioTest extends \TestCase
                 'channel' => $channel->label,
                 'channelId' => $channel->id,
                 'openNow' => ['status' => true, 'label' => 'open'],
+                'channelTypeLabel' => $channel->type->name,
+                'channelTypeId' => $channel->type->id
             ];
         }
 
@@ -57,6 +59,8 @@ class OpeningHoursScenarioTest extends \TestCase
                 'channel' => $channel->label,
                 'channelId' => $channel->id,
                 'openNow' => ['status' => false, 'label' => 'gesloten'],
+                'channelTypeLabel' => $channel->type->name,
+                'channelTypeId' => $channel->type->id
             ];
         }
         $this->assertEquals($expected, $content);
@@ -94,7 +98,9 @@ class OpeningHoursScenarioTest extends \TestCase
                             1 => ['from' => '13:00', 'until' => '17:00']
                         ],
                     ],
-                ]
+                ],
+                'channelTypeLabel' => $channel->type->name,
+                'channelTypeId' => $channel->type->id
             ];
         }
         $this->assertEquals($expected, $content);
@@ -123,6 +129,8 @@ class OpeningHoursScenarioTest extends \TestCase
                         ],
                     ],
                 ],
+                'channelTypeLabel' => $channel->type->name,
+                'channelTypeId' => $channel->type->id
             ];
         }
         $this->assertEquals($expected, $content);
@@ -144,6 +152,8 @@ class OpeningHoursScenarioTest extends \TestCase
                 'openinghours' => [
                     ['date' => '2017-09-04', 'open' => false, 'hours' => []]
                 ],
+                'channelTypeLabel' => $channel->type->name,
+                'channelTypeId' => $channel->type->id
             ];
         }
         $this->assertEquals($expected, $content);
@@ -204,6 +214,8 @@ class OpeningHoursScenarioTest extends \TestCase
                     ],
                     ['date' => '2017-09-10', 'open' => false, 'hours' => []],
                 ],
+                'channelTypeLabel' => $channel->type->name,
+                'channelTypeId' => $channel->type->id
             ];
         }
         $this->assertEquals($expected, $content);

@@ -42,16 +42,28 @@ class ChannelController extends Controller
      * Get Subset of channels from Service
      *
      * @param Service $service
-     * @return Response
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
      */
-    public function getFromService(Service $service)
+    public function getFromService(Service $service, Request $request)
     {
-        if($service->draft){
+        if ($service->draft) {
             $exception = new ModelNotFoundException();
             $exception->setModel(Service::class);
             throw $exception;
         }
 
-        return response()->collection(new ChannelTransformer(), $service->channels);
+        if ($request['type']) {
+            if ($request['type'] === 'null') {
+                return response()->collection(new ChannelTransformer(),
+                    $service->channels->where('type_id', null));
+            }
+            return response()->collection(new ChannelTransformer(),
+                $service->channels->where('type_id', $request['type']));
+        }
+
+        return response()->collection(new ChannelTransformer(),
+            $service->channels);
     }
 }
