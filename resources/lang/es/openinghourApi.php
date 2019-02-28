@@ -23,6 +23,8 @@ return [
     'LONG_HOUR' => '',
     'HH:MM' => ':HH::MM',
 
+    'DAY_OF_THE_MONTH_POSTFIX' => '',
+
     'day_0' => 'Domingo',
     'day_1' => 'Lunes',
     'day_2' => 'Martes',
