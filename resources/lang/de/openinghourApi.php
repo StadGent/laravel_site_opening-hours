@@ -19,9 +19,11 @@ return [
     'UNTIL_HOUR' => 'bis',
     'FROM_DATA' => 'vom',
     'UNTIL_DATA' => 'bis zum',
-    'SHORT_HOUR' => 'Urh',
+    'SHORT_HOUR' => 'Uhr',
     'LONG_HOUR' => '',
     'HH:MM' => ':HH::MM',
+
+    'DAY_OF_MONTH' => ':DAY.',
 
     'day_0' => 'Sonntag',
     'day_1' => 'Montag',
