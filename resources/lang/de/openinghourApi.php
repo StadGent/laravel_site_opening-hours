@@ -23,6 +23,8 @@ return [
     'LONG_HOUR' => '',
     'HH:MM' => ':HH::MM',
 
+    'DAY_OF_MONTH' => ':DAY.',
+
     'day_0' => 'Sonntag',
     'day_1' => 'Montag',
     'day_2' => 'Dienstag',
