@@ -37,7 +37,7 @@ if (isset($type) && $isOpen) {
             <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span class="openinghours--date-between">, </span>
         @endif
         <span class="openinghours--date-day-of-week"><link property="dayOfWeek" href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}</span>
-        <span class="openinghours--date-day">{{ $dayOfMonth }}</span>
+        <span class="openinghours--date-day">{{ $dayOfMonth }}@lang('openinghourApi.DAY_OF_MONTH_POSTFIX')</span>
         <span class="openinghours--date-month">{{ $translatedMonthName }}</span>
         @if(!$isSameYear)
             <span class="openinghours--date-year">{{ $date->year }}</span>
