@@ -28,57 +28,91 @@
                            placeholder="Brugdagen, collectieve sluitingsdagen, ..." autofocus>
                     <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
                 </div>
-                <transition name="slideup">
-                    <div v-if="showPresets">
-                        <h3>Voeg voorgedefineerde momenten toe</h3>
-                        <p class="text-muted">
-                            Klik op
-                            <em>Bewaar</em>
-                            om ook andere momenten toe te voegen
-                        </p>
-                        <div class="form-group">
-                            <div v-if="presets && presets.recurring">
-                                <h4>Herhalende vakantiedagen</h4>
-                                <div class="checkbox checkbox--preset" v-for="preset in presets.recurring">
-                                    <label>
+                <div v-if="showPresets">
+                    <h3>Voeg voorgedefineerde momenten toe</h3>
+                    <p class="text-muted">
+                        Klik op
+                        <em>Bewaar</em>
+                        om ook andere momenten toe te voegen
+                    </p>
+                    <div class="form-group">
+                        <div v-if="presets && presets.recurring">
+                            <h4>Herhalende vakantiedagen</h4>
+                            <div class="checkbox checkbox--preset" v-for="preset in presets.recurring">
+                                <label>
+                                    <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
+                                    <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
+                                    {{ preset.label }}
+                                </label>
+                            </div>
+                        </div>
+                        <div v-if="presets && presets.unique">
+                            <h4>Unieke vakantiedagen</h4>
+                            <div class="checkbox checkbox--preset"
+                                 v-if="presets.collection && presets.collection.length">
+                                <h5 class="text-muted">Selecteer voor elk jaar</h5>
+                                <label v-for="label in presets.collection">
+                                    <input type="checkbox" name="preset" :value="{label, multiple: true}"
+                                           @change="recurringClicked($event.target.checked, {label, multiple: true})">
+                                    {{ label }}
+                                </label>
+                            </div>
+                            <div class="calendar-editor__buttons" style="margin-top: 1rem" v-if="!showUnique">
+                                <button type="button" class="btn btn-default btn-sm btn-block"
+                                        @click="showUnique = true">Toon alle jaren
+                                </button>
+                                <hr>
+                            </div>
+                            <div v-if="showUnique">
+                                <div class="checkbox checkbox--preset" v-for="(year,key) in presets.unique">
+                                    <hr>
+                                    <h5 class="text-muted">
+                                        Geldig voor jaar {{ key }}
+                                    </h5>
+                                    <label v-for="preset in year">
                                         <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
                                         <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
                                         {{ preset.label }}
                                     </label>
                                 </div>
                             </div>
-                            <div v-if="presets && presets.unique">
-                                <h4>Unieke vakantiedagen</h4>
-                                <div class="checkbox checkbox--preset"
-                                     v-if="presets.collection && presets.collection.length">
-                                    <h5 class="text-muted">Selecteer voor elk jaar</h5>
-                                    <label v-for="label in presets.collection">
-                                        <input type="checkbox" name="preset" :value="{label, multiple: true}"
-                                               @change="recurringClicked($event.target.checked, {label, multiple: true})">
-                                        {{ label }}
-                                    </label>
-                                </div>
-                                <div class="calendar-editor__buttons" style="margin-top: 1rem" v-if="!showUnique">
-                                    <button type="button" class="btn btn-default btn-sm btn-block" @click="showUnique = true">Toon alle jaren</button>
-                                    <hr>
-                                </div>
-                                <div v-if="showUnique">
-                                    <div class="checkbox checkbox--preset" v-for="(year,key) in presets.unique">
-                                        <hr>
-                                        <h5 class="text-muted">
-                                            Geldig voor jaar {{ key }}
-                                        </h5>
-                                        <label v-for="preset in year">
-                                            <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
-                                            <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
-                                            {{ preset.label }}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                </transition>
+                </div>
+                <div v-else-if="showDefaults">
+                    <h3>Stel de standaardwaarden in</h3>
+                    <div class="form-group">
+                        <fieldset class="btn-toggle">
+                            <input type="radio" id="closed_true" name="closinghours" class="visuallyhidden"
+                                   @change="toggleClosing"
+                                   :checked="cal.closinghours"><label for="closed_true">Gesloten</label>
+                            <input type="radio" id="closed_false" name="closinghours" class="visuallyhidden"
+                                   @change="toggleClosing"
+                                   :checked="!cal.closinghours"><label for="closed_false">Open</label>
+                        </fieldset>
+                    </div>
+                    <div>
+                        <div v-if="!cal.closinghours" class="form-group row">
+                            <div class="col-xs-3">
+                                <label>Van</label>
+                                <input type="time" class="form-control control-time inp-startTime"
+                                       aria-label="Van"
+                                       v-model="defaultStartTime"
+                                       placeholder="_ _ : _ _">
+                            </div>
+                            <div class="col-xs-3">
+                                <label :aria-describedby="`next_day_${this._uid}`">tot</label>
+                                <input type="time" class="form-control control-time inp-endTime"
+                                       aria-label="tot"
+                                       v-model="defaultEndTime"
+                                       placeholder="_ _ : _ _">
+                            </div>
+                            <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`"
+                                  v-if="defaultStartTime >= defaultEndTime">volgende dag</span>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
             </div>
 
             <!-- Other calendars have more options -->
@@ -109,9 +143,13 @@
                 </button>
                 <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
                 <button type="submit" class="btn btn-primary" @click.prevent="showPresets = true"
-                        v-if="cal.label == 'Uitzondering' && !showPresets">Volgende
+                        v-if="cal.label == 'Uitzondering' && !showPresets && !showDefaults">Volgende
+                </button>
+                <button type="submit" class="btn btn-primary" @click.prevent="showDefaults = true; showPresets = false"
+                        v-else-if="cal.label == 'Uitzondering' && cal.events.length && showPresets">Volgende
                 </button>
                 <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
+
                 <button type="submit" class="btn btn-primary" @click="saveLabel"
                         v-else-if="cal.label == 'Uitzondering'">{{ cal.published ? 'Bewaar' : 'Publiceer'}}
                 </button>
@@ -127,7 +165,7 @@
 <script>
     import EventEditor from '../components/EventEditor.vue'
     import {createEvent, createFirstEvent} from '../defaults.js'
-    import {Hub, toDatetime} from '../lib.js'
+    import {Hub, toDatetime, nextDateString} from '../lib.js'
     import {MONTHS} from '../mixins/filters.js'
     import Services from '../mixins/services.js'
     import {
@@ -154,7 +192,6 @@
         props: ['cal', 'layer'],
         data() {
             return {
-                // options: {}
                 calLabel: '',
                 days: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'],
                 fullDays,
@@ -162,6 +199,9 @@
                 showPresets: false,
                 showUnique: false,
                 storedPresets: null,
+                defaultStartTime: '09:00',
+                defaultEndTime: '17:00',
+                showDefaults: false
             }
         },
         computed: {
@@ -289,6 +329,19 @@
                 }
                 this.showPresets = false;
                 this.cal.label = this.calLabel;
+
+                if (this.cal.events && this.cal.events.length && /\d\d:\d\d/.test(this.defaultStartTime) && /\d\d:\d\d/.test(this.defaultEndTime)) {
+                    this.cal.events.forEach(event => {
+                        event.start_date = event.start_date.slice(0, 11) + this.defaultStartTime + ':00';
+                        if (this.defaultStartTime >= this.defaultEndTime) {
+                            event.end_date = nextDateString(event.start_date.slice(0, 11) + this.defaultEndTime + ':00');
+                        }
+                        else {
+                            // Force end_date to be on same date as start_date
+                            event.end_date = event.start_date.slice(0, 11) + this.defaultEndTime + ':00';
+                        }
+                    })
+                }
                 Hub.$emit('createCalendar', this.cal)
             },
             rmCalendar() {

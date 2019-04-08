@@ -170,7 +170,6 @@
 
             <!-- Openinghours -->
             <div v-if="!closinghours" class="form-group">
-
                 <div class="col-xs-3">
                     <label>Van</label>
                     <input type="text" class="form-control control-time inp-startTime"
