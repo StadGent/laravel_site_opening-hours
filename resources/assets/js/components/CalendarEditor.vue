@@ -28,7 +28,6 @@
                            placeholder="Brugdagen, collectieve sluitingsdagen, ..." autofocus>
                     <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
                 </div>
-                <br>
                 <transition name="slideup">
                     <div v-if="showPresets">
                         <h3>Voeg voorgedefineerde momenten toe</h3>
@@ -50,15 +49,31 @@
                             </div>
                             <div v-if="presets && presets.unique">
                                 <h4>Unieke vakantiedagen</h4>
-                                <div class="checkbox checkbox--preset" v-for="(year,key) in presets.unique">
-                                    <h5 class="text-muted">
-                                        Geldig voor jaar {{ key }}
-                                    </h5>
-                                    <label v-for="preset in year">
-                                        <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
-                                        <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
-                                        {{ preset.label }}
+                                <div class="checkbox checkbox--preset"
+                                     v-if="presets.collection && presets.collection.length">
+                                    <h5 class="text-muted">Selecteer voor elk jaar</h5>
+                                    <label v-for="label in presets.collection">
+                                        <input type="checkbox" name="preset" :value="{label, multiple: true}"
+                                               @change="recurringClicked($event.target.checked, {label, multiple: true})">
+                                        {{ label }}
                                     </label>
+                                </div>
+                                <div class="calendar-editor__buttons" style="margin-top: 1rem" v-if="!showUnique">
+                                    <button type="button" class="btn btn-default btn-sm btn-block" @click="showUnique = true">Toon alle jaren</button>
+                                    <hr>
+                                </div>
+                                <div v-if="showUnique">
+                                    <div class="checkbox checkbox--preset" v-for="(year,key) in presets.unique">
+                                        <hr>
+                                        <h5 class="text-muted">
+                                            Geldig voor jaar {{ key }}
+                                        </h5>
+                                        <label v-for="preset in year">
+                                            <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
+                                            <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
+                                            {{ preset.label }}
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -145,6 +160,7 @@
                 fullDays,
                 presetSelection: [],
                 showPresets: false,
+                showUnique: false,
                 storedPresets: null,
             }
         },
@@ -153,12 +169,19 @@
                 if (!this.storedPresets) {
                     Services.methods.fetchPresets(this.$root.routeVersion.start_date, this.$root.routeVersion.end_date,
                         data => {
+                            data.collection = [];
                             if (data.recurring) {
                                 data.recurring.sort((a, b) => a.start_date > b.start_date ? 1 : -1);
                             }
                             if (data.unique) {
                                 Object.keys(data.unique).forEach(key => {
-                                    data.unique[key].sort((a, b) => a.start_date > b.start_date ? 1 : -1);
+                                    data.unique[key]
+                                        .sort((a, b) => a.start_date > b.start_date ? 1 : -1)
+                                        .forEach(preset => {
+                                            if (data.collection.indexOf(preset.label) === -1) {
+                                                data.collection.push(preset.label);
+                                            }
+                                        });
                                 })
                             }
                             this.storedPresets = data;
@@ -209,6 +232,22 @@
             }
         },
         methods: {
+            recurringClicked(checked, value) {
+                Object.values(this.presets.unique).forEach(
+                    presets => {
+                        presets.filter(preset => preset.label === value.label).forEach(preset => {
+                            const isInSelection = this.presetSelection.indexOf(preset);
+                            if (checked && isInSelection === -1) {
+                                this.presetSelection.push(preset);
+                            }
+                            if (!checked && isInSelection !== -1) {
+                                this.presetSelection.splice(isInSelection, 1);
+                            }
+                        })
+                    }
+                );
+
+            },
             toggleClosing() {
                 this.$set(this.cal, 'closinghours', !this.cal.closinghours)
             },
