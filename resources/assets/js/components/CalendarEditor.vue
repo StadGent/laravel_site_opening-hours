@@ -38,17 +38,28 @@
                             om ook andere momenten toe te voegen
                         </p>
                         <div class="form-group">
-                            <h4>Herhalende vakantiedagen</h4>
-                            <div class="checkbox checkbox--preset" v-for="(preset, index) in presets">
-                                <hr v-if="preset.group"/>
-                                <p class="text-muted" v-if="preset.group">
-                                    Geldig voor jaar {{preset.group}}
-                                </p>
-                                <label>
-                                    <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
-                                    <input type="checkbox" name="preset" :value="index" v-model="presetSelection">
-                                    {{ preset.label }}
-                                </label>
+                            <div v-if="presets && presets.recurring">
+                                <h4>Herhalende vakantiedagen</h4>
+                                <div class="checkbox checkbox--preset" v-for="preset in presets.recurring">
+                                    <label>
+                                        <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
+                                        <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
+                                        {{ preset.label }}
+                                    </label>
+                                </div>
+                            </div>
+                            <div v-if="presets && presets.unique">
+                                <h4>Unieke vakantiedagen</h4>
+                                <div class="checkbox checkbox--preset" v-for="(year,key) in presets.unique">
+                                    <h5 class="text-muted">
+                                        Geldig voor jaar {{ key }}
+                                    </h5>
+                                    <label v-for="preset in year">
+                                        <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
+                                        <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
+                                        {{ preset.label }}
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -89,7 +100,9 @@
                 <button type="submit" class="btn btn-primary" @click="saveLabel"
                         v-else-if="cal.label == 'Uitzondering'">{{ cal.published ? 'Bewaar' : 'Publiceer'}}
                 </button>
-                <button type="button" class="btn btn-primary" @click="save" v-else>{{ cal.published ? 'Bewaar' : 'Publiceer'}}</button>
+                <button type="button" class="btn btn-primary" @click="save" v-else>{{ cal.published ? 'Bewaar' :
+                    'Publiceer'}}
+                </button>
             </div>
             <p class="alert alert-warning" v-if="disabled">{{ disabled }}</p>
         </div>
@@ -99,11 +112,17 @@
 <script>
     import EventEditor from '../components/EventEditor.vue'
     import {createEvent, createFirstEvent} from '../defaults.js'
-    import {cleanEmpty, Hub, toDatetime} from '../lib.js'
+    import {Hub, toDatetime} from '../lib.js'
     import {MONTHS} from '../mixins/filters.js'
-    import {rruleToStarts, keepRuleWithin} from '../util/rrule-helpers.js'
     import Services from '../mixins/services.js'
-    import {EVENT_INVALID_RANGE, IS_RECREATEX, NAME_CANNOT_BE_EXCEPTION, NO_EVENTS, START_AFTER_END, START_AFTER_UNTIL} from "../constants";
+    import {
+        EVENT_INVALID_RANGE,
+        IS_RECREATEX,
+        NAME_CANNOT_BE_EXCEPTION,
+        NO_EVENTS,
+        START_AFTER_END,
+        START_AFTER_UNTIL
+    } from "../constants";
 
     const fullDays = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
 
@@ -134,15 +153,14 @@
                 if (!this.storedPresets) {
                     Services.methods.fetchPresets(this.$root.routeVersion.start_date, this.$root.routeVersion.end_date,
                         data => {
-                            data.sort((a, b) => a.start_date > b.start_date ? 1 : -1);
-
-                            for (let i = data.length - 2; i >= 0; i--) {
-                                const year = (data[i + 1].start_date || '').slice(0, 4);
-                                if (year !== (data[i].start_date || '').slice(0, 4)) {
-                                    data[i + 1].group = year;
-                                }
+                            if (data.recurring) {
+                                data.recurring.sort((a, b) => a.start_date > b.start_date ? 1 : -1);
                             }
-
+                            if (data.unique) {
+                                Object.keys(data.unique).forEach(key => {
+                                    data.unique[key].sort((a, b) => a.start_date > b.start_date ? 1 : -1);
+                                })
+                            }
                             this.storedPresets = data;
                         })
                 }
@@ -242,7 +260,7 @@
             this.RRule = RRule || {};
         },
         mounted() {
-            this.$set(this.cal, 'closinghours', !!this.cal.closinghours)
+            this.$set(this.cal, 'closinghours', !!this.cal.closinghours);
             if (!this.cal.events) {
                 this.$set(this.cal, 'events', [])
             }
@@ -250,10 +268,8 @@
         watch: {
             presetSelection(selection) {
                 this.cal.events = [];
-
                 selection
-                    .map(s => this.presets[s])
-                    .forEach(({start_date, rrule, until, ended}) => {
+                    .forEach(({start_date, rrule, ended}) => {
                         // Repeating events
                         if (rrule) {
                             const start = toDatetime(start_date);
@@ -279,7 +295,7 @@
                                 rrule: 'FREQ=DAILY'
                             }))
                         }
-                    })
+                    });
             }
         },
         filters: {
