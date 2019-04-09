@@ -202,7 +202,7 @@
     import MultiDaySelect from '../components/MultiDaySelect.vue'
     import Pikaday from '../components/Pikaday.vue'
 
-    import {cleanEmpty, toTime, toDatetime, dateAfter} from '../lib.js'
+    import {toTime, toDatetime} from '../lib.js'
     import {stringToHM} from '../util/stringToHM'
     import {nextDateString} from "../lib";
 

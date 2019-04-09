@@ -2,7 +2,6 @@
     <form class="calendar-editor" @submit.prevent>
         <div class="calendar-editor__fields">
             <div class="cal-img top-right" :class="'layer-'+cal.layer"></div>
-
             <!-- First calendar is always weekly -->
             <div v-if="!cal.layer">
                 <h3>Stel de openingsuren in voor kanaal <strong>{{ $root.routeChannel.label}}</strong>
@@ -41,7 +40,10 @@
                             <div class="checkbox checkbox--preset" v-for="preset in presets.recurring">
                                 <label>
                                     <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
-                                    <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
+                                    <input type="checkbox" name="preset"
+                                           :value="preset" v-model="presetSelection"
+                                           @change="toggleRepeating($event.target.checked, preset)"
+                                    >
                                     {{ preset.label }}
                                 </label>
                             </div>
@@ -71,7 +73,8 @@
                                     </h5>
                                     <label v-for="preset in year">
                                         <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
-                                        <input type="checkbox" name="preset" :value="preset" v-model="presetSelection">
+                                        <input type="checkbox" name="preset" :value="preset" v-model="presetSelection"
+                                               @change="toggleUnique($event.target.checked, preset)">
                                         {{ preset.label }}
                                     </label>
                                 </div>
@@ -79,40 +82,10 @@
                         </div>
                     </div>
                 </div>
-                <div v-else-if="showDefaults">
-                    <h3>Stel de standaardwaarden in</h3>
-                    <div class="form-group">
-                        <fieldset class="btn-toggle">
-                            <input type="radio" id="closed_true" name="closinghours" class="visuallyhidden"
-                                   @change="toggleClosing"
-                                   :checked="cal.closinghours"><label for="closed_true">Gesloten</label>
-                            <input type="radio" id="closed_false" name="closinghours" class="visuallyhidden"
-                                   @change="toggleClosing"
-                                   :checked="!cal.closinghours"><label for="closed_false">Open</label>
-                        </fieldset>
-                    </div>
-                    <div>
-                        <div v-if="!cal.closinghours" class="form-group row">
-                            <div class="col-xs-3">
-                                <label>Van</label>
-                                <input type="time" class="form-control control-time inp-startTime"
-                                       aria-label="Van"
-                                       v-model="defaultStartTime"
-                                       placeholder="_ _ : _ _">
-                            </div>
-                            <div class="col-xs-3">
-                                <label :aria-describedby="`next_day_${this._uid}`">tot</label>
-                                <input type="time" class="form-control control-time inp-endTime"
-                                       aria-label="tot"
-                                       v-model="defaultEndTime"
-                                       placeholder="_ _ : _ _">
-                            </div>
-                            <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`"
-                                  v-if="defaultStartTime >= defaultEndTime">volgende dag</span>
-                        </div>
-                        <hr>
-                    </div>
-                </div>
+                <calendar-defaults v-else-if="showDefaults"
+                                   :cal="cal"
+                                   v-on:endTime="setEndTime" :end-time="defaultEndTime"
+                                   v-on:startTime="setStartTime" :start-time="defaultStartTime"/>
             </div>
 
             <!-- Other calendars have more options -->
@@ -163,6 +136,7 @@
 </template>
 
 <script>
+    import CalendarDefaults from "../components/CalendarDefaults.vue";
     import EventEditor from '../components/EventEditor.vue'
     import {createEvent, createFirstEvent} from '../defaults.js'
     import {Hub, toDatetime, nextDateString} from '../lib.js'
@@ -272,21 +246,68 @@
             }
         },
         methods: {
+            setEndTime(time) {
+                this.defaultEndTime = time;
+            },
+            setStartTime(time) {
+                this.defaultStartTime = time;
+            },
             recurringClicked(checked, value) {
                 Object.values(this.presets.unique).forEach(
                     presets => {
                         presets.filter(preset => preset.label === value.label).forEach(preset => {
                             const isInSelection = this.presetSelection.indexOf(preset);
                             if (checked && isInSelection === -1) {
+                                this.toggleUnique(true, preset);
                                 this.presetSelection.push(preset);
                             }
                             if (!checked && isInSelection !== -1) {
+                                this.toggleUnique(false, preset);
                                 this.presetSelection.splice(isInSelection, 1);
                             }
                         })
                     }
                 );
 
+            },
+            toggleRepeating(checked, {start_date, rrule, label}) {
+                const start = toDatetime(start_date);
+                const versionStart = toDatetime(this.$parent.version.start_date);
+                start.setFullYear(versionStart.getFullYear());
+                if (start < versionStart) {
+                    start.setFullYear(start.getFullYear() + 1)
+                }
+                const event = createEvent({
+                    label: label,
+                    start_date: start,
+                    until: toDatetime(this.$parent.version.end_date),
+                    rrule: rrule + (rrule === 'FREQ=YEARLY' ? ';BYMONTH=' + (start.getMonth() + 1) + ';BYMONTHDAY=' + start.getDate() : '')
+                });
+                if (checked) {
+                    this.cal.events.push(event)
+                } else {
+                    this.rmEvent(this.cal.events.indexOf(event))
+                }
+            },
+            toggleUnique(checked, {start_date, label, ended}) {
+                const event = createEvent({
+                    label: label,
+                    start_date: toDatetime(start_date),
+                    until: toDatetime(ended),
+                    rrule: 'FREQ=DAILY'
+                });
+                if (checked) {
+                    this.cal.events.push(event)
+                } else {
+                    this.cal.events = this.cal.events.filter(e =>
+                        e.label !== event.label
+                        || e.start_date !== event.start_date
+                        || e.end_date !== event.end_date
+                        || e.until !== event.until
+                        || e.rrule !== event.rrule
+                    );
+                }
+                console.log(inert(this.cal.events))
             },
             toggleClosing() {
                 this.$set(this.cal, 'closinghours', !this.cal.closinghours)
@@ -335,8 +356,7 @@
                         event.start_date = event.start_date.slice(0, 11) + this.defaultStartTime + ':00';
                         if (this.defaultStartTime >= this.defaultEndTime) {
                             event.end_date = nextDateString(event.start_date.slice(0, 11) + this.defaultEndTime + ':00');
-                        }
-                        else {
+                        } else {
                             // Force end_date to be on same date as start_date
                             event.end_date = event.start_date.slice(0, 11) + this.defaultEndTime + ':00';
                         }
@@ -357,39 +377,6 @@
                 this.$set(this.cal, 'events', [])
             }
         },
-        watch: {
-            presetSelection(selection) {
-                this.cal.events = [];
-                selection
-                    .forEach(({start_date, rrule, ended}) => {
-                        // Repeating events
-                        if (rrule) {
-                            const start = toDatetime(start_date);
-                            const versionStart = toDatetime(this.$parent.version.start_date);
-                            start.setFullYear(versionStart.getFullYear());
-                            if (start < versionStart) {
-                                start.setFullYear(start.getFullYear() + 1)
-                            }
-                            let event = createEvent({
-                                start_date: start,
-                                until: toDatetime(this.$parent.version.end_date),
-                                rrule: rrule + (rrule === 'FREQ=YEARLY' ? ';BYMONTH=' + (start.getMonth() + 1) + ';BYMONTHDAY=' + start.getDate() : '')
-                            });
-
-                            this.cal.events.push(event)
-                        }
-
-                        // Specific events
-                        if (ended) {
-                            this.cal.events.push(createEvent({
-                                start_date: toDatetime(start_date),
-                                until: toDatetime(ended),
-                                rrule: 'FREQ=DAILY'
-                            }))
-                        }
-                    });
-            }
-        },
         filters: {
             dayMonth(d) {
                 const start = toDatetime(d.start_date);
@@ -404,6 +391,7 @@
             }
         },
         components: {
+            CalendarDefaults,
             EventEditor
         }
     }
