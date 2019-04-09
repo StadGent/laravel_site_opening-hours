@@ -16,118 +16,65 @@
                     </button>
                 </p>
             </div>
-
-            <!-- Exception calendars must be renamed -->
-            <!-- Choose from presets -->
-            <div v-else-if="cal.label == 'Uitzondering'">
-                <h3>Stel de uitzondering in.</h3>
-                <div class="form-group required">
-                    <label>Naam uitzondering</label>
-                    <input type="text" class="form-control" v-model="calLabel"
-                           placeholder="Brugdagen, collectieve sluitingsdagen, ..." autofocus>
-                    <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
-                </div>
-                <div v-if="showPresets">
-                    <h3>Voeg voorgedefineerde momenten toe</h3>
-                    <p class="text-muted">
-                        Klik op
-                        <em>Bewaar</em>
-                        om ook andere momenten toe te voegen
-                    </p>
-                    <div class="form-group">
-                        <div v-if="presets && presets.recurring">
-                            <h4>Herhalende vakantiedagen</h4>
-                            <div class="checkbox checkbox--preset" v-for="preset in presets.recurring">
-                                <label>
-                                    <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
-                                    <input type="checkbox" name="preset"
-                                           :value="preset" v-model="presetSelection"
-                                           @change="toggleRepeating($event.target.checked, preset)"
-                                    >
-                                    {{ preset.label }}
-                                </label>
-                            </div>
-                        </div>
-                        <div v-if="presets && presets.unique">
-                            <h4>Unieke vakantiedagen</h4>
-                            <div class="checkbox checkbox--preset"
-                                 v-if="presets.collection && presets.collection.length">
-                                <h5 class="text-muted">Selecteer voor elk jaar</h5>
-                                <label v-for="label in presets.collection">
-                                    <input type="checkbox" name="preset" :value="{label, multiple: true}"
-                                           @change="recurringClicked($event.target.checked, {label, multiple: true})">
-                                    {{ label }}
-                                </label>
-                            </div>
-                            <div class="calendar-editor__buttons" style="margin-top: 1rem" v-if="!showUnique">
-                                <button type="button" class="btn btn-default btn-sm btn-block"
-                                        @click="showUnique = true">Toon alle jaren
-                                </button>
-                                <hr>
-                            </div>
-                            <div v-if="showUnique">
-                                <div class="checkbox checkbox--preset" v-for="(year,key) in presets.unique">
-                                    <hr>
-                                    <h5 class="text-muted">
-                                        Geldig voor jaar {{ key }}
-                                    </h5>
-                                    <label v-for="preset in year">
-                                        <div class="text-muted pull-right">{{ preset | dayMonth }}</div>
-                                        <input type="checkbox" name="preset" :value="preset" v-model="presetSelection"
-                                               @change="toggleUnique($event.target.checked, preset)">
-                                        {{ preset.label }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <calendar-defaults v-else-if="showDefaults"
-                                   :cal="cal"
-                                   v-on:endTime="setEndTime" :end-time="defaultEndTime"
-                                   v-on:startTime="setStartTime" :start-time="defaultStartTime"/>
-            </div>
-
-            <!-- Other calendars have more options -->
             <div v-else>
-                <h3>{{ cal.label }}</h3>
-                <fieldset class="btn-toggle">
-                    <input type="radio" id="closinghours_true" name="closinghours" class="visuallyhidden"
-                           @change="toggleClosing"
-                           :checked="cal.closinghours"><label for="closinghours_true">Gesloten</label>
-                    <input type="radio" id="closinghours_false" name="closinghours" class="visuallyhidden"
-                           @change="toggleClosing"
-                           :checked="!cal.closinghours"><label for="closinghours_false">Open</label>
-                </fieldset>
-                <hr>
-                <event-editor v-for="(e, i) in cal.events" :parent="cal.events" :prop="i" @add-event="addEvent(i, e)"
-                              @rm="rmEvent(i)"></event-editor>
-                <p>
-                    <button type="button" @click="pushEvent" class="btn btn-link" :disabled="$root.isRecreatex">
-                        + Voeg nieuwe periode of dag toe
-                    </button>
-                </p>
+                <div :hidden="showPresets">
+                    <h3>Stel de uitzondering in.</h3>
+                    <div class="form-group required"
+                         :class="{ 'has-error': cal.label === 'Uitzondering' || !cal.label.trim().length }">
+                        <label for="name">Naam uitzondering</label>
+                        <input id="name" type="text" class="form-control" v-model="cal.label"
+                               required
+                               placeholder="Brugdagen, collectieve sluitingsdagen, ..." autofocus>
+                        <div class="help-block">Kies een specifieke naam die deze uitzondering beschrijft.</div>
+                    </div>
+                    <calendar-defaults :cal="cal"
+                                       v-on:endTime="setEndTime" :end-time="defaultEndTime"
+                                       v-on:startTime="setStartTime" :start-time="defaultStartTime"/>
+                    <p>
+                        <button type="button" @click="pushEvent" class="btn btn-link" :disabled="$root.isRecreatex">
+                            + Voeg nieuwe periode of dag toe
+                        </button>
+                    </p>
+                    <p>
+                        <button type="button" @click="showPresets = true" class="btn btn-link"
+                                :disabled="$root.isRecreatex">
+                            + Voeg voorgedefineerde momenten toe
+                        </button>
+                    </p>
+                    <fieldset v-if="cal.events.length">
+                        <legend>Items</legend>
+                        <pre>
+                         {{ cal.events | json }}
+                    </pre>
+<!--                        todo: find out why this removes items and puts them in another day-->
+<!--                        <event-editor v-for="(e, i) in cal.events"-->
+<!--                                      :parent="cal.events" :prop="i"-->
+<!--                                      @add-event="addEvent(i, e)"-->
+<!--                                      @rm="rmEvent(i)"></event-editor>-->
+                    </fieldset>
+                </div>
+                <!-- Choose from presets -->
+                <preset-selection v-if="showPresets"
+                                  @add="addPreset"
+                                  @remove="removePreset"
+                                  @submit="submitPresets"
+                                  :start-time="defaultStartTime"
+                                  :end-time="defaultEndTime"
+                                  :cal="cal" :presets="presets"
+                                  :start-date="versionStartDate" :end-date="versionEndDate">
+                </preset-selection>
             </div>
         </div>
-        <div class="calendar-editor__buttons">
+        <div class="calendar-editor__buttons" v-if="!showPresets">
             <div class="text-right">
                 <button type="button" class="btn btn-default pull-left" @click="rmCalendar()"
                         :disabled="$root.isRecreatex || cal.priority === 0">Verwijder
                 </button>
                 <button type="button" class="btn btn-default" @click="cancel">Annuleer</button>
-                <button type="submit" class="btn btn-primary" @click.prevent="showPresets = true"
-                        v-if="cal.label == 'Uitzondering' && !showPresets && !showDefaults">Volgende
-                </button>
-                <button type="submit" class="btn btn-primary" @click.prevent="showDefaults = true; showPresets = false"
-                        v-else-if="cal.label == 'Uitzondering' && cal.events.length && showPresets">Volgende
-                </button>
-                <button type="button" class="btn btn-danger" v-else-if="disabled" disabled>Bewaar</button>
-
-                <button type="submit" class="btn btn-primary" @click="saveLabel"
-                        v-else-if="cal.label == 'Uitzondering'">{{ cal.published ? 'Bewaar' : 'Publiceer'}}
-                </button>
-                <button type="button" class="btn btn-primary" @click="save" v-else>{{ cal.published ? 'Bewaar' :
-                    'Publiceer'}}
+                <button type="button" class="btn btn-danger" v-if="disabled" disabled
+                        v-text="cal.published ? 'bewaar' : 'publiceer'"></button>
+                <button type="button" class="btn btn-primary" @click="save" v-else
+                        v-text="cal.published ? 'bewaar' : 'publiceer'">
                 </button>
             </div>
             <p class="alert alert-warning" v-if="disabled">{{ disabled }}</p>
@@ -138,14 +85,14 @@
 <script>
     import CalendarDefaults from "../components/CalendarDefaults.vue";
     import EventEditor from '../components/EventEditor.vue'
+    import PresetSelection from "../components/PresetSelection.vue";
     import {createEvent, createFirstEvent} from '../defaults.js'
     import {Hub, toDatetime, nextDateString} from '../lib.js'
-    import {MONTHS} from '../mixins/filters.js'
     import Services from '../mixins/services.js'
     import {
         EVENT_INVALID_RANGE,
         IS_RECREATEX,
-        NAME_CANNOT_BE_EXCEPTION,
+        NAME_CANNOT_BE_EXCEPTION, NAME_REQUIRED,
         NO_EVENTS,
         START_AFTER_END,
         START_AFTER_UNTIL
@@ -226,13 +173,18 @@
                     return EVENT_INVALID_RANGE
                 }
 
+                // Name cannot be empty
+                if (!this.cal.label || !this.cal.label.trim().length) {
+                    return NAME_REQUIRED
+                }
+
                 // Name cannot be 'Uitzondering'
-                if (this.cal.label === 'Uitzondering' && (!this.calLabel || this.calLabel === 'Uitzondering')) {
+                if (this.cal.label === 'Uitzondering') {
                     return NAME_CANNOT_BE_EXCEPTION
                 }
 
                 // Cannot save a calendar with no events
-                if (!this.showPresets && this.events.length === 0) {
+                if (!this.showPresets && !this.showDefaults && this.events.length === 0) {
                     return NO_EVENTS;
                 }
 
@@ -243,9 +195,30 @@
             },
             versionEndDate() {
                 return toDateString(this.$parent.version.end_date)
+            },
+            sortedEvents() {
+                return this.cal.events.sort((a, b) => {
+                        if (a.start_date > b.start_date) {
+                            return 1
+                        }
+                        if (a.start_date < b.start_date) {
+                            return -1
+                        }
+                        return 0
+                    }
+                )
             }
         },
         methods: {
+            addPreset(event) {
+                this.cal.events.push(event);
+            },
+            removePreset(event) {
+                this.cal.events.splice(this.cal.events.indexOf(event), 1)
+            },
+            submitPresets() {
+                this.showPresets = false;
+            },
             setEndTime(time) {
                 this.defaultEndTime = time;
             },
@@ -318,7 +291,9 @@
                 this.cal.events.push(createEvent({
                     start_date,
                     until,
-                    label: this.cal.events.length + 1
+                    label: this.cal.events.length + 1,
+                    startTime: this.defaultStartTime,
+                    endTime: this.defaultEndTime
                 }))
             },
             pushFirstEvent() {
@@ -345,13 +320,11 @@
                 Hub.$emit('createCalendar', this.cal, true)
             },
             saveLabel() {
-                if (!this.calLabel || this.calLabel === 'Uitzondering') {
+                this.showDefaults = false;
+                if (!this.cal.label || this.cal.label === 'Uitzondering') {
                     return console.warn('Expected calendar name')
                 }
-                this.showPresets = false;
-                this.cal.label = this.calLabel;
-
-                if (this.cal.events && this.cal.events.length && /\d\d:\d\d/.test(this.defaultStartTime) && /\d\d:\d\d/.test(this.defaultEndTime)) {
+                if (this.cal.events && this.cal.events.length) {
                     this.cal.events.forEach(event => {
                         event.start_date = event.start_date.slice(0, 11) + this.defaultStartTime + ':00';
                         if (this.defaultStartTime >= this.defaultEndTime) {
@@ -374,23 +347,14 @@
         mounted() {
             this.$set(this.cal, 'closinghours', !!this.cal.closinghours);
             if (!this.cal.events) {
-                this.$set(this.cal, 'events', [])
+                this.$set(this.cal, 'events', []);
             }
-        },
-        filters: {
-            dayMonth(d) {
-                const start = toDatetime(d.start_date);
-                const until = d.ended ? toDatetime(d.ended) : start;
-                if (start.getMonth() === until.getMonth()) {
-                    if (start.getDate() === until.getDate()) {
-                        return start.getDate() + ' ' + MONTHS[start.getMonth()]
-                    }
-                    return start.getDate() + ' - ' + until.getDate() + ' ' + MONTHS[start.getMonth()]
-                }
-                return start.getDate() + ' ' + MONTHS[start.getMonth()] + ' - ' + until.getDate() + ' ' + MONTHS[until.getMonth()]
+            if (!this.cal.events.length) {
+                this.showDefaults = true;
             }
         },
         components: {
+            PresetSelection,
             CalendarDefaults,
             EventEditor
         }

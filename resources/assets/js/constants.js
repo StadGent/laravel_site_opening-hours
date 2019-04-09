@@ -30,4 +30,5 @@ export const IS_RECREATEX = 'Recreatex data kan hier niet gewijzigd worden.';
 export const START_AFTER_END = 'De start ligt na het einde.';
 export const START_AFTER_UNTIL = 'De begindatum ligt na de einddatum.';
 export const NAME_CANNOT_BE_EXCEPTION = 'De naam van de kalender kan niet "uitzondering" zijn.';
+export const NAME_REQUIRED = 'De kalender moet een naam hebben.';
 export const NO_EVENTS = 'Er zijn geen gebeurtenissen in deze kalender.';
