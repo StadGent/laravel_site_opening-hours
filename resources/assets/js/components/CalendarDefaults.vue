@@ -1,33 +1,42 @@
 <template>
     <div>
-        <h3>Stel de standaardwaarden in</h3>
         <div class="form-group">
-            <fieldset class="btn-toggle">
-                <input type="radio" id="closed_true" name="closinghours" class="visuallyhidden"
-                       @change="toggleClosing"
-                       :checked="cal.closinghours"><label for="closed_true">Gesloten</label>
-                <input type="radio" id="closed_false" name="closinghours" class="visuallyhidden"
-                       @change="toggleClosing"
-                       :checked="!cal.closinghours"><label for="closed_false">Open</label>
+            <fieldset>
+                <legend>Het kanaal is standaard</legend>
+                <div class="radio">
+                    <label><input type="radio" name="closinghours"
+                                  @change="toggleClosing"
+                                  :checked="cal.closinghours">Gesloten</label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="closinghours"
+                               @change="toggleClosing"
+                               :checked="!cal.closinghours">Open
+                    </label>
+                </div>
             </fieldset>
         </div>
-        <div v-if="!cal.closinghours" class="form-group row" :class="{ 'has-error': !isValid }">
-            <div class="col-xs-3">
-                <label>Van</label>
-                <input type="time" class="form-control control-time inp-startTime"
-                       aria-label="Van"
-                       v-model="defaultStartTime">
+        <div v-if="!cal.closinghours">
+            <div class="form-group row" :class="{ 'has-error': !isValid }">
+                <div class="col-xs-3">
+                    <label>Van</label>
+                    <input type="time" class="form-control control-time inp-startTime"
+                           aria-label="Van"
+                           v-model="defaultStartTime">
+                </div>
+                <div class="col-xs-3">
+                    <label :aria-describedby="`next_day_${this._uid}`">tot</label>
+                    <input type="time" class="form-control control-time inp-endTime"
+                           aria-label="tot"
+                           v-model="defaultEndTime">
+                </div>
+                <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`"
+                      v-if="startTime >= endTime">volgende dag</span>
             </div>
-            <div class="col-xs-3">
-                <label :aria-describedby="`next_day_${this._uid}`">tot</label>
-                <input type="time" class="form-control control-time inp-endTime"
-                       aria-label="tot"
-                       v-model="defaultEndTime">
-            </div>
-            <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`"
-                  v-if="startTime >= endTime">volgende dag</span>
+            <p class="alert alert-info">Deze uren worden gebruikt voor bij het aanmaken van <em>nieuwe</em> items en hebben
+                <em>geen</em> invloed op bestaande items.</p>
         </div>
-        <hr>
     </div>
 </template>
 
