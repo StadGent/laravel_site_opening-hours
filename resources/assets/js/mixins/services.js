@@ -55,6 +55,34 @@ export default {
         }
     },
     methods: {
+        serviceEndDate(s) {
+            if (!s.channels || !s.channels.length) {
+                return s.end_date;
+            }
+            return s.channels.map(channel => {
+                if (!channel.openinghours) {
+                    return null
+                }
+                return channel.openinghours.map(oh => oh.end_date)
+                    .sort((a, b) => {
+                        if (a < b) {
+                            return 1;
+                        }
+                        if (a > b) {
+                            return -1
+                        }
+                        return 0
+                    })[0]
+            }).sort((a, b) => {
+                if (a > b) {
+                    return 1;
+                }
+                if (a < b) {
+                    return -1
+                }
+                return 0
+            })[0]
+        },
         serviceStatus(s) {
             if (!s.channels) {
                 if (s.countChannels === 0) {
@@ -66,8 +94,7 @@ export default {
                 if (s.has_inactive_oh === 1 || s.has_inactive_oh === true) {
                     return SERVICE_INACTIVE_OH;
                 }
-            }
-            else {
+            } else {
                 if (s.channels.length === 0) {
                     return SERVICE_NO_CH;
                 }
@@ -106,11 +133,9 @@ export default {
 
             if (limit && offset) {
                 query += '?offset=' + offset + '&limit=' + limit;
-            }
-            else if (limit) {
+            } else if (limit) {
                 query += '?limit=' + limit;
-            }
-            else if (offset) {
+            } else if (offset) {
                 query += '?offset=' + offset;
             }
 
@@ -154,6 +179,8 @@ export default {
                 .then(({data}) => {
                     this.$set(this.routeService, 'channels', data);
                     this.$set(this.routeService, 'status', this.serviceStatus(this.routeService));
+                    this.$set(this.routeService, 'end_date', this.serviceEndDate(this.routeService));
+                    this.serviceEndDate(this.routeService)
                 })
                 .then(() => {
                     this.fetchUsers(this.route.service)
@@ -249,6 +276,7 @@ export default {
                 .then(({data}) => {
                     this.routeService.channels.push(data);
                     this.routeService.status = this.serviceStatus(this.routeService);
+                    this.routeService.end_date = this.serviceEndDate(this.routeService);
                     this.modalClose();
                     this.toChannel(data.id);
                 })
@@ -301,6 +329,7 @@ export default {
                     // remove channel from routeService
                     this.routeService.channels = this.routeService.channels.filter(c => c.id !== channel.id);
                     this.routeService.status = this.serviceStatus(this.routeService);
+                    this.routeService.end_date = this.serviceEndDate(this.routeService);
                     this.modalClose();
                 })
                 .then(this.statusReset)
@@ -329,13 +358,13 @@ export default {
 
                     this.routeService.has_missing_oh = true;
                     this.routeService.status = this.serviceStatus(this.routeService);
+                    this.routeService.end_date = this.serviceEndDate(this.routeService);
                     this.fetchChannels().then(() => {
                         if (!originalVersion) {
                             Hub.$emit('createCalendar', Object.assign(createFirstCalendar(data), {
                                 openinghours_id: data.id
                             }), 'calendar');
-                        }
-                        else {
+                        } else {
                             this.toVersion(data.id);
                         }
                     });

@@ -55,16 +55,24 @@ class ServicesRepository extends EloquentRepository
         $rawSelect = \DB::raw("services.*,
             count(channelId) countChannels,
             if(group_concat(missingOH) like '%1%', 1, 0) has_missing_oh,
-            if(group_concat(activeOH) like '%0%', 1, 0) has_inactive_oh");
+            if(group_concat(activeOH) like '%0%', 1, 0) has_inactive_oh, min(date.end_date) as end_date");
 
         $rawSubQuery = \DB::raw("(select  c.service_id, c.id channelId ,
                 if(oh.id is null, true, false) missingOH,
                 if(group_concat(oh.active) like '%1%', 1, 0) activeOH
                 from channels c left join openinghours oh on c.id = oh.channel_id
                 group by c.id) as tmp");
+
+        $rawEndDateQuery = \DB::raw("(select c.service_id, max(oh.end_date) as end_date
+                from channels as c
+                left join openinghours as oh on oh.channel_id = c.id
+                where c.deleted_at is null
+                group by c.id) as date");
+
         $query = \DB::table('services')
             ->select($rawSelect)
             ->leftJoin($rawSubQuery, 'services.id', '=', 'tmp.service_id')
+            ->leftJoin($rawEndDateQuery, 'services.id', '=', 'date.service_id')
             ->groupBy('services.id')
             ->orderBy('services.draft', 'ASC')
             ->orderBy('services.updated_at', 'DESC')
@@ -125,7 +133,8 @@ class ServicesRepository extends EloquentRepository
     /**
      * Get all services where the user, based on the passed user ID, is part of
      *
-     * @param  integer $userId
+     * @param integer $userId
+     *
      * @return Collection
      */
     public function getForUser($userId)
