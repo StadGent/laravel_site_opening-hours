@@ -43,14 +43,10 @@
                     </p>
                     <fieldset v-if="cal.events.length">
                         <legend>Items</legend>
-                        <pre>
-                         {{ cal.events | json }}
-                    </pre>
-<!--                        todo: find out why this removes items and puts them in another day-->
-<!--                        <event-editor v-for="(e, i) in cal.events"-->
-<!--                                      :parent="cal.events" :prop="i"-->
-<!--                                      @add-event="addEvent(i, e)"-->
-<!--                                      @rm="rmEvent(i)"></event-editor>-->
+                        <event-editor v-for="(e, i) in cal.events"
+                                      :parent="cal.events" :prop="i"
+                                      @add-event="addEvent(i, e)"
+                                      @rm="rmEvent(i)"></event-editor>
                     </fieldset>
                 </div>
                 <!-- Choose from presets -->
