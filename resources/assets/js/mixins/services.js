@@ -180,7 +180,6 @@ export default {
                     this.$set(this.routeService, 'channels', data);
                     this.$set(this.routeService, 'status', this.serviceStatus(this.routeService));
                     this.$set(this.routeService, 'end_date', this.serviceEndDate(this.routeService));
-                    this.serviceEndDate(this.routeService)
                 })
                 .then(() => {
                     this.fetchUsers(this.route.service)
