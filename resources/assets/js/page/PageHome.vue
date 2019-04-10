@@ -95,6 +95,7 @@
             <th-sort by="label">Naam dienst</th-sort>
             <th-sort class="narrow" by="source">Bron</th-sort>
             <th-sort by="status" class="narrow">Status</th-sort>
+            <th-sort by="end_date" class="narrow">Verloopt op</th-sort>
             <th-sort class="narrow" by="updated_at">Aangepast</th-sort>
             <th class="text-right narrow">Deactiveer</th>
           </tr>
@@ -109,6 +110,7 @@
             <th-sort by="label">Naam dienst</th-sort>
             <th-sort class="narrow" by="source">Bron</th-sort>
             <th-sort by="status" class="narrow">Status</th-sort>
+            <th-sort by="end_date" class="narrow">Verloopt op</th-sort>
             <th-sort class="narrow" by="updated_at">Aangepast</th-sort>
           </tr>
         </thead>
