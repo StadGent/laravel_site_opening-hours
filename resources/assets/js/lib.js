@@ -96,6 +96,7 @@ export function expiresOn(ohs) {
 /** Date functions **/
 
 export function nextDateString(dateString) {
+    console.log(dateString, toDatetime(moment(dateString).add(1, 'days')),  toDatetime(moment(dateString).add(1, 'days')).format());
     return toDatetime(moment(dateString).add(1, 'days')).format();
 }
 

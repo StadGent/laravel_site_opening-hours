@@ -245,7 +245,7 @@
                 return event;
             },
             eventStartDayMonth() {
-                return toDatetime(this.event.start_date).getDate() + ' ' + fullMonths[toDatetime(this.event.start_date).getMonth()];
+                return moment.utc(this.event.start_date).date() + ' ' + fullMonths[moment.utc(this.event.start_date).month()];
             },
             eventStartDate: {
                 get() {
@@ -266,19 +266,19 @@
                     }
                     this.event.start_date = v + ((this.event.start_date || '').slice(10, 20) || 'T00:00:00Z');
                     if (this.options.bymonthday) {
-                        this.options.bymonthday = toDatetime(this.event.start_date).getDate();
-                        this.options.bymonth = toDatetime(this.event.start_date).getMonth() + 1;
+                        this.options.bymonthday = moment.utc(this.event.start_date).date();
+                        this.options.bymonth = moment.utc(this.event.start_date).month() + 1;
                     }
                     if (this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)) {
                         this.warnTime('.inp-startDate', 'Dit tijdstip moet voor het eindtijdstip liggen.');
                     }
                     // update end_date
                     if (this.eventStartTime >= this.eventEndTime) {
-                        this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + this.eventEndTime + ':00');
+                        this.event.end_date = moment.utc(this.event.start_date).add(1,'days').format('YYYY-MM-DD') + 'T' + this.eventEndTime + ':00Z';
                     }
                     else {
                         // Force end_date to be on same date as start_date
-                        this.event.end_date = this.event.start_date.slice(0, 11) + this.eventEndTime + ':00';
+                        this.event.end_date = this.event.start_date.slice(0, 11) + this.eventEndTime + ':00Z';
                     }
                 }
             },
@@ -286,7 +286,7 @@
                 get() {
                     return (this.event.end_date || '').slice(0, 10);
                 },
-                set() {
+                set(v) {
                     // Force end_date to be on same date as start_date
                     this.event.end_date = v + ((this.event.start_date || '').slice(10, 20) || 'T00:00:00Z');
                 }
@@ -316,7 +316,7 @@
                         return;
                     }
                     if (this.eventStartTime >= v) {
-                        this.event.end_date = nextDateString(this.event.start_date.slice(0, 11) + v + ':00');
+                        this.event.end_date =  nextDateString(this.event.start_date.slice(0, 11) + v + ':00');
                     }
                     else {
                         // Force end_date to be on same date as start_date
@@ -332,8 +332,8 @@
                     return moment.utc(this.event.until || this.versionEndDate).format('YYYY-MM-DD');
                 },
                 set(v) {
-                    this.event.until = new Date(Date.parse(v)).toJSON().slice(0, 10);
-                    if (this.event.start_date.slice(0, 10) > this.event.until.slice(0, 10)) {
+                    this.event.until = moment.utc(v).format('YYYY-MM-DD');
+                    if (this.event.start_date.slice(0, 10) > this.event.until) {
                         this.warnTime('.inp-until', 'Dit tijdstip moet na het start tijdstip liggen.');
                     } else if (this.$root.routeVersion.end_date < this.event.until) {
                         this.warnTime('.inp-until', 'Dit tijdstip moet voor het einde van de kalender liggen.');
@@ -460,9 +460,8 @@
                 }
             },
             byMonthDay() {
-                // console.debug('monthday')
                 delete this.options.byweekday;
-                this.options.bymonthday = toDatetime(this.event.start_date).getDate();
+                this.options.bymonthday = moment.utc(this.event.start_date).date();
             },
             cleanOptions() {
                 delete this.options.byhour;
