@@ -143,16 +143,7 @@ export default {
         return type.name || '';
     },
     expiryDate(channel) {
-      return channel.openinghours.map(oh => oh.end_date)
-              .sort((a, b) => {
-                if (a < b) {
-                  return 1;
-                }
-                if (a > b) {
-                  return -1
-                }
-                return 0
-              })[0]
+      return channel.openinghours.map(oh => oh.end_date).sort().reverse()[0]
     }
   },
   filters: {
