@@ -1,6 +1,21 @@
-window.Vue.filter('date', date)
+window.Vue.filter('date', date);
+window.Vue.filter('simpleDate', simpleDate);
 
 export const MONTHS = 'jan,feb,maart,apr,mei,juni,juli,aug,sept,okt,nov,dec'.split(',')
+
+function simpleDate(d) {
+  if (!d) {
+    return d
+  }
+  if (typeof d === 'string') {
+    d = d.replace(' ', 'T')
+  }
+  d = new Date(d);
+  if (!d) {
+    return 'invalid'
+  }
+  return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear()
+}
 
 function date(d) {
   if (!d) {

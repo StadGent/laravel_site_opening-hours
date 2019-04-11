@@ -68,7 +68,7 @@
               <div>{{ channel.updated_at | date }}</div>
               <div>{{ channel.updated_by }}</div>
             </td>
-            <td v-text="expiryDate(channel)"></td>
+            <td class="text-muted">{{ expiryDate(channel) | simpleDate}}</td>
             <td class="td-btn text-right" @click.stop>
               <button @click="rmChannel(channel)" class="btn btn-icon btn-default" :disabled="$root.isRecreatex">
                 <i class="glyphicon glyphicon-trash"></i>
