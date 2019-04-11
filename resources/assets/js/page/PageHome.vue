@@ -51,7 +51,7 @@
           <tr>
             <th-sort by="name">Naam gebruiker</th-sort>
             <th-sort by="email">E-mailadres</th-sort>
-            <th-sort by="services">Diensten</th-sort>
+            <th-sort by="services">Rollen</th-sort>
             <th-sort by="verified">Actief</th-sort>
             <th class="text-right">Verwijder</th>
           </tr>
@@ -153,7 +153,6 @@ export default {
 
     // Services
     allowedServices () {
-        console.log(inert(this.services));
       return this.services.filter(s => s.draft == this.draft)
     },
     filteredServices () {
