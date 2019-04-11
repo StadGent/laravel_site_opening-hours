@@ -66,4 +66,14 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\Service', 'user_service_role', 'user_id', 'service_id')
           ->withPivot(['role_id']);
     }
+
+    /**
+     * @param $name
+     * @param bool $requireAll
+     *
+     * @return mixed
+     */
+    public function hasRole($name, $requireAll = false) {
+        return User::roles()->where('name', $name)->get()->pluck('name')->contains($name);
+    }
 }
