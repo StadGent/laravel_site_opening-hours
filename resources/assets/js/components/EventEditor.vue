@@ -437,7 +437,7 @@
             },
             isUntilValid() {
                 return this.event.start_date.slice(0, 10) <= this.event.until.slice(0, 10)
-                    && this.$root.routeVersion.end_date >= this.event.until;
+                    && this.$root.routeVersion.end_date >= this.event.until.slice(0, 10);
             }
         },
         methods: {
