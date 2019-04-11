@@ -21,6 +21,9 @@ export default {
     isAdmin () {
       return this.$root.user.admin
     },
+    isEditor() {
+      return this.$root.user.editor
+    },
     isOwner () {
       return this.isOwnerOf(this.srv || this.$root.routeService)
     }

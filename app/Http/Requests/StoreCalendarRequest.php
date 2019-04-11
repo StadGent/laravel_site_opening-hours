@@ -26,7 +26,7 @@ class StoreCalendarRequest extends FormRequest
             return false;
         }
 
-        return $this->user()->hasRole('Admin')
+        return $this->user()->hasRole('Admin') || $this->user()->hasRole('Editor')
         || $users->hasRoleInService($this->user()->id, $openinghours->channel->service->id, 'Owner')
         || $users->hasRoleInService($this->user()->id, $openinghours->channel->service->id, 'Member');
     }

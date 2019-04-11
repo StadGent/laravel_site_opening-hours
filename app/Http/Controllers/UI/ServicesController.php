@@ -39,7 +39,7 @@ class ServicesController extends Controller
         $offset = $request->get('offset', 0);
         $limit = $request->get('limit', null);
 
-        if ($request->user('api')->hasRole('Admin')) {
+        if ($request->user('api')->hasRole('Admin') || $request->user('api')->hasRole('Editor')) {
             return $this->servicesRepository->getExpandedServices(null, $offset, $limit);
         }
 
