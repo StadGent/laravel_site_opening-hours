@@ -36,7 +36,7 @@ class RolesController extends Controller
         $user = User::find($request->input('user_id'));
         $role = Role::where('name', $request->input('role'))->first();
 
-        if ($request->input('role') === 'Editor' || $request->input('role') === 'Admin') {
+        if ($request->input('role') === 'Editor') {
             $user->roles()->sync([$role->id]);
             return response()->json(['role' => $request->input('role')]);
         }
