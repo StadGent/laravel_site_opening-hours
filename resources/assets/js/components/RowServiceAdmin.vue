@@ -16,6 +16,8 @@
           <i class="glyphicon glyphicon-info-sign" v-if="getStatusTooltip(s.status)"></i>
         </span>
       </td>
+      <td class="td-sortable" v-text="s.end_date">
+      </td>
       <td  class="text-muted td-sortable" :title="s.updated_at">
         <div>{{ s.updated_at | date }}</div>
       </td>

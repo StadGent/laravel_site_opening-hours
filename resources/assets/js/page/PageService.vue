@@ -49,6 +49,7 @@
             <th>Type</th>
             <th>Status</th>
             <th-sort by="updated_at">Laatst aangepast</th-sort>
+            <th>Laatste versie verloopt op</th>
             <th class="text-right">Verwijder</th>
           </tr>
         </thead>
@@ -67,6 +68,7 @@
               <div>{{ channel.updated_at | date }}</div>
               <div>{{ channel.updated_by }}</div>
             </td>
+            <td v-text="expiryDate(channel)"></td>
             <td class="td-btn text-right" @click.stop>
               <button @click="rmChannel(channel)" class="btn btn-icon btn-default" :disabled="$root.isRecreatex">
                 <i class="glyphicon glyphicon-trash"></i>
@@ -140,6 +142,9 @@ export default {
         let type = this.types.find(t => t.id === id) || {};
         return type.name || '';
     },
+    expiryDate(channel) {
+      return channel.openinghours.map(oh => oh.end_date).sort().reverse()[0]
+    }
   },
   filters: {
     toChannelStatus
