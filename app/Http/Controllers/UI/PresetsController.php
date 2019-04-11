@@ -96,8 +96,8 @@ class PresetsController extends Controller
                 $obj = new \stdClass();
                 // limit the holidays periode to the begin of the requested periode
                 $tmpStart = new Carbon($event->start_date);
-                if ($startPeriode > $tmpStart) {
-                    $tmpStart = $startPeriode->copy()->subYear(1);
+                while ($startPeriode > $tmpStart) {
+                    $tmpStart = $tmpStart->addDay(1);
                 }
                 $obj->start_date = $tmpStart->format('Y-m-d');
                 // limit the holidays periode to the end of the requested periode
