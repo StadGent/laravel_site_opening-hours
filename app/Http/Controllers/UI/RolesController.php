@@ -46,8 +46,6 @@ class RolesController extends Controller
             return response()->json(['role' => $request->input('role')]);
         }
 
-        error_log('tadaa');
-
         $service = Service::find($request->input('service_id'));
         $user = app('UserService')->setRoleToUser($user->email, $role, $service);
         $assignedRoles = app('UserRepository')->getAllRolesForUser($user->id);
