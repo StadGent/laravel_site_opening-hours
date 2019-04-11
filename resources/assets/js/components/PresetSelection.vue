@@ -3,10 +3,10 @@
         <h3>Voeg voorgedefineerde momenten toe</h3>
         <p class="text-muted">Klik op <em>Bewaar</em> om ook andere momenten toe te voegen</p>
         <div class="alert alert-info">
-            <p v-if="cal.closinghours">
-                Op de geselecteerde ogenblikken zal het kanaal <strong>gesloten</strong> zijn.
-            </p>
             <p>
+                Op de geselecteerde ogenblikken zal het kanaal <strong v-text="cal.closinghours ? 'gesloten' : 'open'"></strong> zijn.
+            </p>
+            <p v-if="!cal.closinghours">
                 De voorgedefinieerde openingsuren zijn van
                 <em v-text="startTime"></em> tot <em v-text="endTime"></em>.
             </p>

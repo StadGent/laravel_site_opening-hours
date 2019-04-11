@@ -43,10 +43,10 @@
                     </p>
                     <fieldset v-if="cal.events.length">
                         <legend>Items</legend>
-                        <event-editor v-for="(e, i) in cal.events"
-                                      :parent="cal.events" :prop="i"
-                                      @add-event="addEvent(i, e)"
-                                      @rm="rmEvent(i)"></event-editor>
+                        <event-editor v-for="(e, i) in cal.events.slice().reverse()"
+                                      :parent="cal.events" :prop="cal.events.length - 1 - i"
+                                      @add-event="addEvent(cal.events.length - 1 - i, e)"
+                                      @rm="rmEvent(cal.events.length - 1 - i)"></event-editor>
                     </fieldset>
                 </div>
                 <!-- Choose from presets -->

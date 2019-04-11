@@ -2,7 +2,7 @@
     <div>
         <div class="form-group">
             <fieldset>
-                <legend>Het kanaal is standaard</legend>
+                <legend>Deze uitzondering stelt het kanaal in als</legend>
                 <div class="radio">
                     <label><input type="radio" name="closinghours"
                                   @change="toggleClosing"
@@ -34,8 +34,8 @@
                 <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`"
                       v-if="startTime >= endTime">volgende dag</span>
             </div>
-            <p class="alert alert-info">Deze uren worden gebruikt voor bij het aanmaken van <em>nieuwe</em> items en hebben
-                <em>geen</em> invloed op bestaande items.</p>
+            <p class="alert alert-info">Deze uren worden gebruikt als standaard voor <em>nieuwe</em> items en hebben
+                <em>geen</em> invloed op reeds bestaande items.</p>
         </div>
     </div>
 </template>
