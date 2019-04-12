@@ -34,12 +34,12 @@ class RolesControllerTest extends \TestCase
     public function requestTypeProvider()
     {
         $data = [
-            'user_id' => '3',
+            'user_id' => '4',
             'service_id' => '1',
             'role' => 'Member',
         ];
         $dataRemove = [
-            'user_id' => '3',
+            'user_id' => '4',
             'service_id' => '1',
         ];
 
@@ -63,6 +63,13 @@ class RolesControllerTest extends \TestCase
             ], // cannot assign himself
             ['admin', 'delete', '', $dataRemove, '200'], // destroy
             ['admin', 'delete', '', ['user_id' => '1', 'service_id' => '1'], '400'], // cannot remove himself
+            // editor user
+            ['editor', 'get', '', [], '405'], // index
+            ['editor', 'post', '', $data, '405'], // store
+            ['editor', 'get', '1', [], '404'], // show
+            ['editor', 'put', '', $data, '405'], // update (full)
+            ['editor', 'patch', '', $data, '401'], // update (partial)
+            ['editor', 'delete', '', $dataRemove, '401'], // destroy
             // owner user
             ['owner', 'get', '', [], '405'], // index
             ['owner', 'post', '', $data, '405'], // store
@@ -75,11 +82,11 @@ class RolesControllerTest extends \TestCase
             ], // cannot alter admin
             [
                 'owner', 'patch', '',
-                ['user_id' => '2', 'service_id' => '1', 'role' => 'Member'], '400',
+                ['user_id' => '3', 'service_id' => '1', 'role' => 'Member'], '400',
             ], // cannot alter himself
             [
                 'owner', 'patch', '',
-                ['user_id' => '2', 'service_id' => '2', 'role' => 'Member'], '401',
+                ['user_id' => '3', 'service_id' => '3', 'role' => 'Member'], '401',
             ], // cannot assign himself to not owned service
             [
                 'owner', 'patch', '',

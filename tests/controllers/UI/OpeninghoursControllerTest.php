@@ -55,6 +55,14 @@ class OpeninghoursControllerTest extends \TestCase
             ['admin', 'patch', '1', $data, '200'], // update (partial)
             ['admin', 'delete', '1', [], '200'], // destroy
             ['admin', 'delete', '6854635468', [], '422'], // destroy no model match
+            // editor user
+            ['editor', 'get', '', [], '405'], // index
+            ['editor', 'post', '', $data, '200'], // store
+            ['editor', 'get', '1', [], '200'], // show
+            ['editor', 'put', '1', $data, '200'], // update (full)
+            ['editor', 'patch', '1', $data, '200'], // update (partial)
+            ['editor', 'delete', '1', [], '200'], // destroy
+
             // owner user
             ['owner', 'get', '', [], '405'], // index
             ['owner', 'post', '', $data, '200'], // store

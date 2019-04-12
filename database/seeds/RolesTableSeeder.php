@@ -22,6 +22,11 @@ class RolesTableSeeder extends Seeder
                 'description' => 'The admin of the application, can basically do anything.',
             ],
             [
+                'name' => 'Editor',
+                'display_name' => 'Redacteur',
+                'description' => 'Redacteur van alle diensten',
+            ],
+            [
                 'name' => 'Owner',
                 'display_name' => 'Beheerder van een dienst',
                 'description' => 'Beheerder van een dienst',

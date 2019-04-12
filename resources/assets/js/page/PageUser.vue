@@ -1,54 +1,59 @@
 <template>
   <div class="container">
     <h1>{{ usr.name || 'Naamloos' }}</h1>
+    <form v-if="isAdmin && !hasRoleAdmin" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;" @submit.prevent="updateRole">
+      <fieldset>
+        <legend>Globale rol</legend>
+        <div class="radio">
+          <label><input ref="noRole" name="role" :checked="!hasRoleEditor && !hasRoleAdmin" :value="null"  type="radio">Geen globale rol</label>
+        </div>
+        <div class="radio">
+          <label><input ref="editor" name="role" :checked="hasRoleEditor" :value="'Editor'" type="radio">Redacteur</label>
+        </div>
+      </fieldset>
+      <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Opslaan</button>
+      <p style="margin-top: 1rem;" class="text-info" v-if="message" v-html="message"></p>
+    </form>
 
     <h2>Diensten</h2>
-    <div v-if="usr.admin">
+    <div v-if="hasRoleAdmin">
       Admins hebben toegang tot alle diensten.
     </div>
     <div v-else>
       <button class="btn btn-default" @click="newRoleForUser(usr)">Nodig uit voor een dienst</button>
     </div>
 
-    <div v-if="user.id == usr.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;">
-      <p>
-        Dit is je eigen profiel. Je kan je naam wijzigen
-      </p>
-      <p>
-        <label>Naam</label>
-        <input type="text" class="form-control" v-model="usr.name">
-      </p>
-    </div>
-
     <!-- Services -->
-    <div v-if="!userServices.length" class="table-message">
+    <div v-if="!userServices.length && !hasRoleAdmin" class="table-message">
       <h3 class="text-muted">Deze gebruiker heeft nog geen diensten</h3>
       <p>
         <button class="btn btn-lg btn-default" @click="newRoleForUser(usr)">Nodig uit voor een dienst</button>
       </p>
     </div>
-    <div v-else-if="isAdmin">
-      <table class="table table-hover table-service-admin">
-        <thead>
-          <tr>
-            <th-sort by="service_id">Dienst</th-sort>
-            <th>Rol</th>
-            <th class="text-right">Beheer gebruikers</th>
-          </tr>
-        </thead>
-        <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s"></tbody>
-      </table>
-    </div>
-    <div v-else>
-      <table class="table table-hover table-service">
-        <thead>
-          <tr>
-            <th-sort by="label">Dienst</th-sort>
-            <th>Rol</th>
-          </tr>
-        </thead>
-        <tbody is="row-user-service" v-for="s in sortedServices" :s="s"></tbody>
-      </table>
+    <div v-if="userServices.length">
+      <div v-if="isAdmin">
+        <table class="table table-hover table-service-admin">
+          <thead>
+            <tr>
+              <th-sort by="service_id">Dienst</th-sort>
+              <th>Rol</th>
+              <th class="text-right">Beheer gebruikers</th>
+            </tr>
+          </thead>
+          <tbody is="row-user-service-admin" v-for="s in sortedServices" :s="s"></tbody>
+        </table>
+      </div>
+      <div v-else>
+        <table class="table table-hover table-service">
+          <thead>
+            <tr>
+              <th-sort by="label">Dienst</th-sort>
+              <th>Rol</th>
+            </tr>
+          </thead>
+          <tbody is="row-user-service" v-for="s in sortedServices" :s="s"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -57,8 +62,7 @@
 import RowUserService from '../components/RowUserService.vue'
 import RowUserServiceAdmin from '../components/RowUserServiceAdmin.vue'
 import ThSort from '../components/ThSort.vue'
-
-import { orderBy } from '../lib.js'
+import { Hub, orderBy } from '../lib.js'
 
 export default {
   name: 'page-user',
@@ -66,7 +70,9 @@ export default {
     return {
       fetchedUser: null,
       order: 'name',
-      query: ''
+      query: '',
+      globalRole: null,
+      message: null
     }
   },
   computed: {
@@ -78,7 +84,12 @@ export default {
     usr () {
       return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || {}
     },
-
+    hasRoleAdmin() {
+      return this.usr.globalRoles && this.usr.globalRoles.indexOf('Admin') !== -1;
+    },
+    hasRoleEditor() {
+      return this.usr.globalRoles && this.usr.globalRoles.indexOf('Editor') !== -1;
+    },
     // Services
     services () {
       return this.$root.services || []
@@ -104,6 +115,16 @@ export default {
     }
   },
   methods: {
+    updateRole() {
+      this.usr.role = this.$refs.editor.checked ? 'Editor' : null;
+      Hub.$emit('patchRole', this.usr, (role) => {
+        if (!role) {
+          this.message = 'De gebruiker heeft geen globale rol meer';
+          return;
+        }
+        this.message = `De gebruiker heeft nu globale rol <strong>${role}</strong>`;
+      });
+    }
   },
   components: {
     RowUserService,
