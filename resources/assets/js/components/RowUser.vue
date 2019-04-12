@@ -7,7 +7,7 @@
         {{ u.email }}
       </td>
       <td @click.stop class="td-clickstop td-sortable">
-        <div v-if="! u.roles.length">-</div>
+        <div v-for="role in u.globalRoles" v-text="role"></div>
         <div>
           <div v-for="r in u.roles">
             {{$root.translateRole(r.role)}}
