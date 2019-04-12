@@ -32,13 +32,13 @@
                                        v-on:startTime="setStartTime" :start-time="defaultStartTime"/>
                     <p>
                         <button type="button" @click="pushEvent" class="btn btn-link" :disabled="$root.isRecreatex">
-                            + Voeg nieuwe periode of dag toe
+                            + Voeg nieuwe periode of dag toe vanaf {{ currentStartDate | simpleDate }}
                         </button>
                     </p>
                     <p>
                         <button type="button" @click="showPresets = true" class="btn btn-link"
                                 :disabled="$root.isRecreatex">
-                            + Voeg voorgedefineerde momenten toe
+                            + Voeg voorgedefineerde momenten toe vanaf {{ currentStartDate | simpleDate }}
                         </button>
                     </p>
                     <fieldset v-if="cal.events.length">
@@ -57,7 +57,7 @@
                                   :start-time="defaultStartTime"
                                   :end-time="defaultEndTime"
                                   :cal="cal" :presets="presets"
-                                  :start-date="versionStartDate" :end-date="versionEndDate">
+                                  :start-date="currentStartDate" :end-date="versionEndDate">
                 </preset-selection>
             </div>
         </div>
@@ -124,7 +124,7 @@
         computed: {
             presets() {
                 if (!this.storedPresets) {
-                    Services.methods.fetchPresets(this.$root.routeVersion.start_date, this.$root.routeVersion.end_date,
+                    Services.methods.fetchPresets(moment.utc(this.currentStartDate).format('YYYY-MM-DD'), this.$root.routeVersion.end_date,
                         data => {
                             data.collection = [];
                             if (data.recurring) {
@@ -188,6 +188,12 @@
             },
             versionStartDate() {
                 return toDateString(this.$parent.version.start_date)
+            },
+            currentStartDate() {
+                const today = moment.utc();
+                const versionStartDate = moment.utc(this.$parent.version.start_date);
+                const versionEndDate = moment.utc(this.$parent.version.end_date);
+                return today.isBetween(versionStartDate, versionEndDate) ? today.toDate(): versionStartDate.toDate();
             },
             versionEndDate() {
                 return toDateString(this.$parent.version.end_date)
@@ -282,7 +288,7 @@
                 this.$set(this.cal, 'closinghours', !this.cal.closinghours)
             },
             pushEvent() {
-                const start_date = toDatetime(this.$parent.version.start_date);
+                const start_date = this.currentStartDate;
                 const until = toDatetime(this.$parent.version.end_date);
                 this.cal.events.push(createEvent({
                     start_date,
