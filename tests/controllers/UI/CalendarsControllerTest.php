@@ -100,6 +100,15 @@ class CalendarsControllerTest extends \TestCase
             ['admin', 'delete', '1', [], '400'], // can't delete base calendar
             ['admin', 'delete', '2', [], '200'], // destroy
 
+            // editor user
+            ['editor', 'get', '', [], '405'], // index
+            ['editor', 'post', '', $data, '200'], // store
+            ['editor', 'get', '1', [], '405'], // show
+            ['editor', 'put', '1', $data, '200'], // update (full)
+            ['editor', 'patch', '1', $data, '200'], // update (partial)
+            ['editor', 'delete', '1', [], '400'], // can't delete base calendar
+            ['editor', 'delete', '2', [], '200'], // destroy
+
             // owner user
             ['owner', 'get', '', [], '405'], // index
             ['owner', 'post', '', $data, '200'], // store
