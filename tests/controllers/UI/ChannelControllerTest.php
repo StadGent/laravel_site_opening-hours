@@ -55,6 +55,16 @@ class ChannelControllerTest extends \TestCase
             ['admin', 'patch', '1/channels/1', [], '405'], // update (partial)
             ['admin', 'delete', '1/channels/1', [], '200'], // destroy
             ['admin', 'delete', '2/channels/1', [], '422'], // Model mismatch
+            // editor user
+            ['editor', 'get', '1/channels', [], '200'], // getFromService
+            ['editor', 'post', '1/channels', ['label' => 'test', 'service_id' => 1], '200'], // store
+            ['editor', 'get', '1/channels/1', [], '405'], // show
+            ['editor', 'put', '1/channels/1', ['label' => 'updated label'], '200'], // update (partial)
+            ['editor', 'put', '1/channels/1', ['label' => 'updated label', 'type_id' => null], '200'], // update (full)
+            ['editor', 'put', '1/channels/1', ['label' => 'updated label', 'type_id' => 1], '200'], // update (full)
+            ['editor', 'patch', '1/channels/1', [], '405'], // update (partial)
+            ['editor', 'delete', '1/channels/1', [], '401'], // destroy
+            ['editor', 'delete', '2/channels/1', [], '401'], // Model mismatch
             // owner user
             ['owner', 'get', '1/channels', [], '200'], // getFromService
             ['owner', 'get', '2/channels', [], '401'], // cannot see for not owned service
