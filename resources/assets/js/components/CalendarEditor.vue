@@ -32,13 +32,13 @@
                                        v-on:startTime="setStartTime" :start-time="defaultStartTime"/>
                     <p>
                         <button type="button" @click="pushEvent" class="btn btn-link" :disabled="$root.isRecreatex">
-                            + Voeg nieuwe periode of dag toe
+                            + Voeg nieuwe periode of dag toe vanaf {{ currentStartDate | simpleDate }}
                         </button>
                     </p>
                     <p>
                         <button type="button" @click="showPresets = true" class="btn btn-link"
                                 :disabled="$root.isRecreatex">
-                            + Voeg voorgedefineerde momenten toe
+                            + Voeg voorgedefineerde momenten toe vanaf {{ currentStartDate | simpleDate }}
                         </button>
                     </p>
                     <fieldset v-if="cal.events.length">

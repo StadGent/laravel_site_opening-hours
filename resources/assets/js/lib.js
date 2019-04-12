@@ -182,9 +182,25 @@ export function orderBy(order) {
     if (order) {
         if (order.startsWith('-')) {
             order = order.slice(1);
-            return (a, b) => a[order] < b[order] ? 1 : -1;
+            return (a,b) => {
+                if (!a[order] || a[order] < b[order]) {
+                    return 1;
+                }
+                if (!b[order] || a[order] > b[order]) {
+                    return -1;
+                }
+                return 0;
+            };
         }
-        return (a, b) => a[order] > b[order] ? 1 : -1;
+        return (a,b) => {
+            if (!b[order] || a[order] > b[order]) {
+                return 1;
+            }
+            if (!a[order] || a[order] < b[order]) {
+                return -1;
+            }
+            return 0;
+        };
     }
 
     // No sorting
