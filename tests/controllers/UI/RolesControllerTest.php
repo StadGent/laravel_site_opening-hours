@@ -63,6 +63,13 @@ class RolesControllerTest extends \TestCase
             ], // cannot assign himself
             ['admin', 'delete', '', $dataRemove, '200'], // destroy
             ['admin', 'delete', '', ['user_id' => '1', 'service_id' => '1'], '400'], // cannot remove himself
+            // editor user
+            ['editor', 'get', '', [], '405'], // index
+            ['editor', 'post', '', $data, '405'], // store
+            ['editor', 'get', '1', [], '404'], // show
+            ['editor', 'put', '', $data, '405'], // update (full)
+            ['editor', 'patch', '', $data, '401'], // update (partial)
+            ['editor', 'delete', '', $dataRemove, '401'], // destroy
             // owner user
             ['owner', 'get', '', [], '405'], // index
             ['owner', 'post', '', $data, '405'], // store
