@@ -29,7 +29,7 @@ class DummyUsersTableSeeder extends Seeder
 
             $user->save();
             
-            if ($name === 'admin') {
+            if ($name === 'admin' || $name === 'editor') {
                 $user->attachRole($roleConfig);
             } else {
                 \DB::insert(

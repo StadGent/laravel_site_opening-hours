@@ -36,8 +36,8 @@ class StoreRoleRequest extends FormRequest
     {
         return [
             'user_id' => 'exists:users,id|required|numeric',
-            'service_id' => 'exists:services,id|required|numeric',
-            'role' => 'exists:roles,name|required',
+            'service_id' => 'nullable|exists:services,id|numeric',
+            'role' => 'nullable|exists:roles,name',
         ];
     }
 

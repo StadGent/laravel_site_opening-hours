@@ -12,6 +12,7 @@ export const SERVICE_COMPLETE_TOOLTIP = 'Alle kanalen hebben minstens een kalend
 export const MEMBER = 'Lid';
 export const OWNER = 'Eigenaar';
 export const ADMIN = 'Admin';
+export const EDITOR = 'Redacteur';
 
 // API
 export const API_PREFIX = '/api/v1/ui';
