@@ -26,11 +26,17 @@ export default {
     },
     isOwner () {
       return this.isOwnerOf(this.srv || this.$root.routeService)
+    },
+    isMember () {
+      return this.isMemberOf(this.srv || this.$root.routeService)
     }
   },
   methods: {
     isOwnerOf (service) {
       return this.isAdmin || service && service.users && service.users.find(u => u.id == this.$root.user.id && u.role === 'Owner')
+    },
+    isMemberOf (service) {
+      return this.isAdmin || service && service.users && service.users.find(u => u.id == this.$root.user.id && u.role === 'Member')
     },
     logout() {
       return this.$http.post('/logout')
