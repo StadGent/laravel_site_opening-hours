@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsEditor;
 use App\Http\Middleware\HasRoleInService;
 use App\Http\Middleware\IsOwner;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -62,5 +63,6 @@ class Kernel extends HttpKernel
         'admin' => IsAdmin::class,
         'hasRoleInService' => HasRoleInService::class,
         'isOwner' => IsOwner::class,
+        'editor' => IsEditor::class
     ];
 }
