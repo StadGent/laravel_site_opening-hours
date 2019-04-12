@@ -50,7 +50,7 @@
             <th>Status</th>
             <th-sort by="updated_at">Laatst aangepast</th-sort>
             <th>Laatste versie verloopt op</th>
-            <th class="text-right" v-if="!isEditor">Verwijder</th>
+            <th class="text-right" v-if="isAdmin || isOwner || isMember">Verwijder</th>
           </tr>
         </thead>
         <tbody>
@@ -69,7 +69,7 @@
               <div>{{ channel.updated_by }}</div>
             </td>
             <td v-text="expiryDate(channel)"></td>
-            <td class="td-btn text-right" v-if="!isEditor" @click.stop>
+            <td class="td-btn text-right" v-if="isAdmin || isOwner || isMember" @click.stop>
               <button @click="rmChannel(channel)" class="btn btn-icon btn-default" :disabled="$root.isRecreatex">
                 <i class="glyphicon glyphicon-trash"></i>
               </button>
