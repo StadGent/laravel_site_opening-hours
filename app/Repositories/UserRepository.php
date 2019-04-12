@@ -72,7 +72,7 @@ class UserRepository extends EloquentRepository
         foreach ($users as $user) {
             $result = $user->toArray();
             $result['roles'] = $this->getAllRolesForUser($user->id);
-
+            $result['globalRoles'] = $user->roles()->pluck('name');
             $results[] = $result;
         }
 
