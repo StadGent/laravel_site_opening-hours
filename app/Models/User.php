@@ -73,7 +73,12 @@ class User extends Authenticatable
      *
      * @return mixed
      */
-    public function hasRole($name, $requireAll = false) {
-        return User::roles()->where('name', $name)->get()->pluck('name')->contains($name);
+    public function hasRole($name, $requireAll = false)
+    {
+        return User::roles()
+            ->where('name', $name)
+            ->get()
+            ->pluck('name')
+            ->contains($name);
     }
 }
