@@ -274,7 +274,7 @@ class RecurringOHService
             // date of 2018-05-01 17:00:00, but have an 'until' value of
             // 2020-12-31. This would represent all 1sts of May for years 2018,
             // 2019 and 2020. We need to get the event that lies within our
-            // and end date filters.
+            // start and end date filters.
 
             $difference = $eventEnd->year - $eventStart->year;
             $eventStart->year = $startDate->year;
