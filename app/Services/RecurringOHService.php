@@ -94,6 +94,7 @@ class RecurringOHService
         ];
 
         foreach ($calendar->events as $event) {
+            $this->normalizeEvent($event, $startDate, $endDate);
             $isValid = $this->validateEvent($event, $startDate, $endDate);
 
             if ($isValid) {
@@ -260,6 +261,32 @@ class RecurringOHService
         return $properties;
     }
 
+    public function normalizeEvent(Event $event, Carbon $startDate, Carbon $endDate)
+    {
+        $eventStart = new Carbon($event->start_date);
+        $eventEnd = new Carbon($event->end_date);
+
+        $frequency = $this->getFrequency($event);
+
+        if ($frequency == self::YEARLY) {
+            // Normalize start and end date:
+            // An event can have a start date of 2018-05-01 09:00:00 and an end
+            // date of 2018-05-01 17:00:00, but have an 'until' value of
+            // 2020-12-31. This would represent all 1sts of May for years 2018,
+            // 2019 and 2020. We need to get the event that lies within our
+            // start and end date filters.
+
+            $difference = $eventEnd->year - $eventStart->year;
+            $eventStart->year = $startDate->year;
+            while ($eventStart->lessThan($startDate)) {
+                $eventStart->year++;
+            }
+            $eventEnd->year = $eventStart->year;
+            $eventEnd->addYears($difference);
+            $event->start_date = $eventStart->format('Y-m-d H:i:s');
+            $event->end_date = $eventEnd->format('Y-m-d H:i:s');
+        }
+    }
 
     /**
      * @param Event $event

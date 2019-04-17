@@ -63,7 +63,7 @@ class UpdateVestaOpeninghoursTest extends \TestCase
      * @test
      * @group validation
      */
-    public function testFailOnEmptyService()
+    public function testRemoveOnEmptyService()
     {
         $this->app->singleton(RecurringOHService::class, function () {
             $mock = $this->createMock(\App\Services\RecurringOHService::class, ['getServiceOutput']);
@@ -73,15 +73,19 @@ class UpdateVestaOpeninghoursTest extends \TestCase
 
             return $mock;
         });
-        $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta']);
-        $this->setExpectedException(
-            \Exception::class,
-            'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
-            '). Check the logs for details. - No data was found to send to VEST'
-        );
-        $job = new UpdateVestaOpeninghours($service->identifier, $service->id, true);
+        $this->app->singleton(VestaService::class, function () {
+            $mock = $this->createMock(\App\Services\VestaService::class, ['updateOpeninghours']);
+            $mock->expects($this->atLeastOnce())
+                ->method('emptyOpeninghours')
+                ->willReturn(true);
 
-        $queue = dispatch($job);
+            return $mock;
+        });
+
+        $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta']);
+        $job = new UpdateVestaOpeninghours($service->identifier, $service->id, true);
+        $job->handle();
+        $this->assertTrue(true);
     }
 
     /**
