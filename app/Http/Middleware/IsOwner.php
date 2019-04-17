@@ -8,15 +8,18 @@ use Illuminate\Auth\AuthenticationException;
 
 class IsOwner extends HasRoleInService
 {
+
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
+     * @param bool $excludeEditor
      *
      * @return mixed
+     * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $excludeEditor = false)
     {
         if ($request->user('api')->hasRole('Admin')) {
             return $next($request);
