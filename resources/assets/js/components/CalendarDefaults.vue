@@ -19,16 +19,16 @@
         </div>
         <div v-if="!cal.closinghours">
             <div class="form-group row" :class="{ 'has-error': !isValid }">
-                <div class="col-xs-3">
+                <div class="col-xs-6">
                     <label>Van</label>
                     <input type="time" class="form-control control-time inp-startTime"
-                           aria-label="Van"
+                           aria-label="Van" style="line-height: unset"
                            v-model="defaultStartTime">
                 </div>
-                <div class="col-xs-3">
+                <div class="col-xs-6">
                     <label :aria-describedby="`next_day_${this._uid}`">tot</label>
                     <input type="time" class="form-control control-time inp-endTime"
-                           aria-label="tot"
+                           aria-label="tot" style="line-height: unset"
                            v-model="defaultEndTime">
                 </div>
                 <span class="col-xs-9  col-sm-offset-3 text-danger" :id="`next_day_${this._uid}`"
