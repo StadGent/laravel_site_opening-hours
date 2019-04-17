@@ -32,7 +32,7 @@ class RecurringOHServiceTest extends \TestCase
      */
     public function testAService()
     {
-        $startDate = Carbon::today()->startOfWeek();
+        $startDate = Carbon::create(2018,3,1)->startOfWeek();
         $endDate = $startDate->copy()->addMonths(3);
 
         $service = Service::find(1);
