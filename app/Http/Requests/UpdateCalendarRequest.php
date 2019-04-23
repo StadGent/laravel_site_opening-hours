@@ -30,7 +30,7 @@ class UpdateCalendarRequest extends FormRequest
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
 
-        return $this->user()->hasRole('Admin')
+        return $this->user()->hasRole('Admin') || $this->user()->hasRole('Editor')
         || $users->hasRoleInService($this->user()->id, $serviceId, 'Owner')
         || $users->hasRoleInService($this->user()->id, $serviceId, 'Member');
     }

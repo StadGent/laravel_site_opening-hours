@@ -46,7 +46,7 @@ class PresetsController extends Controller
         $endPeriode = new Carbon($request->input('end_date'));
         $this->output = [];
         // handle some data
-        $this->getFequenties($startPeriode);
+        $this->getFrequenties($startPeriode);
         $this->getHolidays($startPeriode, $endPeriode);
 
         return response()->json($this->output);
@@ -58,7 +58,7 @@ class PresetsController extends Controller
      *
      * @return void
      */
-    private function getFequenties(Carbon $startPeriode)
+    private function getFrequenties(Carbon $startPeriode)
     {
         DefaultEvent::where('rrule', 'FREQ=YEARLY')->get()
             ->each(function ($event) use ($startPeriode) {
@@ -74,7 +74,10 @@ class PresetsController extends Controller
                 $obj->rrule = $event->rrule;
                 $obj->label = $event->label;
 
-                $this->output[] = $obj;
+                if (!isset($this->output['recurring'])) {
+                    $this->output['recurring'] = [];
+                }
+                $this->output['recurring'][] = $obj;
             });
     }
 
@@ -93,8 +96,8 @@ class PresetsController extends Controller
                 $obj = new \stdClass();
                 // limit the holidays periode to the begin of the requested periode
                 $tmpStart = new Carbon($event->start_date);
-                if ($startPeriode > $tmpStart) {
-                    $tmpStart = $startPeriode->copy()->subYear(1);
+                while ($startPeriode > $tmpStart) {
+                    $tmpStart = $tmpStart->addDay(1);
                 }
                 $obj->start_date = $tmpStart->format('Y-m-d');
                 // limit the holidays periode to the end of the requested periode
@@ -105,7 +108,13 @@ class PresetsController extends Controller
                 $obj->ended = $tmpEnd->format('Y-m-d');
                 $obj->label = $event->label;
 
-                $this->output[] = $obj;
+                if (!isset($this->output['unique'])) {
+                    $this->output['unique'] = [];
+                }
+                if (!isset($this->output['unique'][$tmpEnd->year])) {
+                    $this->output['unique'][$tmpEnd->year] = [];
+                }
+                $this->output['unique'][$tmpEnd->year][] = $obj;
             });
     }
 }

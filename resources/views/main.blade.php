@@ -30,6 +30,7 @@
 
   var initialUser = {!! json_encode(Auth::user()) !!};
   initialUser.admin = {!! json_encode(Auth::user()->hasRole('Admin')) !!};
+  initialUser.editor = {!! json_encode(Auth::user()->hasRole('Editor')) !!};
   Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
   var appName = {!! json_encode(config('app.name')) !!};
 

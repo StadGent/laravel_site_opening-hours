@@ -1,5 +1,5 @@
 import {fetchError, Hub} from '../lib.js'
-import {ADMIN, OWNER, MEMBER, API_PREFIX, COULD_NOT_DENY_ACCESS, NO_VALID_EMAIL, ID_MISSING} from "../constants.js";
+import {ADMIN, EDITOR, OWNER, MEMBER, API_PREFIX, COULD_NOT_DENY_ACCESS, NO_VALID_EMAIL, ID_MISSING} from "../constants.js";
 
 export default {
     data() {
@@ -50,6 +50,8 @@ export default {
                     return MEMBER;
                 case 'Owner':
                     return OWNER;
+                case 'Editor':
+                    return EDITOR
                 default:
                     return role;
             }
@@ -105,11 +107,10 @@ export default {
                 .then(this.statusReset)
                 .catch(fetchError)
         });
-        Hub.$on('patchRole', user => {
+        Hub.$on('patchRole', (user, next) => {
             this.statusStart();
 
-            user.service_id = user.service_id || this.routeService.id;
-            user.role = user.role || 'Member';
+            user.service_id = user.service_id || this.routeService.id || null;
             user.user_id = user.user_id || user.id;
 
             if (!user.user_id) {
@@ -120,8 +121,12 @@ export default {
             this.$http.patch(API_PREFIX + '/roles', user)
                 .then(({data}) => {
                     user.role = data.role;
+                    if (next) {
+                        next(data.role)
+                    }
                 })
                 .then(this.statusReset)
+                .then(this.fetchUsers)
                 .catch(fetchError)
         });
         Hub.$on('deleteRole', role => {
