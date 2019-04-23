@@ -31,7 +31,7 @@ class StoreOpeninghoursRequest extends FormRequest
 
         $serviceId = $channel->service->id;
 
-        return $this->user()->hasRole('Admin')
+        return $this->user()->hasRole('Admin') || $this->user()->hasRole('Editor')
         || $users->hasRoleInService($this->user()->id, $serviceId, 'Owner')
         || $users->hasRoleInService($this->user()->id, $serviceId, 'Member');
     }

@@ -18,7 +18,8 @@ class ChannelController extends Controller
      */
     public function __construct(ChannelRepository $channels)
     {
-        $this->middleware('hasRoleInService');
+        $this->middleware('hasRoleInService')->except('destroy');
+        $this->middleware('hasRoleInService:true')->only('destroy');
         $this->channels = $channels;
     }
 
@@ -42,7 +43,6 @@ class ChannelController extends Controller
 
         return response()->json($channel);
     }
-
 
     /**
      * Update the specified resource in storage.

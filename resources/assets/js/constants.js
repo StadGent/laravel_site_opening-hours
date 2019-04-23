@@ -12,6 +12,7 @@ export const SERVICE_COMPLETE_TOOLTIP = 'Alle kanalen hebben minstens een kalend
 export const MEMBER = 'Lid';
 export const OWNER = 'Eigenaar';
 export const ADMIN = 'Admin';
+export const EDITOR = 'Redacteur';
 
 // API
 export const API_PREFIX = '/api/v1/ui';
@@ -29,5 +30,6 @@ export const EVENT_INVALID_RANGE = 'Een event mag niet starten of eindigen buite
 export const IS_RECREATEX = 'Recreatex data kan hier niet gewijzigd worden.';
 export const START_AFTER_END = 'De start ligt na het einde.';
 export const START_AFTER_UNTIL = 'De begindatum ligt na de einddatum.';
-export const NAME_CANNOT_BE_EXCEPTION = 'De naam van de kalender kan niet "uitzondering" zijn.';
-export const NO_EVENTS = 'Er zijn geen gebeurtenissen in deze kalender.';
+export const NAME_CANNOT_BE_EXCEPTION = 'De naam van de uitzondering kan niet "uitzondering" zijn.';
+export const NAME_REQUIRED = 'De uitzondering moet een naam hebben.';
+export const NO_EVENTS = 'Er zijn geen gebeurtenissen in deze uitzondering.';

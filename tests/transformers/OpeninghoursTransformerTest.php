@@ -163,8 +163,8 @@ class OpeninghoursTransformerTest extends \TestCase
         $transformer = new OpeninghoursTransformer();
         $transformer->setIncludeIsOpenNow(true);
         $transformer->setService($service);
-        $transformer->setStart(Carbon::now());
-        $transformer->setEnd(Carbon::now()->addMinute(1));
+        $transformer->setStart(Carbon::create(2018,3,1));
+        $transformer->setEnd(Carbon::create(2018,3,1)->addMinute(1));
         $transformer->setLocaleService($this->localeService);
 
         $data = $transformer->transformJsonCollection($service->channels);

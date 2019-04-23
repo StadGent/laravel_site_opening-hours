@@ -1,38 +1,38 @@
 <template>
   <div class="container">
-    <h1>{{ isAdmin ? 'Admin' : 'Mijn diensten' }}</h1>
-      <div>
-        <span v-if="isAdmin">
-
+    <h1 v-if="isAdmin" v-text="">Admin</h1>
+    <h1 v-else-if="isEditor">Alle diensten</h1>
+    <h1 v-else>Mijn diensten</h1>
+    <div>
+      <span v-if="isAdmin">
         <span v-if="!draft" class="btn-group">
           <button type="button" class="btn btn-primary" :class="{ 'active': !route.tab }" @click="route.tab=0">Beheer diensten</button>
           <button type="button" class="btn btn-primary" :class="{ 'active': route.tab=='users' }" @click="route.tab='users'">Beheer gebruikers</button>
         </span>
-
-          <button type="button" class="btn btn-primary" @click="newUser" v-if="route.tab == 'users'">+ Gebruiker uitnodigen</button>
-          <button type="button" class="btn btn-primary" @click="draft = !draft" v-if="!route.tab">
-              {{draft ? "Terug naar actieve diensten" : "+ Activeer diensten"}}
-          </button>
-        </span>
-          <span v-else>
-          <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
-        </span>
-          <form class="pull-right">
-            <div class="form-group">
-                <input aria-label="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
-                       v-model="query"
-                       v-if="this.showSearch"
-                       @input="route.offset=0"
-                       class="form-control"
-                       :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
-                       style="max-width:300px"
-                       type="search">
-            </div>
-        </form>
-      </div>
+        <button type="button" class="btn btn-primary" @click="newUser" v-if="route.tab == 'users'">+ Gebruiker uitnodigen</button>
+        <button type="button" class="btn btn-primary" @click="draft = !draft" v-if="!route.tab">
+            {{draft ? "Terug naar actieve diensten" : "+ Activeer diensten"}}
+        </button>
+      </span>
+      <span v-else-if="!isEditor">
+        <button type="button" class="btn btn-default" @click="requestService">Vraag toegang tot een dienst</button>
+      </span>
+      <form class="pull-right">
+          <div class="form-group">
+              <input aria-label="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
+                     v-model="query"
+                     v-if="this.showSearch"
+                     @input="route.offset=0"
+                     class="form-control"
+                     :placeholder="'Zoek ' + (route.tab ? 'gebruikers' : (draft ? 'inactive':'actieve') + ' diensten')"
+                     style="max-width:300px"
+                     type="search">
+          </div>
+      </form>
+    </div>
 
     <!-- Users -->
-    <div v-if="isAdmin&&route.tab==='users'">
+    <div v-if="isAdmin && route.tab==='users'">
       <div v-if="!users.length" class="table-message">
         <h3 class="text-muted">
           Er zijn nog geen gebruikers op het platform. Mogelijke oorzaken:
@@ -51,7 +51,7 @@
           <tr>
             <th-sort by="name">Naam gebruiker</th-sort>
             <th-sort by="email">E-mailadres</th-sort>
-            <th-sort by="services">Diensten</th-sort>
+            <th-sort by="services">Rollen</th-sort>
             <th-sort by="verified">Actief</th-sort>
             <th class="text-right">Verwijder</th>
           </tr>
@@ -95,6 +95,7 @@
             <th-sort by="label">Naam dienst</th-sort>
             <th-sort class="narrow" by="source">Bron</th-sort>
             <th-sort by="status" class="narrow">Status</th-sort>
+            <th-sort by="end_date" class="narrow">Verloopt op</th-sort>
             <th-sort class="narrow" by="updated_at">Aangepast</th-sort>
             <th class="text-right narrow">Deactiveer</th>
           </tr>
@@ -109,6 +110,7 @@
             <th-sort by="label">Naam dienst</th-sort>
             <th-sort class="narrow" by="source">Bron</th-sort>
             <th-sort by="status" class="narrow">Status</th-sort>
+            <th-sort by="end_date" class="narrow">Verloopt op</th-sort>
             <th-sort class="narrow" by="updated_at">Aangepast</th-sort>
           </tr>
         </thead>

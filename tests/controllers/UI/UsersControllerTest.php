@@ -47,6 +47,12 @@ class UsersControllerTest extends \TestCase
             ['admin', 'unknown', 'Owner', '1', '200'], // can add owner
             ['admin', 'unknown', 'Member', '1', '200'], // can add member
 
+            ['editor', 'unknown', 'Admin', '', '401'], // cannot add admin
+            ['editor', 'member@foo.bar', 'Admin', '', '401'], // cannot make himself Admin
+            ['editor', 'unknown', 'Owner', '1', '401'], // cannot add owner
+            ['editor', 'member@foo.bar', 'Owner', '1', '401'], // cannot make himself Owner
+            ['editor', 'unknown', 'Member', '1', '401'], // cannot add member
+
             ['owner', 'unknown', 'Admin', '', '401'], // cannot add admin
             ['owner', 'unknown', 'Owner', '5', '401'], // cannot assign others to not owned service
             ['owner', 'owner@foo.bar', 'Owner', '5', '401'], // cannot assign himself to not owned service
@@ -113,6 +119,26 @@ class UsersControllerTest extends \TestCase
     /**
      * @test
      */
+    public function testWhenLinkedUserIsMadeEditorTheLinkToTheServicesAreNotRemoved()
+    {
+        $adminUser = \App\Models\User::where('name', 'adminuser')->first();
+        $this->actingAs($adminUser, 'api');
+
+        $ownerUser = \App\Models\User::where('name', 'owneruser')->first();
+
+        $this->assertCount(1, app('UserRepository')->getAllRolesForUser($ownerUser->id));
+
+        $request = [
+            'email' => $ownerUser->email,
+            'role' => 'Editor',
+        ];
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+        $this->assertCount(1, app('UserRepository')->getAllRolesForUser($ownerUser->id));
+    }
+
+    /**
+     * @test
+     */
     public function testWhenAdminIsMadeOwnerHeIsRemovedFromTheGlobalAdminRole()
     {
         Mail::fake();
@@ -142,6 +168,30 @@ class UsersControllerTest extends \TestCase
             [$createdUser['id']]
         );
         $this->assertCount(0, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function testWhenEditorIsMadeOwnerHeIsNotRemovedFromTheGlobalEditorRole()
+    {
+        Mail::fake();
+        $adminUser = \App\Models\User::where('name', 'adminuser')->first();
+        $this->actingAs($adminUser, 'api');
+
+        $editorUser = \App\Models\User::where('name', 'editoruser')->first();
+
+        // Editor user is also to be Owner of Service 1
+        $request['email'] = $editorUser['email'];
+        $request['role'] = 'Owner';
+        $request['service_id'] = '1';
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
+
+        $result = \DB::select(
+            'SELECT * FROM role_user WHERE user_id = ?',
+            [$editorUser['id']]
+        );
+        $this->assertCount(1, $result);
     }
 
     /**
@@ -238,6 +288,15 @@ class UsersControllerTest extends \TestCase
             ['admin', 'patch', 'users/1', $data, '405'], // update (partial)
             ['admin', 'delete', 'users/2', [], '200'], // destroy
             ['admin', 'delete', 'users/1', [], '401'], // you can't delete yourself
+            // editor user
+            ['editor', 'get', 'users', [], '401'], // index
+            ['editor', 'get', 'services/1/users', [], '401'], // index
+            ['editor', 'post', 'users', $data, '405'], // store
+            ['editor', 'get', 'users/1', [], '401'], // show
+            ['editor', 'put', 'users/1', $data, '405'], // update (full)
+            ['editor', 'patch', 'users/1', $data, '405'], // update (partial)
+            ['editor', 'delete', 'users/2', [], '401'], // destroy
+            ['editor', 'delete', 'users/1', [], '401'], // you can't delete yourself
             // owner user
             ['owner', 'get', 'users', [], '401'], // index
             ['owner', 'get', 'services/1/users', [], '200'], // getFromService

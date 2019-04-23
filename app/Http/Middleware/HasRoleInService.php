@@ -12,17 +12,25 @@ use Illuminate\Http\Request;
 
 class HasRoleInService
 {
+
     /**
      * Handle an incoming request.
      *
      * @param \Illuminate\Http\Request $request
      * @param \Closure $next
      *
+     * @param $excludeEditor
+     *
      * @return mixed
+     * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $excludeEditor = false)
     {
         if ($request->user('api')->hasRole('Admin')) {
+            return $next($request);
+        }
+
+        if (!$excludeEditor && $request->user('api')->hasRole('Editor')) {
             return $next($request);
         }
 
