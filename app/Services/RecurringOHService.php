@@ -136,7 +136,9 @@ class RecurringOHService
             $currentAvailability = $rulesArray['availability'];
 
             if ($currentPeriod == $lastPeriod && $lastAvailability == $currentAvailability) {
-                $rulesMatrix[$index - 1]['hours'] = $rulesMatrix[$index - 1]['hours'] . ' en ' . $rulesArray['hours'];
+                $matrixKeys = array_keys($rulesMatrix);
+                $prevKey = array_search($index, $matrixKeys) - 1;
+                $rulesMatrix[$matrixKeys[$prevKey]]['hours'] = $rulesMatrix[$matrixKeys[$prevKey]]['hours'] . ' en ' . $rulesArray['hours'];
                 unset($rulesMatrix[$index]);
                 continue;
             }
