@@ -59,8 +59,9 @@ class ServicesRepository extends EloquentRepository
 
         $rawSubQuery = \DB::raw("(select  c.service_id, c.id channelId ,
                 if(oh.id is null, true, false) missingOH,
-                if(group_concat(oh.active) like '%1%', 1, 0) activeOH
+                if(group_concat((select oh.start_date < curdate() and oh.end_date > curdate())) like '%1%', 1, 0) activeOH
                 from channels c left join openinghours oh on c.id = oh.channel_id
+                where c.deleted_at is null
                 group by c.id) as tmp");
 
         $rawEndDateQuery = \DB::raw("(select c.service_id, max(oh.end_date) as end_date
