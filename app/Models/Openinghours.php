@@ -115,7 +115,6 @@ class Openinghours extends Model
             foreach (Calendar::find($calendar['id'])->events->toArray() as $event) {
                 // update period of the base openinghours
                 if ($new_calendar->priority === 0) {
-
                     // in case of opening hours past midnight, end date is next day
                     // we need to keep the difference in days between start and end date
                     try {
@@ -132,16 +131,16 @@ class Openinghours extends Model
                             ->format('Y-m-d');
 
                         // update date, keep time
-                        $event['end_date'] = $end_date . ' ' . explode(' ',
-                                $event['end_date'])[1];
+                        $event['end_date'] = $end_date . ' ' .
+                            explode(' ', $event['end_date'])[1];
                     } catch (Exception $e) {
                         // just in case some date value was malformed, keep the old behaviour
-                        $event['end_date'] = $this->start_date . ' ' . explode(' ',
-                                $event['end_date'])[1];
+                        $event['end_date'] = $this->start_date . ' ' .
+                            explode(' ', $event['end_date'])[1];
                     } finally {
                         // update date, keep time
-                        $event['start_date'] = $this->start_date . ' ' . explode(' ',
-                                $event['start_date'])[1];
+                        $event['start_date'] = $this->start_date . ' ' .
+                            explode(' ', $event['start_date'])[1];
                     }
 
                     // update until to end_date of the version
