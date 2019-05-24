@@ -110,14 +110,14 @@ class Openinghours extends Model
         foreach (Openinghours::find($originalVersion)->calendars->toArray() as $calendar) {
             $calendar['openinghours_id'] = $this->id;
             $calendar['published'] = false;
-            $new_calendar = Calendar::create($calendar);
+            $newCalendar = Calendar::create($calendar);
 
             foreach (Calendar::find($calendar['id'])->events->toArray() as $event) {
-                // update period of the base openinghours
-                if ($new_calendar->priority === 0) {
+                // Update period of the base openinghours.
+                if ($newCalendar->priority === 0) {
                     $event = $this->adjustBaseEvent($event);
                 }
-                $event['calendar_id'] = $new_calendar->id;
+                $event['calendar_id'] = $newCalendar->id;
                 Event::create($event);
             }
         }
@@ -132,35 +132,35 @@ class Openinghours extends Model
      */
     private function adjustBaseEvent($event)
     {
-        // in case of opening hours past midnight, end date is next day
-        // we need to keep the difference in days between start and end date
+        // In case of opening hours past midnight, end date is next day
+        // we need to keep the difference in days between start and end date.
         try {
-            // get the difference in days
-            $start_date = new DateTime($event['start_date']);
-            $end_date = new DateTime($event['end_date']);
-            $start_date->setTime(0, 0, 0, 0);
-            $end_date->setTime(0, 0, 0, 0);
-            $days_difference = $start_date->diff($end_date)->days;
+            // Get the difference in days.
+            $startDate = new DateTime($event['start_date']);
+            $endDate = new DateTime($event['end_date']);
+            $startDate->setTime(0, 0, 0, 0);
+            $endDate->setTime(0, 0, 0, 0);
+            $daysDifference = $startDate->diff($endDate)->days;
 
-            // add the same difference ot the current start_date
-            $end_date = (new DateTime($this->start_date))
-                ->add(new DateInterval('P' . $days_difference . 'D'))
+            // Add the same difference ot the current start_date.
+            $endDate = (new DateTime($this->start_date))
+                ->add(new DateInterval('P' . $daysDifference . 'D'))
                 ->format('Y-m-d');
 
-            // update date, keep time
-            $event['end_date'] = $end_date . ' ' .
+            // Update date, keep time.
+            $event['end_date'] = $endDate . ' ' .
                 explode(' ', $event['end_date'])[1];
         } catch (Exception $e) {
-            // just in case some date value was malformed, keep the old behaviour
+            // Just in case some date value was malformed, keep the old behaviour.
             $event['end_date'] = $this->start_date . ' ' .
                 explode(' ', $event['end_date'])[1];
         } finally {
-            // update date, keep time
+            // Update date, keep time.
             $event['start_date'] = $this->start_date . ' ' .
                 explode(' ', $event['start_date'])[1];
         }
 
-        // update until to end_date of the version
+        // Update until to end_date of the version.
         $event['until'] = $this->end_date;
         return $event;
     }
