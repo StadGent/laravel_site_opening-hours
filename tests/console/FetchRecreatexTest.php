@@ -8,7 +8,7 @@ use App\Models\Service;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class FetchRecreatexTest extends \TestCase
+class FetchRecreatexTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

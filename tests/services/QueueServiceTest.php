@@ -7,7 +7,7 @@ use App\Models\QueuedJob;
 use App\Services\QueueService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class QueueServiceTest extends \TestCase
+class QueueServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

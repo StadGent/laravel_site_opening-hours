@@ -4,7 +4,8 @@ env:
 language: php
 
 php:
-  - 5.6.30
+  - 7.2
+#  - 7.3 # https://github.com/laravel/framework/issues/26936
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -17,8 +18,9 @@ before_script:
   - ./vendor/bin/robo digipolis:install-laravel
   - php artisan db:seed
   - php artisan passport:keys
+  - chmod go-rwx ./storage/oauth-public.key
 
 script:
   - vendor/bin/phpunit --disallow-test-output --report-useless-tests --strict-coverage -d error_reporting=-1 --coverage-clover=build/logs/clover.xml tests
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT  
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

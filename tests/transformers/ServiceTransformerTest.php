@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ServiceTransformerTest extends \TestCase
+class ServiceTransformerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

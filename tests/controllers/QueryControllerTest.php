@@ -4,7 +4,7 @@ namespace Tests\Controllers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class QueryControllerTest extends \TestCase
+class QueryControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -244,7 +244,7 @@ class QueryControllerTest extends \TestCase
                 "details" => [
                     [
                         "code" => "NotValidParameter",
-                        "message" => "The until must be a date after or equal to :date.",
+                        "message" => "The until must be a date after or equal to from.",
                         "target" => "until",
                     ],
                 ],

@@ -9,7 +9,7 @@ use App\Models\Openinghours;
 use App\Models\QueuedJob;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class VestaServiceTest extends \TestCase
+class VestaServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
     /**

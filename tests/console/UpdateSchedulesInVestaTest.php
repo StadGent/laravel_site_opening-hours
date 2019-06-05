@@ -5,7 +5,7 @@ namespace Tests\Console;
 use App\Jobs\UpdateVestaOpeninghours;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class UpdateSchedulesInVestaTest extends \TestCase
+class UpdateSchedulesInVestaTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
