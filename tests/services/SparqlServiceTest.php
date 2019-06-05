@@ -6,7 +6,7 @@ use App\Repositories\LodServicesRepository;
 use App\Services\SparqlService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class SparqlServiceTest extends \TestCase
+class SparqlServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

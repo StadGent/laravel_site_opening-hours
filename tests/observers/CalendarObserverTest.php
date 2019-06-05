@@ -4,7 +4,7 @@ namespace Tests\Observers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class CalendarObserverTest extends \TestCase
+class CalendarObserverTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

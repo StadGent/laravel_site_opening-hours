@@ -11,7 +11,7 @@ use App\Services\RecurringOHService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class RecurringOHServiceTest extends \TestCase
+class RecurringOHServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

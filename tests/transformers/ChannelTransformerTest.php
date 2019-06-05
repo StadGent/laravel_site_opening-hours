@@ -7,7 +7,7 @@ use App\Models\Channel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ChannelTransformerTest extends \TestCase
+class ChannelTransformerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

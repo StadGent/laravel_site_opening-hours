@@ -19,23 +19,17 @@ class VerifyCsrfToken extends BaseVerifier
      */
     public function handle($request, Closure $next)
     {
-        if (
-            $this->isReading($request) ||
-            $this->runningUnitTests() ||
-            $this->shouldPassThrough($request) ||
-            $this->tokensMatch($request)
-        ) {
-            return $this->addCookieToResponse($request, $next($request));
+        try {
+            return parent::handle($request, $next);
+        } catch (TokenMismatchException $ex) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'csrf' => true,
+                    'token' => csrf_token(),
+                    'message' => 'The page was open for too long and this triggered our security protection. (csrf)'
+                ], 452);
+            }
+            throw $ex;
         }
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'csrf' => true,
-                'token' => csrf_token(),
-                'message' => 'The page was open for too long and this triggered our security protection. (csrf)'
-            ], 452);
-        }
-
-        throw new TokenMismatchException;
     }
 }

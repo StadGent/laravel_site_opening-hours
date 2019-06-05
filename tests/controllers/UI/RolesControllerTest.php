@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 
-class RolesControllerTest extends \TestCase
+class RolesControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

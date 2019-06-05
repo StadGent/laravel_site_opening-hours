@@ -18,8 +18,16 @@ class UidProcessor
     public function __invoke(array $record)
     {
         $record['extra']['uid'] = 0;
-        $user = auth()->user();
-        $uid = $user ? $user->getAuthIdentifier() : null;
+        try {
+            $auth = auth();
+            if (!$auth) {
+                return $record;
+            }
+            $user = $auth->user();
+            $uid = $user ? $user->getAuthIdentifier() : null;
+        } catch (\Exception $e) {
+            // Do nothing. We could not load the current user.
+        }
         if (null === $uid) {
             return $record;
         }
