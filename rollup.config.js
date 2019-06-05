@@ -12,7 +12,6 @@ export default {
   plugins: [
     vue2(),
     buble(),
-    process.argv.indexOf('--live') > 1 && livereload('./public'),
     // nodeResolve(),
     // commonjs({
     //   include: 'node_modules/**'
