@@ -49,8 +49,8 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
     public function testFailOnWrongService()
     {
         $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'recreatex']);
-        $this->setExpectedException(
-            \Exception::class,
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage(
             'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
             '). Check the logs for details. - Incompatible with VESTA or uid JyeehBab'
         );
@@ -95,8 +95,8 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
     public function testFailForDraft()
     {
         $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta', 'draft' => 1]);
-        $this->setExpectedException(
-            \Exception::class,
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage(
             'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
             '). Check the logs for details. - Service is inactive'
         );
