@@ -4,7 +4,7 @@ namespace Tests\Controllers\UI;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ChannelControllerTest extends \TestCase
+class ChannelControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

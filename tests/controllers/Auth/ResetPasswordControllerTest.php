@@ -4,13 +4,16 @@ namespace Tests\Controllers\Auth;
 
 use App\Mail\SendPasswordResetNotification;
 use App\Models\User;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
-class ResetPasswordControllerTest extends \TestCase
+class ResetPasswordControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
+
+    protected $hasher;
 
     /**
      * setup for each test
@@ -19,6 +22,7 @@ class ResetPasswordControllerTest extends \TestCase
     {
         parent::setUp();
         Mail::fake();
+        $this->hasher = $this->app->make(Hasher::class);
     }
 
     /**
@@ -35,9 +39,9 @@ class ResetPasswordControllerTest extends \TestCase
 
         // Perform order shipping...
         $record = DB::table('password_resets')->select('token')->where('email', $user->email)->first();
-
-        Mail::assertSent(SendPasswordResetNotification::class, function ($mail) use ($record) {
-            return $mail->token === $record->token;
+        $hasher = $this->hasher;
+        Mail::assertSent(SendPasswordResetNotification::class, function ($mail) use ($record, $hasher) {
+            return $hasher->check($mail->token, $record->token);
         });
     }
 }
