@@ -105,7 +105,6 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-      parent::unauthenticated($request, $exception);
         if ($request->isJson() || $request->expectsJson()) {
             $this->errorObj = new \stdClass();
             $this->errorObj->code = "AuthenticationException";
