@@ -5,6 +5,7 @@ namespace Database\Seeds;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UsersTableSeeder extends Seeder
 {
@@ -21,7 +22,7 @@ class UsersTableSeeder extends Seeder
             $admin = User::create([
                 'name' => 'admin',
                 'email' => 'admin@foo.bar',
-                'password' => bcrypt($password),
+                'password' => Hash::make($password),
             ]);
             $admin->save();
             $admin->attachRole(Role::where('name', 'Admin')->first());
