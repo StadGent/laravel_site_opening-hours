@@ -6,7 +6,8 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -18,19 +19,26 @@ class Handler extends ExceptionHandler
      * @var stdClass
      */
     private $errorObj;
+
     /**
-     * A list of the exception types that should not be reported.
+     * A list of the exception types that are not reported.
      *
      * @var array
      */
     protected $dontReport = [
-        \Illuminate\Auth\AuthenticationException::class,
-        \Illuminate\Auth\Access\AuthorizationException::class,
-        \Symfony\Component\HttpKernel\Exception\HttpException::class,
-        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
-        \Illuminate\Session\TokenMismatchException::class,
-        \Illuminate\Validation\ValidationException::class,
+        //
     ];
+
+    /**
+     * A list of the inputs that are never flashed for validation exceptions.
+     *
+     * @var array
+     */
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
+    ];
+
     /**
      * setup basic error Obj with main properties
      *
@@ -70,9 +78,9 @@ class Handler extends ExceptionHandler
      * http://docs.oasis-open.org/odata/odata-json-format/v4.0/os/odata-json-format-v4.0-os.html#_Toc372793091
      * search dynamic for handler method of exception type
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function render($request, Exception $exception)
     {
@@ -91,9 +99,9 @@ class Handler extends ExceptionHandler
     /**
      * Convert an authentication exception into an unauthenticated response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $exception
-     * @return \Illuminate\Http\Response 401
+     * @param  Request  $request
+     * @param  AuthenticationException  $exception
+     * @return Response 401
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
@@ -116,7 +124,7 @@ class Handler extends ExceptionHandler
      * The requested path could not match a route in the API
      *
      * @param NotFoundHttpException $exception
-     * @return \Illuminate\Http\Response 404
+     * @return Response 404
      */
     protected function handleNotFoundHttpException(NotFoundHttpException $exception)
     {
@@ -131,7 +139,7 @@ class Handler extends ExceptionHandler
      * The used HTTP method is not allowed on this route in the API
      *
      * @param MethodNotAllowedHttpException $exception
-     * @return \Illuminate\Http\Response 405
+     * @return Response 405
      */
     protected function handleMethodNotAllowedHttpException(MethodNotAllowedHttpException $exception)
     {
@@ -146,7 +154,7 @@ class Handler extends ExceptionHandler
      * The used HTTP Accept header is not allowed on this route in the API
      *
      * @param NotAcceptableHttpException $exception
-     * @return \Illuminate\Http\Response 406
+     * @return Response 406
      */
     protected function handleNotAcceptableHttpException(NotAcceptableHttpException $exception)
     {
@@ -162,7 +170,7 @@ class Handler extends ExceptionHandler
      * https://restpatterns.mindtouch.us/HTTP_Status_Codes/422_-_Unprocessable_Entity
      *
      * @param ModelNotFoundException $exception
-     * @return \Illuminate\Http\Response 422
+     * @return Response 422
      */
     protected function handleModelNotFoundException(ModelNotFoundException $exception)
     {
@@ -181,7 +189,7 @@ class Handler extends ExceptionHandler
      * https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#examples
      *
      * @param ValidationException $exception
-     * @return \Illuminate\Http\Response 400
+     * @return Response 400
      */
     protected function handleValidationException(ValidationException $exception)
     {

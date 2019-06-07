@@ -31,7 +31,6 @@ class RoboFile extends RoboFileBase
         $this->stopOnFail(true);
         $this->taskPHPUnit()
             ->option('disallow-test-output')
-            ->option('report-useless-tests')
             ->option('strict-coverage')
             ->option('-d error_reporting=-1')
             ->option('--coverage-clover=build/logs/clover.xml')
