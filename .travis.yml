@@ -21,6 +21,6 @@ before_script:
   - chmod go-rwx ./storage/oauth-public.key
 
 script:
-  - vendor/bin/phpunit --disallow-test-output --report-useless-tests --strict-coverage -d error_reporting=-1 --coverage-clover=build/logs/clover.xml tests
+  - vendor/bin/phpunit --disallow-test-output --strict-coverage -d error_reporting=-1 --coverage-clover=build/logs/clover.xml tests
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
