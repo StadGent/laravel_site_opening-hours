@@ -51,7 +51,7 @@ class SparqlServiceTest extends \BrowserKitTestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\Exception::class);
         $this->sparqlService->setClient('http://stad.gent');
     }
 
@@ -64,7 +64,7 @@ class SparqlServiceTest extends \BrowserKitTestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException(\GuzzleHttp\Exception\ConnectException::class);
+        $this->expectException(\GuzzleHttp\Exception\ConnectException::class);
         $this->sparqlService->setClient('http://thisIsNotAnEndpoint');
     }
 
@@ -77,7 +77,7 @@ class SparqlServiceTest extends \BrowserKitTestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException(\GuzzleHttp\Exception\ClientException::class);
+        $this->expectException(\GuzzleHttp\Exception\ClientException::class);
         $this->sparqlService->setClient(
             env('SPARQL_WRITE_ENDPOINT'),
             'WrongUserName',

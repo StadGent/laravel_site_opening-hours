@@ -44,7 +44,8 @@ class VestaServiceTest extends \BrowserKitTestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException('Exception', 'A guid is required to update the data in VESTA');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A guid is required to update the data in VESTA');
         $this->vestaService->updateOpeninghours('');
     }
 
@@ -57,7 +58,8 @@ class VestaServiceTest extends \BrowserKitTestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException('Exception', 'A guid is required to request the data from VESTA');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A guid is required to request the data from VESTA');
         $this->vestaService->getOpeningshoursByGuid('');
     }
 
@@ -70,7 +72,7 @@ class VestaServiceTest extends \BrowserKitTestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException('SoapFault');
+        $this->expectException(\SoapFault::class);
         $this->vestaService->updateOpeninghours('inVallidIdentifier', 'SomeDummyData');
     }
 
@@ -102,7 +104,7 @@ class VestaServiceTest extends \BrowserKitTestCase
             return;
         }
 
-        $this->setExpectedException('Exception');
+        $this->expectException(\Exception::class);
         $openinghours = Openinghours::first();
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'thisIsNotAType');
     }
