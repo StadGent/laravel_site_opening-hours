@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -92,7 +93,7 @@ class RegisterController extends Controller
         $user = User::where('email', $input['email'])->first();
 
         if (!empty($user)) {
-            $user->password = bcrypt($input['password']);
+            $user->password = Hash::make($input['password']);
             $user->token = null;
             $user->save();
 
