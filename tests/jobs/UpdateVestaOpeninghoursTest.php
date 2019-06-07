@@ -8,7 +8,7 @@ use App\Services\RecurringOHService;
 use App\Services\VestaService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class UpdateVestaOpeninghoursTest extends \TestCase
+class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

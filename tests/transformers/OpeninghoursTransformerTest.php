@@ -9,7 +9,7 @@ use App\Services\LocaleService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class OpeninghoursTransformerTest extends \TestCase
+class OpeninghoursTransformerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

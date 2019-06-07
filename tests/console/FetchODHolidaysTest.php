@@ -6,7 +6,7 @@ use App\Models\DefaultCalendar;
 use App\Models\DefaultEvent;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class FetchODHolidaysTest extends \TestCase
+class FetchODHolidaysTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

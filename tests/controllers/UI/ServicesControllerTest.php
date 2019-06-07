@@ -9,7 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ServicesControllerTest extends \TestCase
+class ServicesControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

@@ -5,7 +5,7 @@ namespace Tests;
 use App\Models\Channel;
 use App\Models\Service;
 
-class OpeningHoursScenarioTest extends \TestCase
+class OpeningHoursScenarioTest extends \BrowserKitTestCase
 {
     /**
      * @var string
