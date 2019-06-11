@@ -23,7 +23,7 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->initQDriver = env('QUEUE_DRIVER');
+        $this->initQDriver = env('QUEUE_CONNECTION');
         config(['queue.default' => 'sync']);
 
         $this->app->singleton(RecurringOHService::class, function () {
