@@ -28,6 +28,7 @@ use App\Services\UserService;
 use App\Services\VestaService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         Channel::observe(ChannelObserver::class);
         Openinghours::observe(OpeninghoursObserver::class);
         Schema::defaultStringLength(191);
+        Passport::withCookieSerialization();
     }
 
     /**
