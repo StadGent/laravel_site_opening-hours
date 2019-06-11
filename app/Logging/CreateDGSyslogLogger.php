@@ -39,10 +39,26 @@ class CreateDGSyslogLogger
         $logger->pushProcessor(new UidProcessor());
 
         // Syslog handler.
-        $handler = new SyslogHandler('openingsuren', defined('LOG_LOCAL4') ? LOG_LOCAL4 : 160, 'debug', true, LOG_ODELAY);
+        $handler = new SyslogHandler(
+            'openingsuren',
+            defined('LOG_LOCAL4') ? LOG_LOCAL4 : 160,
+            'debug',
+            true,
+            LOG_ODELAY
+        );
 
         // Format parseable for kibana.
-        $formatter = new LineFormatter('%extra.base_url%|%timestamp%|laravel|%level_name%|%extra.client_ip%|%extra.base_url%%extra.url%|%extra.referrer%|%extra.uid%||%message%');
+        $formatter = new LineFormatter(
+            '%extra.base_url%'
+            . '|%timestamp%'
+            . '|laravel'
+            . '|%level_name%'
+            . '|%extra.client_ip%'
+            . '|%extra.base_url%%extra.url%'
+            . '|%extra.referrer%'
+            . '|%extra.uid%'
+            . '||%message%'
+        );
         $handler->setFormatter($formatter);
 
         // Set the handler.
