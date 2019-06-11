@@ -112,8 +112,8 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'name' => ['string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         ]);
     }
 
@@ -126,8 +126,8 @@ class RegisterController extends Controller
     protected function registrationCompletionValidator(array $data)
     {
         return Validator::make($data, [
-            'email' => 'required|email',
-            'password' => 'min:6|confirmed',
+            'email' => ['required', 'email'],
+            'password' => ['min:6', 'confirmed'],
         ]);
     }
 
