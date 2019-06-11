@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -16,7 +18,7 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'password' => Illuminate\Support\Facades\Hash::make('secret'),
-        'remember_token' => str_random(10),
-        'token' => str_random(10),
+        'remember_token' => Str::random(10),
+        'token' => Str::random(10),
     ];
 });
