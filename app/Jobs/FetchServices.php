@@ -3,11 +3,8 @@
 namespace App\Jobs;
 
 use App\Repositories\LodServicesRepository;
-use App\Repositories\ServicesRepository;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Arr;
 
 class FetchServices extends BaseJob implements ShouldQueue
 {
@@ -32,7 +29,7 @@ class FetchServices extends BaseJob implements ShouldQueue
 
         foreach ($types as $type) {
             collect((new LodServicesRepository())->fetchServices($type))->each(function ($service) use ($services, $type) {
-                $uniqueProperties = array_only($service, ['uri', 'identifier']);
+                $uniqueProperties = Arr::only($service, ['uri', 'identifier']);
 
                 $service['source'] = $type;
 

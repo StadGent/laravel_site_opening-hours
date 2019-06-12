@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UsersTableSeeder extends Seeder
 {
@@ -18,7 +19,7 @@ class UsersTableSeeder extends Seeder
     {
         $admin = User::where('email', 'admin@foo.bar')->first();
         if (empty($admin)) {
-            $password = str_random();
+            $password = Str::random();
             $admin = User::create([
                 'name' => 'admin',
                 'email' => 'admin@foo.bar',

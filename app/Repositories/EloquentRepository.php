@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use Illuminate\Support\Arr;
+
 class EloquentRepository
 {
     protected $model;
@@ -85,7 +87,7 @@ class EloquentRepository
 
     public function update($modelId, $properties)
     {
-        $properties = array_only($properties, $this->model->getFillable());
+        $properties = Arr::only($properties, $this->model->getFillable());
 
         $model = $this->model->find($modelId);
 
