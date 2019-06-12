@@ -22,9 +22,9 @@
         </whitelist>
     </filter>
     <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="CACHE_DRIVER" value="array"/>
-        <env name="SESSION_DRIVER" value="array"/>
+        <server name="APP_ENV" value="testing"/>
+        <server name="CACHE_DRIVER" value="array"/>
+        <server name="SESSION_DRIVER" value="array"/>
     </php>
     <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>

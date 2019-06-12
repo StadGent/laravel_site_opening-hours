@@ -15,7 +15,7 @@ class OpeningHoursScenarioTest extends \BrowserKitTestCase
     /**
      * setup for each test
      */
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         $service = Service::first();

@@ -8,6 +8,8 @@ use App\Models\Event;
 use App\Models\Openinghours;
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * Class FetchRecreatex
@@ -418,7 +420,7 @@ class FetchRecreatex extends BaseCommand
         // Catch the 00:00 case, the feed is supposed to deliver daily events
         // but to make a "full day open" 2 days are passed with the second day
         // having 00:00
-        if (str_contains($timestamp, '00:00:00')) {
+        if (Str::contains($timestamp, '00:00:00')) {
             $date = clone $eventDate;
             $date->startOfDay();
         }
@@ -444,7 +446,7 @@ class FetchRecreatex extends BaseCommand
         // Catch the 00:00 case, the feed is supposed to deliver daily events
         // but to make a "full day open" 2 days are passed with the second day
         // having 00:00
-        if (str_contains($timestamp, '00:00:00')) {
+        if (Str::contains($timestamp, '00:00:00')) {
             $date = clone $eventDate;
             $date->endOfDay();
         }
@@ -484,7 +486,7 @@ class FetchRecreatex extends BaseCommand
 
         $key = 'InfrastructureOpenings.InfrastructureOpeningHours.InfrastructureOpeningHours.OpenHours.OpeningHour';
 
-        return array_get($transformedData, $key, 0);
+        return Arr::get($transformedData, $key, 0);
     }
 
     /**
