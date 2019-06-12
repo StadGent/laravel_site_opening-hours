@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -127,7 +128,7 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'email' => ['required', 'email'],
-            'password' => ['min:6', 'confirmed'],
+            'password' => ['min:8', 'confirmed'],
         ]);
     }
 
@@ -143,7 +144,7 @@ class RegisterController extends Controller
             'name' => @$data['name'],
             'email' => $data['email'],
             'password' => '',
-            'token' => str_random(32),
+            'token' => Str::random(32),
             'verified' => false,
         ]);
 

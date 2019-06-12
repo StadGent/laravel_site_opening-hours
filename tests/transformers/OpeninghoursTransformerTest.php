@@ -23,9 +23,9 @@ class OpeninghoursTransformerTest extends \BrowserKitTestCase
      */
     private $service;
 
-    public function setup()
+    public function setUp(): void
     {
-        parent::setup();
+        parent::setUp();
 
         $this->localeService = app('LocaleService');
         $this->localeService->setDateFormat('d-m-Y');

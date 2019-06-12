@@ -20,7 +20,7 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
     /**
      * setup for each test
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->initQDriver = env('QUEUE_CONNECTION');
@@ -36,7 +36,7 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
         });
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         config(['queue.default' => $this->initQDriver]);
         parent::tearDown();

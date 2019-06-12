@@ -25,7 +25,7 @@ class VestaServiceTest extends \BrowserKitTestCase
     /**
      * @return null
      */
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         if (env('APP_SKIP_TRAVIS_TEST')) {

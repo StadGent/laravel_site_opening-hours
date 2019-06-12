@@ -5,6 +5,7 @@ namespace Database\Seeds;
 use App\Jobs\FetchServices;
 use App\Models\Service;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ServicesTableSeeder extends Seeder
 {
@@ -56,7 +57,7 @@ class ServicesTableSeeder extends Seeder
         foreach ($sampleServiceNames as $serviceName) {
             factory(Service::class)
                 ->create([
-                    'uri' => 'http://dev.foo/' . str_slug($serviceName),
+                    'uri' => 'http://dev.foo/' . Str::slug($serviceName),
                     'label' => $serviceName,
                 ]);
         }
