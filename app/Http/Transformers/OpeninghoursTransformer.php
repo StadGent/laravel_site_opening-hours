@@ -9,6 +9,7 @@ use App\Services\LocaleService;
 use Carbon\Carbon;
 use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class OpeninghoursTransformer implements TransformerInterface
@@ -118,7 +119,7 @@ class OpeninghoursTransformer implements TransformerInterface
         }
 
         if ($this->hasOneChannel) {
-            $data = array_first($data);
+            $data = Arr::first($data);
         }
         return json_encode($data);
     }
