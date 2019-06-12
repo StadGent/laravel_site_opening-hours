@@ -16,7 +16,7 @@ class QueueServiceTest extends \BrowserKitTestCase
      */
     private $channelService;
 
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         $this->queueService = app(QueueService::class);
