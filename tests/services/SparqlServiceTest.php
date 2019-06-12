@@ -3,8 +3,8 @@
 namespace Tests\Services;
 
 use App\Repositories\LodServicesRepository;
-use App\Services\SparqlService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Arr;
 
 class SparqlServiceTest extends \BrowserKitTestCase
 {
@@ -18,9 +18,9 @@ class SparqlServiceTest extends \BrowserKitTestCase
     /**
      * @return null
      */
-    public function setup()
+    public function setUp(): void
     {
-        parent::setup();
+        parent::setUp();
 
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
@@ -137,7 +137,7 @@ class SparqlServiceTest extends \BrowserKitTestCase
         $response = $this->sparqlService->post($query);
         // see if results are correct
         $data = json_decode($response, true);
-        $resultString = array_get($data, 'results.bindings.0.callret-0.value');
+        $resultString = Arr::get($data, 'results.bindings.0.callret-0.value');
         $succesString = 'Insert into <' . env('SPARQL_WRITE_GRAPH') . '>, 1 (or less) triples -- done';
         $this->assertEquals($succesString, $resultString);
         $this->assertEquals(200, $this->sparqlService->getLastResponceCode());
@@ -153,7 +153,7 @@ class SparqlServiceTest extends \BrowserKitTestCase
         $response = $this->sparqlService->post($query);
         // see if results are correct
         $data = json_decode($response, true);
-        $resultString = array_get($data, 'results.bindings.0.callret-0.value');
+        $resultString = Arr::get($data, 'results.bindings.0.callret-0.value');
         $succesString = 'Modify <' . env('SPARQL_WRITE_GRAPH') . '>, delete 1 (or less) ' .
             'and insert 1 (or less) triples -- done';
         $this->assertEquals($succesString, $resultString);
@@ -167,7 +167,7 @@ class SparqlServiceTest extends \BrowserKitTestCase
         $response = $this->sparqlService->get($query);
         // see if results are correct
         $data = json_decode($response, true);
-        $resultString = array_get($data, 'results.bindings.0.callret-0.value');
+        $resultString = Arr::get($data, 'results.bindings.0.callret-0.value');
         $succesString = 'Delete from <' . env('SPARQL_WRITE_GRAPH') . '>, 1 (or less) triples -- done';
         $this->assertEquals($succesString, $resultString);
 
@@ -195,11 +195,11 @@ class SparqlServiceTest extends \BrowserKitTestCase
         $this->assertEquals(200, $this->sparqlService->getLastResponceCode());
         // see if results are correct
         $data = json_decode($response, true);
-        $subtest = array_get($data, 'results.bindings');
+        $subtest = Arr::get($data, 'results.bindings');
         $this->assertCount(($endValue ? 1 : 0), $subtest);
         // check end result
         if ($endValue) {
-            $resultString = array_get($data, 'results.bindings.0.value.value');
+            $resultString = Arr::get($data, 'results.bindings.0.value.value');
             $this->assertEquals($endValue, $resultString);
         }
     }

@@ -20,7 +20,7 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
      */
     private $recurringOHService;
 
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         $this->recurringOHService = app(RecurringOHService::class);

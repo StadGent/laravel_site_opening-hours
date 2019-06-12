@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Role;
 use App\Models\User;
 use DB;
+use Illuminate\Support\Arr;
 
 class UserRepository extends EloquentRepository
 {
@@ -26,7 +27,7 @@ class UserRepository extends EloquentRepository
         $existingUser = $this->model->where('email', $input['email'])->first();
 
         if (empty($existingUser)) {
-            $input = array_only($input, $this->model->getFillable());
+            $input = Arr::only($input, $this->model->getFillable());
 
             return parent::store($input);
         }
