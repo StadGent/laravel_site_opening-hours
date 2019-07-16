@@ -1029,16 +1029,16 @@
         },
         {
             "name": "digipolisgent/robo-digipolis-helpers",
-            "version": "1.0.0-alpha2",
+            "version": "1.0.0-alpha3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digipolisgent/robo-digipolis-helpers.git",
-                "reference": "e8119dd90cfe6510ff7a05ac0bcf095891ed8d6a"
+                "reference": "dcf3a26ec44a49d53633d16bc02cac640255410e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-helpers/zipball/e8119dd90cfe6510ff7a05ac0bcf095891ed8d6a",
-                "reference": "e8119dd90cfe6510ff7a05ac0bcf095891ed8d6a",
+                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-helpers/zipball/dcf3a26ec44a49d53633d16bc02cac640255410e",
+                "reference": "dcf3a26ec44a49d53633d16bc02cac640255410e",
                 "shasum": ""
             },
             "require": {
@@ -1077,7 +1077,7 @@
                 }
             ],
             "description": "Helper to create a basic deploy flow.",
-            "time": "2019-07-16T09:18:45+00:00"
+            "time": "2019-07-16T13:39:03+00:00"
         },
         {
             "name": "digipolisgent/robo-digipolis-laravel",
