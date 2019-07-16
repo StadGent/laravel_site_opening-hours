@@ -85,10 +85,10 @@ class Handler extends ExceptionHandler
         $this->initErrorObj();
         $reflect = new \ReflectionClass($exception);
         $method = 'handle' . $reflect->getShortName();
-        if (method_exists($this, $method)) {
+        if (method_exists($this, $method) && ($request->isJson() || $request->expectsJson() || $method === 'unauthenticated')) {
             $this->errorObj->code = $reflect->getShortName();
 
-            return $this->$method($exception)->header('Access-Control-Allow-Origin', '*');
+            return $this->$method($exception, $request)->header('Access-Control-Allow-Origin', '*');
         }
 
         return parent::render($request, $exception);
