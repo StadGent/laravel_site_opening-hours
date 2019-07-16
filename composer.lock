@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "22ec7aa4985c994b90d145caeaa2dcf8",
+    "content-hash": "7861595b8be4b684ac417788f5d81ae4",
     "packages": [
         {
             "name": "adoy/fastcgi-client",
@@ -1081,16 +1081,16 @@
         },
         {
             "name": "digipolisgent/robo-digipolis-laravel",
-            "version": "dev-develop",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digipolisgent/robo-digipolis-laravel.git",
-                "reference": "9cc8f4d05d89e4b695eed1b15c90dfe0648c9b49"
+                "reference": "27769df656bf1a76a729d573199c967c33b6148d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/9cc8f4d05d89e4b695eed1b15c90dfe0648c9b49",
-                "reference": "9cc8f4d05d89e4b695eed1b15c90dfe0648c9b49",
+                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/27769df656bf1a76a729d573199c967c33b6148d",
+                "reference": "27769df656bf1a76a729d573199c967c33b6148d",
                 "shasum": ""
             },
             "require": {
@@ -1126,7 +1126,7 @@
                 }
             ],
             "description": "Basic deploy flow for a Laravel site.",
-            "time": "2019-07-16T12:47:19+00:00"
+            "time": "2019-07-16T13:46:26+00:00"
         },
         {
             "name": "digipolisgent/robo-digipolis-package",
@@ -8392,9 +8392,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "digipolisgent/robo-digipolis-laravel": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
