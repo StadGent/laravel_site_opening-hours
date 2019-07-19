@@ -10,6 +10,10 @@ export default {
       format: 'es',
       sourcemap: true
   },
+  watch: {
+      chokidar: false,
+      include: 'resources/assets/*/**'
+  },
   plugins: [
     vue2(),
     buble(),
