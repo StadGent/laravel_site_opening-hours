@@ -164,7 +164,7 @@
                     <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
                 <div class="col-xs-5">
-                    <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
+                    <multi-day-select :options="fullDays" :value="optionByweekday" @input="optionByweekday = $event"></multi-day-select>
                 </div>
             </div>
 
