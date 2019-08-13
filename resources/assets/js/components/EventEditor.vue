@@ -164,7 +164,7 @@
                     <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
                 <div class="col-xs-5">
-                    <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
+                    <multi-day-select :options="fullDays" :value="optionByweekday" @input="optionByweekday = $event"></multi-day-select>
                 </div>
             </div>
 
@@ -373,9 +373,11 @@
             },
             optionByweekday: {
                 get() {
+                    console.log(this.options.byweekday ? this.options.byweekday.map(wd => wd.weekday || 0).join(',') : '0')
                     return this.options.byweekday ? this.options.byweekday.map(wd => wd.weekday || 0).join(',') : '0';
                 },
                 set(v) {
+                    console.log('setting', v)
                     if (v) {
                         this.options.byweekday = v.split(',').map(wd => ({weekday: parseInt(wd)}));
                         this.sync();
