@@ -376,7 +376,6 @@
                     return this.options.byweekday ? this.options.byweekday.map(wd => wd.weekday || 0).join(',') : '0';
                 },
                 set(v) {
-                    console.log('setting', v)
                     if (v) {
                         this.options.byweekday = v.split(',').map(wd => ({weekday: parseInt(wd)}));
                         this.sync();
