@@ -373,7 +373,6 @@
             },
             optionByweekday: {
                 get() {
-                    console.log(this.options.byweekday ? this.options.byweekday.map(wd => wd.weekday || 0).join(',') : '0')
                     return this.options.byweekday ? this.options.byweekday.map(wd => wd.weekday || 0).join(',') : '0';
                 },
                 set(v) {
