@@ -58,7 +58,7 @@ class CalendarsController extends Controller
 
         // If events are passed, bulk insert them
         // Base calendars can have no events
-        if (!empty($input['events'] || $input['layer'] == 0)) {
+        if (!empty($input['events'])) {
             $this->bulkInsert($id, $input['events']);
         }
         /*
@@ -111,7 +111,6 @@ class CalendarsController extends Controller
             $event['calendar_id'] = $calendarId;
         });
 
-        error_log($events);
         // Detach the current events from the calendar, then bulk insert them
         app('EventRepository')->deleteForCalendar($calendarId);
 

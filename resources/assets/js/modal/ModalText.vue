@@ -278,9 +278,6 @@ export default {
       Hub.$emit('inviteUser', this.modal)
     }
   },
-  mounted () {
-    console.log(inert(this.modal))
-  },
   updated () {
     const inp = this.$el.querySelector('input');
     inp && inp.focus()
