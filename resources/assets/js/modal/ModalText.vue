@@ -30,16 +30,16 @@
           <div v-else-if="modal.text=='newVersion'">
             <div class="form-group">
               <label for="recipient-name" class="control-label">Naam van de versie</label>
-              <input type="text" class="form-control" v-model="modal.label" :placeholder="nextVersionLabel">
+              <input id="recipient-name" type="text" class="form-control" v-model="modal.label" :placeholder="nextVersionLabel">
             </div>
             <div class="row form-group">
               <div class="col-sm-6">
                 <label for="start_date" class="control-label">Geldig van</label>
-                <pikaday id="start_date" class="form-control" v-model="modal.start_date" :options="pikadayStart" />
+                <pikaday id="start_date" class="form-control" :value="modal.start_date" @input="modal.start_date = $event" :options="pikadayStart" />
               </div>
               <div class="col-sm-6">
                 <label for="end_date" class="control-label">Verloopt op</label>
-                <pikaday id="end_date" class="form-control" v-model="modal.end_date" :options="pikadayEnd" />
+                <pikaday id="end_date" class="form-control" :value="modal.end_date" @input="modal.end_date = $event" :options="pikadayEnd" />
               </div>
             </div>
             <div v-if="modal.id" class="alert alert-warning">
@@ -277,6 +277,9 @@ export default {
 
       Hub.$emit('inviteUser', this.modal)
     }
+  },
+  mounted () {
+    console.log(inert(this.modal))
   },
   updated () {
     const inp = this.$el.querySelector('input');
