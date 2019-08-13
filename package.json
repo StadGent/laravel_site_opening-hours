@@ -1,5 +1,4 @@
 {
-  "private": true,
   "scripts": {
     "sass": "node-sass resources/assets/sass/app.scss > public/css/app.css",
     "devsass": "node-sass -w resources/assets/sass/app.scss -o public/css",
@@ -8,7 +7,7 @@
   },
   "name": "openinghours",
   "description": "Manage and publish opening hours",
-  "repository": "https://github.com/weconnectdata/openinghours",
+  "repository": "https://github.com/StadGent/laravel_site_opening-hours",
   "dependencies": {
     "bootstrap-sass": "^3.3.7",
     "gulp": "^4.0.0",
