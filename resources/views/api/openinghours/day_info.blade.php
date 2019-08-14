@@ -32,7 +32,8 @@ if (isset($type) && $isOpen) {
 }
 ?>
 <div class="{{ $outerClass }}" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
-    <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}" property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
+    <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}"
+         property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
             <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span class="openinghours--date-between">, </span>
         @endif
@@ -51,11 +52,17 @@ if (isset($type) && $isOpen) {
                     <div class="openinghours--time">
                         <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
                         <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">
-                            @lang('openinghourApi.HH:MM', ['HH' => substr($hours['from'],0,2), 'MM' => substr($hours['from'],3,2)])&nbsp;@lang('openinghourApi.SHORT_HOUR')
+                            @lang('openinghourApi.HH:MM', [
+                            'HH' => substr($hours['from'],0,2),
+                            'MM' => substr($hours['from'],3,2)
+                            ])&nbsp;@lang('openinghourApi.SHORT_HOUR')
                         </time>
                         <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
                         <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">
-                            @lang('openinghourApi.HH:MM', ['HH' => substr($hours['until'],0,2), 'MM' => substr($hours['until'],3,2)])&nbsp;@lang('openinghourApi.SHORT_HOUR')
+                            @lang('openinghourApi.HH:MM', [
+                            'HH' => substr($hours['until'],0,2),
+                            'MM' => substr($hours['until'],3,2)
+                            ])&nbsp;@lang('openinghourApi.SHORT_HOUR')
                         </time>
                     </div>
                     @if(end($dayInfoObj->hours) != $hours)
