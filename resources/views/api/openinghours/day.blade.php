@@ -13,13 +13,17 @@
 
     @if($default && ($default['openinghours'][0]->open || !$booking || !$booking['openinghours'][0]->open))
         @foreach($default['openinghours'] as $dayInfoObj)
-            @include('api.openinghours.day_info_short', ['dayInfoObj' => $dayInfoObj, 'type' => $default['channelTypeLabel'],])
+            @include('api.openinghours.day_info_short', [
+            'dayInfoObj' => $dayInfoObj,
+            'type' => $default['channelTypeLabel'],])
         @endforeach
     @endif
 
     @if($booking)
         @foreach($booking['openinghours'] as $dayInfoObj)
-            @include('api.openinghours.day_info_short', ['dayInfoObj' => $dayInfoObj, 'type' => $booking['channelTypeLabel'],])
+            @include('api.openinghours.day_info_short', [
+            'dayInfoObj' => $dayInfoObj,
+            'type' => $booking['channelTypeLabel'],])
         @endforeach
     @endif
 
