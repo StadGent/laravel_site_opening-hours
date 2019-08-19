@@ -4,11 +4,11 @@
              v-if="event.rrule && $parent.cal.layer">
             <div class="col-xs-5">
                 <label class="control-label">Geldig vanaf</label>
-                <pikaday class="form-control inp-startDate" v-model="eventStartDate" :options="pikadayStart"/>
+                <pikaday :value="eventStartDate" @input="eventStartDate = $event" class="form-control inp-startDate" :options="pikadayStart"/>
             </div>
             <div class="col-xs-5">
                 <label class="control-label">tot en met</label>
-                <pikaday class="form-control inp-until" v-model="eventUntil" :options="pikadayUntil"/>
+                <pikaday :value="eventUntil" @input="eventUntil = $event" class="form-control inp-until" :options="pikadayUntil"/>
             </div>
             <div class="col-xs-2">
                 <div class="close close--col" style="padding-top: 30px;" @click="$emit('rm')">&times;</div>
@@ -164,7 +164,7 @@
                     <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
                 <div class="col-xs-5">
-                    <multi-day-select :options="fullDays" v-model="optionByweekday"></multi-day-select>
+                    <multi-day-select :options="fullDays" :value="optionByweekday" @input="optionByweekday = $event"></multi-day-select>
                 </div>
             </div>
 
