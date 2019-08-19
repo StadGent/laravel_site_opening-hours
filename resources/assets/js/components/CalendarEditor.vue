@@ -180,7 +180,8 @@
                 }
 
                 // Cannot save a calendar with no events
-                if (!this.showPresets && !this.showDefaults && this.events.length === 0) {
+                // Except for the base calendar
+                if (this.cal.layer !== 0 && !this.showPresets && !this.showDefaults && this.events.length === 0) {
                     return NO_EVENTS;
                 }
 
