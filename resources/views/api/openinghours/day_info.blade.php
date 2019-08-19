@@ -1,7 +1,7 @@
 <?php
 /** @var Carbon\Carbon $date */
 $date = $dayInfoObj->date;
-$isOpen = !empty($dayInfoObj->hours);
+$isOpen = ! empty($dayInfoObj->hours);
 $status = $isOpen ? 'OPEN' : 'CLOSED';
 $dayName = $date->format('l');
 $translatedDayName = trans('openinghourApi.' . $date->format('l'));
@@ -14,7 +14,7 @@ if ((new \Carbon\Carbon())->isSameDay($date)) {
     $specialDayName = trans('openinghourApi.TODAY');
 } elseif ((new \Carbon\Carbon())->addDay()->isSameDay($date)) {
     $specialDayName = trans('openinghourApi.TOMORROW');
-}elseif ((new \Carbon\Carbon())->subDay()->isSameDay($date)){
+} elseif ((new \Carbon\Carbon())->subDay()->isSameDay($date)) {
     $specialDayName = trans('openinghourApi.YESTERDAY');
 };
 
@@ -22,8 +22,8 @@ $referenceDate = clone $dayInfoObj->date;
 $referenceDate->endOfDay();
 $isDayPassed = (new \Carbon\Carbon())->greaterThan($referenceDate);
 
-$outerClass = 'openinghours openinghours--details openinghours--day-'.strtolower($status);
-if($isDayPassed){
+$outerClass = 'openinghours openinghours--details openinghours--day-' . strtolower($status);
+if ($isDayPassed) {
     $outerClass .= ' openinghours--day-passed';
 }
 
@@ -35,7 +35,8 @@ if (isset($type) && $isOpen) {
     <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}"
          property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
-            <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span class="openinghours--date-between">, </span>
+            <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span
+                    class="openinghours--date-between">, </span>
         @endif
         <span class="openinghours--date-day-of-week"><link property="dayOfWeek" href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}</span>
         <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])</span>
@@ -49,20 +50,29 @@ if (isset($type) && $isOpen) {
             <span class="openinghours--status">{{ $translatedStatus }}</span>
             @if($isOpen)
                 @foreach($dayInfoObj->hours as $hours)
+                    @php
+                        $from = trans('openinghourApi.HH:MM', [
+                                'HH' => substr($hours['from'],0,2),
+                                'MM' => substr($hours['from'],3,2)
+                                ]);
+                        $from = preg_replace('/\D00$/', '', $from);
+                        $from = preg_replace('/^0/', '', $from);
+
+                        $until = trans('openinghourApi.HH:MM', [
+                                'HH' => substr($hours['until'],0,2),
+                                'MM' => substr($hours['until'],3,2)
+                                ]);
+                        $until = preg_replace('/\D00$/', '', $until);
+                        $until = preg_replace('/^0/', '', $until);
+                    @endphp
                     <div class="openinghours--time">
                         <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
                         <time property="opens" datetime="{{ $hours['from'] }}" aria-label="{{ $hours['from'] }}">
-                            @lang('openinghourApi.HH:MM', [
-                            'HH' => substr($hours['from'],0,2),
-                            'MM' => substr($hours['from'],3,2)
-                            ])&nbsp;@lang('openinghourApi.SHORT_HOUR')
+                            {{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')
                         </time>
                         <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
                         <time property="closes" datetime="{{ $hours['until'] }}" aria-label="{{ $hours['until']}}">
-                            @lang('openinghourApi.HH:MM', [
-                            'HH' => substr($hours['until'],0,2),
-                            'MM' => substr($hours['until'],3,2)
-                            ])&nbsp;@lang('openinghourApi.SHORT_HOUR')
+                            {{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')
                         </time>
                     </div>
                     @if(end($dayInfoObj->hours) != $hours)
