@@ -32,13 +32,16 @@ if (isset($type) && $isOpen) {
 }
 ?>
 <div class="{{ $outerClass }}" property="openingHoursSpecification" typeof="OpeningHoursSpecification">
-    <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}{{ !$isSameYear? " openinghours--different-year": ""}}"
+    <div class="openinghours--date{{ $specialDayName? " openinghours--special-day": ""}}
+    {{ !$isSameYear? " openinghours--different-year": ""}}"
          property="validFrom validThrough" datetime="{{ $date->toDateString() }}">
         @if($specialDayName)
             <span class="openinghours--date-special-day">{{ $specialDayName }}</span><span
                     class="openinghours--date-between">, </span>
         @endif
-        <span class="openinghours--date-day-of-week"><link property="dayOfWeek" href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}</span>
+        <span class="openinghours--date-day-of-week"><link property="dayOfWeek" href="http://schema.org/{{ $dayName }}">
+            {{ $translatedDayName }}
+        </span>
         <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])</span>
         <span class="openinghours--date-month">{{ $translatedMonthName }}</span>
         @if(!$isSameYear)
