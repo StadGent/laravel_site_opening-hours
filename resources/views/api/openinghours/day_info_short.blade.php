@@ -58,10 +58,15 @@ if (isset($type) && $isOpen) {
                                 'HH' => substr($hours['from'],0,2),
                                 'MM' => substr($hours['from'],3,2)
                                 ]);
+                        $from = preg_replace('/\D00$/', '', $from);
+                        $from = preg_replace('/^0/', '', $from);
+
                         $until = trans('openinghourApi.HH:MM', [
                                 'HH' => substr($hours['until'],0,2),
                                 'MM' => substr($hours['until'],3,2)
                                 ]);
+                        $until = preg_replace('/\D00$/', '', $until);
+                        $until = preg_replace('/^0/', '', $until);
                     @endphp
                     <div class="openinghours--time">
                         <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
