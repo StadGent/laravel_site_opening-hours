@@ -1,4 +1,5 @@
 {{--Check if the channel has multiple channels--}}
+multiple days
 <?php $hasMultipleChannels = count($data) > 1; ?>
 @foreach($data as $channelData)
     {{--If multiple channels are present the channel name is printed--}}
