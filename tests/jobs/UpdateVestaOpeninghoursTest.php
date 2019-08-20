@@ -8,7 +8,7 @@ use App\Services\RecurringOHService;
 use App\Services\VestaService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class UpdateVestaOpeninghoursTest extends \TestCase
+class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -20,10 +20,10 @@ class UpdateVestaOpeninghoursTest extends \TestCase
     /**
      * setup for each test
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-        $this->initQDriver = env('QUEUE_DRIVER');
+        $this->initQDriver = env('QUEUE_CONNECTION');
         config(['queue.default' => 'sync']);
 
         $this->app->singleton(RecurringOHService::class, function () {
@@ -36,7 +36,7 @@ class UpdateVestaOpeninghoursTest extends \TestCase
         });
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         config(['queue.default' => $this->initQDriver]);
         parent::tearDown();
@@ -49,8 +49,8 @@ class UpdateVestaOpeninghoursTest extends \TestCase
     public function testFailOnWrongService()
     {
         $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'recreatex']);
-        $this->setExpectedException(
-            \Exception::class,
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage(
             'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
             '). Check the logs for details. - Incompatible with VESTA or uid JyeehBab'
         );
@@ -95,8 +95,8 @@ class UpdateVestaOpeninghoursTest extends \TestCase
     public function testFailForDraft()
     {
         $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta', 'draft' => 1]);
-        $this->setExpectedException(
-            \Exception::class,
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage(
             'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
             '). Check the logs for details. - Service is inactive'
         );

@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ServiceTransformerTest extends \TestCase
+class ServiceTransformerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -26,9 +26,9 @@ class ServiceTransformerTest extends \TestCase
 
     const DATETIME_REPLACEMENT = "/[0-9]{4}(-[0-9]{2}){2}T[0-9]{2}(:[0-9]{2}){2}\+[0-9]{2}:[0-9]{2}/";
 
-    public function setup()
+    public function setUp(): void
     {
-        parent::setup();
+        parent::setUp();
 
         $this->service = \App\Models\Service::first();
         $this->transformer = new ServiceTransformer();

@@ -7,7 +7,7 @@ use App\Jobs\UpdateVestaOpeninghours;
 use App\Services\ChannelService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ChannelServiceTest extends \TestCase
+class ChannelServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -16,7 +16,7 @@ class ChannelServiceTest extends \TestCase
      */
     private $channelService;
 
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         $this->channelService = app('ChannelService');

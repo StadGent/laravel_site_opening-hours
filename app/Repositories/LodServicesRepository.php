@@ -2,8 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Services\SparqlService;
-use EasyRdf_Graph as Graph;
+use Illuminate\Support\Arr;
 
 /**
  * This class is responsible for fetching services from a SPARQL endpoint
@@ -72,19 +71,19 @@ class LodServicesRepository
         $services = [];
 
         $data = json_decode($data, true);
-        $data = array_get($data, 'results.bindings', []);
+        $data = Arr::get($data, 'results.bindings', []);
 
         if (empty($data)) {
             return $services;
         }
 
         collect($data)->each(function ($agent) use (&$services) {
-            $identifier = array_get($agent, 'identifier.value', '');
+            $identifier = Arr::get($agent, 'identifier.value', '');
 
             if (!empty($identifier)) {
                 $services[] = [
-                    'label' => array_get($agent, 'name.value', ''),
-                    'uri' => array_get($agent, 'agent.value', ''),
+                    'label' => Arr::get($agent, 'name.value', ''),
+                    'uri' => Arr::get($agent, 'agent.value', ''),
                     'identifier' => $identifier,
                 ];
             }

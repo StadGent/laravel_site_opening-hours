@@ -9,7 +9,7 @@ use App\Models\Openinghours;
 use App\Models\QueuedJob;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class VestaServiceTest extends \TestCase
+class VestaServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
     /**
@@ -25,7 +25,7 @@ class VestaServiceTest extends \TestCase
     /**
      * @return null
      */
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         if (env('APP_SKIP_TRAVIS_TEST')) {
@@ -44,7 +44,8 @@ class VestaServiceTest extends \TestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException('Exception', 'A guid is required to update the data in VESTA');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A guid is required to update the data in VESTA');
         $this->vestaService->updateOpeninghours('');
     }
 
@@ -57,7 +58,8 @@ class VestaServiceTest extends \TestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException('Exception', 'A guid is required to request the data from VESTA');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A guid is required to request the data from VESTA');
         $this->vestaService->getOpeningshoursByGuid('');
     }
 
@@ -70,7 +72,7 @@ class VestaServiceTest extends \TestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
-        $this->setExpectedException('SoapFault');
+        $this->expectException(\SoapFault::class);
         $this->vestaService->updateOpeninghours('inVallidIdentifier', 'SomeDummyData');
     }
 
@@ -102,7 +104,7 @@ class VestaServiceTest extends \TestCase
             return;
         }
 
-        $this->setExpectedException('Exception');
+        $this->expectException(\Exception::class);
         $openinghours = Openinghours::first();
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'thisIsNotAType');
     }
