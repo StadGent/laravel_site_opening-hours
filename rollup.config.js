@@ -1,18 +1,22 @@
 import vue2 from 'rollup-plugin-vue2'
 import buble from 'rollup-plugin-buble'
-import livereload from 'rollup-plugin-livereload'
 // import nodeResolve from 'rollup-plugin-node-resolve'
 // import commonjs from 'rollup-plugin-commonjs'
 
 export default {
-  entry: 'resources/assets/js/app.js',
-  dest: 'public/js/bundle.js',
-  sourceMap: true,
-  format: 'es',
+  input: 'resources/assets/js/app.js',
+  output: {
+      file: 'public/js/bundle.js',
+      format: 'es',
+      sourcemap: true
+  },
+  watch: {
+      chokidar: false,
+      include: 'resources/assets/*/**'
+  },
   plugins: [
     vue2(),
     buble(),
-    process.argv.indexOf('--live') > 1 && livereload('./public'),
     // nodeResolve(),
     // commonjs({
     //   include: 'node_modules/**'

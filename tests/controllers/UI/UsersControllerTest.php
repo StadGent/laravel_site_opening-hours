@@ -8,14 +8,14 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 
-class UsersControllerTest extends \TestCase
+class UsersControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
     /**
      * setup for each test
      */
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         Mail::fake();

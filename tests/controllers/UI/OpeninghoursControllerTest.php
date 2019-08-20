@@ -5,7 +5,7 @@ namespace Tests\Controllers\UI;
 use App\Models\Openinghours;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class OpeninghoursControllerTest extends \TestCase
+class OpeninghoursControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

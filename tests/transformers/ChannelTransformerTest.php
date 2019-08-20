@@ -7,7 +7,7 @@ use App\Models\Channel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ChannelTransformerTest extends \TestCase
+class ChannelTransformerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -23,9 +23,9 @@ class ChannelTransformerTest extends \TestCase
 
     const DATETIME_REPLACEMENT = "/[0-9]{4}(-[0-9]{2}){2}T[0-9]{2}(:[0-9]{2}){2}\+[0-9]{2}:[0-9]{2}/";
 
-    public function setup()
+    public function setUp(): void
     {
-        parent::setup();
+        parent::setUp();
 
         $this->channel = \App\Models\Channel::first();
         $this->transformer = new ChannelTransformer();

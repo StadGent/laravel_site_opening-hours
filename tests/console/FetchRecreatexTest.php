@@ -8,7 +8,7 @@ use App\Models\Service;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class FetchRecreatexTest extends \TestCase
+class FetchRecreatexTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -64,7 +64,7 @@ class FetchRecreatexTest extends \TestCase
         $this->app[Kernel::class]->registerCommand($commandMockup);
 
         // Calling the command will run the mocked version of the command
-        $this->artisan('openinghours:fetch-recreatex');
+        \Artisan::call('openinghours:fetch-recreatex');
 
         // Now we check if the values are inserted into the database as expected
         $this->assertEquals(1, $service->channels->count());

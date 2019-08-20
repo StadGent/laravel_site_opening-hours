@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class DefaultEvent extends Model
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'default_events';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

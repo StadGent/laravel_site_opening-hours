@@ -417,8 +417,8 @@ class RecurringOHService
 
     private function getFullDayOutput(Carbon $event)
     {
-        $translatedDay = trans('openinghourApi.' . $event->format('l'), [], 'messages', 'nl');
-        $translatedMonth = trans('openinghourApi.' . $event->format('F'), [], 'messages', 'nl');
+        $translatedDay = trans('openinghourApi.' . $event->format('l'), [], 'nl');
+        $translatedMonth = trans('openinghourApi.' . $event->format('F'), [], 'nl');
 
         $output = strtolower($translatedDay);
         $output .= ' ';

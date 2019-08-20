@@ -5,7 +5,7 @@ namespace Tests\Controllers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\Service;
 
-class ServicesControllerTest extends \TestCase
+class ServicesControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

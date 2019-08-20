@@ -12,7 +12,7 @@ return [
     'OPEN' => 'ouvert',
     'CLOSED' => 'fermé',
     'AND' => 'et',
-    'Algemeen' => 'open',
+    'Algemeen' => 'ouvert',
     'Na afspraak' => 'sur rendez-vous',
 
     'FROM_HOUR' => 'de',

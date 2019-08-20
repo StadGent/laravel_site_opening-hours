@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Mail\SendInviteConfirmation;
 use App\Mail\SendRegisterConfirmation;
-use App\Models\Channel;
 use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 /**
  * Internal Business logic Service for User
@@ -63,7 +63,7 @@ class UserService
     public function createNewUser($email)
     {
         $input['password'] = '';
-        $input['token'] = str_random(32);
+        $input['token'] = Str::random(32);
 
         $input['email'] = $email;
         $input['name'] = $email;

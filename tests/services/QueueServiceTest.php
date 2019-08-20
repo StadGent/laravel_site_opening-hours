@@ -7,7 +7,7 @@ use App\Models\QueuedJob;
 use App\Services\QueueService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class QueueServiceTest extends \TestCase
+class QueueServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -16,7 +16,7 @@ class QueueServiceTest extends \TestCase
      */
     private $channelService;
 
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         $this->queueService = app(QueueService::class);

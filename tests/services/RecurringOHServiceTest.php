@@ -11,7 +11,7 @@ use App\Services\RecurringOHService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class RecurringOHServiceTest extends \TestCase
+class RecurringOHServiceTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -20,7 +20,7 @@ class RecurringOHServiceTest extends \TestCase
      */
     private $recurringOHService;
 
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         $this->recurringOHService = app(RecurringOHService::class);
