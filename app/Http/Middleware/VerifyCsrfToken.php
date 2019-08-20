@@ -3,11 +3,18 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as BaseVerifier;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 use Illuminate\Session\TokenMismatchException;
 
-class VerifyCsrfToken extends BaseVerifier
+class VerifyCsrfToken extends Middleware
 {
+    /**
+     * Indicates whether the XSRF-TOKEN cookie should be set on the response.
+     *
+     * @var bool
+     */
+    protected $addHttpCookie = true;
+
     /**
      * Handle an incoming request.
      *
@@ -19,23 +26,17 @@ class VerifyCsrfToken extends BaseVerifier
      */
     public function handle($request, Closure $next)
     {
-        if (
-            $this->isReading($request) ||
-            $this->runningUnitTests() ||
-            $this->shouldPassThrough($request) ||
-            $this->tokensMatch($request)
-        ) {
-            return $this->addCookieToResponse($request, $next($request));
+        try {
+            return parent::handle($request, $next);
+        } catch (TokenMismatchException $ex) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'csrf' => true,
+                    'token' => csrf_token(),
+                    'message' => 'The page was open for too long and this triggered our security protection. (csrf)'
+                ], 452);
+            }
+            throw $ex;
         }
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'csrf' => true,
-                'token' => csrf_token(),
-                'message' => 'The page was open for too long and this triggered our security protection. (csrf)'
-            ], 452);
-        }
-
-        throw new TokenMismatchException;
     }
 }

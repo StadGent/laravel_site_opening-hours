@@ -5,7 +5,7 @@ namespace Tests;
 use App\Models\Channel;
 use App\Models\Service;
 
-class OpeningHoursScenarioTest extends \TestCase
+class OpeningHoursScenarioTest extends \BrowserKitTestCase
 {
     /**
      * @var string
@@ -15,7 +15,7 @@ class OpeningHoursScenarioTest extends \TestCase
     /**
      * setup for each test
      */
-    public function setup()
+    public function setUp(): void
     {
         parent::setUp();
         $service = Service::first();

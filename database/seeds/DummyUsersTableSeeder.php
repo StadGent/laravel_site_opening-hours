@@ -5,6 +5,7 @@ namespace Database\Seeds;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DummyUsersTableSeeder extends Seeder
 {
@@ -24,11 +25,11 @@ class DummyUsersTableSeeder extends Seeder
             $user = User::create([
                 'name' => $name . 'user',
                 'email' => $name . '@foo.bar',
-                'password' => bcrypt($password),
+                'password' => Hash::make($password),
             ]);
 
             $user->save();
-            
+
             if ($name === 'admin' || $name === 'editor') {
                 $user->attachRole($roleConfig);
             } else {

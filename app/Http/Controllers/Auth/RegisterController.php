@@ -8,8 +8,10 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -92,7 +94,7 @@ class RegisterController extends Controller
         $user = User::where('email', $input['email'])->first();
 
         if (!empty($user)) {
-            $user->password = bcrypt($input['password']);
+            $user->password = Hash::make($input['password']);
             $user->token = null;
             $user->save();
 
@@ -111,8 +113,8 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'max:255',
-            'email' => 'required|email|max:255|unique:users',
+            'name' => ['string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         ]);
     }
 
@@ -125,8 +127,8 @@ class RegisterController extends Controller
     protected function registrationCompletionValidator(array $data)
     {
         return Validator::make($data, [
-            'email' => 'required|email',
-            'password' => 'min:6|confirmed',
+            'email' => ['required', 'email'],
+            'password' => ['min:8', 'confirmed'],
         ]);
     }
 
@@ -142,7 +144,7 @@ class RegisterController extends Controller
             'name' => @$data['name'],
             'email' => $data['email'],
             'password' => '',
-            'token' => str_random(32),
+            'token' => Str::random(32),
             'verified' => false,
         ]);
 

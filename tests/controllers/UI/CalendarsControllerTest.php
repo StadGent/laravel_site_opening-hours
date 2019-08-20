@@ -5,7 +5,7 @@ namespace Tests\Controllers\UI;
 use App\Models\Event;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class CalendarsControllerTest extends \TestCase
+class CalendarsControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

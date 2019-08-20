@@ -4,7 +4,7 @@ namespace Tests\Observers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ChannelObserverTest extends \TestCase
+class ChannelObserverTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
