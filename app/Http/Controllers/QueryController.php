@@ -111,15 +111,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
 
-        if ($from && $from->greaterThan($start)) {
-            $start = $from;
-        }
-
-        if ($until && $end->greaterThan($until)) {
-            $end = $until;
-        }
-
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS, false, $from, $until);
     }
 
     /**
@@ -139,15 +131,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfMonth();
         $end = $date->copy()->endOfMonth();
 
-        if ($from && $from->greaterThan($start)) {
-            $start = $from;
-        }
-
-        if ($until && $end->greaterThan($until)) {
-            $end = $until;
-        }
-
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MONTH);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MONTH,false, $from, $until);
     }
 
     /**
@@ -167,15 +151,7 @@ class QueryController extends Controller
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
 
-        if ($from && $from->greaterThan($start)) {
-            $start = $from;
-        }
-
-        if ($until && $end->greaterThan($until)) {
-            $end = $until;
-        }
-
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS);
+        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS, false, $from, $until);
     }
 
     /**
@@ -186,7 +162,11 @@ class QueryController extends Controller
      * @param Carbon $end
      * @param Service $service
      * @param Channel $channel
+     * @param $calendarLength
      * @param bool $includeIsOpenNow
+     * @param \Carbon\Carbon $from
+     * @param \Carbon\Carbon $until
+     *
      * @return Response
      */
     public function getResponse(
@@ -196,7 +176,9 @@ class QueryController extends Controller
         Service $service,
         Channel $channel,
         $calendarLength,
-        $includeIsOpenNow = false
+        $includeIsOpenNow = false,
+        Carbon $from = null,
+        Carbon $until = null
     ) {
         $this->localeService->setRequest($request);
         $hasOneChannel = isset($channel->id);
@@ -209,6 +191,13 @@ class QueryController extends Controller
         $transformer->setIncludeIsOpenNow($includeIsOpenNow);
         $transformer->setHasOneChannel($hasOneChannel);
         $transformer->setCalendarLength($calendarLength);
+
+        if (isset($from)) {
+            $transformer->setFrom($from);
+        }
+        if (isset($until)) {
+            $transformer->setUntil($until);
+        }
 
         $channels = isset($channel->id) ? (new Collection())->add($channel) : $service->channels;
 

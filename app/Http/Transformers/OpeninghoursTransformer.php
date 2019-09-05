@@ -27,6 +27,10 @@ class OpeninghoursTransformer implements TransformerInterface
 
     private $end;
 
+    private $from;
+
+    private $until;
+
     private $service;
 
     private $localeService;
@@ -59,6 +63,22 @@ class OpeninghoursTransformer implements TransformerInterface
     public function setEnd(Carbon $end)
     {
         $this->end = $end;
+    }
+
+    /**
+     * @param Carbon $from
+     */
+    public function setFrom(Carbon $from)
+    {
+        $this->from = $from;
+    }
+
+    /**
+     * @param Carbon $until
+     */
+    public function setUntil(Carbon $until)
+    {
+        $this->until = $until;
     }
 
     /**
@@ -176,6 +196,7 @@ class OpeninghoursTransformer implements TransformerInterface
             $dataCollection[$channel->id]['openinghours'] = [];
         }
 
+        /** @var \App\Models\Openinghours $openinghours */
         foreach ($ohCollection as $openinghours) {
             // Copy the calendar start and end
             $calendarBegin = new Carbon($openinghours->start_date);
@@ -195,7 +216,7 @@ class OpeninghoursTransformer implements TransformerInterface
             $ical->createIcalString($calendarBegin, $calendarEnd);
 
             if (!$this->includeIsOpenNow) {
-                $newOpeninghours = array_values($ical->getPeriodInfo($datePeriod));
+                $newOpeninghours = array_values($ical->getPeriodInfo($datePeriod, $this->from, $this->until));
                 $mergedOpeninghours = array_merge($dataCollection[$channel->id]['openinghours'], $newOpeninghours);
                 $dataCollection[$channel->id]['openinghours'] = $mergedOpeninghours;
             }
