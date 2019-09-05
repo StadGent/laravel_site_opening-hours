@@ -206,10 +206,11 @@ class Ical
          */
         $eventPeriod = new \DatePeriod(
             isset($from) && $from->isAfter($datePeriod->getStartDate()) ?
-                $from->startOfDay() : $datePeriod->getStartDate(),
+            $from->startOfDay() : $datePeriod->getStartDate(),
             $dayInterval,
             isset($until) && $until->isBefore($datePeriod->getEndDate()) ?
-                $until->endOfDay() : $datePeriod->getEndDate());
+            $until->endOfDay() : $datePeriod->getEndDate()
+        );
 
         $events = $this->getEvents($eventPeriod);
 
