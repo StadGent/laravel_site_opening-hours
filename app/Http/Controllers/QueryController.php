@@ -180,7 +180,8 @@ class QueryController extends Controller
             self::CALENDAR_LENGTH_MULTIPLE_DAYS,
             false,
             $from,
-            $until);
+            $until
+        );
     }
 
     /**
