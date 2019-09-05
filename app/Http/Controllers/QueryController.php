@@ -111,7 +111,17 @@ class QueryController extends Controller
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
 
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS, false, $from, $until);
+        return $this->getResponse(
+            $request,
+            $start,
+            $end,
+            $service,
+            $channel,
+            self::CALENDAR_LENGTH_MULTIPLE_DAYS,
+            false,
+            $from,
+            $until
+        );
     }
 
     /**
@@ -131,7 +141,17 @@ class QueryController extends Controller
         $start = $date->copy()->startOfMonth();
         $end = $date->copy()->endOfMonth();
 
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MONTH,false, $from, $until);
+        return $this->getResponse(
+            $request,
+            $start,
+            $end,
+            $service,
+            $channel,
+            self::CALENDAR_LENGTH_MONTH,
+            false,
+            $from,
+            $until
+        );
     }
 
     /**
@@ -151,7 +171,16 @@ class QueryController extends Controller
         $start = $date->copy()->startOfYear();
         $end = $date->copy()->endOfYear();
 
-        return $this->getResponse($request, $start, $end, $service, $channel, self::CALENDAR_LENGTH_MULTIPLE_DAYS, false, $from, $until);
+        return $this->getResponse(
+            $request,
+            $start,
+            $end,
+            $service,
+            $channel,
+            self::CALENDAR_LENGTH_MULTIPLE_DAYS,
+            false,
+            $from,
+            $until);
     }
 
     /**
