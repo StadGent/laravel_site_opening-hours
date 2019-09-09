@@ -189,12 +189,30 @@ class Ical
      * Check if there are events for a given day
      * Attr openNow respects the given time and adds an extra minute
      *
-     * @param  DatePeriod $datePeriod [description]
+     * @param \DatePeriod $datePeriod [description]
+     * @param \Carbon\Carbon|null $from Limit eventInfo to $from date, dates before are 'Closed'.
+     * @param \Carbon\Carbon|null $until Limit eventInfo to $until date, dates after are 'Closed'.
+     *
      * @return DayInfo[]                  [description]
+     * @throws \Exception
      */
-    public function getPeriodInfo(\DatePeriod $datePeriod)
+    public function getPeriodInfo(\DatePeriod $datePeriod, Carbon $from = null, Carbon $until = null)
     {
-        $events = $this->getEvents($datePeriod);
+        $dayInterval = \DateInterval::createFromDateString('1 day');
+
+        /**
+         * Determine perioded for which events are fetched.
+         * Days in the $datePeriod without events are defaulted to 'closed'.
+         */
+        $eventPeriod = new \DatePeriod(
+            isset($from) && $from->isAfter($datePeriod->getStartDate()) ?
+            $from->startOfDay() : $datePeriod->getStartDate(),
+            $dayInterval,
+            isset($until) && $until->isBefore($datePeriod->getEndDate()) ?
+            $until->endOfDay() : $datePeriod->getEndDate()
+        );
+
+        $events = $this->getEvents($eventPeriod);
 
         $data = [];
 
