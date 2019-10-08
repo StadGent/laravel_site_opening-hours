@@ -342,7 +342,14 @@ class OpeninghoursTransformer implements TransformerInterface
         $data = $this->getCollectionData($channels);
 
         try {
-            $output = view('api.openinghours.' . $this->calendarLength, ['data' => $data, 'transformer' => $this, 'hasOneChannel' => $this->hasOneChannel]);
+            $output = view(
+                'api.openinghours.' . $this->calendarLength,
+                [
+                    'data' => $data,
+                    'transformer' => $this,
+                    'hasOneChannel' => $this->hasOneChannel,
+                ]
+            );
         } catch (\InvalidArgumentException $ex) {
             throw new NotAcceptableHttpException();
         }
