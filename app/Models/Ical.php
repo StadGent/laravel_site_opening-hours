@@ -224,13 +224,19 @@ class Ical
 
         $priorities = [];
 
-        foreach ($events as $event) {
+        foreach ($events as $key => $event) {
             $dtStart = Carbon::createFromFormat('Ymd\THis', $event->dtstart);
 
             if (!isset($data[$dtStart->toDateString()]) || $data[$dtStart->toDateString()]->open === false) {
                 // This was added once, but now it is said we should be able to
                 // ovverride the 'closed' exception, so I'm commenting it.
                 //continue;
+            }
+
+            $rrule = new \RRule\RRule('RRULE:' . $event->rrule . PHP_EOL . 'DTSTART:' . $dtStart->format('Ymd\THis'));
+            if (!$rrule->occursAt($dtStart->format('Ymd\THis'))) {
+              unset($events[$key]);
+              continue;
             }
 
             $priorities[$dtStart->toDateString()][$event->priority] = $event->priority;
@@ -244,10 +250,6 @@ class Ical
                 // This was added once, but now it is said we should be able to
                 // ovverride the 'closed' exception, so I'm commenting it.
                 //continue;
-            }
-            $rrule = new \RRule\RRule('RRULE:' . $event->rrule . PHP_EOL . 'DTSTART:' . $dtStart->format('Ymd\THis'));
-            if (!$rrule->occursAt($dtStart->format('Ymd\THis'))) {
-              continue;
             }
 
             $eventPriorities = $priorities[$dtStart->toDateString()];
