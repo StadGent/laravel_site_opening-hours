@@ -101,6 +101,6 @@ class FetchRecreatexTest extends \BrowserKitTestCase
         $this->assertEquals($openinghours->end_date, '2017-12-31');
         $this->assertCount(1, $openinghours->calendars);
         $calendar = $openinghours->calendars->first();
-        $this->assertEquals(14, $calendar->events->count());
+        $this->assertEquals(6, $calendar->events->count());
     }
 }
