@@ -144,45 +144,12 @@ class FetchRecreatex extends BaseCommand
             $this->channelName,
         ];
         foreach ($this->sportsUuids as $uuid) {
-            $parameters = [
-                'Context' => [
-                    'ShopId' => $this->shopId,
-                ],
-                'ReservationSearchCriteria' => [
-                    'InfrastructureId' => $this->activeServiceRecord->identifier,
-                    'FromDateTime' => $year . '-01-01T00:00:00.8115784+02:00',
-                    'ToDateTime' => $year+1 . '-01-01T00:00:00.8115784+02:00',
-                    'ReservationActivityId' => $uuid,
-                    'Includes' => [
-                        'SingleReservations' => true,
-                        'ReservationsInList' => true,
-                        'SerieReservations' => true,
-                        'PlaceInfo' => true,
-                        'InfrastructureInfo' => true,
-                        'ReservationActivityInfo' => true,
-                        'ReservedPlaces' => true,
-                    ],
-                    'Paging' => [
-                        'PageSize' => 999999,
-                        'PageIndex' => 0,
-                    ]
-                ],
-            ];
-
-            try {
-                $response = $this->getClient()->FindReservations($parameters);
-                $transformedData = json_decode(json_encode($response), true);
-            } catch (\Exception $e) {
-                $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord . ' with year ' .
-                    $year . ': ' . $e->getMessage());
-
-                return false;
-            }
-            if (!$transformedData['Reservations']) {
+            $reservations = $this->getReservations($uuid, $year);
+            if (!$reservations) {
                 continue;
             }
             $dailyEventList = [];
-            foreach (array_filter(Arr::get($transformedData, 'Reservations.Reservation', 0)) as $reservation) {
+            foreach ($reservations as $reservation) {
                 $channelName = $reservation['ReservationActivity']['Description'];
                 $date = Carbon::createFromFormat('Y-m-d\TH:i:s', $reservation['StartDateTime'])
                     ->setTime(0, 0, 0)->format('Y-m-d\TH:i:s');
@@ -215,6 +182,48 @@ class FetchRecreatex extends BaseCommand
             $this->clearChannelOpeningHour($channelToCheck, $year);
         }
         return $success;
+    }
+
+    protected function getReservations($uuid, $year)
+    {
+        $parameters = [
+            'Context' => [
+                'ShopId' => $this->shopId,
+            ],
+            'ReservationSearchCriteria' => [
+                'InfrastructureId' => $this->activeServiceRecord->identifier,
+                'FromDateTime' => $year . '-01-01T00:00:00.8115784+02:00',
+                'ToDateTime' => $year+1 . '-01-01T00:00:00.8115784+02:00',
+                'ReservationActivityId' => $uuid,
+                'Includes' => [
+                    'SingleReservations' => true,
+                    'ReservationsInList' => true,
+                    'SerieReservations' => true,
+                    'PlaceInfo' => true,
+                    'InfrastructureInfo' => true,
+                    'ReservationActivityInfo' => true,
+                    'ReservedPlaces' => true,
+                ],
+                'Paging' => [
+                    'PageSize' => 999999,
+                    'PageIndex' => 0,
+                ]
+            ],
+        ];
+
+        try {
+            $response = $this->getClient()->FindReservations($parameters);
+            $transformedData = json_decode(json_encode($response), true);
+        } catch (\Exception $e) {
+            $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord . ' with year ' .
+                $year . ': ' . $e->getMessage());
+
+            return false;
+        }
+        if (!$transformedData['Reservations']) {
+            return false;
+        }
+        return array_filter(Arr::get($transformedData, 'Reservations.Reservation', 0));
     }
 
     private function processCollapsedReservations($eventList)
