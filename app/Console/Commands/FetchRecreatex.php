@@ -53,6 +53,11 @@ class FetchRecreatex extends BaseCommand
     private $channelName;
 
     /**
+     * @var string[]
+     */
+    private $sportsUuids;
+
+    /**
      * @var string
      */
     private $calendarName;
@@ -78,6 +83,7 @@ class FetchRecreatex extends BaseCommand
         $this->calendarName = env('CALENDAR_NAME');
         $this->calendarStartYear = Carbon::now()->year;
         $this->calendarEndYear = Carbon::now()->addYear(3)->year;
+        $this->sportsUuids = explode(',', env('SPORTS_UUIDS'));
     }
 
     /**
@@ -122,12 +128,128 @@ class FetchRecreatex extends BaseCommand
         $succes = true;
         for ($year = $this->calendarStartYear; $year <= $this->calendarEndYear; $year++) {
             $succes = $succes && $this->handleCalendarYear($channel, $year);
+            $this->handleReservations($year);
         }
         if (!$succes) {
             $this->error('Not able to sync recreatex for "' . $this->activeServiceRecord->label . '"');
         }
 
         return $succes;
+    }
+
+    private function handleReservations($year)
+    {
+        $success = true;
+        $processedChannels = [
+            $this->channelName,
+        ];
+        foreach ($this->sportsUuids as $uuid) {
+            $parameters = [
+                'Context' => [
+                    'ShopId' => $this->shopId,
+                ],
+                'ReservationSearchCriteria' => [
+                    'InfrastructureId' => $this->activeServiceRecord->identifier,
+                    'FromDateTime' => $year . '-01-01T00:00:00.8115784+02:00',
+                    'ToDateTime' => $year+1 . '-01-01T00:00:00.8115784+02:00',
+                    'ReservationActivityId' => $uuid,
+                    'Includes' => [
+                        'SingleReservations' => true,
+                        'ReservationsInList' => true,
+                        'SerieReservations' => true,
+                        'PlaceInfo' => true,
+                        'InfrastructureInfo' => true,
+                        'ReservationActivityInfo' => true,
+                        'ReservedPlaces' => true,
+                    ],
+                    'Paging' => [
+                        'PageSize' => 999999,
+                        'PageIndex' => 0,
+                    ]
+                ],
+            ];
+
+            try {
+                $response = $this->getClient()->FindReservations($parameters);
+                $transformedData = json_decode(json_encode($response), true);
+            } catch (\Exception $e) {
+                $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord . ' with year ' .
+                    $year . ': ' . $e->getMessage());
+
+                return false;
+            }
+            if (!$transformedData['Reservations']) {
+                continue;
+            }
+            $dailyEventList = [];
+            foreach (array_filter(Arr::get($transformedData, 'Reservations.Reservation', 0)) as $reservation) {
+                $channelName = $reservation['ReservationActivity']['Description'];
+                $date = Carbon::createFromFormat('Y-m-d\TH:i:s', $reservation['StartDateTime'])
+                    ->setTime(0, 0, 0)->format('Y-m-d\TH:i:s');
+                $dailyEventList[$date][] = [
+                  'Date' => $date,
+                  'From1' => $reservation['StartDateTime'],
+                  'To1' => $reservation['EndDateTime'],
+                  'From2' => null,
+                  'To2' => null,
+                  'start' => Carbon::createFromFormat('Y-m-d\TH:i:s', $reservation['StartDateTime'])->getTimestamp(),
+                  'end' => Carbon::createFromFormat('Y-m-d\TH:i:s', $reservation['EndDateTime'])->getTimestamp(),
+                ];
+            }
+            $dailyEventList = array_map([$this, 'processCollapsedReservations'], $dailyEventList);
+            $eventList = [];
+            foreach ($dailyEventList as $dayEvents) {
+                $eventList = array_merge($eventList, $dayEvents);
+            }
+            $channel = $this->getOrCreateChannel($channelName);
+            $openinghours = $this->getOrCreateOpeninghours($channel, $year);
+            $calendar = $this->getOrCreateCalendar($openinghours);
+
+            $success = $success && $this->fillCalendar($calendar, $year, $eventList);
+            $processedChannels[] = $channelName;
+        }
+        $channels = Channel::where('service_id', $this->activeServiceRecord->id)
+            ->whereNotIn('label', $processedChannels)
+            ->get();
+        foreach ($channels as $channelToCheck) {
+            $this->clearChannelOpeningHour($channelToCheck, $year);
+        }
+        return $success;
+    }
+
+    private function processCollapsedReservations($eventList)
+    {
+        $openings = array('data' => array(), 'keys' => array());
+
+        foreach ($eventList as $event) {
+            if (empty($openings['data'])) {
+                  $openings['data'][] = $event;
+            }
+            $buffer = $openings['data'];
+
+            // Check if we have collapsed time periods
+            foreach ($buffer as $key => $data) {
+                if ($event['start'] <= $data['start'] && $event['start'] <= $data['end']) {
+                    $openings['data'][$key]['start'] = $event['start'];
+                    $openings['data'][$key]['From1'] = $event['From1'];
+                }
+                if ($event['end'] >= $data['end'] && $event['start'] <= $data['start']) {
+                    $openings['data'][$key]['end'] = $event['end'];
+                    $openings['data'][$key]['To1'] = $event['To1'];
+                }
+                if ($event['start'] <= $data['end'] && $event['end'] > $data['end']) {
+                    $openings['data'][$key]['end'] = $event['end'];
+                    $openings['data'][$key]['To1'] = $event['To1'];
+                }
+                if ($event['start'] > $openings['data'][$key]['start']
+                    && $event['end'] > $openings['data'][$key]['end']
+                    && !in_array($event['start'] . '-' . $event['end'], $openings['keys'])) {
+                    $openings['data'][] = $event;
+                    $openings['keys'][] = $event['start'] . '-' . $event['end'];
+                }
+            }
+        }
+        return $openings['data'];
     }
 
     /**
@@ -494,16 +616,16 @@ class FetchRecreatex extends BaseCommand
      *
      * @return Channel
      */
-    private function getOrCreateChannel()
+    private function getOrCreateChannel($channelName = null)
     {
         // Look for a channel with the predefined channel name
         $channel = Channel::where('service_id', $this->activeServiceRecord->id)
-            ->where('label', $this->channelName)
+            ->where('label', $channelName ?: $this->channelName)
             ->first();
 
         // If this channel doesn't exist a new one is created
         if (is_null($channel)) {
-            $channel = new Channel(['label' => $this->channelName]);
+            $channel = new Channel(['label' => $channelName ?: $this->channelName]);
             $this->activeServiceRecord->channels()->save($channel);
         }
 
