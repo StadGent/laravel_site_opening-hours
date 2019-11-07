@@ -215,7 +215,7 @@ class FetchRecreatex extends BaseCommand
             $response = $this->getClient()->FindReservations($parameters);
             $transformedData = json_decode(json_encode($response), true);
         } catch (\Exception $e) {
-            $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord . ' with year ' .
+            $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord->label . ' with year ' .
                 $year . ': ' . $e->getMessage());
 
             return false;
