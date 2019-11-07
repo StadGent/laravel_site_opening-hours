@@ -21,6 +21,12 @@ class FetchRecreatexTest extends \BrowserKitTestCase
         return json_decode($content, true);
     }
 
+    private function getReservationsMockupList()
+    {
+        $content = file_get_contents(__DIR__ . '/../data/console/reservationsMockupList.json');
+        return json_decode($content, true);
+    }
+
     /**
      * @return array
      */
@@ -49,12 +55,16 @@ class FetchRecreatexTest extends \BrowserKitTestCase
         $service->save();
 
         $commandMockup = $this->getMockBuilder(FetchRecreatex::class)
-            ->setMethods(['getOpeninghoursList'])
+            ->setMethods(['getOpeninghoursList', 'getReservations'])
             ->getMock();
 
         $commandMockup->expects($this->any())
             ->method('getOpeninghoursList')
             ->willReturn($this->getOpeninghourListMockupList());
+
+        $commandMockup->expects($this->any())
+            ->method('getReservations')
+            ->willReturn($this->getReservationsMockupList());
 
         // We only provided the output for 1 year so we limit the years to the known data
         $commandMockup->setCalendarStartYear(2017);
@@ -67,7 +77,7 @@ class FetchRecreatexTest extends \BrowserKitTestCase
         \Artisan::call('openinghours:fetch-recreatex');
 
         // Now we check if the values are inserted into the database as expected
-        $this->assertEquals(1, $service->channels->count());
+        $this->assertEquals(2, $service->channels->count());
         $channel = $service->channels->first();
         $this->assertEquals(1, $channel->openinghours->count());
         $openinghours = $channel->openinghours->first();
@@ -82,5 +92,15 @@ class FetchRecreatexTest extends \BrowserKitTestCase
             $events = Event::where($criteria)->get();
             $this->assertEquals(1,$events->count());
         }
+
+        $channel = $service->channels->get(1);
+        $this->assertEquals(1, $channel->openinghours->count());
+        $openinghours = $channel->openinghours->first();
+        $this->assertEquals($openinghours->label, 'Geïmporteerde kalender2017-01-01 -2017-12-31');
+        $this->assertEquals($openinghours->start_date, '2017-01-01');
+        $this->assertEquals($openinghours->end_date, '2017-12-31');
+        $this->assertCount(1, $openinghours->calendars);
+        $calendar = $openinghours->calendars->first();
+        $this->assertEquals(14, $calendar->events->count());
     }
 }
