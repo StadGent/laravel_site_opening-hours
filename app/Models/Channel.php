@@ -18,7 +18,7 @@ class Channel extends Model
      * @var array
      */
     protected $fillable = [
-        'label', 'service_id', 'type_id',
+        'label', 'service_id', 'type_id', 'weight',
     ];
 
     /**
