@@ -3,7 +3,7 @@
     "description": "An open source web application to create calendars that represent openinghours of public services.",
     "keywords": ["framework", "laravel"],
     "license": "AGPLv3",
-    "type": "Web application",
+    "type": "project",
     "repositories": [
         {
             "type": "vcs",
