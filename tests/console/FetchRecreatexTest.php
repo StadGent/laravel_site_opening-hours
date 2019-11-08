@@ -78,7 +78,7 @@ class FetchRecreatexTest extends \BrowserKitTestCase
 
         // Now we check if the values are inserted into the database as expected
         $this->assertEquals(2, $service->channels->count());
-        $channel = $service->channels->first();
+        $channel = $service->channels->get(1);
         $this->assertEquals(1, $channel->openinghours->count());
         $openinghours = $channel->openinghours->first();
         $this->assertEquals($openinghours->label, 'Geïmporteerde kalender2017-01-01 -2017-12-31');
@@ -93,7 +93,7 @@ class FetchRecreatexTest extends \BrowserKitTestCase
             $this->assertEquals(1,$events->count());
         }
 
-        $channel = $service->channels->get(1);
+        $channel = $service->channels->first();
         $this->assertEquals(1, $channel->openinghours->count());
         $openinghours = $channel->openinghours->first();
         $this->assertEquals($openinghours->label, 'Geïmporteerde kalender2017-01-01 -2017-12-31');
