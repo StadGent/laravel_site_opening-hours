@@ -36,7 +36,7 @@ class Service extends Model
      */
     public function channels()
     {
-        return $this->hasMany('App\Models\Channel');
+        return $this->hasMany('App\Models\Channel')->orderBy('weight')->orderBy('id');
     }
 
     /**
