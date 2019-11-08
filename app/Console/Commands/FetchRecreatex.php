@@ -170,7 +170,7 @@ class FetchRecreatex extends BaseCommand
             }
             $channel = $this->getOrCreateChannel($channelName);
             $channel->type()->associate(\App\Models\Type::where('name', 'Algemeen')->first());
-            $channel->weight = -1;
+            $channel->weight = env('SPORTS_RESERVATION_CHANNEL_WEIGHT', 1);
             $channel->save();
             $openinghours = $this->getOrCreateOpeninghours($channel, $year);
             $calendar = $this->getOrCreateCalendar($openinghours);
@@ -233,37 +233,32 @@ class FetchRecreatex extends BaseCommand
 
     private function processCollapsedReservations($eventList)
     {
-        $openings = array('data' => array(), 'keys' => array());
-
+        $openings = [];
         foreach ($eventList as $event) {
-            if (empty($openings['data'])) {
-                  $openings['data'][] = $event;
+            if (empty($openings)) {
+                  $openings[] = $event;
             }
-            $buffer = $openings['data'];
+            $buffer = $openings;
 
             // Check if we have collapsed time periods
             foreach ($buffer as $key => $data) {
-                if ($event['start'] <= $data['start'] && $event['start'] <= $data['end']) {
-                    $openings['data'][$key]['start'] = $event['start'];
-                    $openings['data'][$key]['From1'] = $event['From1'];
+                $overlap = false;
+                if ($event['start'] <= $data['start'] && $event['end'] >= $data['start']) {
+                    $openings[$key]['start'] = $event['start'];
+                    $openings[$key]['From1'] = $event['From1'];
+                    $overlap = true;
                 }
-                if ($event['end'] >= $data['end'] && $event['start'] <= $data['start']) {
-                    $openings['data'][$key]['end'] = $event['end'];
-                    $openings['data'][$key]['To1'] = $event['To1'];
+                if ($event['end'] >= $data['end'] && $event['start'] <= $data['end']) {
+                    $openings[$key]['end'] = $event['end'];
+                    $openings[$key]['To1'] = $event['To1'];
+                    $overlap = true;
                 }
-                if ($event['start'] <= $data['end'] && $event['end'] > $data['end']) {
-                    $openings['data'][$key]['end'] = $event['end'];
-                    $openings['data'][$key]['To1'] = $event['To1'];
-                }
-                if ($event['start'] > $openings['data'][$key]['start']
-                    && $event['end'] > $openings['data'][$key]['end']
-                    && !in_array($event['start'] . '-' . $event['end'], $openings['keys'])) {
-                    $openings['data'][] = $event;
-                    $openings['keys'][] = $event['start'] . '-' . $event['end'];
+                if (!$overlap) {
+                    $openings[] = $event;
                 }
             }
         }
-        return $openings['data'];
+        return $openings;
     }
 
     /**
