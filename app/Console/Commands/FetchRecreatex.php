@@ -234,28 +234,34 @@ class FetchRecreatex extends BaseCommand
     private function processCollapsedReservations($eventList)
     {
         $openings = [];
+        $print = false;
+        usort($eventList, function ($a, $b) {
+            return $a['start'] === $b['start']
+                ? $a['end'] - $b['end']
+                : $a['start'] - $b['start'];
+        });
         foreach ($eventList as $event) {
             if (empty($openings)) {
                   $openings[] = $event;
+                  continue;
             }
             $buffer = $openings;
-
+            $shouldAdd = true;
             // Check if we have collapsed time periods
             foreach ($buffer as $key => $data) {
-                $overlap = false;
                 if ($event['start'] <= $data['start'] && $event['end'] >= $data['start']) {
                     $openings[$key]['start'] = $event['start'];
                     $openings[$key]['From1'] = $event['From1'];
-                    $overlap = true;
+                    $shouldAdd = false;
                 }
                 if ($event['end'] >= $data['end'] && $event['start'] <= $data['end']) {
                     $openings[$key]['end'] = $event['end'];
                     $openings[$key]['To1'] = $event['To1'];
-                    $overlap = true;
+                    $shouldAdd = false;
                 }
-                if (!$overlap) {
-                    $openings[] = $event;
-                }
+            }
+            if ($shouldAdd) {
+                $openings[] = $event;
             }
         }
         return $openings;
