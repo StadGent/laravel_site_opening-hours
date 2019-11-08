@@ -169,8 +169,13 @@ class FetchRecreatex extends BaseCommand
                 $eventList = array_merge($eventList, $dayEvents);
             }
             $channel = $this->getOrCreateChannel($channelName);
+            $channel->type()->associate(\App\Models\Type::where('name', 'Algemeen')->first());
+            $channel->weight = -1;
+            $channel->save();
             $openinghours = $this->getOrCreateOpeninghours($channel, $year);
             $calendar = $this->getOrCreateCalendar($openinghours);
+            $calendar->published = true;
+            $calendar->save();
 
             $success = $success && $this->fillCalendar($calendar, $year, $eventList);
             $processedChannels[] = $channelName;
