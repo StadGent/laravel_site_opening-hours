@@ -254,6 +254,9 @@ EOL;
         ]);
 
         $event->calendar = new Calendar();
+        $event->calendar->openinghours = new Openinghours();
+        $event->calendar->openinghours->start_date = '2015-01-01';
+        $event->calendar->openinghours->end_date = '2099-11-31';
 
         $valid = $this->recurringOHService->validateEvent($event, $startDate, $endDate);
         $this->assertTrue($valid);
