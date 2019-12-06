@@ -234,34 +234,29 @@ class FetchRecreatex extends BaseCommand
     private function processCollapsedReservations($eventList)
     {
         $openings = [];
-        $print = false;
         usort($eventList, function ($a, $b) {
             return $a['start'] === $b['start']
                 ? $a['end'] - $b['end']
                 : $a['start'] - $b['start'];
         });
+        $openings[] = array_shift($eventList);
         foreach ($eventList as $event) {
-            if (empty($openings)) {
-                  $openings[] = $event;
-                  continue;
-            }
-            $buffer = $openings;
-            $shouldAdd = true;
-            // Check if we have collapsed time periods
-            foreach ($buffer as $key => $data) {
-                if ($event['start'] <= $data['start'] && $event['end'] >= $data['start']) {
-                    $openings[$key]['start'] = $event['start'];
-                    $openings[$key]['From1'] = $event['From1'];
-                    $shouldAdd = false;
-                }
-                if ($event['end'] >= $data['end'] && $event['start'] <= $data['end']) {
-                    $openings[$key]['end'] = $event['end'];
-                    $openings[$key]['To1'] = $event['To1'];
-                    $shouldAdd = false;
-                }
-            }
-            if ($shouldAdd) {
+            $previous = end($openings);
+            $key = key($openings);
+            // This reservation does not overlap with the previous one, so add
+            // it as a new one.
+            if (!($previous['start'] <= $event['end'] && $previous['end'] >= $event['start'])) {
                 $openings[] = $event;
+                continue;
+            }
+            // They overlap. Adjust the dates of the previous event.
+            if ($previous['start'] > $event['start']) {
+              $openings[$key]['start'] = $event['start'];
+              $openings[$key]['From1'] = $event['From1'];
+            }
+            if ($previous['end'] < $event['end']) {
+              $openings[$key]['end'] = $event['end'];
+              $openings[$key]['To1'] = $event['To1'];
             }
         }
         return $openings;
