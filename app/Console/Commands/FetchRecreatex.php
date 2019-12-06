@@ -251,12 +251,12 @@ class FetchRecreatex extends BaseCommand
             }
             // They overlap. Adjust the dates of the previous event.
             if ($previous['start'] > $event['start']) {
-              $openings[$key]['start'] = $event['start'];
-              $openings[$key]['From1'] = $event['From1'];
+                $openings[$key]['start'] = $event['start'];
+                $openings[$key]['From1'] = $event['From1'];
             }
             if ($previous['end'] < $event['end']) {
-              $openings[$key]['end'] = $event['end'];
-              $openings[$key]['To1'] = $event['To1'];
+                $openings[$key]['end'] = $event['end'];
+                $openings[$key]['To1'] = $event['To1'];
             }
         }
         return $openings;
