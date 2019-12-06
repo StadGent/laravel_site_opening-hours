@@ -140,9 +140,9 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h4>BALIE</h4>
+<h3>BALIE</h3>
 <div>
-<p>maandag tot en met vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot en met vrijdag, geldig t.e.m. zondag 31 december 2017</p>
 </div>
 <div>
 <p>maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur, geldig vanaf maandag 1 januari 2018</p>
@@ -198,9 +198,9 @@ EOL;
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h4>BALIE</h4>
+<h3>BALIE</h3>
 <div>
-<p>maandag tot en met vrijdag: gesloten, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot en met vrijdag, geldig t.e.m. zondag 31 december 2017</p>
 </div>
 EOL;
 
@@ -254,6 +254,9 @@ EOL;
         ]);
 
         $event->calendar = new Calendar();
+        $event->calendar->openinghours = new Openinghours();
+        $event->calendar->openinghours->start_date = '2015-01-01';
+        $event->calendar->openinghours->end_date = '2099-11-31';
 
         $valid = $this->recurringOHService->validateEvent($event, $startDate, $endDate);
         $this->assertTrue($valid);
