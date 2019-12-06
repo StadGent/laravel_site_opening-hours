@@ -145,18 +145,14 @@ class VestaService
         $parameters->hours = new \SoapVar('<ns2:hours><![CDATA[' . $hours . ']]></ns2:hours>', XSD_ANYXML);
         $response = $client->FillHours($parameters);
         if (!isset($response->FillHoursResult)) {
-            Log::error('Something went wrong in VESTA.', [
-                'response' => print_r($response, 1),
-            ]);
+            Log::error('Something went wrong in VESTA. ' . var_export($response, true));
 
             return false;
         }
 
         $fillHoursResult = json_decode($response->FillHoursResult);
         if ($fillHoursResult !== 1) {
-            Log::error('Something went wrong while writing the data to VESTA.', [
-                'response' => var_export($response, true),
-            ]);
+            Log::error('Something went wrong while writing the data to VESTA. ' . var_export($response, true));
 
             return false;
         }
@@ -184,18 +180,14 @@ class VestaService
         $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
         $response = $client->EmptyHours($parameters);
         if (!isset($response->EmptyHoursResult)) {
-            Log::error('Something went wrong in VESTA.', [
-                'response' => print_r($response, 1),
-            ]);
+            Log::error('Something went wrong in VESTA. ' . var_export($response, true));
 
             return false;
         }
 
         $emptyHoursResult = json_decode($response->EmptyHoursResult);
         if ($emptyHoursResult !== 1) {
-            Log::error('Something went wrong while writing the data to VESTA.', [
-                'response' => var_export($response, true),
-            ]);
+            Log::error('Something went wrong while writing the data to VESTA. ' . var_export($response, true));
 
             return false;
         }

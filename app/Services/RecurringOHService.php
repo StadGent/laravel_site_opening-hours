@@ -35,7 +35,7 @@ class RecurringOHService
         foreach ($service->channels as $channel) {
             $channelOutput = $this->getChannelOutput($channel, $startDate, $endDate);
             if ($channelOutput) {
-                $output .= '<h4>' . ucfirst($channel->label) . '</h4>' . PHP_EOL;
+                $output .= '<h3>' . ucfirst($channel->label) . '</h3>' . PHP_EOL;
                 $output .= $channelOutput;
             }
         }
@@ -101,7 +101,7 @@ class RecurringOHService
                 $period = $this->getHumandReadableFrequency($event, $startDate, $endDate);
                 $hours = $this->getHumanReadableHours($event);
                 if (!$hours) {
-                    $hours = 'gesloten';
+                    $hours = '';
                 }
 
                 $availability = $this->getHumanReadableAvailabillity($event, $startDate, $endDate);
@@ -150,7 +150,10 @@ class RecurringOHService
         $rules = [];
 
         foreach ($rulesMatrix as $ruleArray) {
-            $rule = $ruleArray['period'] . ': ' . $ruleArray['hours'];
+            $rule = $ruleArray['period'];
+            if ($ruleArray['hours'] !== '') {
+                $rule .= ': ' . $ruleArray['hours'];
+            }
             if ($ruleArray['availability'] != '') {
                 $rule .= ',' . $ruleArray['availability'];
             }
@@ -245,7 +248,7 @@ class RecurringOHService
     /**
      * Split the RRule up into props
      *
-     * @param $rrime
+     * @param $rrule
      * @return mixed
      */
     public function getRuleProperties($rrule)
@@ -304,49 +307,45 @@ class RecurringOHService
             return false;
         }
 
-        $eventStartHour = new Carbon($event->start_date);
-        $eventEndHour = new Carbon($event->end_date);
+        $eventStartDate = new Carbon($event->start_date);
         $eventUntilDate = new Carbon($event->until);
+        $openingHoursStartDate = new Carbon($event->calendar->openinghours->start_date);
+        $openingHoursEndDate = new Carbon($event->calendar->openinghours->end_date);
 
-        // check event until > begin of periode to skip
-        if ($eventUntilDate->lessThan($startDate)) {
-            return false;
-        }
+        // Compact the period to the latest start date and earliest end date so
+        // we have the smallest possible period in which this event is valid.
+        $startDates = [
+            $startDate,
+            $eventStartDate,
+            $openingHoursStartDate,
+        ];
+        $endDates = [
+            $endDate,
+            $eventUntilDate,
+            $openingHoursEndDate,
+        ];
+        sort($startDates);
+        sort($endDates);
 
-        // check event start is later then end of periode to skip
-        if ($eventStartHour->greaterThan($endDate)) {
+        $periodStart = end($startDates);
+        $periodEnd = reset($endDates);
+
+        // Check if we have a valid period.
+        if ($periodStart->greaterThan($periodEnd)) {
             return false;
         }
 
         if (strpos($event->rrule, 'FREQ=YEARLY') !== false) {
-            $difference = $eventEndHour->year - $eventStartHour->year;
-
-            // take the year of the startDate
-            $eventStartHour->year = $startDate->year;
-            $eventEndHour->year = $startDate->year;
-
-            $eventEndHour->addYears($difference);
-
-            // the end could be in the next year for example Christmas Holidays
-            if ($eventEndHour->greaterThan($startDate) && $eventStartHour->lessThan($endDate)) {
-                return true;
+            $eventStartDate->year = $periodStart->year;
+            if ($eventStartDate->lessThan($periodStart)) {
+                $eventStartDate->year++;
             }
-
-            // check on year leap (needed for when request if from December until February you have a 2nd new year to check)
-            if ($startDate->year != $endDate->year) {
-                $eventStartHour->year = $endDate->year;
-                $eventEndHour->year = $endDate->year;
-
-                // the end could be in the next year
-                $eventEndHour->addYears($difference);
-                if ($eventEndHour->greaterThan($startDate) && $eventStartHour->lessThan($endDate)) {
-                    return true;
-                }
-
+            $rruleString = 'RRULE:' . $event->rrule . ';UNTIL=' . $eventUntilDate->format('Ymd\THis')
+                . PHP_EOL . 'DTSTART:' . $eventStartDate->format('Ymd\THis');
+            $rrule = new \RRule\RRule($rruleString);
+            if (!$rrule->getOccurrencesBetween($startDate, $endDate)) {
                 return false;
             }
-
-            return false;
         }
 
         return true;
