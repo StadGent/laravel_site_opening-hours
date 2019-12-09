@@ -315,14 +315,14 @@ class RecurringOHService
         // Compact the period to the latest start date and earliest end date so
         // we have the smallest possible period in which this event is valid.
         $startDates = [
-            $startDate,
-            $eventStartDate,
-            $openingHoursStartDate,
+            $startDate->clone()->setTime(0, 0, 0),
+            $eventStartDate->clone()->setTime(0, 0, 0),
+            $openingHoursStartDate->clone()->setTime(0, 0, 0),
         ];
         $endDates = [
-            $endDate,
-            $eventUntilDate,
-            $openingHoursEndDate,
+            $endDate->clone()->setTime(23, 59, 59),
+            $eventUntilDate->clone()->setTime(23, 59, 59),
+            $openingHoursEndDate->clone()->setTime(23, 59, 59),
         ];
         sort($startDates);
         sort($endDates);
