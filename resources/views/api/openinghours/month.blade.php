@@ -38,7 +38,7 @@
     $hasPreviousIteration = $transformer->hasPreviousIteration($channelData['channelId']);
 
     ?>
-    <div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--calendar">
+    <div vocab="http://schema.org/" class="openinghours openinghours--calendar">
         <div class="openinghours--header">
             <button class="openinghours--prev" @if(!$hasPreviousIteration)disabled="disabled"@endif>
                 @lang('openinghourApi.PREVIOUS')

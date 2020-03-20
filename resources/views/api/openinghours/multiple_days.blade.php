@@ -7,7 +7,7 @@
             {{ $channelData['channel'] }}
         </div>
     @endif
-    <div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--list">
+    <div vocab="http://schema.org/" class="openinghours openinghours--list">
         <ul class="openinghours--days">
             @foreach($channelData['openinghours'] as $dayInfoObj)
                 <?php
