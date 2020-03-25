@@ -20,9 +20,9 @@ class FetchODHolidaysTest extends \BrowserKitTestCase
         \DB::table('default_events')->delete();
         // set calendars + one fake
         $supportedCalendars = [
-            'feestdagen' => 'https://data.stad.gent/sites/default/files/feestdagen-nl-BE.ical',
-            'schoolvakanties' => 'https://data.stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
-            'testCal' => 'https://data.stad.gent/sites/default/files/testICal.ical',
+            'feestdagen' => 'https://datafiles.stad.gent/sites/default/files/feestdagen-nl-BE.ical',
+            'schoolvakanties' => 'https://datafiles.stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
+            'testCal' => 'https://datafiles.stad.gent/sites/default/files/testICal.ical',
         ];
         \Config::set('app.supported_exception_callendars', $supportedCalendars);
 
