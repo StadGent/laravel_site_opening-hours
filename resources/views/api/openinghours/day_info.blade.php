@@ -33,7 +33,7 @@ $dateClass = 'openinghours--date';
 if ($specialDayName) {
     $dateClass .= ' openinghours--special-day';
 }
-if ($isSameYear) {
+if (!$isSameYear) {
     $dateClass .= ' openinghours--different-year';
 }
 
