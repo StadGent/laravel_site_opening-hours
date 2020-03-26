@@ -92,7 +92,10 @@
                 <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}"
                     class="{{ $class }}">
                     <span aria-hidden="true">{{ $referenceDate->day }}</span>
-                    @include('api.openinghours.day_info_short', ['dayInfoObj' => $dayInfoObj])
+                    @include('api.openinghours.day_info', [
+                        'dayInfoObj' => $dayInfoObj,
+                        'short' => true,
+                        'includeRFDa' => $channelData['channelTypeLabel'] == 'Algemeen'])
                 </li>
             @endforeach
             @for($i=0;$i< $disabledDaysAfterEnd;$i++)
