@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "40927dbfeb7f2ce678e1718bf03b919d",
+    "content-hash": "4f330534a4f094f2caafe3a70a4879ec",
     "packages": [
         {
             "name": "adoy/fastcgi-client",
@@ -2354,6 +2354,60 @@
                 "source": "https://github.com/guzzle/psr7/tree/1.8.2"
             },
             "time": "2021-04-26T09:17:50+00:00"
+        },
+        {
+            "name": "hedronium/spaceless-blade",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Hedronium/SpacelessBlade.git",
+                "reference": "bab2c0d5eaf754876d0d057c6a3d81c239f4e8a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Hedronium/SpacelessBlade/zipball/bab2c0d5eaf754876d0d057c6a3d81c239f4e8a9",
+                "reference": "bab2c0d5eaf754876d0d057c6a3d81c239f4e8a9",
+                "shasum": ""
+            },
+            "replace": {
+                "solidew/spaceless-blade": "*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "hedronium\\SpacelessBlade\\SpacelessBladeProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "hedronium\\SpacelessBlade\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Omran Jamal",
+                    "email": "o.jamal97@gmail.com",
+                    "homepage": "http://about.me/omran.jamal"
+                }
+            ],
+            "description": "Adds the @spaceless tag to Blade. (works like in Twig)",
+            "keywords": [
+                "blade",
+                "laravel",
+                "spaceless",
+                "twig"
+            ],
+            "support": {
+                "issues": "https://github.com/Hedronium/SpacelessBlade/issues",
+                "source": "https://github.com/Hedronium/SpacelessBlade/tree/master"
+            },
+            "time": "2019-08-24T06:23:59+00:00"
         },
         {
             "name": "jetbrains/phpstorm-stubs",
