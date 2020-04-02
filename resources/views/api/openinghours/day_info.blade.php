@@ -33,7 +33,7 @@ $dateClass = 'openinghours--date';
 if ($specialDayName) {
     $dateClass .= ' openinghours--special-day';
 }
-if ( ! $isSameYear) {
+if (!$isSameYear) {
     $dateClass .= ' openinghours--different-year';
 }
 
@@ -57,7 +57,9 @@ if (isset($type) && $isOpen) {
             <span class="openinghours--date-day-of-week">
                 <link property="dayOfWeek"
                       href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}&#32;</span>
-            <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])&#32;</span>
+            <span class="openinghours--date-day">
+                @lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])&#32;
+            </span>
             <span class="openinghours--date-month">{{ $translatedMonthName }}&#32;</span>
             @if(!$isSameYear)
                 <span class="openinghours--date-year">{{ $date->year }}</span>
@@ -86,7 +88,9 @@ if (isset($type) && $isOpen) {
                 <span class="openinghours--date-between">,</span>&#32;
             @endif
             <span class="openinghours--date-day-of-week">{{ $translatedDayName }}&#32;</span>
-            <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])&#32;</span>
+            <span class="openinghours--date-day">
+                @lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])&#32;
+            </span>
             <span class="openinghours--date-month">{{ $translatedMonthName }}&#32;</span>
             @if(!$isSameYear)
                 <span class="openinghours--date-year">{{ $date->year }}</span>
