@@ -17,25 +17,25 @@
 
 @if($includeRFDa)
     <div class="openinghours--time">
-        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
+        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')&#32;</span>
         <time property="opens"
               datetime="{{ $hours['from'] }}"
-              aria-label="{{ $hours['from'] }}">{{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')</time>
+              aria-label="{{ $hours['from'] }}">{{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
         <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
         <time property="closes"
               datetime="{{ $hours['until'] }}"
-              aria-label="{{ $hours['until']}}">{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')</time>
+              aria-label="{{ $hours['until']}}">&#32;{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
     </div>
 @else
     <div class="openinghours--time">
-        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')</span>
+        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR') </span>
         <time datetime="{{ $hours['from'] }}"
-              aria-label="{{ $hours['from'] }}">{{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')</time>
+              aria-label="{{ $hours['from'] }}">{{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
         <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
         <time datetime="{{ $hours['until'] }}"
-              aria-label="{{ $hours['until']}}">{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')</time>
+              aria-label="{{ $hours['until']}}">&#32;{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
     </div>
 @endif
 @if($last)
-    <div class="openinghours--times-between">@lang('openinghourApi.AND')</div>
+    <div class="openinghours--times-between">@lang('openinghourApi.AND')&#32;</div>
 @endif

@@ -2,7 +2,7 @@
 /** @var Carbon\Carbon $date */
 $date = $dayInfoObj->date;
 $includeRFDa = isset($includeRFDa) ? $includeRFDa : false;
-$short = isset($short) ? $short: false;
+$short = isset($short) ? $short : false;
 $isOpen = ! empty($dayInfoObj->hours);
 $status = $isOpen ? 'OPEN' : 'CLOSED';
 $dayName = $date->format('l');
@@ -33,7 +33,7 @@ $dateClass = 'openinghours--date';
 if ($specialDayName) {
     $dateClass .= ' openinghours--special-day';
 }
-if (!$isSameYear) {
+if ( ! $isSameYear) {
     $dateClass .= ' openinghours--different-year';
 }
 
@@ -42,29 +42,30 @@ if (isset($type) && $isOpen) {
 }
 ?>
 
+@spaceless
 @if($includeRFDa)
     <div class="{{ $outerClass }}"
          property="openingHoursSpecification"
-         typeof="OpeningHoursSpecification">
+         typeof="OpeningHoursSpecification">&#32;
         <div class="{{ $dateClass }}"
              property="validFrom validThrough"
              datetime="{{ $date->toDateString() }}">
             @if($specialDayName)
                 <span class="openinghours--date-special-day">{{ $specialDayName }}</span>
-                <span class="openinghours--date-between">, </span>
+                <span class="openinghours--date-between">,</span>&thinsp;
             @endif
             <span class="openinghours--date-day-of-week">
                 <link property="dayOfWeek"
-                      href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}</span>
-            <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])</span>
-            <span class="openinghours--date-month">{{ $translatedMonthName }}</span>
+                      href="http://schema.org/{{ $dayName }}">{{ $translatedDayName }}&#32;</span>
+            <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])&#32;</span>
+            <span class="openinghours--date-month">{{ $translatedMonthName }}&#32;</span>
             @if(!$isSameYear)
                 <span class="openinghours--date-year">{{ $date->year }}</span>
             @endif
         </div>
         <div class="openinghours--content">
             <div class="openinghours--times">
-                <span class="openinghours--status">{{ $translatedStatus }}</span>
+                <span class="openinghours--status">{{ $translatedStatus }}&nbsp;</span>
                 @if($isOpen)
                     @foreach($dayInfoObj->hours as $hours)
                         @include('api.openinghours.hours', [
@@ -78,22 +79,22 @@ if (isset($type) && $isOpen) {
         </div>
     </div>
 @else
-    <div class="{{ $outerClass }}">
+    <div class="{{ $outerClass }}">&#32;
         <div class="{{ $dateClass }}">
             @if($specialDayName)
                 <span class="openinghours--date-special-day">{{ $specialDayName }}</span>
-                <span class="openinghours--date-between">, </span>
+                <span class="openinghours--date-between">,</span>&#32;
             @endif
-            <span class="openinghours--date-day-of-week">{{ $translatedDayName }}</span>
-            <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])</span>
-            <span class="openinghours--date-month">{{ $translatedMonthName }}</span>
+            <span class="openinghours--date-day-of-week">{{ $translatedDayName }}&#32;</span>
+            <span class="openinghours--date-day">@lang('openinghourApi.DAY_OF_MONTH', ['DAY' => $dayOfMonth])&#32;</span>
+            <span class="openinghours--date-month">{{ $translatedMonthName }}&#32;</span>
             @if(!$isSameYear)
                 <span class="openinghours--date-year">{{ $date->year }}</span>
             @endif
         </div>
         <div class="openinghours--content">
             <div class="openinghours--times">
-                <span class="openinghours--status">{{ $translatedStatus }}</span>
+                <span class="openinghours--status">{{ $translatedStatus }}&#32;</span>
                 @if($isOpen)
                     @foreach($dayInfoObj->hours as $hours)
                         @include('api.openinghours.hours', [
@@ -107,3 +108,4 @@ if (isset($type) && $isOpen) {
         </div>
     </div>
 @endif
+@endspaceless
