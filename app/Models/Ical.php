@@ -59,7 +59,7 @@ class Ical
 
         $this->icalString .= "END:VTIMEZONE" . PHP_EOL . "END:VCALENDAR";
         if ($initParser) {
-            $this->initParser();
+            $this->initParser(['defaultSpan' => $till->diffInYears() + 1]);
         }
 
         return $this;
@@ -122,21 +122,15 @@ class Ical
     }
 
     /**
-     * Create parser within from until range
+     * Create parser.
      *
-     * For performance reasons it is better to init the parser only
-     * for the from until periode that will be needed
-     * The parser does a processDateConversions
-     * that converts all the dates and this is expensive
-     *
-     * @param Carbon $from
-     * @param Carbon $until
+     * @param array $options
      *
      * @return ICal
      */
-    public function initParser()
+    public function initParser($options = [])
     {
-        $this->parser = new ICalParser();
+        $this->parser = new ICalParser(false, $options);
         $this->parser->initString($this->icalString);
     }
 
