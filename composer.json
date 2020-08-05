@@ -1,5 +1,5 @@
 {
-    "name": "StadGent/laravel_site_opening-hours",
+    "name": "stadgent/laravel_site_opening-hours",
     "description": "An open source web application to create calendars that represent openinghours of public services.",
     "keywords": ["framework", "laravel"],
     "license": "AGPLv3",
@@ -19,14 +19,14 @@
         "fzaninotto/faker": "^1.4",
         "grasmash/yaml-expander": "^1.1",
         "johngrogg/ics-parser": "^2.1.5",
-        "laravel/framework": "5.8.*",
+        "laravel/framework": "^6.0",
         "laravel/passport": "^7.0",
         "laravel/tinker": "^1.0",
         "ml/json-ld": "^1.0",
-        "nesbot/carbon": "^1.28 || ^2.0",
+        "nesbot/carbon": "^2.0",
         "pda/pheanstalk": "~4.0",
         "rlanvin/php-rrule": "^1.6",
-        "santigarcor/laratrust": "4.0.*",
+        "santigarcor/laratrust": "5.2.*",
         "wildside/userstamps": "^0.5.3"
     },
     "require-dev": {
