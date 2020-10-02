@@ -63,20 +63,23 @@ class RecurringOHService
                 Carbon::createFromFormat('Y-m-d', $openinghours->start_date)->setTime(0, 0, 0),
                 Carbon::createFromFormat('Y-m-d', $openinghours->end_date)->setTime(0, 0, 0)
             );
-
+            $prepend = '';
             if ($this->currentOpeninghoursPeriod->getStartDate()->greaterThan($startDate)) {
-              $output .= '<h4>Geldig vanaf '
+              $prepend .= '<h4>Geldig vanaf '
                   . $this->getFullDayOutput($this->currentOpeninghoursPeriod->getStartDate())
                   . '</h4>' . PHP_EOL;
             }
 
             if ($this->currentOpeninghoursPeriod->getEndDate()->lessThan($endDate)) {
-              $output .= '<h4>Geldig t.e.m. '
+              $prepend .= '<h4>Geldig t.e.m. '
                   . $this->getFullDayOutput($this->currentOpeninghoursPeriod->getEndDate())
                   . '</h4>' . PHP_EOL;
             }
 
-            $output .= $this->getOpeninghoursOutput($openinghours, $startDate, $endDate);
+            $ohOutput = $this->getOpeninghoursOutput($openinghours, $startDate, $endDate);
+            if ($ohOutput) {
+                $output .= $prepend . $ohOutput;
+            }
         }
 
         return $output;
