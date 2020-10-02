@@ -141,11 +141,13 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
 
         $expected = <<<EOL
 <h3>BALIE</h3>
+<h4>Geldig t.e.m. zondag 31 december 2017</h4>
 <div>
-<p>maandag tot en met vrijdag, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot en met vrijdag</p>
 </div>
+<h4>Geldig vanaf maandag 1 januari 2018</h4>
 <div>
-<p>maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur, geldig vanaf maandag 1 januari 2018</p>
+<p>maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur</p>
 </div>
 EOL;
 
@@ -199,8 +201,9 @@ EOL;
 
         $expected = <<<EOL
 <h3>BALIE</h3>
+<h4>Geldig t.e.m. zondag 31 december 2017</h4>
 <div>
-<p>maandag tot en met vrijdag, geldig t.e.m. zondag 31 december 2017</p>
+<p>maandag tot en met vrijdag</p>
 </div>
 EOL;
 
