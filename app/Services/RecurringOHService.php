@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\Openinghours;
 use App\Models\Service;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class RecurringOHService
 {
@@ -18,6 +19,11 @@ class RecurringOHService
     const MONTHLY = 'MONTHLY';
     const WEEKLY = 'WEEKLY';
     const DAILY = 'DAILY';
+
+    /**
+     * @var CarbonPeriod
+     */
+    protected $currentOpeninghoursPeriod;
 
     public static function getInstance()
     {
@@ -53,6 +59,23 @@ class RecurringOHService
             ->get();
 
         foreach ($openinghoursCollection as $openinghours) {
+            $this->currentOpeninghoursPeriod = new CarbonPeriod(
+                Carbon::createFromFormat('Y-m-d', $openinghours->start_date)->setTime(0, 0, 0),
+                Carbon::createFromFormat('Y-m-d', $openinghours->end_date)->setTime(0, 0, 0)
+            );
+
+            if ($this->currentOpeninghoursPeriod->getStartDate()->greaterThan($startDate)) {
+              $output .= '<h4>Geldig vanaf '
+                  . $this->getFullDayOutput($this->currentOpeninghoursPeriod->getStartDate())
+                  . '</h4>' . PHP_EOL;
+            }
+
+            if ($this->currentOpeninghoursPeriod->getEndDate()->lessThan($endDate)) {
+              $output .= '<h4>Geldig t.e.m. '
+                  . $this->getFullDayOutput($this->currentOpeninghoursPeriod->getEndDate())
+                  . '</h4>' . PHP_EOL;
+            }
+
             $output .= $this->getOpeninghoursOutput($openinghours, $startDate, $endDate);
         }
 
@@ -164,9 +187,9 @@ class RecurringOHService
         if (!empty($rules)) {
             $output .= '<div>' . PHP_EOL;
             if ($calendar->priority != 0) {
-                $output .= '<h4>';
+                $output .= '<h5>';
                 $output .= ucfirst($calendar->label);
-                $output .= '</h4>' . PHP_EOL;
+                $output .= '</h5>' . PHP_EOL;
             }
 
             $output .= '<p>' . implode("<br />" . PHP_EOL, $rules) . '</p>' . PHP_EOL;
@@ -487,10 +510,16 @@ class RecurringOHService
                 $eventUntil = (new Carbon($event->calendar->openinghours->end_date));
             }
 
-            if ($eventStart->greaterThan($startDate)) {
+            if (
+                $eventStart->greaterThan($startDate)
+                && $eventStart->greaterThan($this->currentOpeninghoursPeriod->getStartDate())
+            ) {
                 $output .= ' geldig vanaf ' . $this->getFullDayOutput($eventStart);
             }
-            if ($eventUntil->lessThan($endDate)) {
+            if (
+                $eventUntil->lessThan($endDate)
+                && $eventUntil->lessThan($this->currentOpeninghoursPeriod->getEndDate())
+            ) {
                 if ($output == '') {
                     $output .= ' geldig';
                 }
