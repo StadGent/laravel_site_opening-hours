@@ -308,7 +308,6 @@ class RecurringOHService
             // start and end date filters.
 
             $difference = $eventEnd->year - $eventStart->year;
-            $eventStart->year = $startDate->year;
             while ($eventStart->lessThan($startDate)) {
                 $eventStart->year++;
             }
