@@ -36,17 +36,16 @@ class RecurringOHService
 
     public function getServiceOutput(Service $service, Carbon $startDate, Carbon $endDate)
     {
-        $output = '';
+        $output = [];
 
         foreach ($service->channels as $channel) {
             $channelOutput = $this->getChannelOutput($channel, $startDate, $endDate);
             if ($channelOutput) {
-                $output .= '<h3>' . ucfirst($channel->label) . '</h3>' . PHP_EOL;
-                $output .= $channelOutput;
+                $output[] = ucfirst($channel->label) . '<br />'. PHP_EOL . $channelOutput;
             }
         }
 
-        return $output;
+        return implode('<br />--<br />' . PHP_EOL, $output);
     }
 
     public function getChannelOutput(Channel $channel, Carbon $startDate, Carbon $endDate)
@@ -65,15 +64,15 @@ class RecurringOHService
             );
             $prepend = '';
             if ($this->currentOpeninghoursPeriod->getStartDate()->greaterThan($startDate)) {
-              $prepend .= '<h4>Geldig vanaf '
+              $prepend .= 'Geldig vanaf '
                   . $this->getFullDayOutput($this->currentOpeninghoursPeriod->getStartDate())
-                  . '</h4>' . PHP_EOL;
+                  . '<br />' . PHP_EOL;
             }
 
             if ($this->currentOpeninghoursPeriod->getEndDate()->lessThan($endDate)) {
-              $prepend .= '<h4>Geldig t.e.m. '
+              $prepend .= 'Geldig t.e.m. '
                   . $this->getFullDayOutput($this->currentOpeninghoursPeriod->getEndDate())
-                  . '</h4>' . PHP_EOL;
+                  . '<br />' . PHP_EOL;
             }
 
             $ohOutput = $this->getOpeninghoursOutput($openinghours, $startDate, $endDate);
@@ -188,15 +187,13 @@ class RecurringOHService
         }
 
         if (!empty($rules)) {
-            $output .= '<div>' . PHP_EOL;
             if ($calendar->priority != 0) {
-                $output .= '<h5>';
                 $output .= ucfirst($calendar->label);
-                $output .= '</h5>' . PHP_EOL;
+                $output .= '<br />' . PHP_EOL;
             }
 
-            $output .= '<p>' . implode("<br />" . PHP_EOL, $rules) . '</p>' . PHP_EOL;
-            $output .= '</div>' . PHP_EOL;
+            $output .= implode("<br />" . PHP_EOL, $rules) . '<br />' . PHP_EOL;
+            $output .= '<br />' . PHP_EOL;
         }
 
         return $output;
@@ -308,7 +305,6 @@ class RecurringOHService
             // start and end date filters.
 
             $difference = $eventEnd->year - $eventStart->year;
-            $eventStart->year = $startDate->year;
             while ($eventStart->lessThan($startDate)) {
                 $eventStart->year++;
             }
