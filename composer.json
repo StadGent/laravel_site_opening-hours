@@ -4,15 +4,9 @@
     "keywords": ["framework", "laravel"],
     "license": "AGPLv3",
     "type": "project",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/weconnectdata/ics-parser"
-        }
-    ],
     "require": {
         "php": ">=7.2.0",
-        "digipolisgent/robo-digipolis-laravel": "^1.0",
+        "digipolisgent/robo-digipolis-laravel": "^2.0.1",
         "doctrine/dbal": "^2.5",
         "easyrdf/easyrdf": "^0.9.1",
         "fideloper/proxy": "^4.0",
