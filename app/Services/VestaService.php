@@ -226,7 +226,7 @@ class VestaService
         }
         $result = json_decode($result->SearchJSONResult);
 
-        if ($result->Total !== 1) {
+        if (!isset($result->Total) || $result->Total !== 1) {
             return false;
         }
 
