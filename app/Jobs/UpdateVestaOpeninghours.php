@@ -84,16 +84,19 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
             $recurringOHService = app(RecurringOHService::class);
             $output = $recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
+            $vService = app(VestaService::class);
+            $vService->setClient();
             if ($output === '') {
-                $vService = app(VestaService::class);
-                $vService->setClient();
                 $synced = $vService->emptyOpeninghours($service->identifier);
                 if (!$synced) {
                     $this->letsFail('Not able to send the data to VESTA.');
-                    return;
                 }
+                return;
             }
-            $this->sendToVesta($service, $output);
+            $currentOutput = $vService->getOpeningshoursByGuid($service->identifier);
+            if ($currentOutput !== $output) {
+                $this->sendToVesta($service, $output);
+            }
         } catch (\Exception $ex) {
             $this->letsFail($ex->getMessage());
         }
