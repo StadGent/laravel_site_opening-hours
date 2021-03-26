@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "21c4582dcfea54b14e9c7a3c363fb753",
+    "content-hash": "d511937d395fa3e299e133347adcdd02",
     "packages": [
         {
             "name": "adoy/fastcgi-client",
@@ -928,16 +928,16 @@
         },
         {
             "name": "digipolisgent/robo-digipolis-laravel",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/digipolisgent/robo-digipolis-laravel.git",
-                "reference": "837f5076f38b01ba594d241ea1b0db8a07400dd5"
+                "reference": "680c48888ade24e17c80753948fdf9351d251875"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/837f5076f38b01ba594d241ea1b0db8a07400dd5",
-                "reference": "837f5076f38b01ba594d241ea1b0db8a07400dd5",
+                "url": "https://api.github.com/repos/digipolisgent/robo-digipolis-laravel/zipball/680c48888ade24e17c80753948fdf9351d251875",
+                "reference": "680c48888ade24e17c80753948fdf9351d251875",
                 "shasum": ""
             },
             "require": {
@@ -974,9 +974,9 @@
             "description": "Basic deploy flow for a Laravel site.",
             "support": {
                 "issues": "https://github.com/digipolisgent/robo-digipolis-laravel/issues",
-                "source": "https://github.com/digipolisgent/robo-digipolis-laravel/tree/2.0.1"
+                "source": "https://github.com/digipolisgent/robo-digipolis-laravel/tree/2.0.2"
             },
-            "time": "2021-03-15T08:11:11+00:00"
+            "time": "2021-03-26T10:52:35+00:00"
         },
         {
             "name": "digipolisgent/robo-digipolis-package",
