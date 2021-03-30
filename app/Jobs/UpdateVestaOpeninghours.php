@@ -86,6 +86,11 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
 
             $vService = app(VestaService::class);
             $vService->setClient();
+            $currentOutput = $vService->getOpeningshoursByGuid($service->identifier);
+
+            if ($currentOutput == $output) {
+                return;
+            }
             if ($output === '') {
                 $synced = $vService->emptyOpeninghours($service->identifier);
                 if (!$synced) {
@@ -93,10 +98,7 @@ class UpdateVestaOpeninghours extends BaseJob implements ShouldQueue
                 }
                 return;
             }
-            $currentOutput = $vService->getOpeningshoursByGuid($service->identifier);
-            if ($currentOutput !== $output) {
-                $this->sendToVesta($service, $output);
-            }
+            $this->sendToVesta($service, $output);
         } catch (\Exception $ex) {
             $this->letsFail($ex->getMessage());
         }
