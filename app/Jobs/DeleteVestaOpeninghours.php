@@ -91,6 +91,12 @@ class DeleteVestaOpeninghours extends BaseJob implements ShouldQueue
     {
         $vService = app(VestaService::class);
         $vService->setClient();
+        $currentOutput = $vService->getOpeningshoursByGuid($service->identifier);
+
+        // Output already empty, nothing to do.
+        if ($currentOutput == '') {
+            return;
+        }
         $synced = $vService->emptyOpeninghours($service->identifier);
         if ( ! $synced) {
             $this->letsFail('Not able to send the data to VESTA.');
