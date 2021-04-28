@@ -5,8 +5,8 @@
     "license": "AGPLv3",
     "type": "project",
     "require": {
-        "php": ">=7.2.0",
-        "digipolisgent/robo-digipolis-laravel": "^2.0.1",
+        "php": ">=7.3.0",
+        "digipolisgent/robo-digipolis-laravel": "^2.0.2",
         "doctrine/dbal": "^2.5",
         "easyrdf/easyrdf": "^0.9.1",
         "fideloper/proxy": "^4.0",
@@ -74,7 +74,7 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "platform": {
-            "php": "7.2.0"
+            "php": "7.3"
         }
     },
     "minimum-stability": "dev",

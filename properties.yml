@@ -1,4 +1,0 @@
-remote:
-  opcache:
-    env: 'fcgi'
-    host: '/var/run/php_fpm_[user].sock'
