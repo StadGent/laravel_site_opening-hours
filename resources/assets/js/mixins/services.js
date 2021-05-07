@@ -321,6 +321,10 @@ export default {
             this.statusStart();
 
             const version = Object.assign(createVersion(), input);
+            // delete the srv property that it got from the input variable, it
+            // causes TypeError: cyclic object value further down the line when
+            // JSON.stringify() is called.
+            delete version.srv;
             const originalVersion = input.originalVersion;
             if (!version.channel_id) {
                 version.channel_id = this.route.channel;
