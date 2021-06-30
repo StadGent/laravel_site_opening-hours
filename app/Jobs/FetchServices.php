@@ -10,13 +10,6 @@ class FetchServices extends BaseJob implements ShouldQueue
 {
 
     /**
-     * The LOD service repository
-     *
-     * @var App\Repositories\LodServicesRepository
-     */
-    private $lodServices;
-
-    /**
      * Execute the job.
      *
      * @return void
@@ -27,8 +20,10 @@ class FetchServices extends BaseJob implements ShouldQueue
 
         $types = ['vesta', 'recreatex'];
 
+        $repository = new LodServicesRepository();
+
         foreach ($types as $type) {
-            collect((new LodServicesRepository())->fetchServices($type))->each(function ($service) use ($services, $type) {
+            collect($repository->fetchServices($type))->each(function ($service) use ($services, $type) {
                 $uniqueProperties = Arr::only($service, ['uri', 'identifier']);
 
                 $service['source'] = $type;
