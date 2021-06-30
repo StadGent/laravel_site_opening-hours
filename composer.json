@@ -12,6 +12,7 @@
         "fideloper/proxy": "^4.0",
         "fzaninotto/faker": "^1.4",
         "grasmash/yaml-expander": "^1.1",
+        "guzzlehttp/guzzle": "^7.3",
         "johngrogg/ics-parser": "^2.1.5",
         "laravel/framework": "^6.18.26",
         "laravel/passport": "^9.3.2",
