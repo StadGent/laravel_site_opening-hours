@@ -51,6 +51,13 @@ class SparqlService
     private static $instance;
 
     /**
+     * Whether or not the connection test has succeeded.
+     *
+     * @var bool
+     */
+    private $connected = false;
+
+    /**
      *
      * Private contructor for Singleton pattern.
      *
@@ -118,6 +125,9 @@ class SparqlService
      */
     public function baseConnectionTest($options = [])
     {
+        if ($this->connected) {
+          return;
+        }
         $options['connect_timeout'] = 0.1;
         $query = 'WITH <' . env('SPARQL_WRITE_GRAPH') . '> ASK { ?s ?p ?o }';
         $uri = '?query=' . static::transformQuery($query);
@@ -134,6 +144,8 @@ class SparqlService
         if ($data !== true && $data !== false) {
             throw new \Exception("No correct data came back in connection test", 1);
         }
+
+        $this->connected = true;
     }
 
     /**
