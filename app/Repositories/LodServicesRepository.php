@@ -13,7 +13,7 @@ class LodServicesRepository
      * Return the services fetched from the SPARQL endpoint
      * in a structure that is compatible with our internal Service model
      *
-     * @param  string $type recreatex or vesta
+     * @param  string $type recreatex, vesta or publicToilets
      * @return array
      */
     public function fetchServices($type)
@@ -140,6 +140,27 @@ class LodServicesRepository
                     <http://purl.org/dc/terms/identifier> ?identifier.
                     ?agent foaf:name ?name.
                 } ';
+
+        if ($limit) {
+            $query .= " LIMIT $limit OFFSET $offset";
+        }
+
+        return $query;
+    }
+
+    public static function getPublicToiletsServicesQuery($limit = 100, $offset = 0)
+    {
+        $query = 'PREFIX schema: <http://schema.org/>
+                SELECT DISTINCT ?agent ?identifier ?name ?source
+                FROM <http://stad.gent/agents/>
+                WHERE {
+                    ?agent a foaf:Agent, schema:PublicToilet;
+                    <http://purl.org/dc/terms/source> ?source ;
+                    <http://purl.org/dc/terms/identifier> ?identifier;
+                    foaf:name ?official_name.
+                    OPTIONAL { ?agent  foaf:nickname ?nickname}
+                    BIND(IF(BOUND(?nickname) && ?nickname != "" && REPLACE(UCASE(?nickname)," ","") != REPLACE(UCASE(?official_name)," ",""), CONCAT(?official_name, " (", ?nickname, ")"), ?official_name) as ?name)
+                } ORDER BY ?name';
 
         if ($limit) {
             $query .= " LIMIT $limit OFFSET $offset";
