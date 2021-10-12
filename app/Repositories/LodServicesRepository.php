@@ -152,7 +152,7 @@ class LodServicesRepository
     {
         $query = 'PREFIX schema: <http://schema.org/>
                 SELECT DISTINCT ?agent ?identifier ?name ?source
-                FROM <http://stad.gent/agents/>
+                FROM <http://stad.gent/public-restrooms/>
                 WHERE {
                     ?agent a foaf:Agent, schema:PublicToilet;
                     <http://purl.org/dc/terms/source> ?source ;
