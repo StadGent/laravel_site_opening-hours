@@ -21,12 +21,21 @@ class ServicesController extends Controller
     {
         $label = $request->get('label', '');
         $uri = $request->get('uri', '');
+        $source = $request->get('source', '');
+        $sourceId = $request->get('sourceId', '');
 
         $services = Service::where('label', 'like', '%' . $label . '%');
 
         if (!empty($uri)) {
             $services->where('uri', $uri);
         }
+        if (!empty($source)) {
+            $services->where('source', $source);
+        }
+        if (!empty($sourceId)) {
+            $services->where('identifier', $sourceId);
+        }
+
 
         $services->where('draft', false);
 
