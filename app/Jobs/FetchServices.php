@@ -24,9 +24,9 @@ class FetchServices extends BaseJob implements ShouldQueue
 
         foreach ($types as $type) {
             collect($repository->fetchServices($type))->each(function ($service) use ($services, $type) {
-                $uniqueProperties = Arr::only($service, ['uri', 'identifier']);
-
                 $service['source'] = $type;
+                $uniqueProperties = Arr::only($service, ['source', 'identifier']);
+
 
                 try {
                     $services->updateOrCreate($uniqueProperties, $service);
