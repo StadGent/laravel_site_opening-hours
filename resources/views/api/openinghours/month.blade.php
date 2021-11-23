@@ -38,7 +38,7 @@
     $hasPreviousIteration = $transformer->hasPreviousIteration($channelData['channelId']);
 
     ?>
-    <div vocab="http://schema.org/" typeof="Library" class="openinghours openinghours--calendar">
+    <div vocab="http://schema.org/" class="openinghours openinghours--calendar">
         <div class="openinghours--header">
             <button class="openinghours--prev" @if(!$hasPreviousIteration)disabled="disabled"@endif>
                 @lang('openinghourApi.PREVIOUS')
@@ -92,7 +92,10 @@
                 <li aria-setsize="30" aria-posinset="{{ $currentDay }}" tabindex="{{ $tabIndex }}"
                     class="{{ $class }}">
                     <span aria-hidden="true">{{ $referenceDate->day }}</span>
-                    @include('api.openinghours.day_info_short', ['dayInfoObj' => $dayInfoObj])
+                    @include('api.openinghours.day_info', [
+                        'dayInfoObj' => $dayInfoObj,
+                        'short' => true,
+                        'includeRFDa' => $channelData['channelTypeLabel'] == 'Algemeen'])
                 </li>
             @endforeach
             @for($i=0;$i< $disabledDaysAfterEnd;$i++)
