@@ -1,4 +1,5 @@
 @php
+    $allDay = $hours['from'] === '00:00' && $hours['until'] === '23:59';
     $from = trans('openinghourApi.HH:MM', [
             'HH' => substr($hours['from'],0,2),
             'MM' => substr($hours['from'],3,2)
@@ -17,23 +18,55 @@
 
 @if($includeRFDa)
     <div class="openinghours--time">
-        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR')&#32;</span>
+        <span class="openinghours--time-prefix">
+          @if(!$allDay)
+            @lang('openinghourApi.FROM_HOUR')&#32;
+          @endif
+        </span>
         <time property="opens"
               datetime="{{ $hours['from'] }}"
-              aria-label="{{ $hours['from'] }}">{{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
-        <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
+              aria-label="{{ $hours['from'] }}">
+          @if(!$allDay)
+            {{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;
+          @endif
+        </time>
+        @if(!$allDay)
+          <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
+        @else
+          @lang('openinghourApi.ALL_DAY')
+        @endif
         <time property="closes"
               datetime="{{ $hours['until'] }}"
-              aria-label="{{ $hours['until']}}">&#32;{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
+              aria-label="{{ $hours['until']}}">
+          @if(!$allDay)
+            &#32;{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;
+          @endif
+        </time>
     </div>
 @else
     <div class="openinghours--time">
-        <span class="openinghours--time-prefix">@lang('openinghourApi.FROM_HOUR') </span>
+        <span class="openinghours--time-prefix">
+          @if(!$allDay)
+            @lang('openinghourApi.FROM_HOUR')
+          @endif
+        </span>
         <time datetime="{{ $hours['from'] }}"
-              aria-label="{{ $hours['from'] }}">{{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
-        <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
+              aria-label="{{ $hours['from'] }}">
+          @if(!$allDay)
+            {{ $from }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;
+          @endif
+        </time>
+        @if(!$allDay)
+          <span class="openinghours--time-separator">@lang('openinghourApi.UNTIL_HOUR')</span>
+        @else
+          @lang('openinghourApi.ALL_DAY')
+        @endif
         <time datetime="{{ $hours['until'] }}"
-              aria-label="{{ $hours['until']}}">&#32;{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;</time>
+              aria-label="{{ $hours['until']}}">
+          @if(!$allDay)
+            &#32;{{ $until }}&nbsp;@lang('openinghourApi.SHORT_HOUR')&#32;
+          @endif
+        </time>
     </div>
 @endif
 @if($last)
