@@ -22,6 +22,7 @@ return [
     'SHORT_HOUR' => 'u.',
     'LONG_HOUR' => 'uur',
     'HH:MM' => ':HH.:MM',
+    'ALL_DAY' => 'hele dag (24 u.)',
 
     'DAY_OF_MONTH' => ':DAY',
 
