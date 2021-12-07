@@ -14,10 +14,14 @@
 	    $until = preg_replace('/\D00$/', '', $until);
 	    $until = preg_replace('/^0/', '', $until);
     }
+    $wrapperClasses = "openinghours--time";
+    if($allDay) {
+      $wrapperClasses .= " all-day";
+    }
 @endphp
 
 @if($includeRFDa)
-    <div class="openinghours--time">
+    <div class="{{ $wrapperClasses }}">
         <span class="openinghours--time-prefix">
           @if(!$allDay)
             @lang('openinghourApi.FROM_HOUR')&#32;
@@ -44,7 +48,7 @@
         </time>
     </div>
 @else
-    <div class="openinghours--time">
+    <div class="{{ $wrapperClasses }}">
         <span class="openinghours--time-prefix">
           @if(!$allDay)
             @lang('openinghourApi.FROM_HOUR')
