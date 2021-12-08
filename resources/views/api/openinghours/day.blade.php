@@ -10,24 +10,26 @@ $booking = $bookingIndex !== false ? $data[$bookingIndex] : null;
 @if(!$hasOneChannel)
     @if($default && ($default['openinghours'][0]->open || !$booking || !$booking['openinghours'][0]->open))
         @foreach($default['openinghours'] as $dayInfoObj)
-            @include('api.openinghours.day_info_short', [
+            @include('api.openinghours.day_info', [
             'dayInfoObj' => $dayInfoObj,
-            'type' => $default['channelTypeLabel'],])
+            'type' => $default['channelTypeLabel'],
+            'short' => true])
         @endforeach
     @endif
 
     @if($booking)
         @foreach($booking['openinghours'] as $dayInfoObj)
-            @include('api.openinghours.day_info_short', [
+            @include('api.openinghours.day_info', [
             'dayInfoObj' => $dayInfoObj,
-            'type' => $booking['channelTypeLabel'],])
+            'type' => $booking['channelTypeLabel'],
+            'short' => true])
         @endforeach
     @endif
 
 @else
     @foreach($data as $channelData)
         @foreach($channelData['openinghours'] as $dayInfoObj)
-            @include('api.openinghours.day_info_short', ['dayInfoObj' => $dayInfoObj])
+            @include('api.openinghours.day_info', ['dayInfoObj' => $dayInfoObj, 'short' => true])
         @endforeach
     @endforeach
 @endif
