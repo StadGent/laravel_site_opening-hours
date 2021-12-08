@@ -1,5 +1,5 @@
 @foreach($data as $channelData)
-    <div vocab=“http://schema.org/” typeof=“Library”>
+    <div vocab=“http://schema.org/”>
         <h1>{{$channelData['channel']}}</h1>
         @if(isset($channelData['openNow']['status']))
             <div>@lang('openinghourApi.OPEN')</div>
