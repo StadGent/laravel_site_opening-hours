@@ -214,6 +214,7 @@ return [
          * Tinker
          */
         Laravel\Tinker\TinkerServiceProvider::class,
+        'hedronium\SpacelessBlade\SpacelessBladeProvider',
     ],
 
     /*
