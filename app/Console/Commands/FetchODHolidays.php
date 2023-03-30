@@ -69,6 +69,8 @@ class FetchODHolidays extends BaseCommand
                 $this->error('Failed to sync holiday data for ' . $calendarName . "\n" . $e->getMessage());
             }
         }
+
+        return 0;
     }
 
     /**
