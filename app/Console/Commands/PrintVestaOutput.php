@@ -36,5 +36,7 @@ class PrintVestaOutput extends BaseCommand
         $endDate = $startDate->copy()->addMonths(config('app.vesta_output_months', 2));
         $output = $recurringOHService->getServiceOutput($service, $startDate, $endDate);
         echo $output . PHP_EOL;
+
+        return 0;
     }
 }
