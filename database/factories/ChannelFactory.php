@@ -1,9 +1,21 @@
 <?php
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(App\Models\Channel::class, function (Faker\Generator $faker) {
-    return [
-        'label' => $faker->text($maxNbChars = 30),
-        'service_id' => 1,
-    ];
-});
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ChannelFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'label' => $this->faker->text(30),
+            'service_id' => 1,
+        ];
+    }
+}
