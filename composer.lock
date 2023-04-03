@@ -986,16 +986,16 @@
         },
         {
             "name": "digipolisgent/robo-digipolis-laravel",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/district09/robo-digipolis-laravel.git",
-                "reference": "a3871365f980b9fd79b7d5c7ce72d95308874749"
+                "reference": "c22f887f828176491df8ebd2d04db035d65e579c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/district09/robo-digipolis-laravel/zipball/a3871365f980b9fd79b7d5c7ce72d95308874749",
-                "reference": "a3871365f980b9fd79b7d5c7ce72d95308874749",
+                "url": "https://api.github.com/repos/district09/robo-digipolis-laravel/zipball/c22f887f828176491df8ebd2d04db035d65e579c",
+                "reference": "c22f887f828176491df8ebd2d04db035d65e579c",
                 "shasum": ""
             },
             "require": {
@@ -1032,9 +1032,9 @@
             "description": "Basic deploy flow for a Laravel site.",
             "support": {
                 "issues": "https://github.com/district09/robo-digipolis-laravel/issues",
-                "source": "https://github.com/district09/robo-digipolis-laravel/tree/3.0.0"
+                "source": "https://github.com/district09/robo-digipolis-laravel/tree/3.0.1"
             },
-            "time": "2023-03-30T11:42:13+00:00"
+            "time": "2023-04-03T14:03:54+00:00"
         },
         {
             "name": "digipolisgent/robo-digipolis-package",
