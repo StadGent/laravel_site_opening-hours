@@ -3,6 +3,7 @@
 namespace Openinghours\Robo\EventHandler;
 
 use DigipolisGent\Robo\Laravel\EventHandler\ClearCacheHandler;
+use DigipolisGent\Robo\Task\Deploy\Ssh\Auth\KeyFile;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
 class OpeninghoursClearCacheHandler extends ClearCacheHandler
