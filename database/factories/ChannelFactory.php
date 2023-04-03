@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 class ChannelFactory extends Factory
 {
@@ -15,7 +14,7 @@ class ChannelFactory extends Factory
     public function definition()
     {
         return [
-            'label' => $faker->text($maxNbChars = 30),
+            'label' => $this->faker->text(30),
             'service_id' => 1,
         ];
     }
