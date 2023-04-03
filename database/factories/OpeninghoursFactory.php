@@ -20,7 +20,7 @@ class OpeninghoursFactory extends Factory
             'active' => 1,
             'start_date' => $start->subYear(),
             'end_date' => $end->addYear(),
-            'label' => $faker->text($maxNbChars = 30),
+            'label' => $this->faker->text(30),
         ];
     }
 }

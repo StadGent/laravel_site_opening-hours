@@ -9,8 +9,9 @@ class OpeninghoursClearCacheHandler extends ClearCacheHandler
 {
     use \DigipolisGent\Robo\Task\Deploy\Tasks;
 
-    public function getPriority(): int {
-      return parent::getPriority() + 100;
+    public function getPriority(): int
+    {
+        return parent::getPriority() + 100;
     }
 
     /**
