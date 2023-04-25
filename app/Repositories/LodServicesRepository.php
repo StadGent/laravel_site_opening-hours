@@ -131,15 +131,16 @@ class LodServicesRepository
      */
     public static function getRecreatexServicesQuery($limit = 100, $offset = 0)
     {
-        $query = 'SELECT ?agent ?identifier ?name
-                FROM <http://stad.gent/agents/>
-                WHERE
-                {
-                    ?agent a foaf:Agent;
-                    <http://purl.org/dc/terms/source> "RECREATEX"^^xsd:string ;
-                    <http://purl.org/dc/terms/identifier> ?identifier.
-                    ?agent foaf:name ?name.
-                } ';
+        $query = 'SELECT ?agent ?identifier ?name ?source
+                  FROM <http://stad.gent/agents/>
+                  WHERE {
+                      ?agent a foaf:Agent;
+                      <http://purl.org/dc/terms/source> ?source ;
+                      <http://purl.org/dc/terms/identifier> ?identifier.
+                      ?agent foaf:name ?name.
+                      FILTER strstarts(?source, "RECREATEX"^^xsd:string)
+                  }
+                  ORDER BY ?name';
 
         if ($limit) {
             $query .= " LIMIT $limit OFFSET $offset";
