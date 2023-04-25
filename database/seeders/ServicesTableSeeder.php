@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeds;
+namespace Database\Seeders;
 
 use App\Jobs\FetchServices;
 use App\Models\Service;

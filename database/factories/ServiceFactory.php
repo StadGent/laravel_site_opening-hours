@@ -1,11 +1,24 @@
 <?php
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(App\Models\Service::class, function (Faker\Generator $faker) {
-    return [
-        'label' => $faker->text,
-        'uri' => $faker->url,
-        'description' => $faker->text,
-        'draft' => 0,
-    ];
-});
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+class ServiceFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'label' => $this->faker->text,
+            'uri' => $this->faker->url,
+            'description' => $this->faker->text,
+            'draft' => 0,
+        ];
+    }
+}

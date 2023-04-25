@@ -52,5 +52,7 @@ class UpdateSchedulesInVesta extends BaseCommand
 
         $this->info('Nr of services set in queue: ' . $services->count());
         $this->info('Done UpdateSchedulesInVesta');
+
+        return 0;
     }
 }
