@@ -45,11 +45,11 @@ class DayInfo
     ];
 
     /**
-     * @param Carbon $date
+     * @param \DateTime $date
      */
-    public function __construct(Carbon $date)
+    public function __construct(\DateTime $date)
     {
-        $this->date = $date;
+        $this->date = $date instanceof Carbon ? $date : new Carbon($date);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeds;
+namespace Database\Seeders;
 
 use App\Models\Channel;
 use App\Models\Openinghours;

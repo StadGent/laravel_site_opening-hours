@@ -31,5 +31,7 @@ class PrintLodInput extends BaseCommand
         $type = $this->argument('type');
         $output = (new LodServicesRepository())->fetchServices($type);
         echo count($output).PHP_EOL;
+
+        return 0;
     }
 }

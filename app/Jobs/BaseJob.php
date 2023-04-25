@@ -71,7 +71,7 @@ abstract class BaseJob implements ShouldQueue
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(\Exception $exception)
+    public function failed(\Throwable $exception)
     {
         \Log::error('JOB FAIL: ' . $exception->getMessage());
         if (!empty($this->extModelClass) && !empty($this->extId)) {

@@ -132,10 +132,10 @@ return [
     ],
 
     'supported_exception_callendars' => [
-        'feestdagen' => 'https://datafiles.stad.gent/sites/default/files/feestdagen-nl-BE.ical',
-        'schoolvakanties' => 'https://datafiles.stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
-        'gentsefeesten' => 'https://datafiles.stad.gent/sites/default/files/gentsefeesten-nl-BE.ical',
-        'extra-stad-gent' => 'https://datafiles.stad.gent/sites/default/files/extra-feestdagen-stad-gent-nl-BE.ical',
+        'feestdagen' => 'https://stad.gent/sites/default/files/feestdagen-nl-BE.ical',
+        'schoolvakanties' => 'https://stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
+        'gentsefeesten' => 'https://stad.gent/sites/default/files/gentsefeesten-nl-BE.ical',
+        'extra-stad-gent' => 'https://stad.gent/sites/default/files/extra-feestdagen-stad-gent-nl-BE.ical',
     ],
 
     /*

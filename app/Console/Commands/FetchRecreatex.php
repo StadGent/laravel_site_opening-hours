@@ -109,6 +109,8 @@ class FetchRecreatex extends BaseCommand
                     $this->activeServiceRecord->save();
                 }
             });
+
+        return 0;
     }
 
     /**

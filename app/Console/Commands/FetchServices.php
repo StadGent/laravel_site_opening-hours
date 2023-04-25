@@ -30,5 +30,7 @@ class FetchServices extends BaseCommand
         dispatch(new FetchServicesJob());
 
         $this->info('Dispatched a job that will fetch the services from the SPARQL endpoint.');
+
+        return 0;
     }
 }
