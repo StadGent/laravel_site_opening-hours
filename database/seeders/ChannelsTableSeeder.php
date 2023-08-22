@@ -35,7 +35,7 @@ class ChannelsTableSeeder extends Seeder
         foreach ($services as $service) {
             foreach ($sampleChannels as $newChannel) {
                 $service->channels()->save(
-                    factory(Channel::class)
+                    Channel::factory()
                         ->make([
                             'service_id' => $service,
                             'label' => $newChannel['label'],
