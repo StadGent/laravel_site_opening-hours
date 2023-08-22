@@ -20,7 +20,7 @@ class OpeninghoursTableSeeder extends Seeder
             ->values();
 
         foreach ($channels as $channel) {
-            $channel->openinghours()->save(factory(Openinghours::class)->make());
+            $channel->openinghours()->save(Openinghours::factory()->make());
         }
 
         $this->command->info(self::class . " seeded \r");

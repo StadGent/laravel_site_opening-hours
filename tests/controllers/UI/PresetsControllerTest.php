@@ -4,7 +4,7 @@ namespace Tests\Controllers\UI;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class PresetsController extends \BrowserKitTestCase
+class PresetsControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 

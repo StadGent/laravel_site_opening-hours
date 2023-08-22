@@ -12,7 +12,7 @@
         "digipolisgent/robo-digipolis-laravel": "^3.0",
         "doctrine/dbal": "^2.5",
         "easyrdf/easyrdf": "^0.9.1",
-        "fzaninotto/faker": "^1.4",
+        "fakerphp/faker": "^1.23",
         "guzzlehttp/guzzle": "^7.3",
         "hedronium/spaceless-blade": "^3.0",
         "johngrogg/ics-parser": "^2.1.5",
