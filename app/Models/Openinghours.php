@@ -3,14 +3,15 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use DateTime;
 use DateInterval;
+use DateTime;
 use Exception;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Openinghours extends Model
 {
-
+    use HasFactory;
     /**
      * The table to store the openinghours in
      *

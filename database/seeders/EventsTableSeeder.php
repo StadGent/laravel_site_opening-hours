@@ -20,19 +20,19 @@ class EventsTableSeeder extends Seeder
             $calendars = $openinghour->calendars;
 
             $baseCalendar = $calendars->shift();
-            $baseCalendar->events()->save(factory(Event::class)
+            $baseCalendar->events()->save(Event::factory()
                 ->make([
                     'start_date' => '2017-01-01 09:00',
                     'end_date' => '2017-01-01 12:00',
                 ]));
-            $baseCalendar->events()->save(factory(Event::class)
+            $baseCalendar->events()->save(Event::factory()
                 ->make([
                     'start_date' => '2017-01-01 13:00',
                     'end_date' => '2017-01-01 17:00',
                 ]));
 
             $exceptionCalendar = $calendars->shift();
-            $exceptionCalendar->events()->save(factory(Event::class)
+            $exceptionCalendar->events()->save(Event::factory()
                 ->make([
                     'rrule' => 'BYSETPOS=1;BYDAY=MO;FREQ=MONTHLY',
                     'start_date' => '2017-01-01 09:00',
@@ -40,7 +40,7 @@ class EventsTableSeeder extends Seeder
                 ]));
 
             $exceptionCalendar = $calendars->shift();
-            $exceptionCalendar->events()->save(factory(Event::class)
+            $exceptionCalendar->events()->save(Event::factory()
                 ->make([
                     'rrule' => 'BYDAY=SA;FREQ=WEEKLY;INTERVAL=2',
                     'start_date' => '2017-01-01 10:00',

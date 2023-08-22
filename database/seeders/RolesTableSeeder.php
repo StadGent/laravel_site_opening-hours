@@ -39,13 +39,11 @@ class RolesTableSeeder extends Seeder
         ];
 
         foreach ($roles as $roleConfig) {
-            $role = Role::create([
+            $role = Role::factory()->create([
                 'name' => $roleConfig['name'],
                 'display_name' => $roleConfig['display_name'],
                 'description' => $roleConfig['description'],
             ]);
-
-            $role->save();
         }
         $this->command->info(self::class . " seeded \r");
     }

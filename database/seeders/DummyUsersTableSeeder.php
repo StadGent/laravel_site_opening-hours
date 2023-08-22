@@ -22,7 +22,7 @@ class DummyUsersTableSeeder extends Seeder
             $name = strtolower($roleConfig['name']);
             $password = 'opening' . $name;
 
-            $user = User::create([
+            $user = User::factory()->create([
                 'name' => $name . 'user',
                 'email' => $name . '@foo.bar',
                 'password' => Hash::make($password),
