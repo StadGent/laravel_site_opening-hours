@@ -89,8 +89,8 @@ class ServicesControllerTest extends \BrowserKitTestCase
     public function testChildInfoIndicatorsOnServicesOutput()
     {
         // make some fake data to limit the collected data
-        $service = factory(Service::class)->create();
-        $user = factory(User::class)->create();
+        $service = Service::factory()->create();
+        $user = User::factory()->create();
         app('UserRepository')->linkToService($user->id, $service->id, 'Owner');
         $this->actingAs($user, 'api');
         
@@ -100,7 +100,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
         $this->assertEquals(0, $requestOutput[0]['countChannels']);
 
         // add channel check has_missing_oh for Missing calendar info
-        $channel = factory(Channel::class)->create(['service_id' => $service->id]);
+        $channel = Channel::factory()->create(['service_id' => $service->id]);
         $this->doRequest('get', $this->apiUrl, []);
         $requestOutput = $this->decodeResponseJson();
         $this->assertEquals(1, $requestOutput[0]['has_missing_oh']);
@@ -108,7 +108,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
 
         $now = new Carbon();
         // add OH check has_inactive_oh for Missing active calendar info
-        $openinghours = factory(Openinghours::class)->create([
+        $openinghours = Openinghours::factory()->create([
             'channel_id' => $channel->id,
             'active' => 0,
             'start_date' => $now->copy()->addYear(),
