@@ -20,8 +20,9 @@ class FetchODHolidaysTest extends \BrowserKitTestCase
         \DB::table('default_events')->delete();
         // set calendars + one fake
         $supportedCalendars = [
-            'feestdagen' => 'https://datafiles.stad.gent/sites/default/files/feestdagen-nl-BE.ical',
-            'schoolvakanties' => 'https://datafiles.stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
+            'feestdagen' => 'https://stad.gent/sites/default/files/feestdagen-nl-BE.ical',
+            'schoolvakanties' => 'https://stad.gent/sites/default/files/schoolvakanties-nl-BE.ical',
+            'gentsefeesten' => 'https://stad.gent/sites/default/files/gentsefeesten-nl-BE.ical',
             'testCal' => 'https://datafiles.stad.gent/sites/default/files/testICal.ical',
         ];
         \Config::set('app.supported_exception_callendars', $supportedCalendars);
@@ -34,9 +35,11 @@ class FetchODHolidaysTest extends \BrowserKitTestCase
         $feestdagenCalendar = DefaultCalendar::where('label', 'feestdagen')->first();
         $feestdagenEventsCount = $feestdagenCalendar->events()->count();
         $schoolvakantiesEventsCount = DefaultCalendar::where('label', 'schoolvakanties')->first()->events()->count();
+        $gentseFeestenEventsCount = DefaultCalendar::where('label', 'gentsefeesten')->first()->events()->count();
 
         $this->assertTrue(!!$feestdagenEventsCount);
         $this->assertTrue(!!$schoolvakantiesEventsCount);
+        $this->assertTrue(!!$gentseFeestenEventsCount);
         // except for the fake one
         $this->assertFalse(!!DefaultCalendar::where('label', 'testCal')->first()->events()->count());
 

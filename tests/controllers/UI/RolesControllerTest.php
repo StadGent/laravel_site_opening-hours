@@ -45,64 +45,64 @@ class RolesControllerTest extends \BrowserKitTestCase
 
         return [
             //  unauth user
-            ['unauth', 'get', '', [], '405'], // index
-            ['unauth', 'post', '', $data, '405'], // store
-            ['unauth', 'get', '1', [], '404'], // show
-            ['unauth', 'put', '', $data, '405'], // update (full)
-            ['unauth', 'patch', '', $data, '401'], // update (partial)
-            ['unauth', 'delete', '', $dataRemove, '401'], // destroy
+            ['unauth', 'get', '', [], 405], // index
+            ['unauth', 'post', '', $data, 405], // store
+            ['unauth', 'get', '1', [], 404], // show
+            ['unauth', 'put', '', $data, 405], // update (full)
+            ['unauth', 'patch', '', $data, 401], // update (partial)
+            ['unauth', 'delete', '', $dataRemove, 401], // destroy
             // admin user
-            ['admin', 'get', '', [], '405'], // index
-            ['admin', 'post', '', $data, '405'], // store
-            ['admin', 'get', '1', [], '404'], // show
-            ['admin', 'put', '', $data, '405'], // update (full)
-            ['admin', 'patch', '', $data, '200'], // update (partial)
+            ['admin', 'get', '', [], 405], // index
+            ['admin', 'post', '', $data, 405], // store
+            ['admin', 'get', '1', [], 404], // show
+            ['admin', 'put', '', $data, 405], // update (full)
+            ['admin', 'patch', '', $data, 200], // update (partial)
             [
                 'admin', 'patch', '',
-                ['user_id' => '1', 'service_id' => '1', 'role' => 'Owner'], '400',
+                ['user_id' => '1', 'service_id' => '1', 'role' => 'Owner'], 400,
             ], // cannot assign himself
-            ['admin', 'delete', '', $dataRemove, '200'], // destroy
-            ['admin', 'delete', '', ['user_id' => '1', 'service_id' => '1'], '400'], // cannot remove himself
+            ['admin', 'delete', '', $dataRemove, 200], // destroy
+            ['admin', 'delete', '', ['user_id' => '1', 'service_id' => 1], 400], // cannot remove himself
             // editor user
-            ['editor', 'get', '', [], '405'], // index
-            ['editor', 'post', '', $data, '405'], // store
-            ['editor', 'get', '1', [], '404'], // show
-            ['editor', 'put', '', $data, '405'], // update (full)
-            ['editor', 'patch', '', $data, '401'], // update (partial)
-            ['editor', 'delete', '', $dataRemove, '401'], // destroy
+            ['editor', 'get', '', [], 405], // index
+            ['editor', 'post', '', $data, 405], // store
+            ['editor', 'get', '1', [], 404], // show
+            ['editor', 'put', '', $data, 405], // update (full)
+            ['editor', 'patch', '', $data, 401], // update (partial)
+            ['editor', 'delete', '', $dataRemove, 401], // destroy
             // owner user
-            ['owner', 'get', '', [], '405'], // index
-            ['owner', 'post', '', $data, '405'], // store
-            ['owner', 'get', '1', [], '404'], // show
-            ['owner', 'put', '', $data, '405'], // update (full)
-            ['owner', 'patch', '', $data, '200'], // update (partial)
+            ['owner', 'get', '', [], 405], // index
+            ['owner', 'post', '', $data, 405], // store
+            ['owner', 'get', '1', [], 404], // show
+            ['owner', 'put', '', $data, 405], // update (full)
+            ['owner', 'patch', '', $data, 200], // update (partial)
             [
                 'owner', 'patch', '',
-                ['user_id' => '1', 'service_id' => '1', 'role' => 'Owner'], '400',
+                ['user_id' => '1', 'service_id' => '1', 'role' => 'Owner'], 400,
             ], // cannot alter admin
             [
                 'owner', 'patch', '',
-                ['user_id' => '3', 'service_id' => '1', 'role' => 'Member'], '400',
+                ['user_id' => '3', 'service_id' => '1', 'role' => 'Member'], 400,
             ], // cannot alter himself
             [
                 'owner', 'patch', '',
-                ['user_id' => '3', 'service_id' => '3', 'role' => 'Member'], '401',
+                ['user_id' => '3', 'service_id' => '3', 'role' => 'Member'], 401,
             ], // cannot assign himself to not owned service
             [
                 'owner', 'patch', '',
-                ['user_id' => '3', 'service_id' => '2', 'role' => 'Member'], '401',
+                ['user_id' => '3', 'service_id' => '2', 'role' => 'Member'], 401,
             ], // cannot assign someone else to not owned service
-            ['owner', 'delete', '', $dataRemove, '200'], // destroy
-            ['owner', 'delete', '', ['user_id' => '1', 'service_id' => '1'], '400'], // cannot remove admin
-            ['owner', 'delete', '', ['user_id' => '2', 'service_id' => '1'], '400'], // cannot remove himself
+            ['owner', 'delete', '', $dataRemove, 200], // destroy
+            ['owner', 'delete', '', ['user_id' => '1', 'service_id' => 1], 400], // cannot remove admin
+            ['owner', 'delete', '', ['user_id' => '2', 'service_id' => 1], 400], // cannot remove himself
 
             // member user
-            ['member', 'get', '', [], '405'], // index
-            ['member', 'post', '', $data, '405'], // store
-            ['member', 'get', '1', [], '404'], // show
-            ['member', 'put', '', $data, '405'], // update (full)
-            ['member', 'patch', '', $data, '401'], // update (partial)
-            ['member', 'delete', '', $dataRemove, '401'], // destroy
+            ['member', 'get', '', [], 405], // index
+            ['member', 'post', '', $data, 405], // store
+            ['member', 'get', '1', [], 404], // show
+            ['member', 'put', '', $data, 405], // update (full)
+            ['member', 'patch', '', $data, 401], // update (partial)
+            ['member', 'delete', '', $dataRemove, 401], // destroy
         ];
     }
 

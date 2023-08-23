@@ -35,39 +35,39 @@ class UsersControllerTest extends \BrowserKitTestCase
     public function requestValidationProvider()
     {
         return [
-            ['admin', '', 'Owner', '1', '400'], // no email
-            ['admin', 'unknown', '', '1', '400'], // no role
-            ['admin', 'unknown', 'notARole', '1', '400'], // unknown role
-            ['admin', 'unknown', 'Member', '', '400'], // no service for owner
-            ['admin', 'admin@foo.bar', 'Member', '1', '401'], // cannot alter himself
-            ['admin', 'unknown', 'Owner', '', '400'], // no service for member
-            ['admin', 'unknown', 'Member', '54986468', '400'], // unknown service
+            ['admin', '', 'Owner', '1', 400], // no email
+            ['admin', 'unknown', '', '1', 400], // no role
+            ['admin', 'unknown', 'notARole', '1', 400], // unknown role
+            ['admin', 'unknown', 'Member', '', 400], // no service for owner
+            ['admin', 'admin@foo.bar', 'Member', '1', 401], // cannot alter himself
+            ['admin', 'unknown', 'Owner', '', 400], // no service for member
+            ['admin', 'unknown', 'Member', '54986468', 400], // unknown service
 
-            ['admin', 'unknown', 'Admin', '', '200'], // can add admin
-            ['admin', 'unknown', 'Owner', '1', '200'], // can add owner
-            ['admin', 'unknown', 'Member', '1', '200'], // can add member
+            ['admin', 'unknown', 'Admin', '', 200], // can add admin
+            ['admin', 'unknown', 'Owner', '1', 200], // can add owner
+            ['admin', 'unknown', 'Member', '1', 200], // can add member
 
-            ['editor', 'unknown', 'Admin', '', '401'], // cannot add admin
-            ['editor', 'member@foo.bar', 'Admin', '', '401'], // cannot make himself Admin
-            ['editor', 'unknown', 'Owner', '1', '401'], // cannot add owner
-            ['editor', 'member@foo.bar', 'Owner', '1', '401'], // cannot make himself Owner
-            ['editor', 'unknown', 'Member', '1', '401'], // cannot add member
+            ['editor', 'unknown', 'Admin', '', 401], // cannot add admin
+            ['editor', 'member@foo.bar', 'Admin', '', 401], // cannot make himself Admin
+            ['editor', 'unknown', 'Owner', '1', 401], // cannot add owner
+            ['editor', 'member@foo.bar', 'Owner', '1', 401], // cannot make himself Owner
+            ['editor', 'unknown', 'Member', '1', 401], // cannot add member
 
-            ['owner', 'unknown', 'Admin', '', '401'], // cannot add admin
-            ['owner', 'unknown', 'Owner', '5', '401'], // cannot assign others to not owned service
-            ['owner', 'owner@foo.bar', 'Owner', '5', '401'], // cannot assign himself to not owned service
-            ['owner', 'owner@foo.bar', 'Member', '5', '401'], // cannot assign himself to not owned service
-            ['owner', 'unknown', 'Owner', '1', '200'], // can add owner to owned service
-            ['owner', 'owner@foo.bar', 'Admin', '', '401'], // cannot make himself Admin
-            ['owner', 'owner@foo.bar', 'Member', '1', '401'], // cannot alter himself
-            ['owner', 'unknown', 'Member', '5', '401'], // cannot add member to other service
-            ['owner', 'unknown', 'Member', '1', '200'], // can add member to owned service
+            ['owner', 'unknown', 'Admin', '', 401], // cannot add admin
+            ['owner', 'unknown', 'Owner', '5', 401], // cannot assign others to not owned service
+            ['owner', 'owner@foo.bar', 'Owner', '5', 401], // cannot assign himself to not owned service
+            ['owner', 'owner@foo.bar', 'Member', '5', 401], // cannot assign himself to not owned service
+            ['owner', 'unknown', 'Owner', '1', 200], // can add owner to owned service
+            ['owner', 'owner@foo.bar', 'Admin', '', 401], // cannot make himself Admin
+            ['owner', 'owner@foo.bar', 'Member', '1', 401], // cannot alter himself
+            ['owner', 'unknown', 'Member', '5', 401], // cannot add member to other service
+            ['owner', 'unknown', 'Member', '1', 200], // can add member to owned service
 
-            ['member', 'unknown', 'Admin', '', '401'], // cannot add admin
-            ['member', 'member@foo.bar', 'Admin', '', '401'], // cannot make himself Admin
-            ['member', 'unknown', 'Owner', '1', '401'], // cannot add owner
-            ['member', 'member@foo.bar', 'Owner', '1', '401'], // cannot make himself Owner
-            ['member', 'unknown', 'Member', '1', '401'], // cannot add member
+            ['member', 'unknown', 'Admin', '', 401], // cannot add admin
+            ['member', 'member@foo.bar', 'Admin', '', 401], // cannot make himself Admin
+            ['member', 'unknown', 'Owner', '1', 401], // cannot add owner
+            ['member', 'member@foo.bar', 'Owner', '1', 401], // cannot make himself Owner
+            ['member', 'unknown', 'Member', '1', 401], // cannot add member
         ];
     }
 
@@ -273,48 +273,48 @@ class UsersControllerTest extends \BrowserKitTestCase
 
         return [
             //  unauth user
-            ['unauth', 'get', 'users', [], '401'], // index
-            ['unauth', 'post', 'users', [], '405'], // store
-            ['unauth', 'get', 'users/1', [], '401'], // show
-            ['unauth', 'put', 'users/1', [], '405'], // update (full)
-            ['unauth', 'patch', 'users/1', [], '405'], // update (partial)
-            ['unauth', 'delete', 'users/1', [], '401'], // destroy
+            ['unauth', 'get', 'users', [], 401], // index
+            ['unauth', 'post', 'users', [], 405], // store
+            ['unauth', 'get', 'users/1', [], 401], // show
+            ['unauth', 'put', 'users/1', [], 405], // update (full)
+            ['unauth', 'patch', 'users/1', [], 405], // update (partial)
+            ['unauth', 'delete', 'users/1', [], 401], // destroy
             // admin user
-            ['admin', 'get', 'users', [], '200'], // index
-            ['admin', 'get', 'services/1/users', [], '200'], // index
-            ['admin', 'post', 'users', $data, '405'], // store
-            ['admin', 'get', 'users/1', [], '200'], // show
-            ['admin', 'put', 'users/1', $data, '405'], // update (full)
-            ['admin', 'patch', 'users/1', $data, '405'], // update (partial)
-            ['admin', 'delete', 'users/2', [], '200'], // destroy
-            ['admin', 'delete', 'users/1', [], '401'], // you can't delete yourself
+            ['admin', 'get', 'users', [], 200], // index
+            ['admin', 'get', 'services/1/users', [], 200], // index
+            ['admin', 'post', 'users', $data, 405], // store
+            ['admin', 'get', 'users/1', [], 200], // show
+            ['admin', 'put', 'users/1', $data, 405], // update (full)
+            ['admin', 'patch', 'users/1', $data, 405], // update (partial)
+            ['admin', 'delete', 'users/2', [], 200], // destroy
+            ['admin', 'delete', 'users/1', [], 401], // you can't delete yourself
             // editor user
-            ['editor', 'get', 'users', [], '401'], // index
-            ['editor', 'get', 'services/1/users', [], '401'], // index
-            ['editor', 'post', 'users', $data, '405'], // store
-            ['editor', 'get', 'users/1', [], '401'], // show
-            ['editor', 'put', 'users/1', $data, '405'], // update (full)
-            ['editor', 'patch', 'users/1', $data, '405'], // update (partial)
-            ['editor', 'delete', 'users/2', [], '401'], // destroy
-            ['editor', 'delete', 'users/1', [], '401'], // you can't delete yourself
+            ['editor', 'get', 'users', [], 401], // index
+            ['editor', 'get', 'services/1/users', [], 401], // index
+            ['editor', 'post', 'users', $data, 405], // store
+            ['editor', 'get', 'users/1', [], 401], // show
+            ['editor', 'put', 'users/1', $data, 405], // update (full)
+            ['editor', 'patch', 'users/1', $data, 405], // update (partial)
+            ['editor', 'delete', 'users/2', [], 401], // destroy
+            ['editor', 'delete', 'users/1', [], 401], // you can't delete yourself
             // owner user
-            ['owner', 'get', 'users', [], '401'], // index
-            ['owner', 'get', 'services/1/users', [], '200'], // getFromService
-            ['owner', 'get', 'services/2/users', [], '401'], // getFromService but not owned service
-            ['owner', 'post', 'users', $data, '405'], // store
-            ['owner', 'get', 'users/1', [], '401'], // show
-            ['owner', 'put', 'users/1', $data, '405'], // update (full)
-            ['owner', 'patch', 'users/1', $data, '405'], // update (partial)
-            ['owner', 'delete', 'users/3', [], '401'], // destroy
+            ['owner', 'get', 'users', [], 401], // index
+            ['owner', 'get', 'services/1/users', [], 200], // getFromService
+            ['owner', 'get', 'services/2/users', [], 401], // getFromService but not owned service
+            ['owner', 'post', 'users', $data, 405], // store
+            ['owner', 'get', 'users/1', [], 401], // show
+            ['owner', 'put', 'users/1', $data, 405], // update (full)
+            ['owner', 'patch', 'users/1', $data, 405], // update (partial)
+            ['owner', 'delete', 'users/3', [], 401], // destroy
             // member user
-            ['member', 'get', 'users', [], '401'], // index
-            ['member', 'get', 'services/1/users', [], '401'], // getFromService
-            ['member', 'get', 'services/2/users', [], '401'], // getFromService but not owned service
-            ['member', 'post', 'users', $data, '405'], // store
-            ['member', 'get', 'users/1', [], '401'], // show
-            ['member', 'put', 'users/1', $data, '405'], // update (full)
-            ['member', 'patch', 'users/1', $data, '405'], // update (partial)
-            ['member', 'delete', 'users/2', [], '401'], // destroy
+            ['member', 'get', 'users', [], 401], // index
+            ['member', 'get', 'services/1/users', [], 401], // getFromService
+            ['member', 'get', 'services/2/users', [], 401], // getFromService but not owned service
+            ['member', 'post', 'users', $data, 405], // store
+            ['member', 'get', 'users/1', [], 401], // show
+            ['member', 'put', 'users/1', $data, 405], // update (full)
+            ['member', 'patch', 'users/1', $data, 405], // update (partial)
+            ['member', 'delete', 'users/2', [], 401], // destroy
         ];
     }
 
