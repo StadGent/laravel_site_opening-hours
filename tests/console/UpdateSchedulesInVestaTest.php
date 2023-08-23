@@ -15,7 +15,7 @@ class UpdateSchedulesInVestaTest extends \BrowserKitTestCase
     public function commandFiresJobs()
     {
         $this->expectsJobs(UpdateVestaOpeninghours::class);
-        factory(\App\Models\Service::class)->create(['source' => 'vesta']);
+        \App\Models\Service::factory()->create(['source' => 'vesta']);
         \Artisan::call('openinghours:update-vesta');
     }
 }

@@ -153,8 +153,8 @@ class CalendarsControllerTest extends \BrowserKitTestCase
      */
     public function testPostWithBulkInserEvents()
     {
-        $event1 = (array) factory(Event::class)->make();
-        $event2 = (array) factory(Event::class)->make();
+        $event1 = (array) Event::factory()->make();
+        $event2 = (array) Event::factory()->make();
         $data = [
             'priority' => '2',
             'label' => 'test',
@@ -170,8 +170,8 @@ class CalendarsControllerTest extends \BrowserKitTestCase
      */
     public function testPutWithBulkInserEvents()
     {
-        $event1 = (array) factory(Event::class)->make();
-        $event2 = (array) factory(Event::class)->make();
+        $event1 = (array) Event::factory()->make();
+        $event2 = (array) Event::factory()->make();
         $data = [
             'priority' => '2',
             'label' => 'test',

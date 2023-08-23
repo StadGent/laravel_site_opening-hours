@@ -147,7 +147,7 @@ class QueryControllerTest extends \BrowserKitTestCase
      */
     public function testValidateServiceWithoutChannelsReturnsValidationException()
     {
-        $this->serviceId = factory(\App\Models\Service::class)->create(['label' => 'testChildlessService'])->id;
+        $this->serviceId = \App\Models\Service::factory()->create(['label' => 'testChildlessService'])->id;
         $path = $this->assemblePath(['type' => 'openinghours', 'period' => 'day', 'date' => date('Y-m-d')]);
         $call = $this->doRequest('GET', $path);
         $call->seeStatusCode(400);

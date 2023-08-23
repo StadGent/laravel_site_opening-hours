@@ -48,7 +48,7 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
      */
     public function testFailOnWrongService()
     {
-        $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'recreatex']);
+        $service = Service::factory()->create(['identifier' => 'JyeehBaby', 'source' => 'recreatex']);
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage(
             'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .
@@ -82,7 +82,7 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
             return $mock;
         });
 
-        $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta']);
+        $service = Service::factory()->create(['identifier' => 'JyeehBaby', 'source' => 'vesta']);
         $job = new UpdateVestaOpeninghours($service->identifier, $service->id, true);
         $job->handle();
         $this->assertTrue(true);
@@ -94,7 +94,7 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
      */
     public function testFailForDraft()
     {
-        $service = factory(Service::class)->create(['identifier' => 'JyeehBaby', 'source' => 'vesta', 'draft' => 1]);
+        $service = Service::factory()->create(['identifier' => 'JyeehBaby', 'source' => 'vesta', 'draft' => 1]);
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage(
             'The App\Jobs\UpdateVestaOpeninghours job failed for App\Models\Service (' . $service->id .

@@ -81,7 +81,7 @@ class UsersControllerTest extends \BrowserKitTestCase
         $authUser = \App\Models\User::where('name', $userRole . 'user')->first();
         $this->actingAs($authUser, 'api');
 
-        $newUser = factory(User::class)->make();
+        $newUser = User::factory()->make();
 
         if ($email) {
             $request['email'] = $email == 'unknown' ? $newUser->email : $email;
@@ -145,7 +145,7 @@ class UsersControllerTest extends \BrowserKitTestCase
         $adminUser = \App\Models\User::where('name', 'adminuser')->first();
         $this->actingAs($adminUser, 'api');
 
-        $newUser = factory(User::class)->make();
+        $newUser = User::factory()->make();
         // lets make new user Admin
         $request['email'] = $newUser->email;
         $request['role'] = 'Admin';
@@ -202,7 +202,7 @@ class UsersControllerTest extends \BrowserKitTestCase
         $user = \App\Models\User::find(1);
         $this->actingAs($user, 'api');
 
-        $newUser = factory(User::class)->make();
+        $newUser = User::factory()->make();
 
         $request = [
             'email' => $newUser->email,
