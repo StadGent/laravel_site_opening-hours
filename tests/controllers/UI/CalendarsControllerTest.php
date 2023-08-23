@@ -28,7 +28,7 @@ class CalendarsControllerTest extends \BrowserKitTestCase
 
         $this->doRequest('delete', $this->apiUrl . '/' . '958688468468468');
         $this->seeStatusCode(422);
-        $content = $this->decodeResponseJson();
+        $content = $this->getContentStructureTested();
         
         $this->assertEquals([
             'error' => [
@@ -50,7 +50,7 @@ class CalendarsControllerTest extends \BrowserKitTestCase
         $this->doRequest('get', $this->versionUrl . '/' . '1');
         $this->seeStatusCode(200);
 
-        $cal = $this->decodeResponseJson()['calendars'][2];
+        $cal = $this->getContentStructureTested()['calendars'][2];
         $this->assertEquals(3, $cal['id']);
         $this->assertEquals(-2, $cal['priority']);
 
@@ -60,7 +60,7 @@ class CalendarsControllerTest extends \BrowserKitTestCase
         $this->doRequest('get', $this->versionUrl . '/' . '1');
         $this->seeStatusCode(200);
 
-        $cal = $this->decodeResponseJson()['calendars'][1];
+        $cal = $this->getContentStructureTested()['calendars'][1];
         $this->assertEquals(3, $cal['id']);
         $this->assertNotEquals(-2, $cal['priority']);
         $this->assertEquals(-1, $cal['priority']);

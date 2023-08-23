@@ -96,13 +96,13 @@ class ServicesControllerTest extends \BrowserKitTestCase
         
         // check countChannels output for No channels info
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(0, $requestOutput[0]['countChannels']);
 
         // add channel check has_missing_oh for Missing calendar info
         $channel = Channel::factory()->create(['service_id' => $service->id]);
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(1, $requestOutput[0]['has_missing_oh']);
         $this->assertEquals(1, $requestOutput[0]['has_inactive_oh']);
 
@@ -115,7 +115,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
             'end_date' =>$now->copy()->addYear(),
         ]);
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(0, $requestOutput[0]['has_missing_oh']);
         $this->assertEquals(1, $requestOutput[0]['has_inactive_oh']);
 
@@ -125,7 +125,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
         $openinghours->save();
 
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(0, $requestOutput[0]['has_missing_oh']);
         $this->assertEquals(0, $requestOutput[0]['has_inactive_oh']);
     }

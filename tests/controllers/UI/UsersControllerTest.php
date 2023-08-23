@@ -150,7 +150,7 @@ class UsersControllerTest extends \BrowserKitTestCase
         $request['email'] = $newUser->email;
         $request['role'] = 'Admin';
         $this->doRequest('POST', '/api/v1/ui/inviteuser', $request);
-        $createdUser = $this->decodeResponseJson();
+        $createdUser = $this->getContentStructureTested();
         $result = \DB::select(
             'SELECT * FROM role_user WHERE user_id = ?',
             [$createdUser['id']]
