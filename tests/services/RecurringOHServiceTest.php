@@ -140,15 +140,11 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h3>BALIE</h3>
-<h4>Geldig t.e.m. zondag 31 december 2017</h4>
-<div>
-<p>maandag tot en met vrijdag</p>
-</div>
-<h4>Geldig vanaf maandag 1 januari 2018</h4>
-<div>
-<p>maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur</p>
-</div>
+BALIE<br />
+Geldig t.e.m. zondag 31 december 2017<br />
+maandag tot en met vrijdag<br /><br />
+Geldig vanaf maandag 1 januari 2018<br />
+maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur<br /><br />
 EOL;
 
         $expected = str_replace(PHP_EOL,'',$expected);
@@ -200,11 +196,10 @@ EOL;
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h3>BALIE</h3>
-<h4>Geldig t.e.m. zondag 31 december 2017</h4>
-<div>
-<p>maandag tot en met vrijdag</p>
-</div>
+BALIE<br />
+Geldig t.e.m. zondag 31 december 2017<br />
+maandag tot en met vrijdag
+<br /><br />
 EOL;
 
         $expected = str_replace(PHP_EOL,'',$expected);

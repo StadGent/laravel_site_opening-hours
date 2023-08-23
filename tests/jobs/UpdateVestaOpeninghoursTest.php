@@ -65,6 +65,7 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
      */
     public function testRemoveOnEmptyService()
     {
+        $service = Service::factory()->create(['identifier' => 'JyeehBaby', 'source' => 'vesta']);
         $this->app->singleton(RecurringOHService::class, function () {
             $mock = $this->createMock(\App\Services\RecurringOHService::class, ['getServiceOutput']);
             $mock->expects($this->atLeastOnce())
@@ -73,8 +74,12 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
 
             return $mock;
         });
-        $this->app->singleton(VestaService::class, function () {
+        $this->app->singleton(VestaService::class, function () use ($service) {
             $mock = $this->createMock(\App\Services\VestaService::class, ['updateOpeninghours']);
+            $mock->expects($this->atLeastOnce())
+                ->method('getOpeningshoursByGuid')
+                ->with($service->identifier)
+                ->willReturn(\Illuminate\Support\Str::random());
             $mock->expects($this->atLeastOnce())
                 ->method('emptyOpeninghours')
                 ->willReturn(true);
@@ -82,7 +87,6 @@ class UpdateVestaOpeninghoursTest extends \BrowserKitTestCase
             return $mock;
         });
 
-        $service = Service::factory()->create(['identifier' => 'JyeehBaby', 'source' => 'vesta']);
         $job = new UpdateVestaOpeninghours($service->identifier, $service->id, true);
         $job->handle();
         $this->assertTrue(true);

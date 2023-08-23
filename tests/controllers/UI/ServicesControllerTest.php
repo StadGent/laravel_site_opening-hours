@@ -29,40 +29,40 @@ class ServicesControllerTest extends \BrowserKitTestCase
     {
         return [
             //  unauth user
-            ['unauth', 'get', '', [], '401'], // index
-            ['unauth', 'post', '', [], '405'], // store
-            ['unauth', 'get', '1', [], '405'], // show
-            ['unauth', 'put', '1', [], '401'], // update (full)
-            ['unauth', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['unauth', 'delete', '1', [], '405'], // destroy
+            ['unauth', 'get', '', [], 401], // index
+            ['unauth', 'post', '', [], 405], // store
+            ['unauth', 'get', '1', [], 405], // show
+            ['unauth', 'put', '1', [], 401], // update (full)
+            ['unauth', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['unauth', 'delete', '1', [], 405], // destroy
             // admin user
-            ['admin', 'get', '', [], '200'], // index
-            ['admin', 'post', '', [], '405'], // store
-            ['admin', 'get', '1', [], '405'], // show
-            ['admin', 'put', '1', [], '200'], // update (full)
-            ['admin', 'patch', '1', ['draft' => false], '200'], // update (partial)
-            ['admin', 'delete', '1', [], '405'], // destroy
+            ['admin', 'get', '', [], 200], // index
+            ['admin', 'post', '', [], 405], // store
+            ['admin', 'get', '1', [], 405], // show
+            ['admin', 'put', '1', [], 200], // update (full)
+            ['admin', 'patch', '1', ['draft' => false], 200], // update (partial)
+            ['admin', 'delete', '1', [], 405], // destroy
             // editor user
-            ['editor', 'get', '', [], '200'], // index
-            ['editor', 'post', '', [], '405'], // store
-            ['editor', 'get', '1', [], '405'], // show
-            ['editor', 'put', '1', [], '401'], // update (full)
-            ['editor', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['editor', 'delete', '1', [], '405'], // destroy
+            ['editor', 'get', '', [], 200], // index
+            ['editor', 'post', '', [], 405], // store
+            ['editor', 'get', '1', [], 405], // show
+            ['editor', 'put', '1', [], 401], // update (full)
+            ['editor', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['editor', 'delete', '1', [], 405], // destroy
             // owner user
-            ['owner', 'get', '', [], '200'], // index
-            ['owner', 'post', '', [], '405'], // store
-            ['owner', 'get', '1', [], '405'], // show
-            ['owner', 'put', '1', [], '401'], // update (full)
-            ['owner', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['owner', 'delete', '1', [], '405'], // destroy
+            ['owner', 'get', '', [], 200], // index
+            ['owner', 'post', '', [], 405], // store
+            ['owner', 'get', '1', [], 405], // show
+            ['owner', 'put', '1', [], 401], // update (full)
+            ['owner', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['owner', 'delete', '1', [], 405], // destroy
             // member user
-            ['member', 'get', '', [], '200'], // index
-            ['member', 'post', '', [], '405'], // store
-            ['member', 'get', '1', [], '405'], // show
-            ['member', 'put', '1', [], '401'], // update (full)
-            ['member', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['member', 'delete', '1', [], '405'], // destroy
+            ['member', 'get', '', [], 200], // index
+            ['member', 'post', '', [], 405], // store
+            ['member', 'get', '1', [], 405], // show
+            ['member', 'put', '1', [], 401], // update (full)
+            ['member', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['member', 'delete', '1', [], 405], // destroy
         ];
     }
 
@@ -93,7 +93,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
         $user = User::factory()->create();
         app('UserRepository')->linkToService($user->id, $service->id, 'Owner');
         $this->actingAs($user, 'api');
-        
+
         // check countChannels output for No channels info
         $this->doRequest('get', $this->apiUrl, []);
         $requestOutput = $this->getContentStructureTested();
