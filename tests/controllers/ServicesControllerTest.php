@@ -78,7 +78,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
         $content = $this->getContentStructureTested();
         $this->assertEquals(Service::where('label', 'like', '%uur%')->count(), count($content));
         foreach ($content as $service) {
-            $this->assertContains('uur', $service['label']);
+            $this->assertStringContainsString('uur', $service['label']);
         }
 
         $this->doRequest('get', $this->apiUrl . '?label=some-random-string');
