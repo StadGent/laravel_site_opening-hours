@@ -23,7 +23,7 @@ class ChannelControllerTest extends \BrowserKitTestCase
 
         $this->doRequest('delete', '/api/v1/ui/services/2/channels/1');
         $this->seeStatusCode(422);
-        $content = $this->decodeResponseJson();
+        $content = $this->getContentStructureTested();
         $this->assertEquals('Channel model is not found with given identifier', $content['error']['message']);
     }
 

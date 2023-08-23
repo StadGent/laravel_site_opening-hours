@@ -20,7 +20,7 @@ class ChannelControllerTest extends \BrowserKitTestCase
     {
         $this->json('get', $this->apiUrl . '/' . '15');
         $this->seeStatusCode(422);
-        $content = $this->decodeResponseJson();
+        $content = $this->getContentStructureTested();
         $this->assertEquals('Channel model is not found with given identifier', $content['error']['message']);
         $this->assertEquals('Channel', $content['error']['target']);
         $this->assertEquals('ModelNotFoundException', $content['error']['code']);
