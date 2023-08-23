@@ -24,7 +24,7 @@ class PresetsControllerTest extends \BrowserKitTestCase
 
         $this->doRequest('get', $this->apiUrl);
         $this->seeStatusCode(400);
-        $content = $this->getContentStructureTested();
+        $content = $this->response->json();
         $this->assertEquals([
             'error' => [
                 'code' => 'ValidationException',
