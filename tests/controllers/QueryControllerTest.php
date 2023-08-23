@@ -120,7 +120,7 @@ class QueryControllerTest extends \BrowserKitTestCase
     public function testValidateServiceWithNotCoupledChannelIsAModelNotFoundException($typeParams)
     {
         $this->serviceId = 2;
-        $this->channelKeys = 1;
+        $this->channelKeys = [1];
         $typeParams['format'] = 'json';
         $path = $this->assemblePath($typeParams);
 
@@ -356,7 +356,7 @@ class QueryControllerTest extends \BrowserKitTestCase
      **/
     public function testItHasOnlyOneChannelkeyWhenChannelParamIsGiven($typeParams)
     {
-        $this->channelKeys = $this->channelKeys->first();
+        $this->channelKeys = [$this->channelKeys->first()];
         $path = $this->assemblePath($typeParams);
         $call = $this->doRequest('GET', $path);
         if (!isset($typeParams['format']) || $typeParams['format'] === 'json') {
@@ -437,7 +437,7 @@ class QueryControllerTest extends \BrowserKitTestCase
         $path = $this->apiUrl . '/services/' . $this->serviceId;
 
         if ($this->oneChannel()) {
-            $path .= '/channels/' . $this->channelKeys;
+            $path .= '/channels/' . reset($this->channelKeys);
         }
 
         if (is_array($params)) {
