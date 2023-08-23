@@ -75,7 +75,7 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
             'end_date' => '2018-12-31',
         ]);
         $openinghour2->calendars()->saveMany(
-            factory(Calendar::class, 5)->make(['openinghours_id' => $openinghour2->id])
+            Calendar::factory(5)->make(['openinghours_id' => $openinghour2->id])
         );
 
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
