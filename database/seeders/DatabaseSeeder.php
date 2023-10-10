@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,13 +29,13 @@ class DatabaseSeeder extends Seeder
      * @var array
      */
     protected $testDataSeeders = [
-        \Database\Seeds\ServicesTableSeeder::class,
-        \Database\Seeds\ChannelsTableSeeder::class,
-        \Database\Seeds\OpeninghoursTableSeeder::class,
-        \Database\Seeds\CalendarsTableSeeder::class,
-        \Database\Seeds\EventsTableSeeder::class,
-        \Database\Seeds\RolesTableSeeder::class,
-        \Database\Seeds\DummyUsersTableSeeder::class,
+        \Database\Seeders\ServicesTableSeeder::class,
+        \Database\Seeders\ChannelsTableSeeder::class,
+        \Database\Seeders\OpeninghoursTableSeeder::class,
+        \Database\Seeders\CalendarsTableSeeder::class,
+        \Database\Seeders\EventsTableSeeder::class,
+        \Database\Seeders\RolesTableSeeder::class,
+        \Database\Seeders\DummyUsersTableSeeder::class,
     ];
 
     /**
@@ -41,8 +43,8 @@ class DatabaseSeeder extends Seeder
      * @var array
      */
     protected $productionDataSeeders = [
-        \Database\Seeds\RolesTableSeeder::class,
-        \Database\Seeds\UsersTableSeeder::class,
+        \Database\Seeders\RolesTableSeeder::class,
+        \Database\Seeders\UsersTableSeeder::class,
     ];
 
     /**
@@ -54,7 +56,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Eloquent::unguard();
+        Model::unguard();
         $this->cleanDatabase();
 
         $this->command->info("Start Seeding \r");

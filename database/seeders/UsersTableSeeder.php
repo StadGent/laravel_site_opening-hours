@@ -20,12 +20,11 @@ class UsersTableSeeder extends Seeder
         $admin = User::where('email', 'admin@foo.bar')->first();
         if (empty($admin)) {
             $password = Str::random();
-            $admin = User::create([
+            $admin = User::factory()->create([
                 'name' => 'admin',
                 'email' => 'admin@foo.bar',
                 'password' => Hash::make($password),
             ]);
-            $admin->save();
             $admin->attachRole(Role::where('name', 'Admin')->first());
             $this->setFooter($password);
         }

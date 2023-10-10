@@ -4,7 +4,7 @@ namespace Tests\Controllers\UI;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class PresetsController extends \BrowserKitTestCase
+class PresetsControllerTest extends \BrowserKitTestCase
 {
     use DatabaseTransactions;
 
@@ -24,7 +24,7 @@ class PresetsController extends \BrowserKitTestCase
 
         $this->doRequest('get', $this->apiUrl);
         $this->seeStatusCode(400);
-        $content = $this->decodeResponseJson();
+        $content = $this->response->json();
         $this->assertEquals([
             'error' => [
                 'code' => 'ValidationException',

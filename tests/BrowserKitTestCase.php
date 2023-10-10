@@ -111,7 +111,7 @@ abstract class BrowserKitTestCase extends Laravel\BrowserKitTesting\TestCase
     {
         // check status code
         $this->seeStatusCode(200);
-        $content = $this->decodeResponseJson();
+        $content = $this->response->json();
         // set extra checks
         $this->extraStructureTest($content);
 

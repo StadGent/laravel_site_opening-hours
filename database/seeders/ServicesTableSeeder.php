@@ -55,7 +55,7 @@ class ServicesTableSeeder extends Seeder
         ];
 
         foreach ($sampleServiceNames as $serviceName) {
-            factory(Service::class)
+            Service::factory()
                 ->create([
                     'uri' => 'http://dev.foo/' . Str::slug($serviceName),
                     'label' => $serviceName,

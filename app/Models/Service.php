@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -57,7 +60,7 @@ class Service extends Model
      */
     public function usersWithRole()
     {
-        $roles = \App\Models\Role::all();
+        $roles = Role::all();
         $users = $this->users;
         foreach ($users as $user) {
             $user->role = $roles->find($user->pivot->role_id);

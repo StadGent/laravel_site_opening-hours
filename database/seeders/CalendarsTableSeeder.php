@@ -17,10 +17,10 @@ class CalendarsTableSeeder extends Seeder
     {
         $openinghours = Openinghours::all();
         foreach ($openinghours as $openinghour) {
-            $openinghour->calendars()->save(factory(Calendar::class)
+            $openinghour->calendars()->save(Calendar::factory()
                 ->make(['published' => true,]));
 
-            $openinghour->calendars()->save(factory(Calendar::class)
+            $openinghour->calendars()->save(Calendar::factory()
                 ->make([
                     'label' => 'Eerste maandag sluitingsdag',
                     'priority' => '-1',
@@ -28,7 +28,7 @@ class CalendarsTableSeeder extends Seeder
                     'published' => true,
                 ]));
 
-            $openinghour->calendars()->save(factory(Calendar::class)
+            $openinghour->calendars()->save(Calendar::factory()
                 ->make([
                     'label' => 'Zaterdagmorgen open',
                     'priority' => '-2',

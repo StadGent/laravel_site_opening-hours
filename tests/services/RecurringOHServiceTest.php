@@ -46,7 +46,7 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
      */
     public function testEmptyServiceIsEmptyOutput()
     {
-        $service = factory(Service::class)->create();
+        $service = Service::factory()->create();
         $startDate = Carbon::today()->startOfWeek();
         $endDate = $startDate->copy()->addMonths(3);
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
@@ -62,20 +62,20 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
         $startDate = new Carbon('2017-12-25');
         $endDate = $startDate->copy()->addMonths(3);
 
-        $service = factory(Service::class)->create();
+        $service = Service::factory()->create();
 
-        $channel = factory(Channel::class)->make();
-        $openinghour = factory(Openinghours::class)->make(['start_date' => '2017-01-01', 'end_date' => '2017-12-31']);
+        $channel = Channel::factory()->make();
+        $openinghour = Openinghours::factory()->make(['start_date' => '2017-01-01', 'end_date' => '2017-12-31']);
         $service->channels()->save($channel);
         $channel->openinghours()->save($openinghour);
 
-        $openinghour2 = factory(Openinghours::class)->create([
+        $openinghour2 = Openinghours::factory()->create([
             'channel_id' => $channel->id,
             'start_date' => '2018-01-01',
             'end_date' => '2018-12-31',
         ]);
         $openinghour2->calendars()->saveMany(
-            factory(Calendar::class, 5)->make(['openinghours_id' => $openinghour2->id])
+            Calendar::factory(5)->make(['openinghours_id' => $openinghour2->id])
         );
 
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
@@ -91,16 +91,16 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
         $startDate = new Carbon('2017-12-25');
         $endDate = $startDate->copy()->addMonths(3);
 
-        $service = factory(Service::class)->create();
+        $service = Service::factory()->create();
 
-        $channel = factory(Channel::class)->make(['label' => 'BALIE']);
-        $openinghour = factory(Openinghours::class)->make([
+        $channel = Channel::factory()->make(['label' => 'BALIE']);
+        $openinghour = Openinghours::factory()->make([
             'label' => 'Opening van 2017 tot 2018',
             'start_date' => '2017-01-01',
             'end_date' => '2017-12-31'
         ]);
-        $calendar = factory(Calendar::class)->make(['closinghours' => 1, 'published' => 1]);
-        $event = factory(Event::class)->make([
+        $calendar = Calendar::factory()->make(['closinghours' => 1, 'published' => 1]);
+        $event = Event::factory()->make([
             'start_date' => '2017-01-01 08:00:00',
             'end_date' => '2017-01-01 17:00:00',
             'until' => '2017-12-31 17:00:00',
@@ -111,16 +111,16 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
         $openinghour->calendars()->save($calendar);
         $calendar->events()->save($event);
 
-        $openinghour2 = factory(Openinghours::class)->create([
+        $openinghour2 = Openinghours::factory()->create([
             'label' => 'Opening van 2018 tot 2019',
             'channel_id' => $channel->id,
             'start_date' => '2018-01-01',
             'end_date' => '2018-12-31',
         ]);
-        $calendar2 = factory(Calendar::class)->make(['openinghours_id' => $openinghour2->id, 'published' => 1]);
+        $calendar2 = Calendar::factory()->make(['openinghours_id' => $openinghour2->id, 'published' => 1]);
         $openinghour2->calendars()->save($calendar2);
 
-        $event2 = factory(Event::class)->make([
+        $event2 = Event::factory()->make([
             'start_date' => '2018-01-01 08:00:00',
             'start_date' => '2018-01-01 13:00:00',
             'end_date' => '2018-01-01 17:00:00',
@@ -129,7 +129,7 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
         ]);
         $calendar2->events()->save($event2);
 
-        $event3 = factory(Event::class)->make([
+        $event3 = Event::factory()->make([
             'start_date' => '2018-01-01 08:00:00',
             'end_date' => '2018-01-01 12:00:00',
             'until' => '2018-12-31 12:00:00',
@@ -140,15 +140,11 @@ class RecurringOHServiceTest extends \BrowserKitTestCase
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h3>BALIE</h3>
-<h4>Geldig t.e.m. zondag 31 december 2017</h4>
-<div>
-<p>maandag tot en met vrijdag</p>
-</div>
-<h4>Geldig vanaf maandag 1 januari 2018</h4>
-<div>
-<p>maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur</p>
-</div>
+BALIE<br />
+Geldig t.e.m. zondag 31 december 2017<br />
+maandag tot en met vrijdag<br /><br />
+Geldig vanaf maandag 1 januari 2018<br />
+maandag tot en met vrijdag: van 8 tot 12 uur en van 13 tot 17 uur<br /><br />
 EOL;
 
         $expected = str_replace(PHP_EOL,'',$expected);
@@ -165,31 +161,31 @@ EOL;
         $startDate = new Carbon('2017-12-25');
         $endDate = $startDate->copy()->addMonths(3);
 
-        $service = factory(Service::class)->create();
+        $service = Service::factory()->create();
 
-        $channel = factory(Channel::class)->make(['label' => 'BALIE']);
-        $openinghour = factory(Openinghours::class)->make([
+        $channel = Channel::factory()->make(['label' => 'BALIE']);
+        $openinghour = Openinghours::factory()->make([
             'label' => 'Opening van 2017 tot 2018',
             'start_date' => '2017-01-01',
             'end_date' => '2017-12-31'
         ]);
-        $calendar = factory(Calendar::class)->make(['closinghours' => 1, 'published' => 1]);
-        $event = factory(Event::class)->make();
+        $calendar = Calendar::factory()->make(['closinghours' => 1, 'published' => 1]);
+        $event = Event::factory()->make();
         $service->channels()->save($channel);
         $channel->openinghours()->save($openinghour);
         $openinghour->calendars()->save($calendar);
         $calendar->events()->save($event);
 
-        $openinghour2 = factory(Openinghours::class)->create([
+        $openinghour2 = Openinghours::factory()->create([
             'label' => 'Opening van 2018 tot 2019',
             'channel_id' => $channel->id,
             'start_date' => '2018-01-01',
             'end_date' => '2018-12-31',
         ]);
-        $calendar2 = factory(Calendar::class)->make(['openinghours_id' => $openinghour2->id, 'published' => 1]);
+        $calendar2 = Calendar::factory()->make(['openinghours_id' => $openinghour2->id, 'published' => 1]);
         $openinghour2->calendars()->save($calendar2);
 
-        $event2 = factory(Event::class)->make([
+        $event2 = Event::factory()->make([
             'rrule' => 'FREQ=DAILY',
             'start_date' => '2018-10-01 00:00:00',
             'end_date' => '2018-10-01 23:59:59',
@@ -200,11 +196,10 @@ EOL;
         $rrOutput = $this->recurringOHService->getServiceOutput($service, $startDate, $endDate);
 
         $expected = <<<EOL
-<h3>BALIE</h3>
-<h4>Geldig t.e.m. zondag 31 december 2017</h4>
-<div>
-<p>maandag tot en met vrijdag</p>
-</div>
+BALIE<br />
+Geldig t.e.m. zondag 31 december 2017<br />
+maandag tot en met vrijdag
+<br /><br />
 EOL;
 
         $expected = str_replace(PHP_EOL,'',$expected);
@@ -220,7 +215,7 @@ EOL;
     {
         $startDate = Carbon::today()->startOfWeek();
         $endDate = $startDate->copy()->addMonths(3);
-        $event = factory(Event::class)->make(['start_date' => '2099-01-01']);
+        $event = Event::factory()->make(['start_date' => '2099-01-01']);
         $valid = $this->recurringOHService->validateEvent($event, $startDate, $endDate);
         $this->assertFalse($valid);
     }
@@ -233,7 +228,7 @@ EOL;
     {
         $startDate = Carbon::today()->startOfWeek();
         $endDate = $startDate->copy()->addMonths(3);
-        $event = factory(Event::class)->make(['until' => '1995-01-01']);
+        $event = Event::factory()->make(['until' => '1995-01-01']);
         $valid = $this->recurringOHService->validateEvent($event, $startDate, $endDate);
         $this->assertFalse($valid);
     }
@@ -249,7 +244,7 @@ EOL;
         $startDate = new Carbon('2017-04-25');
         $endDate = $startDate->copy()->addMonths(3);
 
-        $event = factory(Event::class)->make([
+        $event = Event::factory()->make([
             'rrule' => 'FREQ=YEARLY',
             'start_date' => '2015-05-01 00:00:00',
             'end_date' => '2015-05-01 23:59:59',

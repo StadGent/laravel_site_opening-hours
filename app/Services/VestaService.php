@@ -23,19 +23,10 @@ class VestaService
     protected $client;
 
     /**
-     * Vesta user domain.
+     * Vesta API key
+     * @var string
      */
-    protected $domain;
-
-    /**
-     * Vesta username.
-     */
-    protected $username;
-
-    /**
-     * Vesta user password.
-     */
-    protected $password;
+    protected $apiKey;
 
     /**
      * Singleton class instance.
@@ -73,11 +64,9 @@ class VestaService
 
     /**
      * @param null $wsdl
-     * @param null $username
-     * @param null $password
-     * @param null $domain
+     * @param null $apiKey
      */
-    public function setClient($wsdl = null, $username = null, $password = null, $domain = null)
+    public function setClient($wsdl = null, $apiKey = null)
     {
         $wsdl = $wsdl ?: env('VESTA_ENDPOINT');
         if (!$wsdl) {
@@ -93,34 +82,33 @@ class VestaService
             'trace' => true,
             'exception' => true,
         ]);
-        $this->username = $username ?: env('VESTA_USER');
-        $this->password = $password ?: env('VESTA_PASSWORD');
-        $this->domain = $domain ?: env('VESTA_USER_DOMAIN');
+        $this->auth($apiKey ?: env('VESTA_KEY'));
     }
 
     /**
-     * Get the security object needed to create a Vesta connection
-     * @return stdClass with correct cred format
+     * Lazily initialize the soap client.
+     *
+     * @return \SoapClient
      */
-    protected function getSecurity()
+    public function getClient()
     {
-        $security = new \stdClass();
-        $security->Domain = new \SoapVar(base64_encode($this->domain), XSD_STRING, null, null, 'Domain', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
-        $security->Password = new \SoapVar(base64_encode($this->password), XSD_STRING, null, null, 'Domain', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
-        $security->Username = new \SoapVar(base64_encode($this->username), XSD_STRING, null, null, 'Domain', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
+        if (!$this->client) {
+            $this->setClient();
+        }
 
-        return $security;
+        return $this->client;
     }
 
     /**
-     * @return mixed
+     * Add the authentication header.
+     *
+     * @param string $apiKey
      */
-    protected function getActionParams()
+    protected function auth($apiKey)
     {
-        $parameters = new \stdClass();
-        $parameters->cred = new \SoapVar($this->getSecurity(), SOAP_ENC_OBJECT, null, null, 'cred', 'http://tempuri.org/');
-
-        return $parameters;
+        $key = new \SoapVar($apiKey, XSD_STRING);
+        $header = new \SoapHeader('http://tempuri.org/', 'X-API-Key', $key);
+        $this->client->__setSoapHeaders([$header]);
     }
 
     /**
@@ -140,7 +128,7 @@ class VestaService
         if (!$guid) {
             throw new \Exception('A guid is required to update the data in VESTA');
         }
-        $parameters = $this->getActionParams();
+        $parameters = new \stdClass();
         $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
         $parameters->hours = new \SoapVar('<ns2:hours><![CDATA[' . $hours . ']]></ns2:hours>', XSD_ANYXML);
         $response = $client->FillHours($parameters);
@@ -176,7 +164,7 @@ class VestaService
         if (!$guid) {
             throw new \Exception('A guid is required to empty the data in VESTA');
         }
-        $parameters = $this->getActionParams();
+        $parameters = new \stdClass();
         $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
         $response = $client->EmptyHours($parameters);
         if (!isset($response->EmptyHoursResult)) {
@@ -215,7 +203,7 @@ class VestaService
         $filters = new \stdClass();
         $filters->Rules[] = $filterRule;
 
-        $search = $this->getActionParams();
+        $search = new \stdClass();
         $search->tableName = 'account';
         $search->filters = $filters;
 
@@ -231,20 +219,6 @@ class VestaService
         }
 
         return $result->Rows[0]->ves_openingsuren;
-    }
-
-    /**
-     * Lazily initialize the soap client.
-     *
-     * @return \SoapClient
-     */
-    public function getClient()
-    {
-        if (!$this->client) {
-            $this->setClient();
-        }
-
-        return $this->client;
     }
 
     /**

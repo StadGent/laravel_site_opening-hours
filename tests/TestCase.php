@@ -111,7 +111,7 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
     {
         // check status code
         $this->seeStatusCode(200);
-        $content = $this->decodeResponseJson();
+        $content = $this->getContentStructureTested();
         // set extra checks
         $this->extraStructureTest($content);
 

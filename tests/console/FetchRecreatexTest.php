@@ -90,7 +90,7 @@ class FetchRecreatexTest extends \BrowserKitTestCase
 
         foreach ($this->getEventListCriteria() as $criteria){
             $events = Event::where($criteria)->get();
-            $this->assertEquals(1,$events->count());
+            $this->assertEquals(1, $events->count());
         }
 
         $channel = $service->channels->first();

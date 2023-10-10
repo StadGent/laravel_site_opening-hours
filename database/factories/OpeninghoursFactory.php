@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 class OpeninghoursFactory extends Factory
 {
@@ -14,7 +14,7 @@ class OpeninghoursFactory extends Factory
      */
     public function definition()
     {
-        $start = new Carbon\Carbon('2017-01-01');
+        $start = new Carbon('2017-01-01');
         $end = $start->copy()->modify('31 December');
         return [
             'active' => 1,
