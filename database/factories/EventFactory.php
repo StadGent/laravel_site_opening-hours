@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 class EventFactory extends Factory
 {
@@ -14,7 +14,7 @@ class EventFactory extends Factory
      */
     public function definition()
     {
-        $dt = new Carbon\Carbon('2017-01-01');
+        $dt = new Carbon('2017-01-01');
         $dt->minute = 00;
         $dt->second = 00;
         $start = $dt->copy();

@@ -4,8 +4,7 @@ env:
 language: php
 
 php:
-  - 7.2
-#  - 7.3 # https://github.com/laravel/framework/issues/26936
+  - 8.1
 
 services:
   - mysql
@@ -16,7 +15,7 @@ before_script:
   - ./cc-test-reporter before-build
   - cp .env.travis .env
   - mysql -h localhost -e 'create database openinghours;'
-  - composer self-update
+  - composer self-update --2
   - composer install --no-interaction
   - ./vendor/bin/robo digipolis:install-laravel
   - php artisan db:seed

@@ -193,14 +193,29 @@ class FetchRecreatex extends BaseCommand
 
     protected function getReservations($uuid, $year)
     {
+        $reservations = [];
+        foreach (range(1, 12) as $month) {
+            $monthReservations = $this->getReservationsForMonth($uuid, $year, $month);
+            if ($monthReservations) {
+                $reservations = array_merge($reservations, $monthReservations);
+            }
+        }
+
+        return $reservations;
+    }
+
+    protected function getReservationsForMonth($uuid, $year, $month) {
+        $start = Carbon::createFromDate($year, $month)->setTimezone('Europe/Brussels')->startOfMonth();
+        $end = clone $start;
+        $end->endOfMonth();
         $parameters = [
             'Context' => [
                 'ShopId' => $this->shopId,
             ],
             'ReservationSearchCriteria' => [
                 'InfrastructureId' => $this->activeServiceRecord->identifier,
-                'FromDateTime' => $year . '-01-01T00:00:00.8115784+02:00',
-                'ToDateTime' => $year+1 . '-01-01T00:00:00.8115784+02:00',
+                'FromDateTime' => $start->format('Y-m-d\TH:i:s.uP'),
+                'ToDateTime' => $end->format('Y-m-d\TH:i:s.uP'),
                 'ReservationActivityId' => $uuid,
                 'Includes' => [
                     'SingleReservations' => true,
@@ -223,14 +238,19 @@ class FetchRecreatex extends BaseCommand
             $transformedData = json_decode(json_encode($response), true);
         } catch (\Exception $e) {
             $this->error('A problem in collecting external data from Recreatex for ' . $this->activeServiceRecord->label . ' with year ' .
-                $year . ': ' . $e->getMessage());
+                $year . ' and month ' . $month . ': ' . $e->getMessage());
 
             return false;
         }
         if (!$transformedData['Reservations']) {
             return false;
         }
-        return array_filter(Arr::get($transformedData, 'Reservations.Reservation', 0));
+        $reservations = array_filter(Arr::get($transformedData, 'Reservations.Reservation', 0));
+        // SOAP inconsistency: if there's only one result, it doesn't wrap it in an array.
+        if ($reservations && isset($reservations['Id'])) {
+          $reservations = [$reservations];
+        }
+        return $reservations;
     }
 
     private function processCollapsedReservations($eventList)
@@ -773,7 +793,7 @@ class FetchRecreatex extends BaseCommand
     public function info($string, $verbosity = null)
     {
         \Log::info($string);
-        parent::error($string, $verbosity);
+        parent::info($string, $verbosity);
     }
 
     /**

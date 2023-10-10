@@ -29,40 +29,40 @@ class ServicesControllerTest extends \BrowserKitTestCase
     {
         return [
             //  unauth user
-            ['unauth', 'get', '', [], '401'], // index
-            ['unauth', 'post', '', [], '405'], // store
-            ['unauth', 'get', '1', [], '405'], // show
-            ['unauth', 'put', '1', [], '401'], // update (full)
-            ['unauth', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['unauth', 'delete', '1', [], '405'], // destroy
+            ['unauth', 'get', '', [], 401], // index
+            ['unauth', 'post', '', [], 405], // store
+            ['unauth', 'get', '1', [], 405], // show
+            ['unauth', 'put', '1', [], 401], // update (full)
+            ['unauth', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['unauth', 'delete', '1', [], 405], // destroy
             // admin user
-            ['admin', 'get', '', [], '200'], // index
-            ['admin', 'post', '', [], '405'], // store
-            ['admin', 'get', '1', [], '405'], // show
-            ['admin', 'put', '1', [], '200'], // update (full)
-            ['admin', 'patch', '1', ['draft' => false], '200'], // update (partial)
-            ['admin', 'delete', '1', [], '405'], // destroy
+            ['admin', 'get', '', [], 200], // index
+            ['admin', 'post', '', [], 405], // store
+            ['admin', 'get', '1', [], 405], // show
+            ['admin', 'put', '1', [], 200], // update (full)
+            ['admin', 'patch', '1', ['draft' => false], 200], // update (partial)
+            ['admin', 'delete', '1', [], 405], // destroy
             // editor user
-            ['editor', 'get', '', [], '200'], // index
-            ['editor', 'post', '', [], '405'], // store
-            ['editor', 'get', '1', [], '405'], // show
-            ['editor', 'put', '1', [], '401'], // update (full)
-            ['editor', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['editor', 'delete', '1', [], '405'], // destroy
+            ['editor', 'get', '', [], 200], // index
+            ['editor', 'post', '', [], 405], // store
+            ['editor', 'get', '1', [], 405], // show
+            ['editor', 'put', '1', [], 401], // update (full)
+            ['editor', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['editor', 'delete', '1', [], 405], // destroy
             // owner user
-            ['owner', 'get', '', [], '200'], // index
-            ['owner', 'post', '', [], '405'], // store
-            ['owner', 'get', '1', [], '405'], // show
-            ['owner', 'put', '1', [], '401'], // update (full)
-            ['owner', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['owner', 'delete', '1', [], '405'], // destroy
+            ['owner', 'get', '', [], 200], // index
+            ['owner', 'post', '', [], 405], // store
+            ['owner', 'get', '1', [], 405], // show
+            ['owner', 'put', '1', [], 401], // update (full)
+            ['owner', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['owner', 'delete', '1', [], 405], // destroy
             // member user
-            ['member', 'get', '', [], '200'], // index
-            ['member', 'post', '', [], '405'], // store
-            ['member', 'get', '1', [], '405'], // show
-            ['member', 'put', '1', [], '401'], // update (full)
-            ['member', 'patch', '1', ['draft' => false], '401'], // update (partial)
-            ['member', 'delete', '1', [], '405'], // destroy
+            ['member', 'get', '', [], 200], // index
+            ['member', 'post', '', [], 405], // store
+            ['member', 'get', '1', [], 405], // show
+            ['member', 'put', '1', [], 401], // update (full)
+            ['member', 'patch', '1', ['draft' => false], 401], // update (partial)
+            ['member', 'delete', '1', [], 405], // destroy
         ];
     }
 
@@ -89,33 +89,33 @@ class ServicesControllerTest extends \BrowserKitTestCase
     public function testChildInfoIndicatorsOnServicesOutput()
     {
         // make some fake data to limit the collected data
-        $service = factory(Service::class)->create();
-        $user = factory(User::class)->create();
+        $service = Service::factory()->create();
+        $user = User::factory()->create();
         app('UserRepository')->linkToService($user->id, $service->id, 'Owner');
         $this->actingAs($user, 'api');
-        
+
         // check countChannels output for No channels info
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(0, $requestOutput[0]['countChannels']);
 
         // add channel check has_missing_oh for Missing calendar info
-        $channel = factory(Channel::class)->create(['service_id' => $service->id]);
+        $channel = Channel::factory()->create(['service_id' => $service->id]);
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(1, $requestOutput[0]['has_missing_oh']);
         $this->assertEquals(1, $requestOutput[0]['has_inactive_oh']);
 
         $now = new Carbon();
         // add OH check has_inactive_oh for Missing active calendar info
-        $openinghours = factory(Openinghours::class)->create([
+        $openinghours = Openinghours::factory()->create([
             'channel_id' => $channel->id,
             'active' => 0,
             'start_date' => $now->copy()->addYear(),
             'end_date' =>$now->copy()->addYear(),
         ]);
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(0, $requestOutput[0]['has_missing_oh']);
         $this->assertEquals(1, $requestOutput[0]['has_inactive_oh']);
 
@@ -125,7 +125,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
         $openinghours->save();
 
         $this->doRequest('get', $this->apiUrl, []);
-        $requestOutput = $this->decodeResponseJson();
+        $requestOutput = $this->getContentStructureTested();
         $this->assertEquals(0, $requestOutput[0]['has_missing_oh']);
         $this->assertEquals(0, $requestOutput[0]['has_inactive_oh']);
     }

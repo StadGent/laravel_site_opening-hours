@@ -28,8 +28,8 @@ class CalendarsControllerTest extends \BrowserKitTestCase
 
         $this->doRequest('delete', $this->apiUrl . '/' . '958688468468468');
         $this->seeStatusCode(422);
-        $content = $this->decodeResponseJson();
-        
+        $content = $this->response->json();
+
         $this->assertEquals([
             'error' => [
                 'code' => 'ModelNotFoundException',
@@ -50,7 +50,7 @@ class CalendarsControllerTest extends \BrowserKitTestCase
         $this->doRequest('get', $this->versionUrl . '/' . '1');
         $this->seeStatusCode(200);
 
-        $cal = $this->decodeResponseJson()['calendars'][2];
+        $cal = $this->getContentStructureTested()['calendars'][2];
         $this->assertEquals(3, $cal['id']);
         $this->assertEquals(-2, $cal['priority']);
 
@@ -60,7 +60,7 @@ class CalendarsControllerTest extends \BrowserKitTestCase
         $this->doRequest('get', $this->versionUrl . '/' . '1');
         $this->seeStatusCode(200);
 
-        $cal = $this->decodeResponseJson()['calendars'][1];
+        $cal = $this->getContentStructureTested()['calendars'][1];
         $this->assertEquals(3, $cal['id']);
         $this->assertNotEquals(-2, $cal['priority']);
         $this->assertEquals(-1, $cal['priority']);
@@ -84,50 +84,50 @@ class CalendarsControllerTest extends \BrowserKitTestCase
 
         return [
             //  unauth user
-            ['unauth', 'get', '', [], '405'], // index
-            ['unauth', 'post', '', [], '401'], // store
-            ['unauth', 'get', '1', [], '405'], // show
-            ['unauth', 'put', '1', [], '401'], // update (full)
-            ['unauth', 'patch', '1', [], '401'], // update (partial)
-            ['unauth', 'delete', '2', [], '401'], // destroy
+            ['unauth', 'get', '', [], 405], // index
+            ['unauth', 'post', '', [], 401], // store
+            ['unauth', 'get', '1', [], 405], // show
+            ['unauth', 'put', '1', [], 401], // update (full)
+            ['unauth', 'patch', '1', [], 401], // update (partial)
+            ['unauth', 'delete', '2', [], 401], // destroy
 
             // admin user
-            ['admin', 'get', '', [], '405'], // index
-            ['admin', 'post', '', $data, '200'], // store
-            ['admin', 'get', '1', [], '405'], // show
-            ['admin', 'put', '1', $data, '200'], // update (full)
-            ['admin', 'patch', '1', $data, '200'], // update (partial)
-            ['admin', 'delete', '1', [], '400'], // can't delete base calendar
-            ['admin', 'delete', '2', [], '200'], // destroy
+            ['admin', 'get', '', [], 405], // index
+            ['admin', 'post', '', $data, 200], // store
+            ['admin', 'get', '1', [], 405], // show
+            ['admin', 'put', '1', $data, 200], // update (full)
+            ['admin', 'patch', '1', $data, 200], // update (partial)
+            ['admin', 'delete', '1', [], 400], // can't delete base calendar
+            ['admin', 'delete', '2', [], 200], // destroy
 
             // editor user
-            ['editor', 'get', '', [], '405'], // index
-            ['editor', 'post', '', $data, '200'], // store
-            ['editor', 'get', '1', [], '405'], // show
-            ['editor', 'put', '1', $data, '200'], // update (full)
-            ['editor', 'patch', '1', $data, '200'], // update (partial)
-            ['editor', 'delete', '1', [], '400'], // can't delete base calendar
-            ['editor', 'delete', '2', [], '200'], // destroy
+            ['editor', 'get', '', [], 405], // index
+            ['editor', 'post', '', $data, 200], // store
+            ['editor', 'get', '1', [], 405], // show
+            ['editor', 'put', '1', $data, 200], // update (full)
+            ['editor', 'patch', '1', $data, 200], // update (partial)
+            ['editor', 'delete', '1', [], 400], // can't delete base calendar
+            ['editor', 'delete', '2', [], 200], // destroy
 
             // owner user
-            ['owner', 'get', '', [], '405'], // index
-            ['owner', 'post', '', $data, '200'], // store
-            ['owner', 'get', '1', [], '405'], // show
-            ['owner', 'put', '1', $data, '200'], // update (full)
-            ['owner', 'patch', '1', $data, '200'], // update (partial)
-            ['owner', 'delete', '1', [], '400'], // can't delete base calendar
-            ['owner', 'delete', '2', [], '200'], // destroy
-            ['owner', 'delete', '22', [], '401'], // can't delete calendar from not Owned service
+            ['owner', 'get', '', [], 405], // index
+            ['owner', 'post', '', $data, 200], // store
+            ['owner', 'get', '1', [], 405], // show
+            ['owner', 'put', '1', $data, 200], // update (full)
+            ['owner', 'patch', '1', $data, 200], // update (partial)
+            ['owner', 'delete', '1', [], 400], // can't delete base calendar
+            ['owner', 'delete', '2', [], 200], // destroy
+            ['owner', 'delete', '22', [], 401], // can't delete calendar from not Owned service
 
             // member user
-            ['member', 'get', '', [], '405'], // index
-            ['member', 'post', '', $data, '200'], // store
-            ['member', 'get', '1', [], '405'], // show
-            ['member', 'put', '1', $data, '200'], // update (full)
-            ['member', 'patch', '1', $data, '200'], // update (partial)
-            ['member', 'delete', '1', [], '400'], // can't delete base calendar
-            ['member', 'delete', '2', [], '200'], // destroy
-            ['member', 'delete', '22', [], '401'], // can't delete calendar from not membered service
+            ['member', 'get', '', [], 405], // index
+            ['member', 'post', '', $data, 200], // store
+            ['member', 'get', '1', [], 405], // show
+            ['member', 'put', '1', $data, 200], // update (full)
+            ['member', 'patch', '1', $data, 200], // update (partial)
+            ['member', 'delete', '1', [], 400], // can't delete base calendar
+            ['member', 'delete', '2', [], 200], // destroy
+            ['member', 'delete', '22', [], 401], // can't delete calendar from not membered service
         ];
     }
 
@@ -153,8 +153,8 @@ class CalendarsControllerTest extends \BrowserKitTestCase
      */
     public function testPostWithBulkInserEvents()
     {
-        $event1 = (array) factory(Event::class)->make();
-        $event2 = (array) factory(Event::class)->make();
+        $event1 = (array) Event::factory()->make();
+        $event2 = (array) Event::factory()->make();
         $data = [
             'priority' => '2',
             'label' => 'test',
@@ -162,7 +162,7 @@ class CalendarsControllerTest extends \BrowserKitTestCase
             'events' => [$event1, $event2],
         ];
 
-        $this->requestsByUserWithRoleAndCheckStatusCode('admin', 'post', '', $data, '200');
+        $this->requestsByUserWithRoleAndCheckStatusCode('admin', 'post', '', $data, 200);
     }
 
     /**
@@ -170,8 +170,8 @@ class CalendarsControllerTest extends \BrowserKitTestCase
      */
     public function testPutWithBulkInserEvents()
     {
-        $event1 = (array) factory(Event::class)->make();
-        $event2 = (array) factory(Event::class)->make();
+        $event1 = (array) Event::factory()->make();
+        $event2 = (array) Event::factory()->make();
         $data = [
             'priority' => '2',
             'label' => 'test',
@@ -179,6 +179,6 @@ class CalendarsControllerTest extends \BrowserKitTestCase
             'events' => [$event1, $event2],
         ];
 
-        $this->requestsByUserWithRoleAndCheckStatusCode('admin', 'put', '2', $data, '200');
+        $this->requestsByUserWithRoleAndCheckStatusCode('admin', 'put', '2', $data, 200);
     }
 }
