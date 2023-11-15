@@ -397,8 +397,8 @@ class FetchRecreatex extends BaseCommand
         $untilDate = $sequence['untilDate'];
 
         $event = new Event();
-        $event->start_date = $startDate->toIso8601String();
-        $event->end_date = $endDate->toIso8601String();
+        $event->start_date = $startDate;
+        $event->end_date = $endDate;
         $event->label = $index + 1;
         $event->until = $untilDate->endOfDay()->format('Y-m-d');
         $event->rrule = $this->getCalendarRule($startDate, $endDate, $untilDate);
@@ -686,7 +686,7 @@ class FetchRecreatex extends BaseCommand
         if (is_null($openinghours)) {
             $openinghours = new Openinghours();
             $openinghours->active = true;
-            $openinghours->label = 'Geïmporteerde kalender' . $startDate . ' -' . $endDate;
+            $openinghours->label = 'Geïmporteerde kalender ' . $startDate . ' -' . $endDate;
             $openinghours->start_date = $startDate;
             $openinghours->end_date = $endDate;
 
