@@ -363,8 +363,8 @@ class FetchRecreatex extends BaseCommand
             $untilDate = $sequence['untilDate'];
 
             $event = Event::where('rrule', $this->getCalendarRule($startDate, $endDate, $untilDate))
-                ->where('start_date', $startDate->toIso8601String())
-                ->where('end_date', $endDate->toIso8601String())
+                ->where('start_date', $startDate)
+                ->where('end_date', $endDate)
                 ->where('until', $untilDate->endOfDay()->format('Y-m-d'))
                 ->where('calendar_id', $calendar->id)
                 ->first();
