@@ -686,10 +686,15 @@ class FetchRecreatex extends BaseCommand
         if (is_null($openinghours)) {
             $openinghours = new Openinghours();
             $openinghours->active = true;
-            $openinghours->label = 'Geïmporteerde kalender ' . $startDate . ' -' . $endDate;
+            $openinghours->label = 'Geïmporteerde kalender ' . $startDate . ' - ' . $endDate;
             $openinghours->start_date = $startDate;
             $openinghours->end_date = $endDate;
 
+            $channel->openinghours()->save($openinghours);
+        }
+
+        if (!$openinghours->active) {
+            $openinghours->active = true;
             $channel->openinghours()->save($openinghours);
         }
 
@@ -714,8 +719,14 @@ class FetchRecreatex extends BaseCommand
             $calendar = new Calendar();
             $calendar->priority = 0;
             $calendar->closinghours = 0;
+            $calendar->published = true;
             $calendar->label = $this->calendarName;
 
+            $openinghours->calendars()->save($calendar);
+        }
+
+        if (!$calendar->published) {
+            $calendar->published = true;
             $openinghours->calendars()->save($calendar);
         }
 
@@ -735,8 +746,8 @@ class FetchRecreatex extends BaseCommand
             ->first();
         if (isset($openinghours->id)) {
             $openinghours->delete();
-            $this->info('Child data removed from channel ' . $channel->id . ' for year ' . $year .
-                'in  "' . $this->activeServiceRecord->label . '"');
+            $this->info('Child data removed from channel ' . $channel->label . '(' . $channel->id . ') for year ' . $year .
+                ' in  "' . $this->activeServiceRecord->label . '"');
         }
     }
 
