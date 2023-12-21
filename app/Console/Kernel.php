@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
     {
         //$schedule->command('openinghours:fetch-services')->weekly();
         //$schedule->command('openinghours:update-vesta')->weekly()->mondays()->at('02:00');
+        $schedule->command('cache:prune-stale-tags')->hourly();
     }
 
     /**
