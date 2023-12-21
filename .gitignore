@@ -21,3 +21,6 @@ Homestead.yaml
 !/public/js/vendor
 
 .phpintel/*
+
+# DDEV
+/.ddev/
