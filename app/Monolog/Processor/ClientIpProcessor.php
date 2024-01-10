@@ -2,6 +2,8 @@
 
 namespace App\Monolog\Processor;
 
+use Monolog\LogRecord;
+
 /**
  * Processor that adds a client_ip to the extra key of a log record.
  */
@@ -16,11 +18,11 @@ class ClientIpProcessor
     /**
      * Adds the client_ip to the record's extra key.
      *
-     * @param array $record
+     * @param \Monolog\LogRecord $record
      *
-     * @return array
+     * @return \Monolog\LogRecord
      */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
         // The client_ip will hold the request's actual origin address.
         $record['extra']['client_ip'] = $this->cachedClientIp
