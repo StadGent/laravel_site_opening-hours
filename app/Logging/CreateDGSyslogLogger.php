@@ -50,9 +50,9 @@ class CreateDGSyslogLogger
         // Format parseable for kibana.
         $formatter = new LineFormatter(
             '%extra.base_url%'
-            . '|%timestamp%'
+            . '|%extra.timestamp%'
             . '|laravel'
-            . '|%level_name%'
+            . '|%extra.level_name%'
             . '|%extra.client_ip%'
             . '|%extra.base_url%%extra.url%'
             . '|%extra.referrer%'

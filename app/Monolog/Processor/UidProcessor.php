@@ -2,6 +2,8 @@
 
 namespace App\Monolog\Processor;
 
+use Monolog\LogRecord;
+
 /**
  * Processor that adds a uid to the extra key of a log record.
  */
@@ -11,11 +13,11 @@ class UidProcessor
     /**
      * Adds the uid to the record's extra key.
      *
-     * @param array $record
+     * @param \Monolog\LogRecord $record
      *
-     * @return array
+     * @return \Monolog\LogRecord
      */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
         $record['extra']['uid'] = 0;
         try {
