@@ -2,6 +2,8 @@
 
 namespace App\Monolog\Processor;
 
+use Monolog\LogRecord;
+
 /**
  * Processor that adds a base_url to the extra key of a log record.
  */
@@ -15,7 +17,7 @@ class BaseUrlProcessor
      *
      * @return array
      */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
         $record['extra']['base_url'] = '';
         if ($request = request()) {

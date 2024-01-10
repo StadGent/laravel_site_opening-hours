@@ -2,6 +2,8 @@
 
 namespace App\Monolog\Processor;
 
+use Monolog\LogRecord;
+
 /**
  * Processor that adds a timestamp to a log record.
  */
@@ -11,17 +13,17 @@ class TimestampProcessor
     /**
      * Adds the timestamp to the record.
      *
-     * @param array $record
+     * @param \Monolog\LogRecord $record
      *
-     * @return array
+     * @return \Monolog\LogRecord
      */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
-        $record['timestamp'] = time();
+        $record['extra']['timestamp'] = time();
         if (isset($record['datetime'])
             && $record['datetime'] instanceof \DateTime
         ) {
-            $record['timestamp'] = $record['datetime']->getTimestamp();
+            $record['extra']['timestamp'] = $record['datetime']->getTimestamp();
         }
 
         return $record;
