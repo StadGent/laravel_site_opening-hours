@@ -178,6 +178,8 @@ class OpeninghoursTransformer implements TransformerInterface
             }
         }
 
+        usort($dataCollection[$channel->id]['openinghours'], fn (DayInfo $a, DayInfo $b) => $a->date > $b->date ? 1 : -1);
+
         return array_values($dataCollection);
     }
 
