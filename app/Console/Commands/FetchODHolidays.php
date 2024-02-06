@@ -154,13 +154,19 @@ class FetchODHolidays extends BaseCommand
             $endDate = substr($startDate, 0, -9) . ' 23:59:59';
         }
 
-        $event = $calendar->events()
+        $events = $calendar->events()
             ->where('label', $label)
             ->where('rrule', $rrule)
             ->where('start_date', $startDate)
-            ->where('end_date', $endDate)
-            ->where('calendar_id', $calendar->id)
-            ->first();
+            ->where('calendar_id', $calendar->id);
+
+        if ($endDate) {
+            $events->where('end_date', $endDate);
+        }
+        else {
+            $events->whereNull('end_date');
+        }
+        $event = $events->first();
 
         if (!isset($event->id)) {
             $this->info('New event ' . $label . ' ' . $startDate . ' for ' . $calendar->label);
