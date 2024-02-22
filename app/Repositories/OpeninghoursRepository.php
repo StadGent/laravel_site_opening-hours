@@ -3,11 +3,11 @@
 namespace App\Repositories;
 
 use App\Models\Openinghours;
-use EasyRdf_Graph as Graph;
-use EasyRdf_Literal as Literal;
-use EasyRdf_Literal_Boolean as BooleanLiteral;
-use EasyRdf_Literal_Integer as IntegerLiteral;
-use EasyRdf_Literal_DateTime as DateTimeLiteral;
+use EasyRdf\Graph;
+use EasyRdf\Literal;
+use EasyRdf\Literal\Boolean as BooleanLiteral;
+use EasyRdf\Literal\Integer as IntegerLiteral;
+use EasyRdf\Literal\DateTime as DateTimeLiteral;
 use DB;
 
 class OpeninghoursRepository extends EloquentRepository
@@ -110,7 +110,7 @@ class OpeninghoursRepository extends EloquentRepository
      * Create a semantic data structure containing all openinghours for the channel
      *
      * @param  integer        $channelId
-     * @return \EasyRdf_Graph
+     * @return \EasyRdf\Graph
      */
     public function getOpeninghoursGraphForChannel($channelId)
     {
