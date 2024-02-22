@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Services\SparqlService;
-use EasyRdf_Serialiser_Turtle as TurtleSerialiser;
+use EasyRdf\Serialiser\Turtle as TurtleSerialiser;
 
 /**
  * This class is responsible for writing openinghours to a LOD (SPARQL based) database
@@ -16,7 +16,7 @@ class LodOpeninghoursRepository
      * @param  string        $service
      * @param  string        $channel
      * @param  int           $openinghoursId
-     * @param  EasyRdf_Graph $graph
+     * @param  EasyRdf\Graph $graph
      * @return bool
      */
     public function update($service, $channel, $openinghoursId, $graph)
@@ -73,7 +73,7 @@ class LodOpeninghoursRepository
      * @param  string        $serviceUri
      * @param  array         $channel
      * @param  int           $openinghoursId
-     * @param  EasyRdf_Graph $graph
+     * @param  EasyRdf\Graph $graph
      * @return array
      */
     private function makeDeleteAndInsertSparqlQuery($service, $channel, $openinghoursId, $graph)
