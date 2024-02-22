@@ -7,7 +7,9 @@ use App\Models\DayInfo;
 use App\Models\Service;
 use App\Services\LocaleService;
 use Carbon\Carbon;
-use EasyRdf_Serialiser_JsonLd as JsonLdSerialiser;
+use EasyRdf\Graph;
+use EasyRdf\RdfNamespace;
+use EasyRdf\Serialiser\JsonLd as JsonLdSerialiser;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -242,9 +244,9 @@ class OpeninghoursTransformer implements TransformerInterface
         if (!$this->service || !($this->service instanceof Service)) {
             throw new \Exception("JSON-LD formatter needs a service instance of \App\Models\Service", 1);
         }
-        \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
+        RdfNamespace::set('cv', 'http://data.europa.eu/m8g/');
 
-        $graph = new \EasyRdf_Graph();
+        $graph = new Graph();
         $service = $graph->resource($this->service->uri, 'schema:Organization');
 
         $data = $this->getCollectionData($collection);
