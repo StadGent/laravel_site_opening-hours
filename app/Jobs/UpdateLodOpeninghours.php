@@ -7,11 +7,8 @@ use App\Repositories\ChannelRepository;
 use App\Repositories\LodOpeninghoursRepository;
 use App\Repositories\OpeninghoursRepository;
 use App\Repositories\ServicesRepository;
-use EasyRdf_Graph as Graph;
-use Illuminate\Bus\Queueable;
+use EasyRdf\RdfNamespace;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class UpdateLodOpeninghours extends BaseJob implements ShouldQueue
 {
@@ -79,12 +76,12 @@ class UpdateLodOpeninghours extends BaseJob implements ShouldQueue
      *
      * @param  array $service
      * @param  array $channel
-     * @param  EasyRdf_Graph $openinghoursGraph
-     * @return EasyRdf_Resource
+     * @param  EasyRdf\Graph $openinghoursGraph
+     * @return EasyRdf\Resource
      */
     private function createServiceResource($service, $channel, $openinghoursGraph)
     {
-        \EasyRdf_Namespace::set('cv', 'http://data.europa.eu/m8g/');
+        RdfNamespace::set('cv', 'http://data.europa.eu/m8g/');
 
         //$graph = $openinghoursGraph->getGraph();
 
