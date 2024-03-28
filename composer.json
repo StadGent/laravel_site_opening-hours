@@ -15,7 +15,7 @@
         "fakerphp/faker": "^1.23",
         "guzzlehttp/guzzle": "^7.3",
         "hedronium/spaceless-blade": "^3.0",
-        "johngrogg/ics-parser": "^2.1.5",
+        "johngrogg/ics-parser": "^3",
         "laravel/framework": "^10",
         "laravel/passport": "^11.10",
         "laravel/sanctum": "^3.2",
