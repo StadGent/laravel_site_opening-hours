@@ -23,8 +23,8 @@
         "laravel/ui": "^4.2",
         "ml/json-ld": "^1.0",
         "nesbot/carbon": "^2.0",
-        "pda/pheanstalk": "~4.0",
-        "rlanvin/php-rrule": "^1.6",
+        "pda/pheanstalk": "^5.0.5",
+        "rlanvin/php-rrule": "^2.4.1",
         "santigarcor/laratrust": "^8",
         "wildside/userstamps": "^2.3"
     },
