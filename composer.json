@@ -25,15 +25,15 @@
         "nesbot/carbon": "^2.0",
         "pda/pheanstalk": "~4.0",
         "rlanvin/php-rrule": "^1.6",
-        "santigarcor/laratrust": "^7",
+        "santigarcor/laratrust": "^8",
         "wildside/userstamps": "^2.3"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
-        "laravel/browser-kit-testing": "^6.4",
+        "laravel/browser-kit-testing": "^7.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^6.0",
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^11.0"
     },
     "repositories": {
         "repman-digipolis": {
