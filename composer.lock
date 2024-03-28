@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ee69894997f43c2c621dcf6f6788bca",
+    "content-hash": "efadc924bac553519c0f1597182e410e",
     "packages": [
         {
             "name": "brick/math",
@@ -5260,24 +5260,35 @@
         },
         {
             "name": "pda/pheanstalk",
-            "version": "v4.0.5",
+            "version": "v5.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pheanstalk/pheanstalk.git",
-                "reference": "1459f2f62dddfe28902e0584708417dddd79bd70"
+                "reference": "dd976acf568d45efddf76494e7ac06fa961b517e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pheanstalk/pheanstalk/zipball/1459f2f62dddfe28902e0584708417dddd79bd70",
-                "reference": "1459f2f62dddfe28902e0584708417dddd79bd70",
+                "url": "https://api.github.com/repos/pheanstalk/pheanstalk/zipball/dd976acf568d45efddf76494e7ac06fa961b517e",
+                "reference": "dd976acf568d45efddf76494e7ac06fa961b517e",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
-                "php": ">=7.1.0"
+                "php": ">=8.1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7"
+                "captainhook/plugin-composer": "^5.3",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^1",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpstan/phpstan-strict-rules": "^1.1",
+                "phpunit/phpunit": "^10",
+                "ramsey/conventional-commits": "^1.2",
+                "symplify/easy-coding-standard": "^11",
+                "vimeo/psalm": "^5"
+            },
+            "suggest": {
+                "ext-sockets": "Socket implementation works best for long running processes"
             },
             "type": "library",
             "autoload": {
@@ -5309,9 +5320,9 @@
             ],
             "support": {
                 "issues": "https://github.com/pheanstalk/pheanstalk/issues",
-                "source": "https://github.com/pheanstalk/pheanstalk/tree/v4.0.5"
+                "source": "https://github.com/pheanstalk/pheanstalk/tree/v5.0.5"
             },
-            "time": "2024-01-11T15:06:06+00:00"
+            "time": "2024-03-04T12:25:02+00:00"
         },
         {
             "name": "pear/archive_tar",
@@ -6650,23 +6661,24 @@
         },
         {
             "name": "rlanvin/php-rrule",
-            "version": "v1.6.3",
+            "version": "v2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rlanvin/php-rrule.git",
-                "reference": "1373df401e0926cf7548716dabbc0d19603a144d"
+                "reference": "7ddef3d49b7a6461dc070f671f0d94509c9a537b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rlanvin/php-rrule/zipball/1373df401e0926cf7548716dabbc0d19603a144d",
-                "reference": "1373df401e0926cf7548716dabbc0d19603a144d",
+                "url": "https://api.github.com/repos/rlanvin/php-rrule/zipball/7ddef3d49b7a6461dc070f671f0d94509c9a537b",
+                "reference": "7ddef3d49b7a6461dc070f671f0d94509c9a537b",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.6.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8|^5.5|^6.5"
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "^5.7|^6.5|^8.0"
             },
             "suggest": {
                 "ext-intl": "Intl extension is needed for humanReadable()"
@@ -6692,9 +6704,9 @@
             ],
             "support": {
                 "issues": "https://github.com/rlanvin/php-rrule/issues",
-                "source": "https://github.com/rlanvin/php-rrule/tree/v1.6.3"
+                "source": "https://github.com/rlanvin/php-rrule/tree/v2.4.1"
             },
-            "time": "2019-01-13T09:49:03+00:00"
+            "time": "2023-06-07T13:15:59+00:00"
         },
         {
             "name": "santigarcor/laratrust",
