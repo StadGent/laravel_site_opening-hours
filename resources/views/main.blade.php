@@ -15,14 +15,14 @@
   <div id="app">Loading...</div>
 
   {{--
-  <script>
+  <script nonce="{{ csp_nonce() }}">
   var initialUsers = {!! json_encode($users) !!}
   var initialServices = {!! json_encode($services) !!}
   var initialRoute = {!! json_encode($route) !!}
   </script>
   --}}
 
-  <script>
+  <script nonce="{{ csp_nonce() }}">
 
   // bugfix: remove old cookie
   document.cookie = "laravel_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -43,7 +43,7 @@
   <script src="{{ asset('js/chunks/lib.js') }}?2"></script>
 
   @if (env('APP_DEBUG'))
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="{{ csp_nonce() }}">
   Vue.config.debug = true
   Vue.config.devtools = true
   </script>
