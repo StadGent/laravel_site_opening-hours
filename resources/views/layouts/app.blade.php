@@ -15,13 +15,16 @@
     <link href="/css/app.css" rel="stylesheet">
 
     <!-- Scripts -->
-    <script>
+    <script nonce="{{ csp_nonce() }}">
         window.Laravel = <?php echo json_encode([
             'csrfToken' => csrf_token(),
         ]); ?>
     </script>
+    <style nonce="{{ csp_nonce() }}">
+        body {padding-top:0;}
+    </style>
 </head>
-<body style="padding-top:0;">
+<body>
     <div id="app">
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
