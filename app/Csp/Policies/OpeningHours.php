@@ -6,13 +6,13 @@ use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
 use Spatie\Csp\Policies\Basic;
 
-class OpeningHours extends Basic 
+class OpeningHours extends Basic
 {
 
     /**
      * {@inheritdoc}
      */
-    public function configure() 
+    public function configure()
     {
         parent::configure();
 
