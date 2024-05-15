@@ -16,8 +16,8 @@
         </div>
         <div v-if="event.rrule">
             <!-- Choose the period -->
-            <div class="form-group" v-if="$parent.cal.layer">
-                <div class="col-xs-5">
+            <div class="form-group">
+                <div :class="{'col-xs-5' : options.freq!=RRule.YEARLY, 'col-xs-9': options.freq==RRule.YEARLY}">
                     <label>Regelmaat</label>
                     <select v-model="optionFreq" class="form-control" aria-label="Regelmaat">
                         <option :value="RRule.YEARLY">Jaarlijks</option>
@@ -26,7 +26,7 @@
                         <option :value="RRule.DAILY">Dagelijks</option>
                     </select>
                 </div>
-                <div class="col-xs-5" v-if="options.freq==RRule.MONTHLY">
+                <div :class="{'col-xs-5' : $parent.cal.layer, 'col-xs-4': !$parent.cal.layer}" v-if="options.freq==RRule.MONTHLY">
                     <label>Frequentie</label>
                     <select v-model="optionInterval" class="form-control" aria-label="Frequentie">
                         <option :value="null">elke maand</option>
@@ -35,7 +35,7 @@
                         <option :value="4">viermaandelijks</option>
                     </select>
                 </div>
-                <div class="col-xs-5" v-else-if="options.freq==RRule.WEEKLY">
+                <div :class="{'col-xs-5' : $parent.cal.layer, 'col-xs-4': !$parent.cal.layer}" v-else-if="options.freq==RRule.WEEKLY">
                     <label>Frequentie</label>
                     <select v-model="optionInterval" class="form-control" aria-label="Frequentie">
                         <option :value="null">elke week</option>
@@ -44,7 +44,7 @@
                         <option :value="4">vierwekelijks</option>
                     </select>
                 </div>
-                <div class="col-xs-5" v-else-if="options.freq==RRule.DAILY">
+                <div :class="{'col-xs-5' : $parent.cal.layer, 'col-xs-4': !$parent.cal.layer}" v-else-if="options.freq==RRule.DAILY">
                     <label>Frequentie</label>
                     <select v-model="optionInterval" class="form-control" aria-label="Frequentie">
                         <option :value="null">elke dag</option>
@@ -54,6 +54,9 @@
                         <option :value="5">om de vijf dagen</option>
                         <option :value="6">om de zes dagen</option>
                     </select>
+                </div>
+                <div v-if="!$parent.cal.layer" class="col-xs-2">
+                    <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
             </div>
             <!-- Yearly -->
@@ -159,9 +162,6 @@
             <div v-else-if="options.freq==RRule.WEEKLY" class="form-group">
                 <div :class="{'col-xs-12' : $parent.cal.layer, 'col-xs-10': !$parent.cal.layer}">
                     <strong>Op</strong>
-                </div>
-                <div v-if="!$parent.cal.layer" class="col-xs-2">
-                    <div class="close close--col" style="padding-top: 0px;" @click="$emit('rm')">&times;</div>
                 </div>
                 <div class="col-xs-5">
                     <multi-day-select :options="fullDays" :value="optionByweekday" @input="optionByweekday = $event"></multi-day-select>
