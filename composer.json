@@ -26,6 +26,7 @@
         "pda/pheanstalk": "~4.0",
         "rlanvin/php-rrule": "^1.6",
         "santigarcor/laratrust": "^7",
+        "spatie/laravel-csp": "^2.9",
         "wildside/userstamps": "^2.3"
     },
     "require-dev": {
