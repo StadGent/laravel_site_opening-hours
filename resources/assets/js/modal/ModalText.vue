@@ -84,9 +84,9 @@
             </div>
             <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
               <label for="recipient-name" class="control-label">Dienst</label>
-              <select v-model="modal.service_id" class="form-control">
-                <option v-for="service in allowedServices" :value="service.id" v-text="service.label"></option>
-              </select>
+              <multiselect v-model="modal.service_id" :options="allowedServices" :multiple="true" :close-on-select="false" :clear-on-select="false" placeholder="Select a service" label="label"
+                track-by="id" :preserve-search="true" :allow-empty="false" @input="updateSelected">
+              </multiselect>
             </div>
           </div>
           <div v-if="this.modal.error" class="alert alert-danger" v-html="modal.error"></div>
@@ -118,6 +118,7 @@ import InputChannel from '../components/InputChannel.vue'
 import SelectChannelType from '../components/SelectChannelType.vue'
 import Pikaday from '../components/Pikaday.vue'
 import Status from '../components/Status.vue'
+import Multiselect from 'vue-multiselect'
 
 import { Hub, toDatetime } from '../lib.js'
 import {CHOOSE_SERVICE, NO_VALID_EMAIL, OH_INVALID_RANGE} from "../constants";
@@ -276,6 +277,9 @@ export default {
       }
 
       Hub.$emit('inviteUser', this.modal)
+    },
+    updateSelected(options) {
+      this.modal.service_id = options.map(option => option.id);
     }
   },
   updated () {
@@ -287,6 +291,7 @@ export default {
     SelectChannelType,
     Pikaday,
     Status,
+    Multiselect
   }
 }
 </script>
