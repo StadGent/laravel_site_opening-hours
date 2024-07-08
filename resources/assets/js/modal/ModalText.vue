@@ -85,8 +85,8 @@
             </div>
             <div class="form-group" :class="{ 'has-error': 0, 'has-success': 0 }">
               <label for="recipient-name" class="control-label">Dienst</label>
-              <multiselect v-model="modal.service_id" :options="allowedServices" :multiple="true" :close-on-select="false" :clear-on-select="false" placeholder="Select a service" label="label"
-                track-by="id" :preserve-search="true" :allow-empty="false" @input="updateSelected">
+              <multiselect v-model="modal.service_id" :options="allowedServices" :multiple="true" :close-on-select="false" :clear-on-select="false" placeholder="Select a service"
+                label="label" track-by="id" :preserve-search="true" :allow-empty="false" @input="updateSelected">
               </multiselect>
             </div>
           </div>
@@ -142,9 +142,16 @@ export default {
     },
 
     allowedServices() {
-      return this.$root.services.filter(s => !s.draft).sort((a, b) => {
-        return (a.label.toLowerCase() <= b.label.toLowerCase()) ? -1 : 1
-      })
+      // Step 1: Filter out draft services and sort them
+      let services = this.$root.services.filter(s => !s.draft)
+        .sort((a, b) => (a.label.toLowerCase() <= b.label.toLowerCase()) ? -1 : 1);
+
+      // Step 2: Filter out userServices from the sorted and filtered services
+      let filteredServices = services.filter(allowedService =>
+        !this.userServices.some(userService => userService.service_id === allowedService.id)
+      );
+
+      return filteredServices;
     },
 
     // Pikaday options
@@ -175,7 +182,16 @@ export default {
         }
         return sum;
       }, [])
-    }
+    },
+
+    usr() {
+      return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || {}
+    },
+
+    userServices() {
+      return this.usr.roles || {};
+    },
+
   },
   methods: {
     createChannel() {
