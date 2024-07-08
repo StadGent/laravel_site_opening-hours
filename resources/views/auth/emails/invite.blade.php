@@ -23,7 +23,16 @@ $style = [
 ];
 ?>
 @section('content')
-<p>Melding dat u toegevoegd werd aan de dienst "{{ $service }}" op het openingsurenplatform </p>
+@if (count($services) > 1)
+<p>Melding dat u toegevoegd werd aan volgende diensten op het openingsurenplatform:</p>
+<ul>
+  @foreach ($services as $service )
+  <li>{{$service->label}}</li>
+  @endforeach
+</ul>
+@else
+<p>Melding dat u toegevoegd werd aan de dienst "{{ $services->first()->label }}" op het openingsurenplatform </p>
+@endif
 
 @if (isset($actionUrl))
 <p>Het blijkt ook dat u uw gebruiker nog niet geactiveerd staat momenteel.<br />

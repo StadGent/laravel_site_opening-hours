@@ -2,11 +2,12 @@
 
 namespace App\Mail;
 
-use App\Models\Service;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Database\Eloquent\Collection;
+
 
 class SendInviteConfirmation extends Mailable
 {
@@ -18,15 +19,21 @@ class SendInviteConfirmation extends Mailable
     public $user;
 
     /**
+     * @var Collection // Collection of type Service
+     */
+    public $services;
+
+    /**
      * Create a new message instance.
      *
      * @param User $user
+     * @param array|Collection $services // Collection of type Service
      * @return void
      */
-    public function __construct(User $user, Service $service)
+    public function __construct(User $user, Collection $services = null)
     {
         $this->user = $user;
-        $this->service = $service;
+        $this->services = $services;
     }
 
     /**
@@ -40,7 +47,7 @@ class SendInviteConfirmation extends Mailable
             ->subject('U werd toegang verleend tot een dienst')
             ->view('auth.emails.invite');
         $params = [
-            'service' => $this->service->label,
+            'services' => $this->services
         ];
 
         if ($this->user->token) {
