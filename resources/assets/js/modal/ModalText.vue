@@ -1,33 +1,34 @@
 <template>
-  <div class="modal fade" :class="{in: modal.text}" :style="{display: modal.text?'block':'none'}" @click="modalClose" tabindex="-1" role="dialog">
+  <div class="modal fade" :class="{ in: modal.text }" :style="{ display: modal.text ? 'block' : 'none' }" @click="modalClose" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <form class="modal-content" @click.stop @submit.prevent>
         <div class="modal-header">
           <button type="button" class="close" @click="modalClose" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title">
-            <span v-if="modal.text=='requestService'">Vraag toegang tot een dienst</span>
-            <span v-else-if="modal.text=='newChannel'">{{ modal.id ? 'Bewerk dit kanaal' : 'Voeg een kanaal toe' }}</span>
-            <span v-else-if="modal.text=='newVersion'">{{ modal.id ? 'Bewerk deze versie' : 'Voeg een versie toe' }}</span>
-            <span v-else-if="modal.text=='newRoleForUser'">Nodig {{ modal.usr.name }} uit voor een dienst</span>
-            <span v-else-if="modal.text=='newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
-            <span v-else-if="modal.text=='newUser'">Nodig iemand uit</span>
+            <span v-if="modal.text == 'requestService'">Vraag toegang tot een dienst</span>
+            <span v-else-if="modal.text == 'newChannel'">{{ modal.id ? 'Bewerk dit kanaal' : 'Voeg een kanaal toe' }}</span>
+            <span v-else-if="modal.text == 'newVersion'">{{ modal.id ? 'Bewerk deze versie' : 'Voeg een versie toe' }}</span>
+            <span v-else-if="modal.text == 'newRoleForUser'">Nodig {{ modal.usr.name }} uit voor een dienst</span>
+            <span v-else-if="modal.text == 'newRole'">Nodig iemand uit voor {{ modal.srv.label }}</span>
+            <span v-else-if="modal.text == 'newUser'">Nodig iemand uit</span>
             <span v-else>Probleem</span>
           </h4>
         </div>
         <div class="modal-body">
-          <div v-if="modal.text=='requestService'">
+          <div v-if="modal.text == 'requestService'">
             Mail naar <a href="mailto:admin@mijngent.be">admin@mijngent.be</a> om toegang te vragen.
           </div>
-          <div v-else-if="modal.text=='newChannel'" class="form-group">
+          <div v-else-if="modal.text == 'newChannel'" class="form-group">
             <label for="input_channel_name" class="control-label">Naam van het kanaal</label>
             <input-channel :parent="modal" :id="'input_channel_name'" prop="label"></input-channel>
-            <select-channel-type prop="type_id" :parent="modal"/>
+            <select-channel-type prop="type_id" :parent="modal" />
             <div class="help-block">
               Een kanaal is een manier waarop burgers jouw dienst kunnen contacteren.
-              <br><br> Dat kunnen algemene openingsuren zijn, maar ook bijvoorbeeld de telefonische beschikbaarheid, afspraak momenten, wanneer er een tolk aanwezig is, of wanneer een bepaalde doelgroep een bezoekje kan brengen zoals jongeren.
+              <br><br> Dat kunnen algemene openingsuren zijn, maar ook bijvoorbeeld de telefonische beschikbaarheid, afspraak momenten, wanneer er een tolk aanwezig is, of wanneer
+              een bepaalde doelgroep een bezoekje kan brengen zoals jongeren.
             </div>
           </div>
-          <div v-else-if="modal.text=='newVersion'">
+          <div v-else-if="modal.text == 'newVersion'">
             <div class="form-group">
               <label for="recipient-name" class="control-label">Naam van de versie</label>
               <input id="recipient-name" type="text" class="form-control" v-model="modal.label" :placeholder="nextVersionLabel">
@@ -49,18 +50,18 @@
             <div v-if="!modal.id" class="form-group">
               <label for="original_version" class="control-label">Kopieer versie (optioneel)</label>
               <select v-model="modal.originalVersion" id="original_version" class="form-control">
-                  <option></option>
+                <option></option>
                 <template v-for="channel in serviceVersions">
                   <optgroup :label="channel.label"></optgroup>
                   <template v-for="version in channel.versions">
-                    <option :value="version.id">{{version.label}}</option>
+                    <option :value="version.id">{{ version.label }}</option>
                   </template>
                 </template>
               </select>
             </div>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser'">
-            <div class="form-group" :class="{'has-error':!validEmail, 'has-success':allowedEmail}">
+            <div class="form-group" :class="{ 'has-error': !validEmail, 'has-success': allowedEmail }">
               <label for="recipient-name" class="control-label">E-mailadres</label>
               <input type="text" class="form-control" v-model="modal.email" placeholder="... @mijngent.be">
             </div>
@@ -73,12 +74,12 @@
               <label for="recipient-name" class="control-label">Rol</label>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> {{$root.translateRole("Member")}}
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Member"> {{ $root.translateRole("Member") }}
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner">  {{$root.translateRole("Owner")}}
+                  <input type="radio" name="modalRole" v-model="modal.role" value="Owner"> {{ $root.translateRole("Owner") }}
                 </label>
               </div>
             </div>
@@ -92,12 +93,14 @@
           <div v-if="this.modal.error" class="alert alert-danger" v-html="modal.error"></div>
         </div>
         <div class="modal-footer">
-          <div v-if="modal.text=='newChannel'">
-            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex || modal.wait">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+          <div v-if="modal.text == 'newChannel'">
+            <button type="submit" class="btn btn-primary" @click="createChannel" :disabled="$root.isRecreatex || modal.wait">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe'
+              }}</button>
             <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
-          <div v-else-if="modal.text=='newVersion'">
-            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex || modal.wait">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe' }}</button>
+          <div v-else-if="modal.text == 'newVersion'">
+            <button type="submit" class="btn btn-primary" @click="createVersion" :disabled="$root.isRecreatex || modal.wait">{{ modal.id ? 'Sla wijzigingen op' : 'Voeg toe'
+              }}</button>
             <button type="button" class="btn btn-default" @click="modalClose" :disabled="modal.wait">Annuleer</button>
           </div>
           <div v-else-if="modal.text == 'newRole' || modal.text == 'newUser' || modal.text == 'newRoleForUser'">
@@ -121,60 +124,61 @@ import Status from '../components/Status.vue'
 import Multiselect from 'vue-multiselect'
 
 import { Hub, toDatetime } from '../lib.js'
-import {CHOOSE_SERVICE, NO_VALID_EMAIL, OH_INVALID_RANGE} from "../constants";
+import { CHOOSE_SERVICE, NO_VALID_EMAIL, OH_INVALID_RANGE } from "../constants";
 
 export default {
   computed: {
-    validEmail () {
+    validEmail() {
       return !this.modal.strict || /.+@.+\...+/.test(this.modal.email || '')
     },
-    allowedEmail () {
+    allowedEmail() {
       return (this.modal.email || '').endsWith('@mijngent.be')
     },
-    nextVersionLabel () {
+    nextVersionLabel() {
       if (!this.modal.start_date || !this.modal.end_date) {
         return 'Nieuwe versie'
       }
       return 'Openingsuren ' + this.modal.start_date.slice(0, 4) + ' tot en met ' + this.modal.end_date.slice(0, 4)
     },
 
-    allowedServices () {
-      return this.$root.services.filter(s => !s.draft).sort((a,b)=>{
-          return  (a.label.toLowerCase() <= b.label.toLowerCase()) ? -1 : 1 })
+    allowedServices() {
+      return this.$root.services.filter(s => !s.draft).sort((a, b) => {
+        return (a.label.toLowerCase() <= b.label.toLowerCase()) ? -1 : 1
+      })
     },
 
     // Pikaday options
-    pikadayStart () {
+    pikadayStart() {
       return {
       }
     },
-    pikadayEnd () {
+    pikadayEnd() {
       return {
         minDate: toDatetime(this.modal.start_date)
       }
     },
 
     serviceVersions() {
-        return this.$root.routeService.channels.reduce((sum, c) => {
-            if (c.openinghours && c.openinghours.length > 0) {
-                sum.push({
-                    // Use channels as optgroup.
-                    "label": c.label,
-                    "versions": c.openinghours.map(o => {
-                        // For each channel, add all versions.
-                        return {
-                            "label": o.label,
-                            "id": o.id
-                        }
-                    })
-                })
-            }
-            return sum;
-        }, [])
+      return this.$root.routeService.channels.reduce((sum, c) => {
+        if (c.openinghours && c.openinghours.length > 0) {
+          sum.push({
+            // Use channels as optgroup.
+            "label": c.label,
+            "versions": c.openinghours.map(o => {
+              // For each channel, add all versions.
+              return {
+                "label": o.label,
+                "id": o.id
+              }
+            })
+          })
+        }
+        return sum;
+      }, [])
     }
   },
   methods: {
-    createChannel () {
+    createChannel() {
 
       this.modalWait();
 
@@ -183,12 +187,12 @@ export default {
       }
 
       if (this.modal.type_id === '') {
-          this.modal.type_id = null
+        this.modal.type_id = null
       }
 
       Hub.$emit(this.modal.id ? 'updateChannel' : 'createChannel', this.modal)
     },
-    createVersion () {
+    createVersion() {
 
       this.modalWait();
 
@@ -197,15 +201,15 @@ export default {
       }
 
       if (this.modal.originalVersion) {
-          this.modal.calendars = this.$root.routeService.channels.find(c => {
-              if (!c.openinghours) {
-                  return false
-              }
-              c.openinghours.find(o => {
-                  if (o.id === this.modal.originalVersion)
-                      return o.calendars
-              })
+        this.modal.calendars = this.$root.routeService.channels.find(c => {
+          if (!c.openinghours) {
+            return false
+          }
+          c.openinghours.find(o => {
+            if (o.id === this.modal.originalVersion)
+              return o.calendars
           })
+        })
       }
 
       // Align events with start_date and end_date
@@ -233,15 +237,15 @@ export default {
           let changed = false;
           cal.events.forEach(event => {
             if (!cal.layer) {
-                // calculate difference to include openinghours past midnight
-                let start = moment(event.start_date);
-                let end = moment(event.end_date);
-                let diff = end.startOf('day').diff(start.startOf('day'), 'days');
+              // calculate difference to include openinghours past midnight
+              let start = moment(event.start_date);
+              let end = moment(event.end_date);
+              let diff = end.startOf('day').diff(start.startOf('day'), 'days');
 
-                event.start_date = moment(version.start_date).format('YYYY-MM-DD') + event.start_date.slice(10);
-                event.end_date = moment(version.start_date).add(diff, 'days').format('YYYY-MM-DD') + event.end_date.slice(10);
-                event.until = version.end_date;
-                changed = true
+              event.start_date = moment(version.start_date).format('YYYY-MM-DD') + event.start_date.slice(10);
+              event.end_date = moment(version.start_date).add(diff, 'days').format('YYYY-MM-DD') + event.end_date.slice(10);
+              event.until = version.end_date;
+              changed = true
             }
           });
           if (changed) {
@@ -251,7 +255,7 @@ export default {
       }
       Hub.$emit(this.modal.id ? 'updateVersion' : 'createVersion', this.modal)
     },
-    createRole () {
+    createRole() {
 
       this.modalWait();
 
@@ -262,14 +266,17 @@ export default {
         this.modalError(NO_VALID_EMAIL);
         return;
       }
+
       if (this.modal.usr) {
         this.modal.user_id = this.modal.usr.id;
         this.modal.email = this.modal.usr.email;
       }
+
       if (!this.modal.user_id && !window.Vue.config.debug && !this.validEmail) {
         this.modalResume();
         return;
       }
+
       if (!this.modal.service_id && !this.modal.srv) {
         this.modalResume();
         this.modalError(CHOOSE_SERVICE);
@@ -282,7 +289,7 @@ export default {
       this.modal.service_id = options.map(option => option.id);
     }
   },
-  updated () {
+  updated() {
     const inp = this.$el.querySelector('input');
     inp && inp.focus()
   },

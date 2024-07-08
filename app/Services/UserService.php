@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -16,18 +17,25 @@ use Illuminate\Support\Str;
  */
 class UserService
 {
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
+  /**
+   * @var UserRepository
+   */
+  private $userRepository;
 
-    /**
-     * Singleton class instance.
-     *
-     * @var ChannelService
-     */
-    private static $instance;
+  /**
+   * Singleton class instance.
+   *
+   * @var ChannelService
+   */
+  private static $instance;
 
+  /**
+   * Private contructor for Singleton pattern
+   */
+  private function __construct()
+  {
+    $this->userRepository = app('UserRepository');
+  }
 
   /**
    * Attach a role to a user, handling admin and non-admin roles differently.
@@ -60,48 +68,48 @@ class UserService
     }
   }
 
-    /**
-     * GetInstance for Singleton pattern
-     *
-     * @return ChannelService
-     */
-    public static function getInstance()
-    {
-        if (!self::$instance) {
-            self::$instance = new self();
-        }
-        self::$instance->serviceModel = null;
+  /**
+   * GetInstance for Singleton pattern
+   *
+   * @return ChannelService
+   */
+  public static function getInstance()
+  {
+    if (!self::$instance) {
+      self::$instance = new self();
+    }
+    self::$instance->serviceModel = null;
 
-        return self::$instance;
+    return self::$instance;
+  }
+
+  /**
+   * Create New user
+   *
+   * capture of old logic
+   * + add SendRegisterConfirmation
+   *
+   * @param [type] $email
+   * @return User
+   */
+  public function createNewUser($email)
+  {
+    $input['password'] = '';
+    $input['token'] = Str::random(32);
+
+    $input['email'] = $email;
+    $input['name'] = $email;
+
+    $userId = $this->userRepository->store($input);
+    $user = $this->userRepository->getById($userId);
+    if (!$user) {
+      throw new Exception('Something went wrong while storing the user, check the logs.', 400);
     }
 
-    /**
-     * Create New user
-     *
-     * capture of old logic
-     * + add SendRegisterConfirmation
-     *
-     * @param [type] $email
-     * @return User
-     */
-    public function createNewUser($email)
-    {
-        $input['password'] = '';
-        $input['token'] = Str::random(32);
+    Mail::to($user)->send(new SendRegisterConfirmation($user));
 
-        $input['email'] = $email;
-        $input['name'] = $email;
-
-        $userId = $this->userRepository->store($input);
-        $user = $this->userRepository->getById($userId);
-        if (!$user) {
-            throw new Exception('Something went wrong while storing the user, check the logs.', 400);
-        }
-
-        Mail::to($user)->send(new SendRegisterConfirmation($user));
-
-        return $user;
-    }
+    return $user;
+  }
 
   /**
    * Set multiple roles to user, refactored to be more DRY.
