@@ -64,7 +64,7 @@ class UserService
      */
     private function linkUserToService($user, $service, $role)
     {
-        if($role->name !== "Admin") {
+        if ($role->name !== "Admin") {
             $this->userRepository->linkToService($user->id, $service->id, $role->name);
         }
     }
