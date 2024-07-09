@@ -34,7 +34,7 @@ class UserService
      */
     private function __construct()
     {
-      $this->userRepository = app('UserRepository');
+        $this->userRepository = app('UserRepository');
     }
 
     /**
@@ -45,14 +45,14 @@ class UserService
      */
     private function attachRoleToUser($user, $role)
     {
-      if ($role->name === 'Admin') {
-        $this->userRepository->removeLinksToAllServices($user->id);
-        $user->attachRole($role);
-        return;
-      }
+        if ($role->name === 'Admin') {
+            $this->userRepository->removeLinksToAllServices($user->id);
+            $user->attachRole($role);
+            return;
+        }
 
-      $adminRole = Role::where('name', 'Admin')->first();
-      $user->detachRole($adminRole);
+        $adminRole = Role::where('name', 'Admin')->first();
+        $user->detachRole($adminRole);
     }
 
     /**
@@ -64,9 +64,9 @@ class UserService
      */
     private function linkUserToService($user, $service, $role)
     {
-      if($role->name !== "Admin") {
-        $this->userRepository->linkToService($user->id, $service->id, $role->name);
-      }
+        if($role->name !== "Admin") {
+            $this->userRepository->linkToService($user->id, $service->id, $role->name);
+        }
     }
 
     /**
@@ -76,12 +76,12 @@ class UserService
      */
     public static function getInstance()
     {
-      if (!self::$instance) {
-        self::$instance = new self();
-      }
-      self::$instance->serviceModel = null;
+        if (!self::$instance) {
+            self::$instance = new self();
+        }
+        self::$instance->serviceModel = null;
 
-      return self::$instance;
+        return self::$instance;
     }
 
     /**
@@ -95,21 +95,21 @@ class UserService
      */
     public function createNewUser($email)
     {
-      $input['password'] = '';
-      $input['token'] = Str::random(32);
+        $input['password'] = '';
+        $input['token'] = Str::random(32);
 
-      $input['email'] = $email;
-      $input['name'] = $email;
+        $input['email'] = $email;
+        $input['name'] = $email;
 
-      $userId = $this->userRepository->store($input);
-      $user = $this->userRepository->getById($userId);
-      if (!$user) {
-        throw new Exception('Something went wrong while storing the user, check the logs.', 400);
-      }
+        $userId = $this->userRepository->store($input);
+        $user = $this->userRepository->getById($userId);
+        if (!$user) {
+            throw new Exception('Something went wrong while storing the user, check the logs.', 400);
+        }
 
-      Mail::to($user)->send(new SendRegisterConfirmation($user));
+        Mail::to($user)->send(new SendRegisterConfirmation($user));
 
-      return $user;
+        return $user;
     }
 
     /**
@@ -124,23 +124,23 @@ class UserService
      */
     public function setRolesToUser($email, Role $role, Collection $services = null)
     {
-      $user = User::where('email', $email)->firstOrCreate(['email' => $email]);
+        $user = User::where('email', $email)->firstOrCreate(['email' => $email]);
 
-      $newUser = $user->wasRecentlyCreated;
+        $newUser = $user->wasRecentlyCreated;
 
-      $this->attachRoleToUser($user, $role);
+        $this->attachRoleToUser($user, $role);
 
-      foreach ($services as $service) {
-        $this->linkUserToService($user, $service, $role, $newUser);
-      }
+        foreach ($services as $service) {
+            $this->linkUserToService($user, $service, $role, $newUser);
+        }
 
-      if (!$newUser) {
-        // Send mail with overview of added services.
-        Mail::to($user)->send(new SendInviteConfirmation($user, $services));
-      }
+        if (!$newUser) {
+            // Send mail with overview of added services.
+            Mail::to($user)->send(new SendInviteConfirmation($user, $services));
+        }
 
-      $user->role = $role->name;
+        $user->role = $role->name;
 
-      return $user;
+        return $user;
     }
 }
