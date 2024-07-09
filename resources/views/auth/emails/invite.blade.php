@@ -27,7 +27,7 @@ $style = [
 <p>Melding dat u toegevoegd werd aan volgende diensten op het openingsurenplatform:</p>
 <ul>
   @foreach ($services as $service )
-  <li>{{$service->label}}</li>
+  <li>{{ $service->label }}</li>
   @endforeach
 </ul>
 @else
@@ -36,11 +36,13 @@ $style = [
 
 @if (isset($actionUrl))
 <p>Het blijkt ook dat u uw gebruiker nog niet geactiveerd staat momenteel.<br />
-  Gelieve op onderstaande knop te klikken om zo een wachtwoord in te stellen en toegang te krijgen tot {{ $service }}</p>
+  Gelieve op onderstaande knop te klikken om zo een wachtwoord in
+  te stellen en toegang te krijgen tot {{ $service }}</p>
 <table style="{{ $style['body_action'] }}" align="center" width="100%" cellpadding="0" cellspacing="0">
   <tr>
     <td align="center">
-      <a href="{{ $actionUrl }}" style="{{ $style['font_family'] }} {{ $style['button'] }} {{ $style['button-blue'] }}" class="button" target="_blank">Gebruiker activeren</a>
+      <a href="{{ $actionUrl }}" style="{{ $style['font_family'] }} {{ $style['button'] }}
+        {{ $style['button-blue'] }}" class="button" target="_blank">Gebruiker activeren</a>
     </td>
   </tr>
 </table>

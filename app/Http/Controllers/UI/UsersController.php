@@ -107,9 +107,9 @@ class UsersController extends Controller
         $role = Role::where('name', $request->input('role'))->first();
         $services = [];
         if ($request->has('service_id')) {
-          $serviceIds = $request->input('service_id');
-          // Get all the services based on the given service ids.
-          $services = Service::whereIn('id', $serviceIds)->get();
+            $serviceIds = $request->input('service_id');
+            // Get all the services based on the given service ids.
+            $services = Service::whereIn('id', $serviceIds)->get();
         }
 
         $user = $this->userService->setRolesToUser($request->input('email'), $role, $services);

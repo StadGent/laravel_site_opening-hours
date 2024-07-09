@@ -8,7 +8,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Collection;
 
-
 class SendInviteConfirmation extends Mailable
 {
     use Queueable, SerializesModels;
@@ -19,7 +18,9 @@ class SendInviteConfirmation extends Mailable
     public $user;
 
     /**
-     * @var Collection // Collection of type Service
+     * Collection of services.
+     *
+     * @var Collection
      */
     public $services;
 
@@ -27,7 +28,8 @@ class SendInviteConfirmation extends Mailable
      * Create a new message instance.
      *
      * @param User $user
-     * @param array|Collection $services // Collection of type Service
+     * @param array|Collection $services
+     *  Collection of services.
      * @return void
      */
     public function __construct(User $user, Collection $services = null)
