@@ -146,6 +146,10 @@ export default {
       let services = this.$root.services.filter(s => !s.draft)
         .sort((a, b) => (a.label.toLowerCase() <= b.label.toLowerCase()) ? -1 : 1);
 
+      if (this.modal.text === 'newUser') {
+        return services;
+      }
+
       // Step 2: Filter out userServices from the sorted and filtered services
       let filteredServices = services.filter(allowedService =>
         !this.userServices.some(userService => userService.service_id === allowedService.id)
