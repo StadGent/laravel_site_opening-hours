@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -34,6 +35,38 @@ class UserService
     private function __construct()
     {
         $this->userRepository = app('UserRepository');
+    }
+
+    /**
+     * Attach a role to a user, handling admin and non-admin roles differently.
+     *
+     * @param User $user
+     * @param Role $role
+     */
+    private function attachRoleToUser($user, $role)
+    {
+        if ($role->name === 'Admin') {
+            $this->userRepository->removeLinksToAllServices($user->id);
+            $user->attachRole($role);
+            return;
+        }
+
+        $adminRole = Role::where('name', 'Admin')->first();
+        $user->detachRole($adminRole);
+    }
+
+    /**
+     * Link user to services based on role, if applicable.
+     *
+     * @param User $user
+     * @param Service $service
+     * @param Role $role
+     */
+    private function linkUserToService($user, $service, $role)
+    {
+        if ($role->name !== "Admin") {
+            $this->userRepository->linkToService($user->id, $service->id, $role->name);
+        }
     }
 
     /**
@@ -80,34 +113,30 @@ class UserService
     }
 
     /**
-     * Set role to user
+     * Set multiple roles to user, refactored to be more DRY.
      *
      * Admin needs to be set in role_user table
      * others need to be set in user_service_role
      *
      * @param string email
      * @param Role $role
-     * @param Service $servcie
+     * @param array|Illuminate\Database\Eloquent\Collection $services
      */
-    public function setRoleToUser($email, Role $role, Service $service = null)
+    public function setRolesToUser($email, Role $role, Collection $services = null)
     {
-        $user = User::where('email', $email)->first();
+        $user = User::where('email', $email)->firstOrCreate(['email' => $email]);
 
-        if ($newUser = $user === null) {
-            $user = $this->createNewUser($email);
+        $newUser = $user->wasRecentlyCreated;
+
+        $this->attachRoleToUser($user, $role);
+
+        foreach ($services as $service) {
+            $this->linkUserToService($user, $service, $role, $newUser);
         }
 
-        if ($role->name === 'Admin') {
-            $this->userRepository->removeLinksToAllServices($user->id);
-            $user->attachRole($role);
-        } else {
-            $adminRole = Role::where('name', 'Admin')->first();
-            $user->detachRole($adminRole);
-            $this->userRepository
-                ->linkToService($user->id, $service->id, $role->name);
-            if (!$newUser) {
-                Mail::to($user)->send(new SendInviteConfirmation($user, $service));
-            }
+        if (!$newUser) {
+            // Send mail with overview of added services.
+            Mail::to($user)->send(new SendInviteConfirmation($user, $services));
         }
 
         $user->role = $role->name;
