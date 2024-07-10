@@ -1,5 +1,15 @@
+## [2.7.4]
 
-## [Unreleased]
+### Fixed
+- function setRoleToUser is renamed to setRolesToUser and requires a collection of services and no service_id
+
+## [2.7.3]
+
+### Fixed
+- Small fix for adding a member to an service
+
+
+## [2.7.2]
 
 ### Updated
 - HEAT-6728759: Mail template now allows multiple services
@@ -210,7 +220,9 @@
 - Remove cancel button
 
 
-[Unreleased]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.1...HEAD
+[2.7.4]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.3...2.7.4
+[2.7.3]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.2...2.7.3
+[2.7.2]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.1...2.7.2
 [2.7.1]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.0...2.7.1
 [2.7.0]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.6.9...2.7.0
 [2.6.9]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.6.8...2.6.9
