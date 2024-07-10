@@ -46,8 +46,10 @@ class RolesController extends Controller
             return response()->json(['role' => $request->input('role')]);
         }
 
-        $service = Service::find($request->input('service_id'));
-        $user = app('UserService')->setRoleToUser($user->email, $role, $service);
+        $services = collect(Service::find($request->input('service_id')));
+        $services = Service::whereIn('id', [$request->input('service_id')])->get();
+
+        $user = app('UserService')->setRolesToUser($user->email, $role, $services);
         $assignedRoles = app('UserRepository')->getAllRolesForUser($user->id);
 
         foreach ($assignedRoles as $seriveRole) {
