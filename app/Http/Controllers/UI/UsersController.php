@@ -105,12 +105,14 @@ class UsersController extends Controller
         }
 
         $role = Role::where('name', $request->input('role'))->first();
-        $service = null;
-        if ($request->input('service_id')) {
-            $service = Service::find($request->input('service_id'));
+        $services = [];
+        if ($request->has('service_id')) {
+            $serviceIds = $request->input('service_id');
+            // Get all the services based on the given service ids.
+            $services = Service::whereIn('id', $serviceIds)->get();
         }
 
-        $user = $this->userService->setRoleToUser($request->input('email'), $role, $service);
+        $user = $this->userService->setRolesToUser($request->input('email'), $role, $services);
         $user->roles = app('UserRepository')->getAllRolesForUser($user->id);
 
         return $user;
