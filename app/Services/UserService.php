@@ -137,6 +137,8 @@ class UserService
         if (!$newUser) {
             // Send mail with overview of added services.
             Mail::to($user)->send(new SendInviteConfirmation($user, $services));
+        } else {
+            $user = $this->createNewUser($email);
         }
 
         $user->role = $role->name;
