@@ -17,7 +17,7 @@ class EloquentRepository
     {
         $query = $this->model->take($limit)->query();
 
-        if ($offset) {
+        if (!is_null($offset)) {
             $query->skip($offset);
         }
 
