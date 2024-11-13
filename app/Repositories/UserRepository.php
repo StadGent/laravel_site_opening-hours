@@ -64,9 +64,15 @@ class UserRepository extends EloquentRepository
      *
      * @return array
      */
-    public function getAll($limit = 50, $offset = 0)
+    public function getAll($limit = null, $offset = null)
     {
-        $users = $this->model->take($limit)->skip($offset)->get();
+        $query = $this->model->take($limit);
+        
+        if (!is_null($offset)) {
+            $query->skip($offset);
+        }
+        
+        $users = $query->get();
 
         $results = [];
 
