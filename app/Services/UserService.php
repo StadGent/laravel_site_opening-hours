@@ -124,21 +124,21 @@ class UserService
      */
     public function setRolesToUser($email, Role $role, Collection $services = null)
     {
-        $user = User::where('email', $email)->firstOrCreate(['email' => $email]);
+        $user = User::where('email', $email)->first();
 
-        $newUser = $user->wasRecentlyCreated;
+        if (is_null($user)) {
+            $user = $this->createNewUser($email);
+        }
 
         $this->attachRoleToUser($user, $role);
 
         foreach ($services as $service) {
-            $this->linkUserToService($user, $service, $role, $newUser);
+            $this->linkUserToService($user, $service, $role);
         }
-
-        if (!$newUser) {
-            // Send mail with overview of added services.
-            Mail::to($user)->send(new SendInviteConfirmation($user, $services));
-        }
-
+        
+        // Send mail with overview of added services.
+        Mail::to($user)->send(new SendInviteConfirmation($user, $services));
+        
         $user->role = $role->name;
 
         return $user;

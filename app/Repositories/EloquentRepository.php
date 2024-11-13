@@ -13,9 +13,15 @@ class EloquentRepository
         $this->model = $model;
     }
 
-    public function getAll($limit = 50, $offset = 0)
+    public function getAll($limit = null, $offset = null)
     {
-        return $this->model->take($limit)->skip($offset)->get()->toArray();
+        $query = $this->model->take($limit);
+
+        if (!is_null($offset)) {
+            $query->skip($offset);
+        }
+
+        return $query->get()->toArray();
     }
 
     public function store(array $properties)

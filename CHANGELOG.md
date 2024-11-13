@@ -1,3 +1,10 @@
+## [2.7.5]
+
+### Fixed
+- only 50 users visible on users overview
+- user not receiving invitation mail when adding to platform
+- link inside the register confirmation mail did not work.
+
 ## [2.7.4]
 
 ### Fixed
@@ -220,6 +227,7 @@
 - Remove cancel button
 
 
+[2.7.5]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.4...2.7.5
 [2.7.4]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.3...2.7.4
 [2.7.3]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.2...2.7.3
 [2.7.2]: https://github.com/StadGent/laravel_site_opening-hours/compare/2.7.1...2.7.2
