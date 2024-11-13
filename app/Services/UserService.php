@@ -126,7 +126,7 @@ class UserService
     {
         $user = User::where('email', $email)->first();
 
-        if(is_null($user)){
+        if (is_null($user)) {
             $user = $this->createNewUser($email);
         }
 
