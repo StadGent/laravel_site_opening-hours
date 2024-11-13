@@ -15,7 +15,7 @@ class EloquentRepository
 
     public function getAll($limit = null, $offset = null)
     {
-        $query = $this->model->take($limit)->query();
+        $query = $this->model->take($limit);
 
         if (!is_null($offset)) {
             $query->skip($offset);
