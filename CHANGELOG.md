@@ -3,6 +3,7 @@
 ### Fixed
 - only 50 users visible on users overview
 - user not receiving invitation mail when adding to platform
+- link inside the register confirmation mail did not work.
 
 ## [2.7.4]
 
