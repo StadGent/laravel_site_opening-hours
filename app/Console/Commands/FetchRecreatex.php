@@ -205,7 +205,7 @@ class FetchRecreatex extends BaseCommand
     }
 
     protected function getReservationsForMonth($uuid, $year, $month) {
-        $start = Carbon::createFromDate($year, $month)->setTimezone('Europe/Brussels')->startOfMonth();
+        $start = Carbon::createFromDate($year, $month, 1)->setTimezone('Europe/Brussels')->startOfMonth();
         $end = clone $start;
         $end->endOfMonth();
         $parameters = [

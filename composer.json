@@ -36,12 +36,6 @@
         "nunomaduro/collision": "^6.0",
         "phpunit/phpunit": "^9.0"
     },
-    "repositories": {
-        "repman-digipolis": {
-            "type": "composer",
-            "url": "https://digipolis.repo.repman.io"
-        }
-    },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
