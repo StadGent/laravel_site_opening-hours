@@ -13,7 +13,7 @@ class LodServicesRepository
      * Return the services fetched from the SPARQL endpoint
      * in a structure that is compatible with our internal Service model
      *
-     * @param  string $type recreatex, vesta or publicToilets
+     * @param  string $type recreatex, vesta, publicToilets, crm
      * @return array
      */
     public function fetchServices($type)
@@ -164,6 +164,28 @@ class LodServicesRepository
                 } ORDER BY ?name';
 
         if ($limit) {
+            $query .= " LIMIT $limit OFFSET $offset";
+        }
+
+        return $query;
+    }
+
+    public static function getCrmServicesQuery($limit = 100, $offset = 0) {
+      $query = 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                PREFIX schema: <http://schema.org/>
+                SELECT DISTINCT ?agent ?identifier ?name
+                FROM <http://stad.gent/agents-crm/>
+                WHERE {
+                    ?agent a schema:Organization;
+                    <http://purl.org/dc/terms/source> ?source ;
+                    schema:identifier ?identifier;
+                    schema:name ?official_name.
+                    OPTIONAL { ?agent  skos:prefLabel ?nickname}
+                    filter(strstarts(?source, "CRM"^^xsd:string))
+                    BIND(IF(BOUND(?nickname) && ?nickname != "" && REPLACE(UCASE(?nickname)," ","") != REPLACE(UCASE(?official_name)," ",""), CONCAT(?official_name, " (", ?nickname, ")"), ?official_name) as ?name)
+                } ORDER BY ?name';
+      if ($limit) {
             $query .= " LIMIT $limit OFFSET $offset";
         }
 

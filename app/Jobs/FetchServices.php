@@ -18,7 +18,7 @@ class FetchServices extends BaseJob implements ShouldQueue
     {
         $services = app('ServicesRepository');
 
-        $types = ['vesta', 'recreatex', 'publicToilets'];
+        $types = ['vesta', 'recreatex', 'publicToilets', 'crm'];
 
         $repository = new LodServicesRepository();
 
