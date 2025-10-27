@@ -2,6 +2,7 @@
 
 namespace App\Http\Transformers;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,6 +32,9 @@ class ChannelTransformer implements TransformerInterface
      */
     private function getItemData(Model $channel)
     {
+        $lastVersion = $channel->openinghours->sortByDesc(
+            fn($a, $b) => (new CarbonImmutable($a->end_date))->getTimestamp() - (new CarbonImmutable($b->end_date))->getTimestamp()
+        )->first()?->end_date;
         return [
             'id' => $channel->id,
             'label' => $channel->label,
@@ -38,6 +42,7 @@ class ChannelTransformer implements TransformerInterface
             'createdAt' => $channel->created_at->format(DATE_ATOM),
             'updatedAt' => $channel->created_at->format(DATE_ATOM),
             'type' => $channel->type,
+            'lastVersionExpiresOn' => $lastVersion ? (new CarbonImmutable($lastVersion))->format(DATE_ATOM) : null,
         ];
     }
 
