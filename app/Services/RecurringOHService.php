@@ -234,7 +234,7 @@ class RecurringOHService
                 $output .= $this->getHumanReadableFormatForDay($properties['BYDAY']);
             }
 
-            if (isset($rrulePerProp['BYMONTHDAY'])) {
+            if (isset($properties['BYMONTHDAY'])) {
                 $output .= $this->getHumanReadableFormatForNumber($properties['BYMONTHDAY']);
             }
         }
@@ -250,7 +250,7 @@ class RecurringOHService
                 $output .= $this->getHumanReadableFormatForDay($properties['BYDAY']);
             }
 
-            if (isset($rrulePerProp['BYMONTHDAY'])) {
+            if (isset($properties['BYMONTHDAY'])) {
                 $output .= $this->getHumanReadableFormatForNumber($properties['BYMONTHDAY']);
             }
 
@@ -262,6 +262,9 @@ class RecurringOHService
                 $output .= $this->getFullDayOutput($eventStart);
             } else {
                 $output .= $this->getFullDayOutput($eventStart) . ' tot en met ' . $this->getFullDayOutput($eventUntill);
+            }
+            if (isset($properties['INTERVAL']) && $properties['INTERVAL'] > 1) {
+                $output .= ' om de ' . (intval($properties['INTERVAL']) === 2 ? 'dag' : $properties['INTERVAL'] . ' dagen');
             }
         }
 
