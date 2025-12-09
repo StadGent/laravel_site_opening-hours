@@ -10,11 +10,6 @@ use Monolog\DateTimeImmutable;
  * Artisan command to generate an ical dump for yearly recurring exceptions for
  * a specific time period.
  *
- * The time period is expected to be given from the command line as <from> <to>
- * where both arguments are expected to be given as <YYYY-MM-DD>.
- * The year is necessary so that we can, for instance, have something like a
- * Christmas period going from 2025-12-25 to 2026-01-02.
- *
  * The {name} is required since we generate recurring events by creating VEVENT
  * for each year and keeping the same description for it, will make it appear
  * in openinghours as a recurring event... as of end 2025 we do not support
@@ -30,11 +25,6 @@ use Monolog\DateTimeImmutable;
  *
  * So every year there will be a period, defined by {from}-{to} that can be used
  * to add an exception to the openinghours for that period.
- *
- * Over time this command can be expanded on to support different use cases,
- * should this be necessary.
- * Note though, that there are probably online systems or libraries that can do
- * this too.
  */
 class PrintIcalYearlyClosingPeriod extends Command
 {
@@ -49,7 +39,10 @@ class PrintIcalYearlyClosingPeriod extends Command
      *
      * @var string
      */
-    protected $signature = 'openinghours:print-ical-yearly-closing-period {name} {from} {to}';
+    protected $signature = 'openinghours:print-ical-yearly-closing-period
+                            {name : The name of the closing period}
+                            {from : The date to start from (YYYY-MM-DD or YYYYMMDD)}
+                            {to : The end date of the period (must be same format as from)}';
 
     /**
      * The console command description.
@@ -107,14 +100,12 @@ class PrintIcalYearlyClosingPeriod extends Command
     /**
      * Parse the given command line arguments {from} and {to}
      *
-     * @param $from string
-     *  The from date, assumed in <YYYY-MM-DD> format
-     * @param $to string
-     *  The to date, assumed in <YYYY-MM-DD> format.
+     * @param $from string The from date
+     * @param $to string The to date
      *
      * @return array<string, DateTimeImmutable, DateTimeImmutable>
-     *  Result of the arg parse, first element is error.
-     *  If the error is null, there were no parse errors.
+     *  Result of the arg parse, first element is an error message.
+     *  If the error is `null`, there were no parse errors.
      *  Next two elements are the from date and to date.
      *  These will be `null` if there is an error.
      */
