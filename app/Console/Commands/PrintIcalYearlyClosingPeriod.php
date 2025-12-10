@@ -10,21 +10,19 @@ use Monolog\DateTimeImmutable;
  * Artisan command to generate an ical dump for yearly recurring exceptions for
  * a specific time period.
  *
- * The {name} is required since we generate recurring events by creating VEVENT
- * for each year and keeping the same description for it, will make it appear
- * in openinghours as a recurring event... as of end 2025 we do not support
+ * Since we don't support:
  *  DURATION:P7D
  *  RRULE:FREQ=YEARLY
+ * yet, the {name} is necessary to present our closing period as a yearly
+ * recurring event.
  *
- * This command will then generate the ical `VEVENT` list for each year, starting
+ * This command will generate ical `VEVENT` entries for each year, starting
  * with the current year up to and including the year 2100, because we've
- * learned from the Y2K stuff, that about a 100 years is _more_ than enough room
- * to cater for all the possibilities, and _no way_ this site will still be up
- * and running in 2100.
- * -- Famous Last Words
+ * learned from the Y2K stuff, that about a 100 years is _more_ than enough
+ * room to cater for all the possibilities, and _no way_ this site will still
+ * be up and running in 2100.
  *
- * So every year there will be a period, defined by {from}-{to} that can be used
- * to add an exception to the openinghours for that period.
+ * So in the UI there will be a recurring exception that will repeat every year up to 2100...
  */
 class PrintIcalYearlyClosingPeriod extends Command
 {
@@ -33,9 +31,7 @@ class PrintIcalYearlyClosingPeriod extends Command
     protected const MAX_YEAR = 2100;
 
     /**
-     * The name and signature of the console command.
-     * {name} {from} {to} defines the period to add an exception,
-     * which will return yearly until (and including) 2100.
+     * The signature of the console command.
      *
      * @var string
      */
@@ -45,7 +41,7 @@ class PrintIcalYearlyClosingPeriod extends Command
                             {to : The end date of the period (must be same format as from)}';
 
     /**
-     * The console command description.
+     * The description of this command.
      *
      * @var string
      */
@@ -74,10 +70,11 @@ class PrintIcalYearlyClosingPeriod extends Command
     }
 
     /**
-     * Print ical part of the closing period, defined by a starting- and end date.
-     * It'll generate all the ical entries necessary from the start date up to
-     * (and including) the year 2100.
+     * Print the VEVENT's for the closing period.
+     * Generate all the ical entries necessary from the start date up to (and
+     * including) the year 2100.
      *
+     * @param string $name The name (label) that must be given to this recurring event
      * @param \DateTimeImmutable $from The date from which to start this period
      * @param \DateTimeImmutable $to   The ending date of the period
      */
@@ -85,13 +82,13 @@ class PrintIcalYearlyClosingPeriod extends Command
     {
         $timestamp = date("Ymd\THis\Z");
         while ($from->format("Y") <= self::MAX_YEAR) {
-            echo "BEGIN:VEVENT\n";
-            echo "DTSTAMP:$timestamp\n";
-            echo "UID:{$this->uuid()}\n";
-            echo "DTSTART;VALUE=DATE:{$from->format(self::DATE_FORMAT_ICAL)}\n";
-            echo "DTEND;VALUE=DATE:{$to->format(self::DATE_FORMAT_ICAL)}", "\n";
-            echo "SUMMARY;LANGUAGE=nl-BE:{$name}\n";
-            echo "END:VEVENT\n";
+            $this->output->writeln("BEGIN:VEVENT");
+            $this->output->writeln("DTSTAMP:$timestamp");
+            $this->output->writeln("UID:{$this->uuid()}");
+            $this->output->writeln("DTSTART;VALUE=DATE:{$from->format(self::DATE_FORMAT_ICAL)}");
+            $this->output->writeln("DTEND;VALUE=DATE:{$to->format(self::DATE_FORMAT_ICAL)}");
+            $this->output->writeln("SUMMARY;LANGUAGE=nl-BE:{$name}");
+            $this->output->writeln("END:VEVENT");
             $from = $from->add(new DateInterval("P1Y"));
             $to = $to->add(new DateInterval("P1Y"));
         }
@@ -151,8 +148,8 @@ class PrintIcalYearlyClosingPeriod extends Command
 
     /**
      * Generate a (pseudo) UUID
-     * This might not be a _real_ UUID, but for the purposes, it should be
-     * GoodEnough™
+     * This might not be a _real_ UUID, but for all intended purposes, it'll be
+     * GoodEnough™... I think.
      *
      * @return string The pseudo UUID
      */
