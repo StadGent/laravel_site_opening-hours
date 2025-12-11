@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use DateInterval;
 use Illuminate\Console\Command;
 use Monolog\DateTimeImmutable;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Artisan command to generate an ical dump for yearly recurring exceptions for
@@ -84,7 +85,7 @@ class PrintIcalYearlyClosingPeriod extends Command
         while ($from->format("Y") <= self::MAX_YEAR) {
             $this->output->writeln("BEGIN:VEVENT");
             $this->output->writeln("DTSTAMP:$timestamp");
-            $this->output->writeln("UID:{$this->uuid()}");
+            $this->output->writeln("UID:" . Uuid::uuid4());
             $this->output->writeln("DTSTART;VALUE=DATE:{$from->format(self::DATE_FORMAT_ICAL)}");
             $this->output->writeln("DTEND;VALUE=DATE:{$to->format(self::DATE_FORMAT_ICAL)}");
             $this->output->writeln("SUMMARY;LANGUAGE=nl-BE:{$name}");
@@ -144,22 +145,5 @@ class PrintIcalYearlyClosingPeriod extends Command
             return ["This command does not handle dates beyond " . self::MAX_YEAR, null, null];
         }
         return [null, $dateFrom, $dateTo];
-    }
-
-    /**
-     * Generate a (pseudo) UUID
-     * This might not be a _real_ UUID, but for all intended purposes, it'll be
-     * GoodEnough™... I think.
-     *
-     * @return string The pseudo UUID
-     */
-    protected function uuid() : string
-    {
-        return substr(sha1(date(self::TIMESTAMP_FORMAT).microtime()), 0, 8) . '-'
-            . substr(sha1(date(self::TIMESTAMP_FORMAT).microtime()), 0, 4) . '-'
-            . substr(sha1(date(self::TIMESTAMP_FORMAT).microtime()), 0, 4) . '-'
-            . substr(sha1(date(self::TIMESTAMP_FORMAT).microtime()), 0, 4) . '-'
-            . substr(sha1(date(self::TIMESTAMP_FORMAT).microtime()), 0, 12);
-
     }
 }
