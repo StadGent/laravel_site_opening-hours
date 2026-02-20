@@ -15,12 +15,12 @@
     <link href="/css/app.css" rel="stylesheet">
 
     <!-- Scripts -->
-    <script nonce="{{ csp_nonce() }}">
+    <script @cspNonce>
         window.Laravel = <?php echo json_encode([
             'csrfToken' => csrf_token(),
         ]); ?>
     </script>
-    <style nonce="{{ csp_nonce() }}">
+    <style @cspNonce>
         body {padding-top:0;}
     </style>
 </head>

@@ -3,12 +3,6 @@
 return [
 
     /*
-     * A policy will determine which CSP headers will be set. A valid CSP policy is
-     * any class that extends `Spatie\Csp\Policies\Policy`
-     */
-    'policy' => \App\Csp\Policies\OpeningHours::class,
-
-    /*
      * This policy which will be put in report only mode. This is great for testing out
      * a new policy or changes to existing csp policy without breaking anything.
      */
@@ -31,4 +25,9 @@ return [
      * The class responsible for generating the nonces used in inline tags and headers.
      */
     'nonce_generator' => Spatie\Csp\Nonce\RandomString::class,
+
+    'presets' => [
+        Spatie\Csp\Presets\Basic::class,
+        \App\Csp\Presets\OpeningHoursPreset::class,
+    ],
 ];
