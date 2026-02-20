@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DummyUsersTableSeeder extends Seeder
@@ -31,9 +32,9 @@ class DummyUsersTableSeeder extends Seeder
             $user->save();
 
             if ($name === 'admin' || $name === 'editor') {
-                $user->attachRole($roleConfig);
+                $user->addRole($roleConfig);
             } else {
-                \DB::insert(
+                DB::insert(
                     'INSERT INTO user_service_role (user_id, role_id, service_id) VALUES (?, ?, ?)',
                     [$user->id, $roleConfig->id, 1]
                 );
