@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Mail;
-use Laratrust\Traits\LaratrustUserTrait;
+use Laratrust\Contracts\LaratrustUser;
+use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements LaratrustUser
 {
     use HasApiTokens;
-    use LaratrustUserTrait;
+    use HasRolesAndPermissions;
     use Notifiable;
     use HasFactory;
 
@@ -67,20 +68,5 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Models\Service', 'user_service_role', 'user_id', 'service_id')
           ->withPivot(['role_id']);
-    }
-
-    /**
-     * @param $name
-     * @param bool $requireAll
-     *
-     * @return mixed
-     */
-    public function hasRole($name, $requireAll = false)
-    {
-        return User::roles()
-            ->where('name', $name)
-            ->get()
-            ->pluck('name')
-            ->contains($name);
     }
 }

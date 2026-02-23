@@ -1,13 +1,5 @@
 <?php
 
-/**
- * This file is part of Laratrust,
- * a role & permission management solution for Laravel.
- *
- * @license MIT
- * @package Laratrust
- */
-
 return [
     /*
     |--------------------------------------------------------------------------
@@ -22,18 +14,44 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Which permissions and role checker to use.
+    | Checkers
     |--------------------------------------------------------------------------
     |
-    | Defines if you want to use the roles and permissions checker.
-    | Available:
-    | - default: Check for the roles and permissions using the method that Laratrust
-                 has always used.
-    | - query: Check for the roles and permissions using direct queries to the database.
-    |           This method doesn't support cache yet.
+    | Manage Laratrust's role and permissions checkers configurations.
     |
-     */
-    'checker' => 'default',
+    */
+    'checkers' => [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Which permissions checker to use.
+        |--------------------------------------------------------------------------
+        |
+        | Defines if you want to use the roles and permissions checker.
+        | Available:
+        | - default: Check for the roles and permissions using the method that Laratrust
+        |            has always used.
+        | - query: Check for the roles and permissions using direct queries to the database.
+        |           This method doesn't support cache yet.
+        | - class that extends Laratrust\Checkers\User\UserChecker
+        */
+        'user' => 'default',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Which role checker to use.
+        |--------------------------------------------------------------------------
+        |
+        | Defines if you want to use the roles and permissions checker.
+        | Available:
+        | - default: Check for the roles and permissions using the method that Laratrust
+                     has always used.
+        | - query: Check for the roles and permissions using direct queries to the database.
+        |          This method doesn't support cache yet.
+        | - class that extends Laratrust\Checkers\Role\RoleChecker
+        */
+        'role' => 'default',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -54,7 +72,7 @@ return [
         | NOTE: Currently the database check does not use cache.
         |
         */
-        'enabled' => true,
+        'enabled' => env('LARATRUST_ENABLE_CACHE', env('APP_ENV') === 'production'),
 
         /*
         |--------------------------------------------------------------------------
@@ -69,42 +87,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Use teams feature in the package
-    |--------------------------------------------------------------------------
-    |
-    | Defines if Laratrust will use the teams feature.
-    | Please check the docs to see what you need to do in case you have the package already configured.
-    |
-    */
-    'use_teams' => false,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Strict check for roles/permissions inside teams
-    |--------------------------------------------------------------------------
-    |
-    | Determines if a strict check should be done when checking if a role or permission
-    | is attached inside a team.
-    | If it's false, when checking a role/permission without specifying the team,
-    | it will check only if the user has attached that role/permission ignoring the team.
-    |
-    */
-    'teams_strict_check' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Laratrust User Models
     |--------------------------------------------------------------------------
     |
     | This is the array that contains the information of the user models.
-    | This information is used in the add-trait command, and for the roles and
-    | permissions relationships with the possible user models.
+    | This information is used in the add-trait command, for the roles and
+    | permissions relationships with the possible user models, and the
+    | administration panel to add roles and permissions to the users.
     |
     | The key in the array is the name of the relationship inside the roles and permissions.
     |
     */
     'user_models' => [
-        'users' => 'App\Models\User',
+        'users' => \App\Models\User::class,
     ],
 
     /*
@@ -118,21 +113,15 @@ return [
     |
     */
     'models' => [
-        /**
-         * Role model
-         */
-        'role' => 'App\Models\Role',
+
+        'role' => \App\Models\Role::class,
+
+        'permission' => \App\Models\Permission::class,
 
         /**
-         * Permission model
+         * Will be used only if the teams functionality is enabled.
          */
-        'permission' => 'App\Models\Permission',
-
-        /**
-         * Team model
-         */
-        'team' => 'App\Models\Team',
-
+        'team' => \App\Models\Team::class,
     ],
 
     /*
@@ -144,36 +133,21 @@ return [
     |
     */
     'tables' => [
-        /**
-         * Roles table.
-         */
+
         'roles' => 'roles',
 
-        /**
-         * Permissions table.
-         */
         'permissions' => 'permissions',
 
         /**
-         * Teams table.
+         * Will be used only if the teams functionality is enabled.
          */
         'teams' => 'teams',
 
-        /**
-         * Role - User intermediate table.
-         */
         'role_user' => 'role_user',
 
-        /**
-         * Permission - User intermediate table.
-         */
         'permission_user' => 'permission_user',
 
-        /**
-         * Permission - Role intermediate table.
-         */
         'permission_role' => 'permission_role',
-
     ],
 
     /*
@@ -204,7 +178,6 @@ return [
          * Role foreign key on Laratrust's role_user and permission_user tables.
          */
         'team' => 'team_id',
-
     ],
 
     /*
@@ -217,13 +190,13 @@ return [
     */
     'middleware' => [
         /**
-         * Define if the laratrust middleware are registered automatically in the service provider
+         * Define if the laratrust middleware are registered automatically in the service provider.
          */
-        'register' => false,
+        'register' => true,
 
         /**
          * Method to be called in the middleware return case.
-         * Available: abort|redirect
+         * Available: abort|redirect.
          */
         'handling' => 'abort',
 
@@ -233,12 +206,13 @@ return [
          */
         'handlers' => [
             /**
-             * Aborts the execution with a 403 code and allows you to provide the response text
+             * Aborts the execution with a 403 code and allows you to provide the response text.
              */
             'abort' => [
                 'code' => 403,
-                'message' => 'User does not have any of the necessary access rights.'
+                'message' => 'User does not have any of the necessary access rights.',
             ],
+
             /**
              * Redirects the user to the given url.
              * If you want to flash a key to the session,
@@ -249,20 +223,147 @@ return [
                 'url' => '/home',
                 'message' => [
                     'key' => 'error',
-                    'content' => ''
-                ]
-            ]
-        ]
+                    'content' => '',
+                ],
+            ],
+        ],
+    ],
+
+    'teams' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Use teams feature in the package
+        |--------------------------------------------------------------------------
+        |
+        | Defines if Laratrust will use the teams feature.
+        | Please check the docs to see what you need to do in case you have the package already configured.
+        |
+        */
+        'enabled' => false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Strict check for roles/permissions inside teams
+        |--------------------------------------------------------------------------
+        |
+        | Determines if a strict check should be done when checking if a role or permission is added inside a team.
+        | If it's false, when checking a role/permission without specifying the team,
+        | it will check only if the user has added that role/permission ignoring the team.
+        |
+        */
+        'strict_check' => false,
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Laratrust Magic 'can' Method
+    | Laratrust Permissions as Gates
     |--------------------------------------------------------------------------
     |
-    | Supported cases for the magic can method (Refer to the docs).
-    | Available: camel_case|snake_case|kebab_case
+    | Determines if you can check if a user has a permission using the "can" method.
     |
     */
-    'magic_can_method_case' => 'kebab_case',
+    'permissions_as_gates' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Laratrust Panel
+    |--------------------------------------------------------------------------
+    |
+    | Section to manage everything related with the admin panel for the roles and permissions.
+    |
+    */
+    'panel' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Laratrust Panel Register
+        |--------------------------------------------------------------------------
+        |
+        | This manages if routes used for the admin panel should be registered.
+        | Turn this value to false if you don't want to use Laratrust admin panel
+        |
+        */
+        'register' => false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Laratrust Panel Domain
+        |--------------------------------------------------------------------------
+        |
+        | This is the Domain Laratrust panel for roles and permissions
+        | will be accessible from.
+        |
+        */
+        'domain' => env('LARATRUST_PANEL_DOMAIN'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Laratrust Panel Path
+        |--------------------------------------------------------------------------
+        |
+        | This is the URI path where Laratrust panel for roles and permissions
+        | will be accessible from.
+        |
+        */
+        'path' => 'laratrust',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Laratrust Panel Path
+        |--------------------------------------------------------------------------
+        |
+        | The route where the go back link should point
+        |
+        */
+        'go_back_route' => '/',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Laratrust Panel Route Middleware
+        |--------------------------------------------------------------------------
+        |
+        | These middleware will get added onto each Laratrust panel route.
+        |
+        */
+        'middleware' => ['web'],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enable permissions assignment
+        |--------------------------------------------------------------------------
+        |
+        | Enable/Disable the permissions assignment to the users.
+        |
+        */
+        'assign_permissions_to_user' => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Enable permissions creation
+        |--------------------------------------------------------------------------
+        |
+        | Enable/Disable the possibility to create permissions from the panel.
+        |
+        */
+        'create_permissions' => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Add restriction to roles in the panel
+        |--------------------------------------------------------------------------
+        |
+        | Configure which roles can not be editable, deletable and removable.
+        | To add a role to the restriction, use name of the role here.
+        |
+        */
+        'roles_restrictions' => [
+            // The user won't be able to remove roles already assigned to users.
+            'not_removable' => [],
+
+            // The user won't be able to edit the role and the permissions assigned.
+            'not_editable' => [],
+
+            // The user won't be able to delete the role.
+            'not_deletable' => [],
+        ],
+    ],
 ];
