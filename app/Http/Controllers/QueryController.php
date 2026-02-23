@@ -101,12 +101,14 @@ class QueryController extends Controller
     public function weekAction(GetQueryRequest $request, Service $service, Channel $channel)
     {
         $date = new Carbon($request['date']);
+        $date->settings([
+            'first_day_of_week' => (int) $this->localeService->getWeekStartDay(),
+            'last_day_of_week' => (int) $this->localeService->getWeekEndDay(),
+        ]);
         $from = $request['from'] ? new Carbon($request['from']) : null;
         $until = $request['until'] ? new Carbon($request['until']) : null;
 
         $this->localeService->setRequest($request);
-        $date->setWeekStartsAt($this->localeService->getWeekStartDay());
-        $date->setWeekEndsAt($this->localeService->getWeekEndDay());
 
         $start = $date->copy()->startOfWeek();
         $end = $date->copy()->endOfWeek();
