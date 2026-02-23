@@ -59,7 +59,7 @@ class Ical
 
         $this->icalString .= "END:VTIMEZONE" . PHP_EOL . "END:VCALENDAR";
         if ($initParser) {
-            $this->initParser(['defaultSpan' => (int) floor($till->diffInYears()) + 1]);
+            $this->initParser(['defaultSpan' => (int) floor($from->diffInYears($till)) + 1]);
         }
 
         return $this;
