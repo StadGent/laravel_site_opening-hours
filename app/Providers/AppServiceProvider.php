@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Passport::enablePasswordGrant();
         /* OBSERVERS */
         Service::observe(ServiceObserver::class);
         Calendar::observe(CalendarObserver::class);

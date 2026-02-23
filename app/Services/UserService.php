@@ -11,6 +11,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Exception;
 
 /**
  * Internal Business logic Service for User
@@ -47,12 +48,14 @@ class UserService
     {
         if ($role->name === 'Admin') {
             $this->userRepository->removeLinksToAllServices($user->id);
-            $user->attachRole($role);
+            $user->addRole($role);
             return;
         }
 
         $adminRole = Role::where('name', 'Admin')->first();
-        $user->detachRole($adminRole);
+        if ($adminRole) {
+            $user->removeRole($adminRole);
+        }
     }
 
     /**
@@ -132,8 +135,10 @@ class UserService
 
         $this->attachRoleToUser($user, $role);
 
-        foreach ($services as $service) {
-            $this->linkUserToService($user, $service, $role);
+        if ($services) {
+            foreach ($services as $service) {
+                $this->linkUserToService($user, $service, $role);
+            }
         }
         
         // Send mail with overview of added services.
