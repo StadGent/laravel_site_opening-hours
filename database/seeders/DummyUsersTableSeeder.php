@@ -31,7 +31,7 @@ class DummyUsersTableSeeder extends Seeder
             $user->save();
 
             if ($name === 'admin' || $name === 'editor') {
-                $user->attachRole($roleConfig);
+                $user->addRole($roleConfig);
             } else {
                 \DB::insert(
                     'INSERT INTO user_service_role (user_id, role_id, service_id) VALUES (?, ?, ?)',

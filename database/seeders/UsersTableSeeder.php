@@ -25,7 +25,7 @@ class UsersTableSeeder extends Seeder
                 'email' => 'admin@foo.bar',
                 'password' => Hash::make($password),
             ]);
-            $admin->attachRole(Role::where('name', 'Admin')->first());
+            $admin->addRole(Role::where('name', 'Admin')->first());
             $this->setFooter($password);
         }
     }
