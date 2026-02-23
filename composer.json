@@ -8,7 +8,7 @@
         "laravel"
     ],
     "require": {
-        "php": ">=7.3.0",
+        "php": ">=8.3",
         "digipolisgent/robo-digipolis-laravel": "^4.0",
         "easyrdf/easyrdf": "^1.0",
         "fakerphp/faker": "^1.23",
@@ -16,17 +16,17 @@
         "guzzlehttp/guzzle": "^7.3",
         "hedronium/spaceless-blade": "^3.0",
         "johngrogg/ics-parser": "^2.1.5",
-        "laravel/framework": "^11",
-        "laravel/passport": "^12.0",
+        "laravel/framework": "^12.0",
+        "laravel/passport": "^13.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^4.2",
         "ml/json-ld": "^1.0",
-        "nesbot/carbon": "^2.0",
+        "nesbot/carbon": "^3.0",
         "pda/pheanstalk": "~4.0",
         "rlanvin/php-rrule": "^1.6",
         "santigarcor/laratrust": "^8",
-        "spatie/laravel-csp": "^2.9",
+        "spatie/laravel-csp": "^3",
         "wildside/userstamps": "^2.3"
     },
     "require-dev": {
@@ -34,7 +34,7 @@
         "laravel/browser-kit-testing": "^7",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^11.0"
     },
     "repositories": {
         "cachetool": {
@@ -66,7 +66,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "extra": {
         "laravel": {
