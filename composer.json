@@ -15,7 +15,7 @@
         "gordalina/cachetool": "dev-feature/symfony-7 as 9.2.1",
         "guzzlehttp/guzzle": "^7.3",
         "hedronium/spaceless-blade": "^3.0",
-        "johngrogg/ics-parser": "^2.1.5",
+        "johngrogg/ics-parser": "^3.0",
         "laravel/framework": "^12.0",
         "laravel/passport": "^13.0",
         "laravel/sanctum": "^4.0",
