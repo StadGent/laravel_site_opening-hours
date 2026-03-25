@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Log;
+
 
 /**
  * This class is responsible to make requests to and return results from a SPARQL endpoint
@@ -163,7 +165,8 @@ class SparqlService
      */
     public function performSparqlQuery($query, $method = 'GET', $format = null)
     {
-        if (!$this->username || $this->password) {
+        //FIX: there was a missing ! in the password check
+        if (!$this->username || !$this->password) {
             $this->setClient();
         }
         try {
@@ -178,10 +181,37 @@ class SparqlService
                     throw new \Exception('Given method: ' . $method . ' is not supported by this SparqlService');
             }
         } catch (\Exception $ex) {
-            \Log::error('Something went wrong while using ' . $method . ' to the LOD repository: ' . $ex->getMessage());
+            Log::error('Something went wrong while using ' . $method . ' to the LOD repository: ' . $ex->getMessage());
         }
 
         return false;
+    }
+
+    /**
+     * Perform an ASK query against the SPARQL endpoint
+     *
+     * Returns true if the pattern matches, false otherwise.
+     * Used to check if data exists before attempting expensive DELETE queries.
+     *
+     * @param  string $query  A SPARQL ASK query
+     * @return bool
+     */
+    public function ask($query)
+    {
+        try {
+            $result = $this->get($query, 'json');
+            $data = json_decode($result, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('ASK query returned invalid JSON');
+                return false;
+            }
+
+            return $data['boolean'] ?? false;
+        } catch (\Exception $ex) {
+            Log::error('Something went wrong while executing ASK query: ' . $ex->getMessage());
+            return false;
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\QueueService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 abstract class BaseCommand extends Command
 {
@@ -34,7 +35,7 @@ abstract class BaseCommand extends Command
      */
     public function error($string, $verbosity = null)
     {
-        \Log::error($string);
+        Log::error($string);
         parent::error($string, $verbosity);
     }
 
@@ -49,7 +50,7 @@ abstract class BaseCommand extends Command
      */
     public function info($string, $verbosity = null)
     {
-        \Log::info($string);
+        Log::info($string);
         parent::info($string, $verbosity);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 abstract class BaseJob implements ShouldQueue
 {
@@ -27,6 +28,14 @@ abstract class BaseJob implements ShouldQueue
      */
     protected $extId;
 
+    /**
+     * Maximum number of job attempts before giving up.
+     * This to prevent endless retry loops that fill up the failed_jobs table.
+     * Currently set at 5 tries, might be re-evaluated later.
+     * @var int
+     */
+    public $tries = 5;
+
     public function __construct()
     {
         $this->queueService = app(QueueService::class);
@@ -42,13 +51,13 @@ abstract class BaseJob implements ShouldQueue
      */
     protected function letsFinish()
     {
-        \Log::info('JOB SUCCES: ' . static::class . ': ' . $this->extModelClass . ' - ' . $this->extId);
+        Log::info('JOB SUCCES: ' . static::class . ': ' . $this->extModelClass . ' - ' . $this->extId);
         $this->queueService->removeJobFromQueue($this, $this->extModelClass, $this->extId);
     }
 
     /**
-     * lest make a method for this repeating code
-     * @param $message
+     * Lets make a method for this repeating code
+     * @param $errorMsg
      */
     protected function letsFail($errorMsg = '')
     {
@@ -56,6 +65,8 @@ abstract class BaseJob implements ShouldQueue
         if (!empty($this->extModelClass) && !empty($this->extId)) {
             $jobStr = ' for %s (%s). Check the logs for details.';
             $jobMsg .= sprintf($jobStr, $this->extModelClass, $this->extId);
+            // FIX: was missing from letsFail — only existed in failed().
+            $this->queueService->removeJobFromQueue($this, $this->extModelClass, $this->extId);
         }
         if (!empty($errorMsg)) {
             $jobMsg .= ' - ' . $errorMsg;
@@ -73,7 +84,7 @@ abstract class BaseJob implements ShouldQueue
      */
     public function failed(\Throwable $exception)
     {
-        \Log::error('JOB FAIL: ' . $exception->getMessage());
+        Log::error('JOB FAIL: ' . $exception->getMessage());
         if (!empty($this->extModelClass) && !empty($this->extId)) {
             $this->queueService->removeJobFromQueue($this, $this->extModelClass, $this->extId);
         }
