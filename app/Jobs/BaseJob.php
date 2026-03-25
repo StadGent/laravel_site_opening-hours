@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 abstract class BaseJob implements ShouldQueue
 {
@@ -42,7 +43,7 @@ abstract class BaseJob implements ShouldQueue
      */
     protected function letsFinish()
     {
-        \Log::info('JOB SUCCES: ' . static::class . ': ' . $this->extModelClass . ' - ' . $this->extId);
+        Log::info('JOB SUCCES: ' . static::class . ': ' . $this->extModelClass . ' - ' . $this->extId);
         $this->queueService->removeJobFromQueue($this, $this->extModelClass, $this->extId);
     }
 
@@ -73,7 +74,7 @@ abstract class BaseJob implements ShouldQueue
      */
     public function failed(\Throwable $exception)
     {
-        \Log::error('JOB FAIL: ' . $exception->getMessage());
+        Log::error('JOB FAIL: ' . $exception->getMessage());
         if (!empty($this->extModelClass) && !empty($this->extId)) {
             $this->queueService->removeJobFromQueue($this, $this->extModelClass, $this->extId);
         }
