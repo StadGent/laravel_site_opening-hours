@@ -10,6 +10,7 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class FetchRecreatex
@@ -788,7 +789,7 @@ class FetchRecreatex extends BaseCommand
      */
     public function error($string, $verbosity = null)
     {
-        \Log::error($string);
+        Log::error($string);
         parent::error($string, $verbosity);
     }
 
@@ -803,7 +804,7 @@ class FetchRecreatex extends BaseCommand
      */
     public function info($string, $verbosity = null)
     {
-        \Log::info($string);
+        Log::info($string);
         parent::info($string, $verbosity);
     }
 

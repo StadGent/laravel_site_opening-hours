@@ -151,8 +151,31 @@ class LodOpeninghoursRepository
     }
 
     /**
-     * Create and return a SPARQL query that deletes a channel triple
+     * Check if a URI has any triples in the graph
+     *
+     * Uses a ASK query to avoid DELETE operations
+     * on non-existent data,causing 600s Virtuoso timeouts.
+     *
+     * @param  string $uri
+     * @return bool
+     */
+    private function uriExistsInGraph($uri)
+    {
+        $graph = $this->getGraphName();
+        $askQuery = "ASK FROM <$graph> WHERE { <$uri> ?p ?o . }";
+
+        return $this->makeSparqlService()->ask($askQuery);
+    }
+
+    /**
+     * Create and return SPARQL queries that delete a channel triple
      * and all of its underlying triples (Openinghours, Vcalendar, Vcomponent, Vevent)
+     *
+     * Returns an empty array if no data exists for the channel URI,
+     * avoiding expensive recursive graph traversal on empty data.
+     *
+     * Uses multiple targeted DELETE queries instead of one recursive query
+     * to avoid rdf:rest* traversal and unbound predicate scans timing out on Virtuoso.
      *
      * @param  int   $channelId
      * @return array
@@ -162,57 +185,104 @@ class LodOpeninghoursRepository
         $channelUri = createChannelUri($channelId);
         $graph = $this->getGraphName();
 
-        return ["WITH <$graph>
-            delete {
-                ?channel a <http://data.europa.eu/m8g/Channel>.
-                ?channel <http://data.europa.eu/m8g/isOwnedBy> ?service.
-                ?channel ?openinghours ?oh.
-                ?channel <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> ?representation.
-                ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>.
-                ?channel ?openinghours ?oh.
-                ?oh <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
-                ?calendar a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
-                ?calendar rdf:first ?head; rdf:rest ?tail.
-                ?head a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
-                ?head ?rdfcal ?vcal.
-                ?vcal ?icalVcomp ?vevent.
-                ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
-                ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
-                ?vevent ?pVevent ?rrule.
-                ?vevent ?vical ?vicalObj.
-                ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                ?rrule ?pRrule ?rruleObj.
+        // FIX: check if data exists before running expensive recursive DELETE
+        if (!$this->uriExistsInGraph($channelUri)) {
+            return [];
+        }
+
+        $oh   = 'http://semweb.datasciencelab.be/ns/oh#';
+        $rdf  = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+        $ical = 'http://www.w3.org/2002/12/cal/ical#';
+
+        return [
+            // Step 1: delete the channel node itself
+            "WITH <$graph>
+            DELETE WHERE {
+                <$channelUri> ?p ?o .
+            }",
+
+            // Step 2: delete openinghours nodes linked to the channel
+            "WITH <$graph>
+            DELETE {
+                ?oh ?p ?o .
             }
             WHERE {
-                ?channel a <http://data.europa.eu/m8g/Channel>.
-                ?channel <http://data.europa.eu/m8g/isOwnedBy> ?service.
-                ?channel <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> ?representation.
-                FILTER(?channel = <$channelUri>)
-                OPTIONAL {
-                    ?channel ?openinghours ?oh.
-                    ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>;
-                    <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
-                    ?channel ?openinghours ?oh.
-                    ?list rdf:rest* ?calendar.
-                    ?calendar rdf:first ?head; rdf:rest ?tail.
-                    ?head a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
-                    ?head ?rdfcal ?vcal.
-                    ?head ?p ?o.
-                    ?vcal ?icalVcomp ?vevent.
-                    ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
-                    ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
-                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                    ?vevent ?pVevent ?rrule.
-                    ?vevent ?vical ?vicalObj.
-                    ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                    ?rrule ?pRrule ?rruleObj.
-                }
-        }"];
+                <$channelUri> ?x ?oh .
+                ?oh a <{$oh}OpeningHours> .
+                ?oh ?p ?o .
+            }",
+
+            // Step 3: delete calendars linked to openinghours
+            "WITH <$graph>
+            DELETE {
+                ?cal ?p ?o .
+            }
+            WHERE {
+                <$channelUri> ?x ?oh .
+                ?oh a <{$oh}OpeningHours> .
+                ?oh <{$oh}calendar> ?cal .
+                ?cal ?p ?o .
+            }",
+
+            // Step 4: delete vcalendars linked to calendar heads
+            "WITH <$graph>
+            DELETE {
+                ?vcal ?p ?o .
+            }
+            WHERE {
+                <$channelUri> ?x ?oh .
+                ?oh a <{$oh}OpeningHours> .
+                ?oh <{$oh}calendar> ?cal .
+                ?cal <{$rdf}first> ?head .
+                ?head ?rdfcal ?vcal .
+                ?vcal a <{$ical}Vcalendar> .
+                ?vcal ?p ?o .
+            }",
+
+            // Step 5: delete vevents linked to vcalendars
+            "WITH <$graph>
+            DELETE {
+                ?vevent ?p ?o .
+            }
+            WHERE {
+                <$channelUri> ?x ?oh .
+                ?oh a <{$oh}OpeningHours> .
+                ?oh <{$oh}calendar> ?cal .
+                ?cal <{$rdf}first> ?head .
+                ?head ?rdfcal ?vcal .
+                ?vcal ?icalVcomp ?vevent .
+                ?vevent a <{$ical}Vevent> .
+                ?vevent ?p ?o .
+            }",
+
+            // Step 6: delete rrules linked to vevents
+            "WITH <$graph>
+            DELETE {
+                ?rrule ?p ?o .
+            }
+            WHERE {
+                <$channelUri> ?x ?oh .
+                ?oh a <{$oh}OpeningHours> .
+                ?oh <{$oh}calendar> ?cal .
+                ?cal <{$rdf}first> ?head .
+                ?head ?rdfcal ?vcal .
+                ?vcal ?icalVcomp ?vevent .
+                ?vevent a <{$ical}Vevent> .
+                ?vevent ?pVevent ?rrule .
+                ?rrule ?p ?o .
+            }",
+        ];
     }
 
     /**
-     * Create and return a SPARQL query that deletes an openinghours triple
+     * Create and return SPARQL queries that delete an openinghours triple
      * and all of its underlying triples (Vcalendar, Vcomponent, Vevent)
+     *
+     * Returns an empty array if no data exists for the openinghours URI,
+     * avoiding expensive recursive graph traversal on empty data.
+     *
+     * Uses multiple targeted DELETE queries instead of one recursive query
+     * to avoid rdf:rest* traversal and unbound predicate scans timing out on Virtuoso.
      *
      * @param  int   $openinghoursId
      * @return array
@@ -222,44 +292,75 @@ class LodOpeninghoursRepository
         $openinghoursUri = createOpeninghoursUri($openinghoursId);
         $graph = $this->getGraphName();
 
-        return ["WITH <$graph>
-            delete {
-                ?oh ?x ?z.
-                ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>.
-                ?channel ?openinghours ?oh.
-                ?oh <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
-                ?calendar a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
-                ?calendar rdf:first ?head; rdf:rest ?tail.
-                ?head a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
-                ?head ?rdfcal ?vcal.
-                ?vcal ?icalVcomp ?vevent.
-                ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
-                ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
-                ?vevent ?pVevent ?rrule.
-                ?vevent ?vical ?vicalObj.
-                ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                ?rrule ?pRrule ?rruleObj.
+        // FIX: check if data exists before running expensive DELETE
+        // The old query was scanning the entire graph for nested structures
+        // that don't exist, causing Virtuoso to timeout after 600 seconds.
+        if (!$this->uriExistsInGraph($openinghoursUri)) {
+            return [];
+        }
+
+        $oh   = 'http://semweb.datasciencelab.be/ns/oh#';
+        $rdf  = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+        $ical = 'http://www.w3.org/2002/12/cal/ical#';
+
+        return [
+            // Step 1: delete the openinghours node itself
+            "WITH <$graph>
+            DELETE WHERE {
+                <$openinghoursUri> ?p ?o .
+            }",
+
+            // Step 2: delete calendars linked to openinghours
+            "WITH <$graph>
+            DELETE {
+                ?cal ?p ?o .
             }
             WHERE {
-                ?oh a <http://semweb.datasciencelab.be/ns/oh#OpeningHours>;
-                <http://semweb.datasciencelab.be/ns/oh#calendar> ?list.
-                ?channel ?openinghours ?oh.
-                FILTER(?oh = <$openinghoursUri>)
-                ?oh ?x ?z.
-                ?channel ?openinghours ?oh.
-                ?list rdf:rest* ?calendar.
-                ?calendar rdf:first ?head; rdf:rest ?tail.
-                ?head a <http://semweb.datasciencelab.be/ns/oh#Calendar>.
-                ?head ?rdfcal ?vcal.
-                ?head ?p ?o.
-                ?vcal ?icalVcomp ?vevent.
-                ?vcal <http://semweb.datasciencelab.be/ns/oh#closinghours> ?closinghours.
-                ?vcal a <http://www.w3.org/2002/12/cal/ical#Vcalendar>.
-                ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                ?vevent ?pVevent ?rrule.
-                ?vevent ?vical ?vicalObj.
-                ?vevent a <http://www.w3.org/2002/12/cal/ical#Vevent>.
-                ?rrule ?pRrule ?rruleObj.
-        }"];
+                <$openinghoursUri> <{$oh}calendar> ?cal .
+                ?cal ?p ?o .
+            }",
+
+            // Step 3: delete vcalendars linked to calendar heads
+            "WITH <$graph>
+            DELETE {
+                ?vcal ?p ?o .
+            }
+            WHERE {
+                <$openinghoursUri> <{$oh}calendar> ?cal .
+                ?cal <{$rdf}first> ?head .
+                ?head ?rdfcal ?vcal .
+                ?vcal a <{$ical}Vcalendar> .
+                ?vcal ?p ?o .
+            }",
+
+            // Step 4: delete vevents linked to vcalendars
+            "WITH <$graph>
+            DELETE {
+                ?vevent ?p ?o .
+            }
+            WHERE {
+                <$openinghoursUri> <{$oh}calendar> ?cal .
+                ?cal <{$rdf}first> ?head .
+                ?head ?rdfcal ?vcal .
+                ?vcal ?icalVcomp ?vevent .
+                ?vevent a <{$ical}Vevent> .
+                ?vevent ?p ?o .
+            }",
+
+            // Step 5: delete rrules linked to vevents
+            "WITH <$graph>
+            DELETE {
+                ?rrule ?p ?o .
+            }
+            WHERE {
+                <$openinghoursUri> <{$oh}calendar> ?cal .
+                ?cal <{$rdf}first> ?head .
+                ?head ?rdfcal ?vcal .
+                ?vcal ?icalVcomp ?vevent .
+                ?vevent a <{$ical}Vevent> .
+                ?vevent ?pVevent ?rrule .
+                ?rrule ?p ?o .
+            }",
+        ];
     }
 }
