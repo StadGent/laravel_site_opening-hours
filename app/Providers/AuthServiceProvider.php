@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -24,5 +25,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Only the super admin may grant or revoke the global Admin role.
+        Gate::define('manage-admins', fn (User $user) => $user->isSuperAdmin());
     }
 }

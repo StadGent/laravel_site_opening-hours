@@ -11,6 +11,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UsersController extends Controller
 {
@@ -103,6 +104,11 @@ class UsersController extends Controller
 
         if (\Auth::user()->email === $request->input('email')) {
             throw new AuthenticationException("You can't alter yourself!");
+        }
+
+        // Only the super admin may invite someone as global Admin.
+        if ($request->input('role') === 'Admin' && Gate::denies('manage-admins')) {
+            abort(403, 'Only the super admin can invite an Admin.');
         }
 
         $role = Role::where('name', $request->input('role'))->first();

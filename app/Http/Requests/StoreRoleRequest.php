@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Validator;
 
 /**
@@ -22,6 +23,13 @@ class StoreRoleRequest extends FormRequest
      */
     public function authorize(UserRepository $users, Request $request)
     {
+        // Granting or revoking the global Admin role is reserved for the super
+        // admin.
+        $target = User::find($request->user_id);
+        if ($request->role === 'Admin' || ($target && $target->hasRole('Admin'))) {
+            return Gate::allows('manage-admins');
+        }
+
         // A user may delete a role for a user in a service if:
         // the user is a super admin or is an owner of the service
         return $this->user()->hasRole('Admin') || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner');
@@ -58,7 +66,8 @@ class StoreRoleRequest extends FormRequest
      * Configure the validator instance.
      *
      * Check if given user_id is not of the current auth user
-     * Check if given user_id is not of an Admin user
+     * Check if given user_id is not of an Admin user, unless the current
+     * user is the super admin
      *
      * @param  Validator  $validator
      * @return void
@@ -70,7 +79,7 @@ class StoreRoleRequest extends FormRequest
             if ($this->user()->id == $user->id) {
                 $validator->errors()->add('user_id', "You can't alter yourself!");
             }
-            if ($user->hasRole('Admin')) {
+            if ($user->hasRole('Admin') && Gate::denies('manage-admins')) {
                 $validator->errors()->add('user_id', "You can't alter an Admin!");
             }
         });

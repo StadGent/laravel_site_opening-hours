@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1>{{ usr.name || 'Naamloos' }}</h1>
-    <form v-if="isAdmin && !hasRoleAdmin" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;" @submit.prevent="updateRole">
+    <form v-if="isAdmin && (!hasRoleAdmin || isSuperAdmin) && usr.id != $root.user.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;" @submit.prevent="updateRole">
       <fieldset>
         <legend>Globale rol</legend>
         <div class="radio">
@@ -9,6 +9,10 @@
         </div>
         <div class="radio">
           <label><input ref="editor" name="role" :checked="hasRoleEditor" :value="'Editor'" type="radio">Redacteur</label>
+        </div>
+        <div class="radio" v-if="isSuperAdmin">
+          <label><input ref="admin" name="role" :checked="hasRoleAdmin" :value="'Admin'" type="radio">Admin</label>
+          <p class="help-block">Een admin heeft toegang tot alle diensten. Bestaande koppelingen met diensten vervallen.</p>
         </div>
       </fieldset>
       <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Opslaan</button>
@@ -116,7 +120,11 @@ export default {
   },
   methods: {
     updateRole() {
-      this.usr.role = this.$refs.editor.checked ? 'Editor' : null;
+      if (this.$refs.admin && this.$refs.admin.checked) {
+        this.usr.role = 'Admin';
+      } else {
+        this.usr.role = this.$refs.editor.checked ? 'Editor' : null;
+      }
       Hub.$emit('patchRole', this.usr, (role) => {
         if (!role) {
           this.message = 'De gebruiker heeft geen globale rol meer';
