@@ -26,6 +26,11 @@ class SparqlServiceTest extends \BrowserKitTestCase
             return;
         }
 
+        // Integration test against a real SPARQL endpoint.
+        if (empty(env('SPARQL_WRITE_ENDPOINT')) || empty(env('SPARQL_WRITE_GRAPH'))) {
+            $this->markTestSkipped('No SPARQL endpoint configured.');
+        }
+
         $this->sparqlService = app('SparqlService');
         $this->sparqlService->setClient();
     }

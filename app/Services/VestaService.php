@@ -124,10 +124,10 @@ class VestaService
      */
     public function updateOpeninghours($guid, $hours = '')
     {
-        $client =  $this->getClient();
         if (!$guid) {
             throw new \Exception('A guid is required to update the data in VESTA');
         }
+        $client = $this->getClient();
         $parameters = new \stdClass();
         $parameters->accountId = new \SoapVar($guid, XSD_STRING, null, null, 'accountId', 'http://schemas.datacontract.org/2004/07/VestaDataMaster.Models');
         $parameters->hours = new \SoapVar('<ns2:hours><![CDATA[' . $hours . ']]></ns2:hours>', XSD_ANYXML);

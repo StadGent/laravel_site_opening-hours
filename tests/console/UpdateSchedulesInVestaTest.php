@@ -4,6 +4,7 @@ namespace Tests\Console;
 
 use App\Jobs\UpdateVestaOpeninghours;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Bus;
 
 class UpdateSchedulesInVestaTest extends \BrowserKitTestCase
 {
@@ -14,8 +15,9 @@ class UpdateSchedulesInVestaTest extends \BrowserKitTestCase
      */
     public function commandFiresJobs()
     {
-        $this->expectsJobs(UpdateVestaOpeninghours::class);
+        Bus::fake();
         \App\Models\Service::factory()->create(['source' => 'vesta']);
         \Artisan::call('openinghours:update-vesta');
+        Bus::assertDispatched(UpdateVestaOpeninghours::class);
     }
 }

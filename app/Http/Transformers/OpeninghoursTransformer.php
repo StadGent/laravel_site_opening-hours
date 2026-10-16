@@ -180,7 +180,14 @@ class OpeninghoursTransformer implements TransformerInterface
             }
         }
 
-        usort($dataCollection[$channel->id]['openinghours'], fn (DayInfo $a, DayInfo $b) => $a->date > $b->date ? 1 : -1);
+        // Sort the days of every channel, consecutive calendars can be merged
+        // out of order. Open now requests have no days.
+        foreach ($dataCollection as &$channelData) {
+            if (!empty($channelData['openinghours'])) {
+                usort($channelData['openinghours'], fn (DayInfo $a, DayInfo $b) => $a->date <=> $b->date);
+            }
+        }
+        unset($channelData);
 
         return array_values($dataCollection);
     }

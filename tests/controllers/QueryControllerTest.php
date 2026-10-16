@@ -43,7 +43,7 @@ class QueryControllerTest extends \BrowserKitTestCase
      *
      * @return array
      */
-    public function requestTypeProvider()
+    public static function requestTypeProvider()
     {
         $dateParam = date('Y-m-d');
 
@@ -307,7 +307,7 @@ class QueryControllerTest extends \BrowserKitTestCase
      *
      * @return array
      */
-    public function requestDateTypes()
+    public static function requestDateTypes()
     {
         return [
             [[
@@ -361,7 +361,9 @@ class QueryControllerTest extends \BrowserKitTestCase
         $call = $this->doRequest('GET', $path);
         if (!isset($typeParams['format']) || $typeParams['format'] === 'json') {
             $this->getContentStructureTested($call);
+            return;
         }
+        $this->seeStatusCode(200);
     }
 
     /**

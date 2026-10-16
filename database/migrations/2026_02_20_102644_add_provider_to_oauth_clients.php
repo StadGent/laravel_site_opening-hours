@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Fresh installs already get the column from the create migration.
+        if (Schema::hasColumn('oauth_clients', 'provider')) {
+            return;
+        }
+
         Schema::table('oauth_clients', function (Blueprint $table) {
             // Add 'provider' column that Passport 13 requires for socialite providers, but make it nullable since we don't use it yet
             $table->string('provider')->after('secret')->nullable();
