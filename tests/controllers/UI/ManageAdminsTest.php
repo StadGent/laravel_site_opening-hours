@@ -94,7 +94,7 @@ class ManageAdminsTest extends \BrowserKitTestCase
 
     public function testOtherAdminCannotMakeUserAdmin()
     {
-        $editor = User::where('name', 'editoruser')->first();
+        $editor = User::factory()->create();
 
         $this->actingAs($this->otherAdmin, 'api');
         $this->doRequest('PATCH', '/api/v1/ui/roles', [
@@ -174,5 +174,112 @@ class ManageAdminsTest extends \BrowserKitTestCase
 
         $this->seeStatusCode(200);
         $this->assertTrue(User::where('email', $newUser->email)->first()->hasRole('Admin'));
+    }
+
+    public function testOwnerCannotDemoteAdminByInvitingAsMember()
+    {
+        $this->actingAs(User::where('name', 'owneruser')->first(), 'api');
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', [
+            'email' => $this->otherAdmin->email,
+            'service_id' => 1,
+            'role' => 'Member',
+        ]);
+
+        $this->seeStatusCode(403);
+        $this->assertTrue($this->otherAdmin->fresh()->hasRole('Admin'));
+    }
+
+    public function testOtherAdminCannotDemoteAdminByInvitingAsOwner()
+    {
+        $this->actingAs($this->otherAdmin, 'api');
+        $this->doRequest('POST', '/api/v1/ui/inviteuser', [
+            'email' => $this->superAdmin->email,
+            'service_id' => 1,
+            'role' => 'Owner',
+        ]);
+
+        $this->seeStatusCode(403);
+        $this->assertTrue($this->superAdmin->fresh()->hasRole('Admin'));
+    }
+
+    public function testOwnerCannotGrantGlobalEditorThroughServiceRole()
+    {
+        $member = User::where('name', 'memberuser')->first();
+
+        $this->actingAs(User::where('name', 'owneruser')->first(), 'api');
+        $this->doRequest('PATCH', '/api/v1/ui/roles', [
+            'user_id' => $member->id,
+            'service_id' => 1,
+            'role' => 'Editor',
+        ]);
+
+        $this->seeStatusCode(403);
+        $this->assertFalse($member->fresh()->hasRole('Editor'));
+    }
+
+    public function testOtherAdminCannotDeleteSuperAdmin()
+    {
+        $this->actingAs($this->otherAdmin, 'api');
+        $this->doRequest('DELETE', '/api/v1/ui/users/' . $this->superAdmin->id);
+
+        $this->seeStatusCode(403);
+        $this->assertNotNull($this->superAdmin->fresh());
+    }
+
+    public function testOtherAdminCannotDeleteAdmin()
+    {
+        $admin = User::factory()->create();
+        $admin->addRole(Role::where('name', 'Admin')->first());
+
+        $this->actingAs($this->otherAdmin, 'api');
+        $this->doRequest('DELETE', '/api/v1/ui/users/' . $admin->id);
+
+        $this->seeStatusCode(403);
+        $this->assertNotNull($admin->fresh());
+    }
+
+    public function testOwnerCannotRemoveServiceRoleOfAdmin()
+    {
+        $this->actingAs(User::where('name', 'owneruser')->first(), 'api');
+        $this->doRequest('DELETE', '/api/v1/ui/roles', [
+            'user_id' => $this->otherAdmin->id,
+            'service_id' => 1,
+        ]);
+
+        $this->seeStatusCode(400);
+    }
+
+    public function testUserListTellsWhatTheCurrentUserMayDo()
+    {
+        $editor = User::factory()->create();
+
+        $this->actingAs($this->otherAdmin, 'api');
+        $this->doRequest('GET', '/api/v1/ui/users');
+        $users = collect(json_decode($this->response->getContent(), true))->keyBy('id');
+
+        $this->assertSame(
+            ['updateGlobalRole' => true, 'assignAdmin' => false, 'delete' => true],
+            $users[$editor->id]['can']
+        );
+        $this->assertSame(
+            ['updateGlobalRole' => false, 'assignAdmin' => false, 'delete' => false],
+            $users[$this->superAdmin->id]['can']
+        );
+        $this->assertSame(
+            ['updateGlobalRole' => false, 'assignAdmin' => false, 'delete' => false],
+            $users[$this->otherAdmin->id]['can']
+        );
+    }
+
+    public function testSuperAdminMayAssignAdminInUserList()
+    {
+        $this->actingAs($this->superAdmin, 'api');
+        $this->doRequest('GET', '/api/v1/ui/users');
+        $users = collect(json_decode($this->response->getContent(), true))->keyBy('id');
+
+        $this->assertSame(
+            ['updateGlobalRole' => true, 'assignAdmin' => true, 'delete' => true],
+            $users[$this->otherAdmin->id]['can']
+        );
     }
 }

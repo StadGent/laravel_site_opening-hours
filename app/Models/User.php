@@ -60,16 +60,6 @@ class User extends Authenticatable implements LaratrustUser
     }
 
     /**
-     * Check if the user is the super admin that may manage other admins
-     *
-     * @return bool
-     */
-    public function isSuperAdmin(): bool
-    {
-        return $this->id === (int) config('auth.super_admin_id');
-    }
-
-    /**
      * Return roles for each service that the user belongs to
      *
      * @return Illuminate\Database\Eloquent\Relations\BelongsToMany

@@ -3,27 +3,28 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Gate;
 
 class DeleteRoleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
-     * @param UserRepository $users
-     * @param Request $request
-     * @return bool
+     * See UserPolicy::updateServiceRole() for the rules.
+     *
+     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function authorize(UserRepository $users, Request $request)
+    public function authorize()
     {
-        // A user may delete a role for a user in a service if:
-        // the user is a super admin or is an owner of the service
-        $isOwner = $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner');
+        $target = User::find($this->input('user_id'));
+        if (!$target) {
+            // Let the validation report the unknown user.
+            return true;
+        }
 
-        return $this->user()->hasRole('Admin') || $isOwner;
+        return Gate::forUser($this->user())
+            ->inspect('updateServiceRole', [$target, $this->input('service_id'), null]);
     }
 
     /**
@@ -34,7 +35,7 @@ class DeleteRoleRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|numeric',
+            'user_id' => 'exists:users,id|required|numeric',
             'service_id' => 'required|numeric',
         ];
     }
@@ -50,27 +51,5 @@ class DeleteRoleRequest extends FormRequest
             'required' => 'Het veld is verplicht in te vullen.',
             'numeric' => 'Het veld moet een numerieke waarde krijgen.',
         ];
-    }
-
-    /**
-     * Configure the validator instance.
-     *
-     * Check if given user_id is not of the current auth user
-     * Check if given user_id is not of an Admin user
-     *
-     * @param  Validator  $validator
-     * @return void
-     */
-    public function withValidator(Validator $validator)
-    {
-        $validator->after(function ($validator) {
-            $user = User::find($this->input('user_id'));
-            if ($this->user()->id == $user->id) {
-                $validator->errors()->add('user_id', "You can't alter yourself!");
-            }
-            if ($user->hasRole('Admin')) {
-                $validator->errors()->add('user_id', "You can't alter an Admin!");
-            }
-        });
     }
 }

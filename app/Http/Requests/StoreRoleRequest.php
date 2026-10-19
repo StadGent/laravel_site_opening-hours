@@ -3,11 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Validator;
 
 /**
  * Add a new role to a user, for a certain service
@@ -17,22 +14,29 @@ class StoreRoleRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
-     * @param UserRepository $users
-     * @param Request $request
-     * @return bool
+     * No role, Editor and Admin are global roles (see RolesController::update),
+     * Owner and Member are roles in the given service. See UserPolicy for the
+     * rules.
+     *
+     * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function authorize(UserRepository $users, Request $request)
+    public function authorize()
     {
-        // Granting or revoking the global Admin role is reserved for the super
-        // admin.
-        $target = User::find($request->user_id);
-        if ($request->role === 'Admin' || ($target && $target->hasRole('Admin'))) {
-            return Gate::allows('manage-admins');
+        $target = User::find($this->input('user_id'));
+        if (!$target) {
+            // Let the validation report the unknown user.
+            return true;
         }
 
-        // A user may delete a role for a user in a service if:
-        // the user is a super admin or is an owner of the service
-        return $this->user()->hasRole('Admin') || $users->hasRoleInService($this->user()->id, $request->service_id, 'Owner');
+        $gate = Gate::forUser($this->user());
+        if (in_array($this->input('role'), [null, 'Editor', 'Admin'], true)) {
+            return $gate->inspect('updateGlobalRole', [$target, $this->input('role')]);
+        }
+
+        return $gate->inspect(
+            'updateServiceRole',
+            [$target, $this->input('service_id'), $this->input('role')]
+        );
     }
 
     /**
@@ -60,28 +64,5 @@ class StoreRoleRequest extends FormRequest
             'required' => 'Het veld is verplicht in te vullen.',
             'numeric' => 'Het veld moet een numerieke waarde krijgen.',
         ];
-    }
-
-    /**
-     * Configure the validator instance.
-     *
-     * Check if given user_id is not of the current auth user
-     * Check if given user_id is not of an Admin user, unless the current
-     * user is the super admin
-     *
-     * @param  Validator  $validator
-     * @return void
-     */
-    public function withValidator(Validator $validator)
-    {
-        $validator->after(function ($validator) {
-            $user = User::find($this->input('user_id'));
-            if ($this->user()->id == $user->id) {
-                $validator->errors()->add('user_id', "You can't alter yourself!");
-            }
-            if ($user->hasRole('Admin') && Gate::denies('manage-admins')) {
-                $validator->errors()->add('user_id', "You can't alter an Admin!");
-            }
-        });
     }
 }

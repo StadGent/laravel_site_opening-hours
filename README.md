@@ -54,6 +54,20 @@ The `./artisan db:seed` command will generate an admin user with a random
 generated password that's outputted to the command line, the default email is
 admin@foo.bar.
 
+### Super admin
+
+One user is the super admin, set with `SUPER_ADMIN_ID` in `.env` (default `1`,
+the admin user created by `./artisan db:seed`). This is a convention of this
+application, not of Laravel. Only the super admin can, through the UI:
+
+- grant or revoke the global Admin role,
+- invite someone as Admin, or invite an existing Admin with another role,
+- delete an Admin.
+
+Other admins can still manage all non-admin users. Make sure the id belongs to
+an existing user with the Admin role. The rules live in
+`app/Policies/UserPolicy.php`.
+
 ## Maintenance and deployment
 
 When updating the software the commands you'll want to run are the following:

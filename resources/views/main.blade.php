@@ -32,7 +32,6 @@
   var initialUser = {!! json_encode(Auth::user()) !!};
   initialUser.admin = {!! json_encode(Auth::user()->hasRole('Admin')) !!};
   initialUser.editor = {!! json_encode(Auth::user()->hasRole('Editor')) !!};
-  initialUser.superAdmin = {!! json_encode(Auth::user()->isSuperAdmin()) !!};
   Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
   var appName = {!! json_encode(config('app.name')) !!};
 

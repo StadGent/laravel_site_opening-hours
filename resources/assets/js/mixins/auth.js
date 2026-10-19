@@ -24,9 +24,6 @@ export default {
     isEditor() {
       return this.$root.user.editor
     },
-    isSuperAdmin() {
-      return this.$root.user.superAdmin
-    },
     isOwner () {
       return this.isOwnerOf(this.srv || this.$root.routeService)
     },

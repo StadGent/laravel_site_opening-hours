@@ -33,7 +33,7 @@ class SendPasswordResetNotification extends Mailable
      */
     public function build()
     {
-        return $this->from(env('MAIL_FROM_ADDRESS'))
+        return $this->from(config('mail.from.address'), config('mail.from.name'))
             ->subject('Reset wachtwoord')
             ->view('auth.emails.reset')
             ->with([

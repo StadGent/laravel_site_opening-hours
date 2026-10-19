@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1>{{ usr.name || 'Naamloos' }}</h1>
-    <form v-if="isAdmin && (!hasRoleAdmin || isSuperAdmin) && usr.id != $root.user.id" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;" @submit.prevent="updateRole">
+    <form v-if="can.updateGlobalRole" style="max-width:25em;margin:2em 0;padding: 1em;border:1px solid #ddd;" @submit.prevent="updateRole">
       <fieldset>
         <legend>Globale rol</legend>
         <div class="radio">
@@ -10,7 +10,7 @@
         <div class="radio">
           <label><input ref="editor" name="role" :checked="hasRoleEditor" :value="'Editor'" type="radio">Redacteur</label>
         </div>
-        <div class="radio" v-if="isSuperAdmin">
+        <div class="radio" v-if="can.assignAdmin">
           <label><input ref="admin" name="role" :checked="hasRoleAdmin" :value="'Admin'" type="radio">Admin</label>
           <p class="help-block">Een admin heeft toegang tot alle diensten. Bestaande koppelingen met diensten vervallen.</p>
         </div>
@@ -87,6 +87,10 @@ export default {
     },
     usr () {
       return (this.$root.users && this.$root.users.find(u => u.id == this.route.id)) || {}
+    },
+    // What the current user may do with this user, decided by the backend.
+    can() {
+      return this.usr.can || {};
     },
     hasRoleAdmin() {
       return this.usr.globalRoles && this.usr.globalRoles.indexOf('Admin') !== -1;

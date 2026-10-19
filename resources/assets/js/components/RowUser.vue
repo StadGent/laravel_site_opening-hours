@@ -19,7 +19,7 @@
       <td v-if="u.verified" class="text-success td-sortable">&checkmark;</td>
       <td v-else class="text-warning td-sortable">&cross;</td>
       <td class="td-btn text-right" @click.stop>
-        <button @click="rm" class="btn btn-default btn-icon">
+        <button v-if="u.can && u.can.delete" @click="rm" class="btn btn-default btn-icon">
           <i class="glyphicon glyphicon-trash"></i>
         </button>
       </td>
