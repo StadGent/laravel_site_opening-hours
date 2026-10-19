@@ -142,7 +142,7 @@ class UserService
         }
         
         // Send mail with overview of added services.
-        Mail::to($user)->send(new SendInviteConfirmation($user, $services));
+        Mail::to($user)->send(new SendInviteConfirmation($user, $services, $role));
         
         $user->role = $role->name;
 

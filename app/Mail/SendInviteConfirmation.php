@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -25,17 +26,26 @@ class SendInviteConfirmation extends Mailable
     public $services;
 
     /**
+     * The invited role, shown when no services are given (global role).
+     *
+     * @var Role|null
+     */
+    public $role;
+
+    /**
      * Create a new message instance.
      *
      * @param User $user
-     * @param array|Collection $services
+     * @param Collection|null $services
      *  Collection of services.
+     * @param Role|null $role
      * @return void
      */
-    public function __construct(User $user, Collection $services = null)
+    public function __construct(User $user, ?Collection $services = null, ?Role $role = null)
     {
         $this->user = $user;
-        $this->services = $services;
+        $this->services = $services ?? new Collection();
+        $this->role = $role;
     }
 
     /**
@@ -45,11 +55,14 @@ class SendInviteConfirmation extends Mailable
      */
     public function build()
     {
-        $mail = $this->from(env('MAIL_FROM_ADDRESS'))
-            ->subject('U werd toegang verleend tot een dienst')
+        $mail = $this->from(config('mail.from.address'), config('mail.from.name'))
+            ->subject($this->services->isEmpty()
+                ? 'U werd toegang verleend tot het openingsurenplatform'
+                : 'U werd toegang verleend tot een dienst')
             ->view('auth.emails.invite');
         $params = [
-            'services' => $this->services
+            'services' => $this->services,
+            'role' => $this->role,
         ];
 
         if ($this->user->token) {

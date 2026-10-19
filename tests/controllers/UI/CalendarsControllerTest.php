@@ -74,7 +74,7 @@ class CalendarsControllerTest extends \BrowserKitTestCase
      *
      * @return array
      */
-    public function requestTypeProvider()
+    public static function requestTypeProvider()
     {
         $data = [
             'priority' => '2',

@@ -7,7 +7,9 @@ use App\Jobs\UpdateLodOpeninghours;
 use App\Jobs\UpdateVestaOpeninghours;
 use App\Models\Openinghours;
 use App\Models\QueuedJob;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Bus;
 
 class VestaServiceTest extends \BrowserKitTestCase
 {
@@ -85,6 +87,10 @@ class VestaServiceTest extends \BrowserKitTestCase
         if (env('APP_SKIP_TRAVIS_TEST')) {
             return;
         }
+        // Integration test against the real VESTA SOAP service.
+        if (empty(env('VESTA_ENDPOINT'))) {
+            $this->markTestSkipped('No VESTA endpoint configured.');
+        }
         $testData = $this->testData . uniqid();
 
         $resultInsert = $this->vestaService->updateOpeninghours($this->testGuid, $testData);
@@ -119,13 +125,15 @@ class VestaServiceTest extends \BrowserKitTestCase
             return;
         }
 
-        $this->expectsJobs(UpdateVestaOpeninghours::class);
-        $this->expectsJobs(UpdateLodOpeninghours::class);
+        Bus::fake();
 
-        $openinghours = Openinghours::first();
+        $openinghours = $this->activeOpeninghours();
         $openinghours->channel->service->source = 'vesta';
         $openinghours->label = 'testLabel';
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'update');
+
+        Bus::assertDispatched(UpdateVestaOpeninghours::class);
+        Bus::assertDispatched(UpdateLodOpeninghours::class);
     }
 
     /**
@@ -138,12 +146,14 @@ class VestaServiceTest extends \BrowserKitTestCase
             return;
         }
 
-        $this->expectsJobs(UpdateVestaOpeninghours::class);
-        $this->expectsJobs(DeleteLodOpeninghours::class);
+        Bus::fake();
 
-        $openinghours = Openinghours::first();
+        $openinghours = $this->activeOpeninghours();
         $openinghours->channel->service->source = 'vesta';
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'delete');
+
+        Bus::assertDispatched(UpdateVestaOpeninghours::class);
+        Bus::assertDispatched(DeleteLodOpeninghours::class);
     }
 
     /**
@@ -168,5 +178,21 @@ class VestaServiceTest extends \BrowserKitTestCase
         $this->vestaService->makeSyncJobsForExternalServices($openinghours, 'update');
         $jobsNrStillTheSame = QueuedJob::all()->count();
         $this->assertEquals($jobsNrOneAdded, $jobsNrStillTheSame);
+    }
+
+    /**
+     * Openinghours that are active today, VESTA only syncs active ones
+     *
+     * The seeded openinghours lie in the past.
+     *
+     * @return Openinghours
+     */
+    private function activeOpeninghours()
+    {
+        $openinghours = Openinghours::first();
+        $openinghours->start_date = Carbon::today()->subMonth()->toDateString();
+        $openinghours->end_date = Carbon::today()->addMonth()->toDateString();
+
+        return $openinghours;
     }
 }

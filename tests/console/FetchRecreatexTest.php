@@ -55,7 +55,7 @@ class FetchRecreatexTest extends \BrowserKitTestCase
         $service->save();
 
         $commandMockup = $this->getMockBuilder(FetchRecreatex::class)
-            ->setMethods(['getOpeninghoursList', 'getReservations'])
+            ->onlyMethods(['getOpeninghoursList', 'getReservations'])
             ->getMock();
 
         $commandMockup->expects($this->any())
@@ -81,7 +81,7 @@ class FetchRecreatexTest extends \BrowserKitTestCase
         $channel = $service->channels->get(1);
         $this->assertEquals(1, $channel->openinghours->count());
         $openinghours = $channel->openinghours->first();
-        $this->assertEquals($openinghours->label, 'Geïmporteerde kalender2017-01-01 -2017-12-31');
+        $this->assertEquals('Geïmporteerde kalender 2017-01-01 - 2017-12-31', $openinghours->label);
         $this->assertEquals($openinghours->start_date, '2017-01-01');
         $this->assertEquals($openinghours->end_date, '2017-12-31');
         $this->assertCount(1, $openinghours->calendars);
@@ -96,7 +96,7 @@ class FetchRecreatexTest extends \BrowserKitTestCase
         $channel = $service->channels->first();
         $this->assertEquals(1, $channel->openinghours->count());
         $openinghours = $channel->openinghours->first();
-        $this->assertEquals($openinghours->label, 'Geïmporteerde kalender2017-01-01 -2017-12-31');
+        $this->assertEquals('Geïmporteerde kalender 2017-01-01 - 2017-12-31', $openinghours->label);
         $this->assertEquals($openinghours->start_date, '2017-01-01');
         $this->assertEquals($openinghours->end_date, '2017-12-31');
         $this->assertCount(1, $openinghours->calendars);

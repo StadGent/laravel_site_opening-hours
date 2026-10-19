@@ -31,7 +31,7 @@ class RolesControllerTest extends \BrowserKitTestCase
      * ['userRole', verb', 'uri', 'data', 'responce status'] // Resource controller action
      * @return array
      */
-    public function requestTypeProvider()
+    public static function requestTypeProvider()
     {
         $data = [
             'user_id' => '4',

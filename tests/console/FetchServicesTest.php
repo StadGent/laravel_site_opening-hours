@@ -4,6 +4,7 @@ namespace Tests\Console;
 
 use App\Jobs\FetchServices;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Bus;
 
 class FetchServicesTest extends \BrowserKitTestCase
 {
@@ -14,7 +15,8 @@ class FetchServicesTest extends \BrowserKitTestCase
      */
     public function commandFiresJobs()
     {
-        $this->expectsJobs(FetchServices::class);
+        Bus::fake();
         \Artisan::call('openinghours:fetch-services');
+        Bus::assertDispatched(FetchServices::class);
     }
 }

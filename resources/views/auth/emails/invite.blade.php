@@ -23,21 +23,25 @@ $style = [
 ];
 ?>
 @section('content')
-@if (count($services) > 1)
+@if ($services->count() > 1)
 <p>Melding dat u toegevoegd werd aan volgende diensten op het openingsurenplatform:</p>
 <ul>
-  @foreach ($services as $service )
+  @foreach ($services as $service)
   <li>{{ $service->label }}</li>
   @endforeach
 </ul>
+@elseif ($services->count() === 1)
+<p>Melding dat u toegevoegd werd aan de dienst "{{ $services->first()->label }}" op het openingsurenplatform.</p>
+@elseif ($role)
+<p>Melding dat u de globale rol "{{ $role->display_name }}" kreeg op het openingsurenplatform.</p>
 @else
-<p>Melding dat u toegevoegd werd aan de dienst "{{ $services->first()->label }}" op het openingsurenplatform </p>
+<p>Melding dat u toegang kreeg tot het openingsurenplatform.</p>
 @endif
 
 @if (isset($actionUrl))
 <p>Het blijkt ook dat u uw gebruiker nog niet geactiveerd staat momenteel.<br />
   Gelieve op onderstaande knop te klikken om zo een wachtwoord in
-  te stellen en toegang te krijgen tot {{ $service }}</p>
+  te stellen en toegang te krijgen tot het openingsurenplatform.</p>
 <table style="{{ $style['body_action'] }}" align="center" width="100%" cellpadding="0" cellspacing="0">
   <tr>
     <td align="center">
