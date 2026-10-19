@@ -1,0 +1,76 @@
+name: Tests
+
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: openinghours
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: openinghours
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      MAIL_MAILER: array
+      MAIL_FROM_ADDRESS: noreply@example.com
+      # Store jobs instead of running them, the sync jobs need SPARQL/VESTA.
+      QUEUE_CONNECTION: database
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: bcmath, curl, gd, intl, mbstring, pdo_mysql, soap, zip
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare the application
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan passport:keys --force
+
+      - name: Migrate and seed the database
+        run: |
+          php artisan migrate --force
+          php artisan db:seed --force
+
+      # phpunit.xml configures a coverage report, without a coverage driver
+      # that is a warning and PHPUnit 11 would exit with 1.
+      - name: Run tests
+        run: vendor/bin/phpunit --no-coverage

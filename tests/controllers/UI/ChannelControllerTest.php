@@ -35,7 +35,7 @@ class ChannelControllerTest extends \BrowserKitTestCase
      *
      * @return array
      */
-    public function requestTypeProvider()
+    public static function requestTypeProvider()
     {
         return [
             //  unauth user

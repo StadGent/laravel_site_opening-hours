@@ -25,7 +25,7 @@ class ServicesControllerTest extends \BrowserKitTestCase
      * ['userRole', verb', 'uri', 'data', 'responce status'] // Resource controller action
      * @return array
      */
-    public function requestTypeProvider()
+    public static function requestTypeProvider()
     {
         return [
             //  unauth user

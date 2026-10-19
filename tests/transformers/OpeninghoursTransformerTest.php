@@ -189,7 +189,7 @@ class OpeninghoursTransformerTest extends \BrowserKitTestCase
      *     => user in other time region
      *     => daylight savings diffs
      */
-    public function dateProvider()
+    public static function dateProvider()
     {
         return [
             [new Carbon('2017-05-17 00:00:00'), new Carbon('2017-05-17 00:01:00')],
@@ -249,7 +249,8 @@ class OpeninghoursTransformerTest extends \BrowserKitTestCase
                 $actual = count($channelBlock['openinghours']);
             }
 
-            $expected = $start->diffInDays($end) + 1;
+            // Carbon 3 returns a float, count whole days like Carbon 2 did.
+            $expected = (int) $start->diffInDays($end) + 1;
 
             $this->assertEquals($expected, $actual);
         }

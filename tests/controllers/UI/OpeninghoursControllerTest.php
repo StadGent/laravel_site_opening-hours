@@ -22,7 +22,7 @@ class OpeninghoursControllerTest extends \BrowserKitTestCase
      *
      * @return array
      */
-    public function requestTypeProvider()
+    public static function requestTypeProvider()
     {
         $data = [
             'label' => 'test',

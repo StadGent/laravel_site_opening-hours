@@ -32,7 +32,7 @@ class UsersControllerTest extends \BrowserKitTestCase
      * ['role_current_user', 'email_new_user', 'role', 'service_id']
      * @return array
      */
-    public function requestValidationProvider()
+    public static function requestValidationProvider()
     {
         return [
             ['admin', '', 'Owner', '1', 400], // no email
@@ -266,7 +266,7 @@ class UsersControllerTest extends \BrowserKitTestCase
      * ['userRole', verb', 'uri', 'data', 'responce status'] // Resource controller action
      * @return array
      */
-    public function requestTypeProvider()
+    public static function requestTypeProvider()
     {
         $data = [
         ];
