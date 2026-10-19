@@ -8,9 +8,9 @@ use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
 use App\Repositories\UserRepository;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UsersController extends Controller
 {
@@ -42,9 +42,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = $this->userRepository->getAll();
-
-        return response()->json($users);
+        return response()->json($this->usersWithPermissions());
     }
 
     /**
@@ -69,12 +67,27 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        if (\Auth::user()->id === $user->id) {
-            throw new AuthenticationException("You can't delete yourself!");
-        }
+        $this->authorize('delete', $user);
         $user->delete();
 
-        return response()->json($this->userRepository->getAll());
+        return response()->json($this->usersWithPermissions());
+    }
+
+    /**
+     * All users, each with what the current user may do with them
+     *
+     * @return array
+     */
+    private function usersWithPermissions(): array
+    {
+        $policy = Gate::getPolicyFor(User::class);
+        $results = $this->userRepository->getAll();
+        $users = User::findMany(array_column($results, 'id'))->keyBy('id');
+
+        return array_map(function (array $user) use ($policy, $users) {
+            $user['can'] = $policy->permissionsFor(\Auth::user(), $users[$user['id']]);
+            return $user;
+        }, $results);
     }
 
     /**
@@ -101,9 +114,12 @@ class UsersController extends Controller
             'service_id' => 'exists:services,id|required_unless:role,Admin',
         ]);
 
-        if (\Auth::user()->email === $request->input('email')) {
-            throw new AuthenticationException("You can't alter yourself!");
-        }
+        $this->authorize('invite', [
+            User::class,
+            $request->input('email'),
+            $request->input('role'),
+            (array) $request->input('service_id'),
+        ]);
 
         $role = Role::where('name', $request->input('role'))->first();
         $services = new Collection();
@@ -115,6 +131,7 @@ class UsersController extends Controller
 
         $user = $this->userService->setRolesToUser($request->input('email'), $role, $services);
         $user->roles = app('UserRepository')->getAllRolesForUser($user->id);
+        $user->can = Gate::getPolicyFor(User::class)->permissionsFor(\Auth::user(), $user);
 
         return $user;
     }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Role;
+use App\Models\User;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 
@@ -21,18 +21,13 @@ class IsOwner extends HasRoleInService
      */
     public function handle($request, Closure $next, $excludeEditor = false)
     {
-        if ($request->user('api')->hasRole('Admin')) {
+        // Admins pass even when the request names no service.
+        if ($request->user('api')->can('administer', User::class)) {
             return $next($request);
         }
 
         $requestServiceId = $this->findTheServiceInTheRequest($request);
-        $allowedServices = $request->user('api')
-          ->services()
-          ->wherePivot('role_id', Role::where('Name', 'Owner')->first()->id);
-
-        if ($allowedServices
-          ->where('id', $requestServiceId)
-          ->count()) {
+        if ($request->user('api')->can('ownService', [User::class, $requestServiceId])) {
             return $next($request);
         }
 

@@ -100,4 +100,16 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin
+    |--------------------------------------------------------------------------
+    |
+    | The id of the user that is allowed to grant or revoke the global Admin
+    | role through the UI.
+    |
+    */
+
+    'super_admin_id' => (int) env('SUPER_ADMIN_ID', 1),
+
 ];
