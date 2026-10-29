@@ -2,8 +2,9 @@
 
 Platform to manage opening hours for services and their channels.
 
-The full (Dutch) functional and technical documentation lives in
-[`docs/`](docs/index.md) and is published in Backstage.
+The full functional and technical documentation lives in
+[`docs/`](docs/index.md), in [English](docs/en/index.md) and
+[Dutch](docs/nl/index.md), and is published in Backstage.
 
 [![Tests](https://github.com/StadGent/laravel_site_opening-hours/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/StadGent/laravel_site_opening-hours/actions/workflows/tests.yml?query=branch%3Amaster)
 
@@ -148,7 +149,7 @@ format is chosen with the `Accept` header (`application/json`,
 - `{host}/api/v1/services/{service}[/channels/{channel}]/openinghours/{day|week|month|year}?date={date}`
 - `{host}/api/v1/services/{service}[/channels/{channel}]/open-now`
 
-See [docs/functioneel/api.md](docs/functioneel/api.md) for all parameters, and
+See [docs/en/functional/api.md](docs/en/functional/api.md) for all parameters, and
 the [SwaggerHub specification](https://app.swaggerhub.com/apis/Digipolis/Openinghours/1.0.0).
 
 ## Contributions

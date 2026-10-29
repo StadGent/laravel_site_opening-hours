@@ -7,7 +7,7 @@
 - Controleer de **volgorde van de lagen**: de bovenste laag wint (zie
   [Openingsuren beheren](../functioneel/openingsuren.md#kalenders-lagen)).
 - Controleer of de versie de gevraagde datum dekt.
-- Vraag de dag op in tekst om snel te vergelijken:
+- Vraag de week op in tekst om snel te vergelijken:
 
 ```bash
 curl -H 'Accept: text/plain' \
