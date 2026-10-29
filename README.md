@@ -1,6 +1,9 @@
 # Openinghours
 
-Platform to manager opening hours for services and their channels.
+Platform to manage opening hours for services and their channels.
+
+The full (Dutch) functional and technical documentation lives in
+[`docs/`](docs/index.md) and is published in Backstage.
 
 [![Tests](https://github.com/StadGent/laravel_site_opening-hours/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/StadGent/laravel_site_opening-hours/actions/workflows/tests.yml?query=branch%3Amaster)
 
@@ -21,10 +24,9 @@ Copy the .env.example to .env and
   triple (`BASE_URI`).
 - Fill in the base URI that is used to link to a data representation of
   something (`DATA_REPRESENTATION_URI`).
-- Fill in the `SPARQL` configuration to read data from.
-- Fill in the `SPARQL` configuration to write data to, don't forget the name of
-  the graph and the specific endpoint of the sparql-graph-crud-auth, which is
-  used to write (possibly) larger amounts of triples to.
+- Fill in the `SPARQL_WRITE_*` configuration, don't forget the name of the
+  graph. This endpoint is used both to read the services and to write the
+  opening hours (the `SPARQL_ENDPOINT*` variables are not used).
 - Mails are sent through SMTP.
 - Set session driver to database (anything but file).
 - Set 1 worker in supervisor
@@ -72,22 +74,17 @@ When updating the software the commands you'll want to run are the following:
 
 ```bash
 composer install
-composer update
 gulp build
 php artisan migrate
 php artisan cache:clear
 php artisan queue:restart
 ```
-    
-> Caveat: Keep an eye out for the johngrogg/ics-parser releases, currently this 
-> dependency is set to dev-master, because the branch contains an implementation
-> that we use in order to provide correct API responses. This is an actively
-> maintained library so (patch) releases are in play.
 
 ## Fetch services
 
 In order to fetch a list of services from the SPARQL endpoint you'll need to
-configure the SPARQL endpoint (READ). You can then run the following command:
+configure the SPARQL endpoint (`SPARQL_WRITE_*`). You can then run the
+following command:
 
 ```bash
 php artisan openinghours:fetch-services
@@ -107,9 +104,9 @@ a recreatex source, a property fetched during the retrieval of services from the
 SPARQL endpoint using the fetch-services command.
 
 The recreatex command will fetch services using the configured recreatex
-endpoint and shop-id and will do so, year by year, currently configured to fetch
-data from 2017 until 2020. These events will be added to the channel
-"Infrastructuur".
+endpoint and shop-id and will do so, year by year, from the current year up to
+3 years ahead. These events will be added to the channel configured in
+`CHANNEL_NAME`.
 
 Because Recreatex doesn't save it's events in a calendar standard, rather it
 saves every single day as an array of 2 events (maximum).
@@ -122,9 +119,8 @@ parses weekly RRULEs from the yearly event list.
 php artisan openinghours:fetch-recreatex
 ```
 
-> **Note**: this will import openinghours from 2017 up until 2020, make sure you
-> refresh the application in the browser after fetching the recreatex
-> openinghours, because the front-end caches responses by default.
+> **Note**: make sure you refresh the application in the browser after fetching
+> the recreatex openinghours, because the front-end caches responses by default.
 
 ## Email
 
@@ -132,11 +128,10 @@ Email is now done through SMTP
 
 ## VESTA
 
-Output can be written to VESTA on a weekly basis by using a predefined command.
-This will write a weekschedule to VESTA starting on monday of the week that the
-timestamp of execution falls in. e.g. If it's called friday at 5PM, the output
-will contain the schedule monday-sunday of that week that friday falls into.
-Scheduling it monday mornings will produce a schedule for that entire week.
+Changes to opening hours of VESTA services are pushed to VESTA through the
+queue. The output contains the opening hours from today up to 2 months ahead,
+so run the command below regularly (e.g. weekly through cron, it is not part of
+the Laravel scheduler) to keep VESTA up to date.
 
 ```bash
 php artisan openinghours:update-vesta
@@ -144,38 +139,17 @@ php artisan openinghours:update-vesta
 
 ## Usage
 
-Queries - No APIB or Swagger available.
+The public API lives under `/api/v1` and doesn't require authentication. The
+format is chosen with the `Accept` header (`application/json`,
+`application/ld+json`, `text/html` or `text/plain`).
 
-- The serviceUri parameter is required and must be the URI of a service.
-- The channel parameter is optional and must be the name of a specific channel
-  within the given service.
-- The format is optional and by default will return a JSON result, other formats
-  can be: html, text, json-ld.
+- `{host}/api/v1/services[/{service}[/channels[/{channel}]]]`
+- `{host}/api/v1/services/{service}[/channels/{channel}]/openinghours?from={date}&until={date}`
+- `{host}/api/v1/services/{service}[/channels/{channel}]/openinghours/{day|week|month|year}?date={date}`
+- `{host}/api/v1/services/{service}[/channels/{channel}]/open-now`
 
-### Get the schedule for the next 7 days
-
-The URI template to get the openinghours for a certain service and a channel
-within that service (optional).
-
-If no channel is passed, all channels will be returned with a schedule of the
-coming 7 days.
-
-- `{host}/api/query?q=week&serviceUri={serviceUri}&channel={channel}&format={format}`
-
-### Get a week schedule starting on monday
-
-Passing a date is optional and if passed will return the monday-sunday schedule
-of the week that the date falls in.
-
-- `{host}/api/query?q=fullWeek&serviceUri={serviceUri}&channel={channel}&date=dd-mm-yyyy&format={format}`
-
-### Is something open right now?
-
-- `{host}/api/query?q=now&serviceUri={serviceUri}&channel={channel}&format={format}`
-
-### Get the openinghours for a specific day
-
-- `{host}/api/query?q=day&date={mm-dd-yyyy}&serviceUri={serviceUri}&channel={channel}&format={format}`
+See [docs/functioneel/api.md](docs/functioneel/api.md) for all parameters, and
+the [SwaggerHub specification](https://app.swaggerhub.com/apis/Digipolis/Openinghours/1.0.0).
 
 ## Contributions
 
