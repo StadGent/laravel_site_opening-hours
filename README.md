@@ -2,9 +2,7 @@
 
 Platform to manager opening hours for services and their channels.
 
-[![Build Status][ico-travis]][link-travis]
-[![Maintainability][ico-maintainability]][link-maintainability]
-[![Test Coverage][ico-test-coverage]][link-test-coverage]
+[![Tests](https://github.com/StadGent/laravel_site_opening-hours/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/StadGent/laravel_site_opening-hours/actions/workflows/tests.yml?query=branch%3Amaster)
 
 ## Installation
 
@@ -188,13 +186,4 @@ The first iteration codebase has been written by
 The design and functional analysis has been performed by
 [@mietcls](https://github.com/mietcls)
 
-Codeclimate set-up, code review and further maintenance will be done by the
-Digipolis team.
-
-[ico-travis]: https://img.shields.io/travis/StadGent/laravel_site_opening-hours/develop.svg?style=flat-square
-[ico-maintainability]: https://img.shields.io/codeclimate/maintainability/StadGent/laravel_site_opening-hours.svg?style=flat-square
-[ico-test-coverage]: https://img.shields.io/codeclimate/c/StadGent/laravel_site_opening-hours.svg?style=flat-square
-
-[link-travis]: https://travis-ci.org/StadGent/laravel_site_opening-hours
-[link-maintainability]: https://codeclimate.com/github/StadGent/laravel_site_opening-hours/maintainability
-[link-test-coverage]: https://codeclimate.com/github/StadGent/laravel_site_opening-hours/test_coverage
+Code review and further maintenance are done by the District09 team.
