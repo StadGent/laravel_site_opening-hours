@@ -13,7 +13,7 @@
 
 Route::get('/', 'HomeController@index')->middleware('auth:web');
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::get('/register/confirm/{token}', 'Auth\RegisterController@showSetPassword');
 Route::post('/register/confirm/{token}', 'Auth\RegisterController@completeRegistration');
