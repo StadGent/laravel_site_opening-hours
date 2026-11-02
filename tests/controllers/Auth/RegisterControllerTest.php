@@ -80,4 +80,17 @@ class RegisterControllerTest extends \BrowserKitTestCase
         $user->refresh();
         $this->assertTrue(Hash::check('first-password', $user->password));
     }
+
+    /**
+     * @test
+     */
+    public function testPublicRegistrationIsDisabled()
+    {
+        $this->call('GET', '/register');
+        $this->assertResponseStatus(404);
+
+        $this->call('POST', '/register', ['email' => 'self-registered@example.com']);
+        $this->assertResponseStatus(404);
+        $this->assertNull(User::where('email', 'self-registered@example.com')->first());
+    }
 }
