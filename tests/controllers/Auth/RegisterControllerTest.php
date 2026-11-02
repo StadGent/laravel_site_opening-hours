@@ -25,6 +25,7 @@ class RegisterControllerTest extends \BrowserKitTestCase
         ]);
 
         $this->call('POST', '/register/confirm/' . $token, [
+            'email' => $user->email,
             'password' => 'new-password',
             'password_confirmation' => 'new-password',
         ]);
@@ -60,6 +61,38 @@ class RegisterControllerTest extends \BrowserKitTestCase
     /**
      * @test
      */
+    public function testValidTokenWithAnotherUsersEmailIsRejected()
+    {
+        $token = Str::random(32);
+        $invited = User::create([
+            'name' => 'Invited',
+            'email' => 'invited-' . Str::random(8) . '@example.com',
+            'password' => '',
+            'token' => $token,
+        ]);
+        $other = User::create([
+            'name' => 'Other',
+            'email' => 'other-' . Str::random(8) . '@example.com',
+            'password' => Hash::make('original-password'),
+        ]);
+
+        $this->call('POST', '/register/confirm/' . $token, [
+            'email' => $other->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+
+        $invited->refresh();
+        $other->refresh();
+        $this->assertSame($token, $invited->token);
+        $this->assertFalse(Hash::check('new-password', $invited->password));
+        $this->assertTrue(Hash::check('original-password', $other->password));
+        $this->assertFalse(\Auth::check());
+    }
+
+    /**
+     * @test
+     */
     public function testUsedTokenCannotBeReused()
     {
         $token = Str::random(32);
@@ -70,11 +103,19 @@ class RegisterControllerTest extends \BrowserKitTestCase
             'token' => $token,
         ]);
 
-        $payload = ['password' => 'first-password', 'password_confirmation' => 'first-password'];
+        $payload = [
+            'email' => $user->email,
+            'password' => 'first-password',
+            'password_confirmation' => 'first-password',
+        ];
         $this->call('POST', '/register/confirm/' . $token, $payload);
         \Auth::logout();
 
-        $payload = ['password' => 'second-password', 'password_confirmation' => 'second-password'];
+        $payload = [
+            'email' => $user->email,
+            'password' => 'second-password',
+            'password_confirmation' => 'second-password',
+        ];
         $this->call('POST', '/register/confirm/' . $token, $payload);
 
         $user->refresh();
