@@ -85,16 +85,16 @@ class RegisterController extends Controller
     /**
      * @param Request $request
      */
-    public function completeRegistration(Request $request)
+    public function completeRegistration(Request $request, $token)
     {
         $this->registrationCompletionValidator($request->all())->validate();
 
-        $input = $request->input();
-
-        $user = User::where('email', $input['email'])->first();
+        // Only the secret token from the confirmation mail identifies the user.
+        // Never trust user-supplied input such as the e-mail address here.
+        $user = User::where('token', $token)->whereNotNull('token')->first();
 
         if (!empty($user)) {
-            $user->password = Hash::make($input['password']);
+            $user->password = Hash::make($request->input('password'));
             $user->token = null;
             $user->save();
 
@@ -127,8 +127,7 @@ class RegisterController extends Controller
     protected function registrationCompletionValidator(array $data)
     {
         return Validator::make($data, [
-            'email' => ['required', 'email'],
-            'password' => ['min:8', 'confirmed'],
+            'password' => ['required', 'min:8', 'confirmed'],
         ]);
     }
 
