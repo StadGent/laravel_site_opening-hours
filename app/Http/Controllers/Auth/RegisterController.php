@@ -58,9 +58,13 @@ class RegisterController extends Controller
     {
         $this->registrationCompletionValidator($request->all())->validate();
 
-        // Only the secret token from the confirmation mail identifies the user.
-        // Never trust user-supplied input such as the e-mail address here.
-        $user = User::where('token', $token)->whereNotNull('token')->first();
+        // The secret token from the confirmation mail identifies the user. As an
+        // extra safeguard, the submitted e-mail address must belong to that same
+        // user; the e-mail alone is never enough to select an account.
+        $user = User::where('token', $token)
+            ->whereNotNull('token')
+            ->where('email', $request->input('email'))
+            ->first();
 
         if (!empty($user)) {
             $user->password = Hash::make($request->input('password'));
@@ -82,6 +86,7 @@ class RegisterController extends Controller
     protected function registrationCompletionValidator(array $data)
     {
         return Validator::make($data, [
+            'email' => ['required', 'string', 'email'],
             'password' => ['required', 'min:8', 'confirmed'],
         ]);
     }
