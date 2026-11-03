@@ -16,7 +16,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "bootstrap-sass": "^3.4.1",
     "commonjs": "^0.0.1",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.1",
     "rollup": "^3.30.0",
     "rollup-plugin-buble": "^0.19.8",
     "rollup-plugin-commonjs": "^10.1.0",
