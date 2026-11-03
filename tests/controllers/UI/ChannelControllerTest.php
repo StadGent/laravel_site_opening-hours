@@ -93,6 +93,12 @@ class ChannelControllerTest extends \BrowserKitTestCase
             ['member', 'patch', '1/channels/1', [], 405], // update (partial)
             ['member', 'delete', '1/channels/1', [], 200], // destroy
             ['member', 'delete', '2/channels/6', [], 401], // cannot destroy on not membered service
+            // an id in the query string or body must not override the one in the URL
+            ['member', 'get', '2/channels?service=1', [], 401],
+            ['member', 'put', '1/channels/7', ['label' => 'updated label', 'channel_id' => 1], 401],
+            ['member', 'put', '3/channels/7', ['label' => 'updated label', 'channel' => 1], 401],
+            ['member', 'delete', '2/channels/6?channel_id=1', [], 401],
+            ['member', 'delete', '2/channels/6', ['service' => 1], 401],
         ];
     }
 

@@ -45,51 +45,81 @@ class HasRoleInService
     }
 
     /**
+     * Find the id of the service the request acts on
+     *
+     * The resource in the URL always decides: route parameters are read with
+     * $request->route() only, because $request->calendar and the like return
+     * a query string or body value of the same name before the route
+     * parameter. The body is only consulted when the URL names no resource,
+     * i.e. when creating one (or managing roles and invites).
+     *
      * @param Request $request
+     * @return int|string
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function findTheServiceInTheRequest(Request $request)
     {
-        switch (true) {
-            case isset($request->calendar):
-                $calendar = $request->calendar;
-                if (!($request->calendar instanceof Calendar)) {
-                    $calendar = Calendar::find($calendar);
-                }
+        $serviceId = $this->findTheServiceInTheRoute($request)
+            ?? $this->findTheServiceInTheInput($request);
 
-                return $calendar->openinghours->channel->service->id;
-            case isset($request->openinghours_id):
-                $openinghours = Openinghours::find($request->openinghours_id);
-
-                return $openinghours->channel->service->id;
-            case isset($request->openinghours):
-                $openinghours = $request->openinghours;
-                if (!($request->openinghours instanceof Openinghours)) {
-                    $openinghours = Openinghours::find($openinghours);
-                }
-
-                return $openinghours->channel->service->id;
-            case isset($request->channel_id):
-                $channel = Channel::find($request->channel_id);
-
-                return $channel->service->id;
-            case isset($request->channel):
-                $channel = $request->channel;
-                if (!($request->channel instanceof Channel)) {
-                    $channel = Channel::find($channel);
-                }
-
-                return $channel->service->id;
-            case isset($request->service):
-                $service = $request->service;
-                if (!($request->service instanceof Service)) {
-                    $service = Service::find($service);
-                }
-
-                return $service->id;
-            case isset($request->service_id):
-                return $request->service_id;
-            default:
-                throw new AuthenticationException("Unauthorized");
+        if (empty($serviceId)) {
+            throw new AuthenticationException("Unauthorized");
         }
+
+        return $serviceId;
+    }
+
+    /**
+     * @param Request $request
+     * @return int|null
+     */
+    private function findTheServiceInTheRoute(Request $request)
+    {
+        if ($request->route('calendar') !== null) {
+            $calendar = $this->resolve(Calendar::class, $request->route('calendar'));
+
+            return $calendar?->openinghours?->channel?->service?->id;
+        }
+        if ($request->route('openinghours') !== null) {
+            $openinghours = $this->resolve(Openinghours::class, $request->route('openinghours'));
+
+            return $openinghours?->channel?->service?->id;
+        }
+        if ($request->route('channel') !== null) {
+            $channel = $this->resolve(Channel::class, $request->route('channel'));
+
+            return $channel?->service?->id;
+        }
+        if ($request->route('service') !== null) {
+            return $this->resolve(Service::class, $request->route('service'))?->id;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param Request $request
+     * @return int|string|null
+     */
+    private function findTheServiceInTheInput(Request $request)
+    {
+        if ($request->input('openinghours_id') !== null) {
+            return Openinghours::find($request->input('openinghours_id'))?->channel?->service?->id;
+        }
+        if ($request->input('channel_id') !== null) {
+            return Channel::find($request->input('channel_id'))?->service?->id;
+        }
+
+        return $request->input('service_id');
+    }
+
+    /**
+     * @param string $class
+     * @param mixed $value A bound model or its id
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    private function resolve(string $class, $value)
+    {
+        return $value instanceof $class ? $value : $class::find($value);
     }
 }

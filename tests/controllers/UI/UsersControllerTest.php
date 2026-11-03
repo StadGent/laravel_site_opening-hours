@@ -301,6 +301,8 @@ class UsersControllerTest extends \BrowserKitTestCase
             ['owner', 'get', 'users', [], 401], // index
             ['owner', 'get', 'services/1/users', [], 200], // getFromService
             ['owner', 'get', 'services/2/users', [], 401], // getFromService but not owned service
+            ['owner', 'get', 'services/2/users?service=1', [], 401], // service in the query must not override the URL
+            ['owner', 'get', 'services/2/users?service_id=1', [], 401],
             ['owner', 'post', 'users', $data, 405], // store
             ['owner', 'get', 'users/1', [], 401], // show
             ['owner', 'put', 'users/1', $data, 405], // update (full)
