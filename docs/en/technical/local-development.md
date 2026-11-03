@@ -5,7 +5,7 @@
 - PHP 8.3 with the `soap`, `intl` and `pdo_mysql` extensions
 - Composer
 - MySQL 8 or MariaDB
-- Node.js 16 (see `.nvmrc`) and npm
+- Node.js 22 or higher (see `.nvmrc`) and npm
 - A web server (Apache/nginx) with the document root at `public/`, or
   `php artisan serve`
 

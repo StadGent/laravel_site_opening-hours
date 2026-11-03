@@ -1,21 +1,23 @@
 {
   "scripts": {
     "sass": "sass -I node_modules/bootstrap-sass/assets/stylesheets resources/assets/sass/app.scss > public/css/app.css",
-    "devsass": "sass -I node_modules/bootstrap-sass/assets/stylesheets -w resources/assets/sass/app.scss -o public/css",
+    "devsass": "sass -I node_modules/bootstrap-sass/assets/stylesheets --watch resources/assets/sass/app.scss:public/css/app.css",
     "build": "rollup -c",
     "dev": "rollup -c --watch"
   },
   "name": "openinghours",
   "description": "Manage and publish opening hours",
   "repository": "https://github.com/StadGent/laravel_site_opening-hours",
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "bootstrap-sass": "^3.4.1",
     "commonjs": "^0.0.1",
-    "gulp": "^4.0.2",
-    "node-sass": "^9.0.0",
-    "rollup": "^3.29.4",
+    "gulp": "^5.0.1",
+    "rollup": "^3.30.0",
     "rollup-plugin-buble": "^0.19.8",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-vue2": "^0.8.1",
