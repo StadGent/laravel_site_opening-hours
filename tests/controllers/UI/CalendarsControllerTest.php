@@ -67,6 +67,26 @@ class CalendarsControllerTest extends \BrowserKitTestCase
     }
 
     /**
+     * @test
+     */
+    public function testUpdateCanNotMoveACalendarToAnotherVersion()
+    {
+        // Version 7 belongs to a service the member has no role in.
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('put', $this->apiUrl . '/2', [
+            'priority' => '2',
+            'label' => 'moved?',
+            'openinghours_id' => '7',
+        ]);
+        $this->seeStatusCode(200);
+
+        $calendar = \App\Models\Calendar::find(2);
+        $this->assertEquals('moved?', $calendar->label);
+        $this->assertEquals(1, $calendar->openinghours_id);
+    }
+
+    /**
      * Data provider for requests
      *
      * Datastructure:
@@ -128,6 +148,11 @@ class CalendarsControllerTest extends \BrowserKitTestCase
             ['member', 'delete', '1', [], 400], // can't delete base calendar
             ['member', 'delete', '2', [], 200], // destroy
             ['member', 'delete', '22', [], 401], // can't delete calendar from not membered service
+            // a calendar id in the query string or body must not override the one in the URL
+            ['member', 'delete', '22?calendar=2', [], 401],
+            ['member', 'delete', '22', ['calendar' => '2'], 401],
+            ['member', 'delete', '22?openinghours_id=1', [], 401],
+            ['member', 'put', '22', array_merge($data, ['calendar' => '1']), 401],
         ];
     }
 

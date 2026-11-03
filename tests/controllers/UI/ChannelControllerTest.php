@@ -28,6 +28,47 @@ class ChannelControllerTest extends \BrowserKitTestCase
     }
 
     /**
+     * @test
+     */
+    public function testStoreCreatesTheChannelInTheServiceOfTheUrl()
+    {
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('post', $this->apiUrl . '/1/channels', ['label' => 'smuggled', 'service_id' => 3]);
+        $this->seeStatusCode(200);
+
+        $this->assertEquals(1, \App\Models\Channel::where('label', 'smuggled')->firstOrFail()->service_id);
+        $this->assertFalse(\App\Models\Channel::where('label', 'smuggled')->where('service_id', 3)->exists());
+    }
+
+    /**
+     * @test
+     */
+    public function testUpdateCanNotMoveAChannelToAnotherService()
+    {
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('put', $this->apiUrl . '/1/channels/1', ['label' => 'moved?', 'service_id' => 3]);
+        $this->seeStatusCode(200);
+
+        $channel = \App\Models\Channel::find(1);
+        $this->assertEquals('moved?', $channel->label);
+        $this->assertEquals(1, $channel->service_id);
+    }
+
+    /**
+     * @test
+     */
+    public function testUpdateFailsWhenTheChannelIsNotOfTheService()
+    {
+        $this->actingAs(\App\Models\User::where('name', 'adminuser')->first(), 'api');
+
+        $this->doRequest('put', $this->apiUrl . '/1/channels/7', ['label' => 'updated label']);
+        $this->seeStatusCode(422);
+        $this->assertNotEquals('updated label', \App\Models\Channel::find(7)->label);
+    }
+
+    /**
      * Data provider for requests
      *
      * Datastructure:
@@ -93,6 +134,12 @@ class ChannelControllerTest extends \BrowserKitTestCase
             ['member', 'patch', '1/channels/1', [], 405], // update (partial)
             ['member', 'delete', '1/channels/1', [], 200], // destroy
             ['member', 'delete', '2/channels/6', [], 401], // cannot destroy on not membered service
+            // an id in the query string or body must not override the one in the URL
+            ['member', 'get', '2/channels?service=1', [], 401],
+            ['member', 'put', '1/channels/7', ['label' => 'updated label', 'channel_id' => 1], 401],
+            ['member', 'put', '3/channels/7', ['label' => 'updated label', 'channel' => 1], 401],
+            ['member', 'delete', '2/channels/6?channel_id=1', [], 401],
+            ['member', 'delete', '2/channels/6', ['service' => 1], 401],
         ];
     }
 
