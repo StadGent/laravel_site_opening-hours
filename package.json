@@ -17,7 +17,7 @@
     "bootstrap-sass": "^3.4.1",
     "commonjs": "^0.0.1",
     "gulp": "^4.0.2",
-    "rollup": "^3.29.4",
+    "rollup": "^3.30.0",
     "rollup-plugin-buble": "^0.19.8",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-vue2": "^0.8.1",
