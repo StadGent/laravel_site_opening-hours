@@ -1,7 +1,7 @@
 {
   "scripts": {
     "sass": "sass -I node_modules/bootstrap-sass/assets/stylesheets resources/assets/sass/app.scss > public/css/app.css",
-    "devsass": "sass -I node_modules/bootstrap-sass/assets/stylesheets -w resources/assets/sass/app.scss -o public/css",
+    "devsass": "sass -I node_modules/bootstrap-sass/assets/stylesheets --watch resources/assets/sass/app.scss:public/css/app.css",
     "build": "rollup -c",
     "dev": "rollup -c --watch"
   },
@@ -16,7 +16,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "bootstrap-sass": "^3.4.1",
     "commonjs": "^0.0.1",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.1",
     "rollup": "^3.30.0",
     "rollup-plugin-buble": "^0.19.8",
     "rollup-plugin-commonjs": "^10.1.0",
