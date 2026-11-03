@@ -1,7 +1,7 @@
 {
   "scripts": {
     "sass": "sass -I node_modules/bootstrap-sass/assets/stylesheets resources/assets/sass/app.scss > public/css/app.css",
-    "devsass": "sass -I node_modules/bootstrap-sass/assets/stylesheets -w resources/assets/sass/app.scss -o public/css",
+    "devsass": "sass -I node_modules/bootstrap-sass/assets/stylesheets --watch resources/assets/sass/app.scss:public/css/app.css",
     "build": "rollup -c",
     "dev": "rollup -c --watch"
   },
