@@ -54,7 +54,9 @@ class CalendarsController extends Controller
      */
     public function update(UpdateCalendarRequest $request, $id)
     {
-        $input = $request->input();
+        // A calendar can't be moved to another version: only the version it
+        // belongs to now was authorized (see UpdateCalendarRequest).
+        $input = $request->except('openinghours_id');
 
         // If events are passed, bulk insert them
         // Base calendars can have no events

@@ -67,6 +67,26 @@ class CalendarsControllerTest extends \BrowserKitTestCase
     }
 
     /**
+     * @test
+     */
+    public function testUpdateCanNotMoveACalendarToAnotherVersion()
+    {
+        // Version 7 belongs to a service the member has no role in.
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('put', $this->apiUrl . '/2', [
+            'priority' => '2',
+            'label' => 'moved?',
+            'openinghours_id' => '7',
+        ]);
+        $this->seeStatusCode(200);
+
+        $calendar = \App\Models\Calendar::find(2);
+        $this->assertEquals('moved?', $calendar->label);
+        $this->assertEquals(1, $calendar->openinghours_id);
+    }
+
+    /**
      * Data provider for requests
      *
      * Datastructure:

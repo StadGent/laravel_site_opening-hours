@@ -26,12 +26,15 @@ class ChannelController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param StoreChannelRequest $request
+     * @param Service $service
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreChannelRequest $request)
+    public function store(StoreChannelRequest $request, Service $service)
     {
-        $input = $request->input();
+        // The service in the URL is the one the user is authorized for.
+        $input = $request->only(['label', 'type_id', 'weight']);
+        $input['service_id'] = $service->id;
         $id = $this->channels->store($input);
         $channel = $this->channels->getById($id);
         if (empty($channel)) {
@@ -54,7 +57,10 @@ class ChannelController extends Controller
      */
     public function update(StoreChannelRequest $request, Service $service, Channel $channel)
     {
-        $input = $request->input();
+        $this->assertChannelOfService($service, $channel);
+
+        // A channel can't be moved to another service.
+        $input = $request->only(['label', 'type_id', 'weight']);
 
         if (!$channel->update($input)) {
             return response()->json(
@@ -87,15 +93,25 @@ class ChannelController extends Controller
      */
     public function destroy(Service $service, Channel $channel)
     {
-        if (!$service->channels->find($channel)) {
+        $this->assertChannelOfService($service, $channel);
+
+        $channel->delete();
+
+        return response()->json(['Het kanaal werd verwijderd.']);
+    }
+
+    /**
+     * @param Service $service
+     * @param Channel $channel
+     * @throws ModelNotFoundException
+     */
+    private function assertChannelOfService(Service $service, Channel $channel)
+    {
+        if ((int) $channel->service_id !== (int) $service->id) {
             $exception = new ModelNotFoundException();
             $exception->setModel(Channel::class);
 
             throw $exception;
         }
-
-        $channel->delete();
-
-        return response()->json(['Het kanaal werd verwijderd.']);
     }
 }

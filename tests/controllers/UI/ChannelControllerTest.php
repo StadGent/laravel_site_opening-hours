@@ -28,6 +28,47 @@ class ChannelControllerTest extends \BrowserKitTestCase
     }
 
     /**
+     * @test
+     */
+    public function testStoreCreatesTheChannelInTheServiceOfTheUrl()
+    {
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('post', $this->apiUrl . '/1/channels', ['label' => 'smuggled', 'service_id' => 3]);
+        $this->seeStatusCode(200);
+
+        $this->assertEquals(1, \App\Models\Channel::where('label', 'smuggled')->firstOrFail()->service_id);
+        $this->assertFalse(\App\Models\Channel::where('label', 'smuggled')->where('service_id', 3)->exists());
+    }
+
+    /**
+     * @test
+     */
+    public function testUpdateCanNotMoveAChannelToAnotherService()
+    {
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('put', $this->apiUrl . '/1/channels/1', ['label' => 'moved?', 'service_id' => 3]);
+        $this->seeStatusCode(200);
+
+        $channel = \App\Models\Channel::find(1);
+        $this->assertEquals('moved?', $channel->label);
+        $this->assertEquals(1, $channel->service_id);
+    }
+
+    /**
+     * @test
+     */
+    public function testUpdateFailsWhenTheChannelIsNotOfTheService()
+    {
+        $this->actingAs(\App\Models\User::where('name', 'adminuser')->first(), 'api');
+
+        $this->doRequest('put', $this->apiUrl . '/1/channels/7', ['label' => 'updated label']);
+        $this->seeStatusCode(422);
+        $this->assertNotEquals('updated label', \App\Models\Channel::find(7)->label);
+    }
+
+    /**
      * Data provider for requests
      *
      * Datastructure:
