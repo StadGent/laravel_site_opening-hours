@@ -5,7 +5,7 @@
 - PHP 8.3 met de extensies `soap`, `intl`, `pdo_mysql`
 - Composer
 - MySQL 8 of MariaDB
-- Node.js 16 (zie `.nvmrc`) en npm
+- Node.js 22 of hoger (zie `.nvmrc`) en npm
 - Een webserver (Apache/nginx) met de document root op `public/`, of
   `php artisan serve`
 

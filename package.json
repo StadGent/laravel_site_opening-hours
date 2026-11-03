@@ -8,13 +8,15 @@
   "name": "openinghours",
   "description": "Manage and publish opening hours",
   "repository": "https://github.com/StadGent/laravel_site_opening-hours",
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "bootstrap-sass": "^3.4.1",
     "commonjs": "^0.0.1",
     "gulp": "^4.0.2",
-    "node-sass": "^9.0.0",
     "rollup": "^3.29.4",
     "rollup-plugin-buble": "^0.19.8",
     "rollup-plugin-commonjs": "^10.1.0",
