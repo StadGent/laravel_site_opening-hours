@@ -15,6 +15,51 @@ class OpeninghoursControllerTest extends \BrowserKitTestCase
     protected $apiUrl = '/api/v1/ui/openinghours';
 
     /**
+     * @test
+     */
+    public function testStoreCopiesAVersionOfTheSameService()
+    {
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('post', $this->apiUrl, $this->newVersion(['originalVersion' => 1]));
+        $this->seeStatusCode(200);
+
+        $copy = Openinghours::where('label', 'copy test')->firstOrFail();
+        $this->assertEquals(
+            Openinghours::find(1)->calendars->pluck('label')->sort()->values(),
+            $copy->calendars->pluck('label')->sort()->values()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function testStoreCanNotCopyAVersionOfAnotherService()
+    {
+        // Version 7 belongs to a service the member has no role in.
+        $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
+
+        $this->doRequest('post', $this->apiUrl, $this->newVersion(['originalVersion' => 7]));
+        $this->seeStatusCode(400);
+        $this->assertContains('originalVersion', array_column($this->response->json()['error']['details'], 'target'));
+        $this->assertFalse(Openinghours::where('label', 'copy test')->exists());
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function newVersion(array $data)
+    {
+        return array_merge([
+            'label' => 'copy test',
+            'channel_id' => '1',
+            'start_date' => '2019-01-01',
+            'end_date' => '2019-02-01',
+        ], $data);
+    }
+
+    /**
      * Data provider for requests
      *
      * Datastructure:

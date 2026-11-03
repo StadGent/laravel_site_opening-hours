@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Channel;
+use App\Models\Openinghours;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
@@ -46,6 +47,7 @@ class StoreOpeninghoursRequest extends FormRequest
         return [
             'label' => 'required',
             'channel_id' => 'exists:channels,id|required|numeric',
+            'originalVersion' => 'nullable|numeric|exists:openinghours,id',
         ];
     }
 
@@ -73,6 +75,19 @@ class StoreOpeninghoursRequest extends FormRequest
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
+            // Only a version of the same service can be copied: the user is
+            // not necessarily allowed to see the calendars of other services.
+            if ($this->input('originalVersion') !== null && !$validator->errors()->has('originalVersion')) {
+                $original = Openinghours::with('channel')->find($this->input('originalVersion'));
+                $channel = Channel::find($this->input('channel_id'));
+                if (!$original || !$channel || $original->channel?->service_id != $channel->service_id) {
+                    $validator->errors()->add(
+                        'originalVersion',
+                        'Je kan enkel een versie van dezelfde dienst kopiëren.'
+                    );
+                }
+            }
+
             // model binding gives correct App\Models\Openinghours
             if (!empty($this->route('openinghours'))) {
                 $openinghours = $this->route('openinghours');
