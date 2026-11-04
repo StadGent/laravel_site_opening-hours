@@ -1,7 +1,7 @@
 {
     "name": "stadgent/laravel_site_opening-hours",
     "description": "An open source web application to create calendars that represent openinghours of public services.",
-    "license": "AGPLv3",
+    "license": "MIT",
     "type": "project",
     "keywords": [
         "framework",
