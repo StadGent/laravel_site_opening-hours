@@ -4,6 +4,7 @@ import { VERSION_YEARS, createVersion } from '../defaults.js'
 export const modal = {
   email: null,
   label: null,
+  weight: null,
   srv: null,
   strict: null,
   start_date: null,
@@ -52,6 +53,7 @@ export default {
       this.modal.label = '';
       this.modal.srv = srv;
       this.modal.type_id = 0;
+      this.modal.weight = 0;
     },
     newVersion(srv) {
       this.modal = Object.assign(this.modal, createVersion());

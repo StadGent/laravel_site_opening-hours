@@ -689,3 +689,34 @@ h1 + h3 {
 input[type=radio] {
     vertical-align: middle;
 }
+
+.channel-order-handle {
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: #777;
+  cursor: move;
+
+  &:hover,
+  &:focus {
+    color: #333;
+  }
+
+  &[disabled] {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+}
+
+tr.channel-dragging {
+  opacity: .5;
+}
+
+// Show where the dragged channel will land.
+tr.channel-drop-before > td {
+  border-top: 2px solid #337ab7;
+}
+
+tr.channel-drop-after > td {
+  border-bottom: 2px solid #337ab7;
+}

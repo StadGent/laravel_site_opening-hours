@@ -32,6 +32,8 @@ Route::group(['prefix' => 'v1'], function () {
         // channels
         Route::get('/services/{service}/channels', 'UI\ChannelController@getFromService');
         Route::post('/services/{service}/channels', 'UI\ChannelController@store');
+        // Before {channel}, so "order" is not bound as a channel id.
+        Route::put('/services/{service}/channels/order', 'UI\ChannelController@order');
         Route::put('/services/{service}/channels/{channel}', 'UI\ChannelController@update');
         Route::delete('/services/{service}/channels/{channel}', 'UI\ChannelController@destroy');
 

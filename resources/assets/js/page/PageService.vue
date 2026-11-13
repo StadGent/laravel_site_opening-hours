@@ -45,6 +45,9 @@
       <table v-else class="table table-hover">
         <thead>
           <tr>
+            <th v-if="canEditChannels" class="td-btn">
+              <span class="sr-only">Volgorde</span>
+            </th>
             <th-sort by="label">Kanaal</th-sort>
             <th>Type</th>
             <th>Status</th>
@@ -55,10 +58,30 @@
         </thead>
         <tbody>
           <tr
-            v-for="channel in sortedChannels"
+            v-for="(channel, index) in sortedChannels"
+            :key="channel.id"
             @click="href('#!channel/'+[srv.id,channel.id].join('/'))"
-            :class="{ 'success text-success': hasActiveOh(channel).length  }"
+            :class="{ 'success text-success': hasActiveOh(channel).length, 'channel-dragging': dragIndex === index, 'channel-drop-before': dropIndex === index && dragIndex > index, 'channel-drop-after': dropIndex === index && dragIndex !== null && dragIndex < index }"
+            :draggable="canReorder"
+            @dragstart="dragStart(index, $event)"
+            @dragover="dragOver(index, $event)"
+            @drop.prevent="drop(index)"
+            @dragend="dragEnd"
           >
+            <td v-if="canEditChannels" class="td-btn" @click.stop>
+              <!-- Keyboard users move the focused channel with the arrow keys. -->
+              <button
+                type="button"
+                class="channel-order-handle"
+                :disabled="!canReorder"
+                :title="reorderTitle"
+                @keydown.up.prevent="move(index, -1)"
+                @keydown.down.prevent="move(index, 1)"
+              >
+                <i class="glyphicon glyphicon-move" aria-hidden="true"></i>
+                <span class="sr-only">Verplaats {{ channel.label }} met de pijltjestoetsen</span>
+              </button>
+            </td>
             <td>
               <a :href="'#!channel/'+[srv.id,channel.id].join('/')">{{ channel.label }}</a>
             </td>
@@ -95,7 +118,9 @@ export default {
       order: '',
       query: '',
       msg: '',
-      service: null
+      service: null,
+      dragIndex: null,
+      dropIndex: null
     }
   },
   created() {
@@ -119,6 +144,19 @@ export default {
     types () {
         return this.$root.types
     },
+    canEditChannels () {
+      return (this.isAdmin || this.isOwner || this.isMember) && !this.$root.isRecreatex
+    },
+    // The order can only be changed when the list shows the saved order.
+    canReorder () {
+      return this.canEditChannels && !this.order && !this.query && this.channels.length > 1
+    },
+    reorderTitle () {
+      if (this.order || this.query) {
+        return 'Wis de sortering om de volgorde aan te passen'
+      }
+      return this.canReorder ? 'Sleep om de volgorde aan te passen' : ''
+    },
     // Users
     filteredUsers () {
       return this.srv.users || {};
@@ -134,6 +172,45 @@ export default {
         user_id: user.id,
         service_id: this.srv.id
       })
+    },
+    move (from, offset) {
+      this.reorder(from, from + offset)
+    },
+    reorder (from, to) {
+      if (!this.canReorder || from === to || to < 0 || to >= this.channels.length) {
+        return
+      }
+      const channels = this.channels.slice()
+      channels.splice(to, 0, channels.splice(from, 1)[0])
+      Hub.$emit('orderChannels', channels)
+    },
+    dragStart (index, event) {
+      if (!this.canReorder) {
+        event.preventDefault()
+        return
+      }
+      this.dragIndex = index
+      event.dataTransfer.effectAllowed = 'move'
+      // Firefox only starts dragging when data is set.
+      event.dataTransfer.setData('text/plain', String(index))
+    },
+    dragOver (index, event) {
+      if (this.dragIndex === null) {
+        return
+      }
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+      this.dropIndex = index
+    },
+    drop (index) {
+      if (this.dragIndex !== null) {
+        this.reorder(this.dragIndex, index)
+      }
+      this.dragEnd()
+    },
+    dragEnd () {
+      this.dragIndex = null
+      this.dropIndex = null
     },
     rmChannel (c) {
       Hub.$emit('deleteChannel', c)
