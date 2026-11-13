@@ -123,7 +123,8 @@ class ChannelControllerTest extends \BrowserKitTestCase
         $this->actingAs(\App\Models\User::where('name', 'memberuser')->first(), 'api');
 
         $this->doRequest('put', $this->apiUrl . '/1/channels/1', ['label' => 'invalid weight', 'weight' => 'abc']);
-        $this->seeStatusCode(422);
+        // The exception handler renders validation errors as a 400.
+        $this->seeStatusCode(400);
         $this->assertNotEquals('invalid weight', \App\Models\Channel::find(1)->label);
     }
 
