@@ -22,6 +22,13 @@
             <label for="input_channel_name" class="control-label">Naam van het kanaal</label>
             <input-channel :parent="modal" :id="'input_channel_name'" prop="label"></input-channel>
             <select-channel-type prop="type_id" :parent="modal" />
+            <div class="form-group">
+              <label for="input_channel_weight" class="control-label">Volgorde</label>
+              <input type="number" step="1" id="input_channel_weight" class="form-control" v-model.number="modal.weight" aria-describedby="input_channel_weight_help">
+              <span id="input_channel_weight_help" class="help-block">
+                Kanalen met een lager getal staan hoger. Kanalen met hetzelfde getal staan in de volgorde waarin ze aangemaakt zijn.
+              </span>
+            </div>
             <div class="help-block">
               Een kanaal is een manier waarop burgers jouw dienst kunnen contacteren.
               <br><br> Dat kunnen algemene openingsuren zijn, maar ook bijvoorbeeld de telefonische beschikbaarheid, afspraak momenten, wanneer er een tolk aanwezig is, of wanneer
@@ -208,6 +215,10 @@ export default {
 
       if (this.modal.type_id === '') {
         this.modal.type_id = null
+      }
+
+      if (!Number.isInteger(this.modal.weight)) {
+        this.modal.weight = 0
       }
 
       Hub.$emit(this.modal.id ? 'updateChannel' : 'createChannel', this.modal)

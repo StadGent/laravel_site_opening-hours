@@ -33,7 +33,7 @@ class ChannelController extends Controller
     public function store(StoreChannelRequest $request, Service $service)
     {
         // The service in the URL is the one the user is authorized for.
-        $input = $request->only(['label', 'type_id', 'weight']);
+        $input = $this->getChannelInput($request);
         $input['service_id'] = $service->id;
         $id = $this->channels->store($input);
         $channel = $this->channels->getById($id);
@@ -60,7 +60,7 @@ class ChannelController extends Controller
         $this->assertChannelOfService($service, $channel);
 
         // A channel can't be moved to another service.
-        $input = $request->only(['label', 'type_id', 'weight']);
+        $input = $this->getChannelInput($request);
 
         if (!$channel->update($input)) {
             return response()->json(
@@ -113,5 +113,23 @@ class ChannelController extends Controller
 
             throw $exception;
         }
+    }
+
+    /**
+     * Get the editable channel fields from the request.
+     *
+     * An empty weight resets the channel to the default order.
+     *
+     * @param StoreChannelRequest $request
+     * @return array
+     */
+    protected function getChannelInput(StoreChannelRequest $request)
+    {
+        $input = $request->only(['label', 'type_id', 'weight']);
+        if (array_key_exists('weight', $input)) {
+            $input['weight'] = (int) $input['weight'];
+        }
+
+        return $input;
     }
 }

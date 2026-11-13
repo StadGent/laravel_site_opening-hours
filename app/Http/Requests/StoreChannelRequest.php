@@ -30,6 +30,7 @@ class StoreChannelRequest extends FormRequest
     {
         return [
             'label' => 'required|min:1',
+            'weight' => 'nullable|integer',
         ];
     }
 
@@ -42,6 +43,7 @@ class StoreChannelRequest extends FormRequest
     {
         return [
             'required' => 'Het veld is verplicht in te vullen.',
+            'integer' => 'Het veld moet een geheel getal zijn.',
         ];
     }
 }

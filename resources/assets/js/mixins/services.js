@@ -257,6 +257,7 @@ export default {
             this.$http.post(API_PREFIX + '/services/' + channel.service_id + '/channels', channel)
                 .then(({data}) => {
                     this.routeService.channels.push(data);
+                    this.routeService.channels.sort((a, b) => (a.weight - b.weight) || (a.id - b.id));
                     this.routeService.status = this.serviceStatus(this.routeService);
                     this.routeService.end_date = this.serviceEndDate(this.routeService);
                     this.modalClose();
@@ -285,7 +286,8 @@ export default {
             this.$http.put(API_PREFIX + '/services/' + channel.service_id + '/channels/' + channel.id, {
                 'channel_id': channel.id,
                 'label': channel.label,
-                'type_id': channel.type_id
+                'type_id': channel.type_id,
+                'weight': channel.weight
             })
                 .then(({data}) => {
                     this.fetchChannels();
