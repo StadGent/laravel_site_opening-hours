@@ -10,6 +10,7 @@ use App\Repositories\ChannelRepository;
 use App\Repositories\ServicesRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ChannelController extends Controller
 {
@@ -33,7 +34,7 @@ class ChannelController extends Controller
     public function store(StoreChannelRequest $request, Service $service)
     {
         // The service in the URL is the one the user is authorized for.
-        $input = $request->only(['label', 'type_id', 'weight']);
+        $input = $this->getChannelInput($request);
         $input['service_id'] = $service->id;
         $id = $this->channels->store($input);
         $channel = $this->channels->getById($id);
@@ -60,7 +61,7 @@ class ChannelController extends Controller
         $this->assertChannelOfService($service, $channel);
 
         // A channel can't be moved to another service.
-        $input = $request->only(['label', 'type_id', 'weight']);
+        $input = $this->getChannelInput($request);
 
         if (!$channel->update($input)) {
             return response()->json(
@@ -113,5 +114,65 @@ class ChannelController extends Controller
 
             throw $exception;
         }
+    }
+
+    /**
+     * Save the order of all channels of a service.
+     *
+     * The request lists every channel id of the service in the new order;
+     * each channel gets its position as weight.
+     *
+     * @param Request $request
+     * @param Service $service
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function order(Request $request, Service $service)
+    {
+        $request->validate([
+            'channels' => 'required|array',
+            'channels.*' => 'integer|distinct',
+        ]);
+
+        $ids = array_map('intval', $request->input('channels'));
+        $serviceIds = $service->channels()->pluck('id')->all();
+        sort($serviceIds);
+        $sortedIds = $ids;
+        sort($sortedIds);
+        if ($sortedIds !== $serviceIds) {
+            return response()->json(
+                ['message' => 'The order must contain every channel of the service exactly once.'],
+                422
+            );
+        }
+
+        // Save through the models, like a regular update, so userstamps are
+        // set and the service is touched. Unchanged channels are not saved.
+        $channels = $service->channels()->get()->keyBy('id');
+        DB::transaction(function () use ($ids, $channels) {
+            foreach ($ids as $weight => $id) {
+                $channels[$id]->weight = $weight;
+                $channels[$id]->save();
+            }
+        });
+
+        return response()->json($service->channels()->get());
+    }
+
+    /**
+     * Get the editable channel fields from the request.
+     *
+     * An empty weight resets the channel to the default order.
+     *
+     * @param StoreChannelRequest $request
+     * @return array
+     */
+    protected function getChannelInput(StoreChannelRequest $request)
+    {
+        $input = $request->only(['label', 'type_id', 'weight']);
+        if (array_key_exists('weight', $input)) {
+            $input['weight'] = (int) $input['weight'];
+        }
+
+        return $input;
     }
 }
