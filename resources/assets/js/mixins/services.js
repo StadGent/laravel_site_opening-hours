@@ -296,6 +296,27 @@ export default {
                 .then(this.statusReset)
                 .catch(fetchError);
         });
+        Hub.$on('orderChannels', channels => {
+            this.statusStart();
+
+            // Show the new order right away, the server gives each channel
+            // its position as weight.
+            channels.forEach((channel, weight) => {
+                channel.weight = weight;
+            });
+            this.$set(this.routeService, 'channels', channels);
+
+            this.$http.put(API_PREFIX + '/services/' + this.routeService.id + '/channels/order', {
+                'channels': channels.map(channel => channel.id)
+            })
+                .then(this.statusReset)
+                .catch(response => {
+                    // Restore the order that is saved on the server.
+                    this.$set(this.routeService, 'channels', null);
+                    this.fetchChannels();
+                    fetchError.call(this, response);
+                });
+        });
         Hub.$on('deleteChannel', channel => {
             this.statusStart();
 
