@@ -12,7 +12,6 @@
         "digipolisgent/robo-digipolis-laravel": "^4.0",
         "easyrdf/easyrdf": "^1.0",
         "fakerphp/faker": "^1.23",
-        "gordalina/cachetool": "dev-feature/symfony-7 as 9.2.1",
         "guzzlehttp/guzzle": "^7.3",
         "hedronium/spaceless-blade": "^3.0",
         "johngrogg/ics-parser": "^3.0",
@@ -35,12 +34,6 @@
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^8.1",
         "phpunit/phpunit": "^11.0"
-    },
-    "repositories": {
-        "cachetool": {
-            "type": "vcs",
-            "url": "https://github.com/Chris53897/cachetool.git"
-        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
